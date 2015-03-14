@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.wearable.watchface;
+package com.j.jface.face;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -46,6 +46,7 @@ import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
+import com.j.jface.face.R;
 
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -424,7 +425,8 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       );
     }
 
-    private void setDefaultValuesForMissingConfigKeys(final DataMap config) {
+    private void setDefaultValuesForMissingConfigKeys(final DataMap config)
+    {
       if (!config.containsKey(DigitalWatchFaceUtil.CONFIG_KEY_BACKGROUND))
         config.putBoolean(DigitalWatchFaceUtil.CONFIG_KEY_BACKGROUND, true);
     }
@@ -469,7 +471,8 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       for (final String key : config.keySet())
       {
         if (!config.containsKey(key)) continue;
-        if (DigitalWatchFaceUtil.CONFIG_KEY_BACKGROUND.equals(key)) {
+        if (DigitalWatchFaceUtil.CONFIG_KEY_BACKGROUND.equals(key))
+        {
           mBackgroundPresent = config.getBoolean(key);
         }
       }

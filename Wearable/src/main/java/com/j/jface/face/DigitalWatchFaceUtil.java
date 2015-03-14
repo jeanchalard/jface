@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.wearable.watchface;
+package com.j.jface.face;
 
 import android.graphics.Color;
 import android.net.Uri;
