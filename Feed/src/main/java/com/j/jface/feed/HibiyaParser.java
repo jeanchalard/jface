@@ -1,10 +1,10 @@
 package com.j.jface.feed;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.PutDataMapRequest;
+import com.j.jface.Const;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -19,7 +19,6 @@ public class HibiyaParser extends FeedParser
   @Override @NonNull
   public PutDataMapRequest parseStream(@NonNull final InputStream srcStream) throws IOException
   {
-    Log.e("J", "Got data");
     final PutDataMapRequest result = PutDataMapRequest.create(Const.DATA_PATH);
     final BufferedReader src = new BufferedReader(new InputStreamReader(new BufferedInputStream(srcStream)));
     if (null == find(src, "table summary=\"平日の時刻表\"") || null == find(src, "</tr>")) {

@@ -18,12 +18,10 @@ import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
+import com.j.jface.Const;
 
 public class JFaceDataFeed implements ResultCallback<DataApi.DataItemResult>
 {
-  private static final String TAG = "Datafeed";
-  static JFaceDataFeed sLogger;
-
   @NonNull private final Activity mA;
   @NonNull private final EditText mDataEdit;
   @NonNull private final TextView mLog;
