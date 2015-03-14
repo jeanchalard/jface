@@ -24,12 +24,36 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <Button
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Set"
-        android:nestedScrollingEnabled="false"
-        android:onClick="onClickSet"/>
+        android:gravity="center_horizontal"
+        android:focusable="false">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Load"
+            android:id="@+id/button"
+            android:layout_margin="10dp"
+            android:onClick="onClickLoad"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Set"
+            android:nestedScrollingEnabled="false"
+            android:onClick="onClickSet"
+            android:layout_margin="10dp"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/log"
+        />
 
 </LinearLayout>
