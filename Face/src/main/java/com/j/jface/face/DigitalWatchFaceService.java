@@ -49,6 +49,7 @@ import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
 import com.j.jface.Const;
+import com.j.jface.R;
 
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -442,7 +443,6 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       {
         for (final DataEvent dataEvent : dataEvents)
         {
-          Log.e("\033[31mDATA\033[0m", dataEvent.toString());
           if (dataEvent.getType() != DataEvent.TYPE_CHANGED)
           {
             continue;
@@ -462,7 +462,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
             DataMapItem dataMapItem = DataMapItem.fromDataItem(dataItem);
             DataMap config = dataMapItem.getDataMap();
             for (final String key : config.keySet())
-              Log.d(TAG, "GOT DATA ! " + key + " = " + config.getString(key));
+              Log.d(TAG, "GOT DATA ! " + key + " = " + config.getDataMapArrayList(key));
           }
         }
       } finally

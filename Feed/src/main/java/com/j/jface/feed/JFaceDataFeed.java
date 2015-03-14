@@ -19,6 +19,7 @@ import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.j.jface.Const;
+import com.j.jface.R;
 
 public class JFaceDataFeed implements ResultCallback<DataApi.DataItemResult>
 {

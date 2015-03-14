@@ -37,6 +37,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.Wearable;
 import com.j.jface.Const;
+import com.j.jface.R;
 
 /**
  * The watch-side config activity for {@link DigitalWatchFaceService}, which allows for setting the
