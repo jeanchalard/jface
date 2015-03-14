@@ -10,7 +10,7 @@ import java.io.InputStream;
 
 public abstract class FeedParser
 {
-  @NonNull abstract PutDataMapRequest parseStream(@NonNull final InputStream src) throws IOException;
+  @NonNull abstract PutDataMapRequest parseStream(@NonNull final String dataName, @NonNull final InputStream src) throws IOException;
 
   String find(@NonNull final BufferedReader src, @NonNull final String s) throws IOException {
     int index = 0;

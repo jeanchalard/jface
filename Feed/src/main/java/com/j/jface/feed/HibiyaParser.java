@@ -17,12 +17,12 @@ import java.util.Scanner;
 public class HibiyaParser extends FeedParser
 {
   @Override @NonNull
-  public PutDataMapRequest parseStream(@NonNull final InputStream srcStream) throws IOException
+  public PutDataMapRequest parseStream(@NonNull final String dataName, @NonNull final InputStream srcStream) throws IOException
   {
     final PutDataMapRequest result = PutDataMapRequest.create(Const.DATA_PATH);
     final BufferedReader src = new BufferedReader(new InputStreamReader(new BufferedInputStream(srcStream)));
     if (null == find(src, "table summary=\"平日の時刻表\"") || null == find(src, "</tr>")) {
-      Logger.L("Argh, data not at expected format");
+      Logger.L("Argh, data not at expected format for " + dataName);
       return result;
     }
     final Scanner srcTable = new Scanner(find(src, "</table>"));

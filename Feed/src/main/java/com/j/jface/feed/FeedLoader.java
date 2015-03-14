@@ -46,7 +46,7 @@ public class FeedLoader
         urlConnection = (HttpURLConnection)url.openConnection();
         InputStream in = new BufferedInputStream(urlConnection.getInputStream());
         final FeedParser parser = ds.parser.newInstance();
-        parser.parseStream(in);
+        parser.parseStream(ds.name, in);
       } catch (@NonNull InstantiationException | IllegalAccessException e) {} // Nopes never happens
       catch (@NonNull IOException e)
       {
