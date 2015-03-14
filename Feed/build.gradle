@@ -17,7 +17,7 @@ dependencies {
 
     compile 'com.google.android.gms:play-services-wearable:6.5.+'
     compile 'com.android.support:support-v13:21.0.+'
-    wearApp project(':Wearable')
+    wearApp project(':Face')
 }
 
 // The sample build uses multiple directories to
