@@ -34,7 +34,7 @@ public class FeedLoader
       startLoadDataSource(ds, handler);
   }
 
-  private static void startLoadDataSource(@NonNull final DataSource ds, @NonNull final UpdateHandler client) {
+  private static void startLoadDataSource(@NonNull final DataSource ds, @NonNull final UpdateHandler handler) {
     URL u = null;
     try { u = new URL(ds.url); } catch (MalformedURLException e) {} // Can't happen because we know the URL is valid
     final URL url = u;
@@ -46,7 +46,7 @@ public class FeedLoader
         urlConnection = (HttpURLConnection)url.openConnection();
         InputStream in = new BufferedInputStream(urlConnection.getInputStream());
         final FeedParser parser = ds.parser.newInstance();
-        parser.parseStream(ds.name, in);
+        handler.handleUpdate(parser.parseStream(ds.name, in));
       } catch (@NonNull InstantiationException | IllegalAccessException e) {} // Nopes never happens
       catch (@NonNull IOException e)
       {

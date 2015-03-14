@@ -48,6 +48,7 @@ import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
+import com.j.jface.Const;
 
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -430,8 +431,8 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
 
     private void setDefaultValuesForMissingConfigKeys(@NonNull final DataMap config)
     {
-      if (!config.containsKey(DigitalWatchFaceUtil.CONFIG_KEY_BACKGROUND))
-        config.putBoolean(DigitalWatchFaceUtil.CONFIG_KEY_BACKGROUND, true);
+      if (!config.containsKey(Const.CONFIG_KEY_BACKGROUND))
+        config.putBoolean(Const.CONFIG_KEY_BACKGROUND, true);
     }
 
     @Override // DataApi.DataListener
@@ -439,8 +440,9 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     {
       try
       {
-        for (DataEvent dataEvent : dataEvents)
+        for (final DataEvent dataEvent : dataEvents)
         {
+          Log.e("\033[31mDATA\033[0m", dataEvent.toString());
           if (dataEvent.getType() != DataEvent.TYPE_CHANGED)
           {
             continue;
@@ -448,14 +450,14 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
 
           final DataItem dataItem = dataEvent.getDataItem();
           final String path = dataItem.getUri().getPath();
-          if (path.equals(DigitalWatchFaceUtil.CONFIG_PATH))
+          if (path.equals(Const.CONFIG_PATH))
           {
             DataMapItem dataMapItem = DataMapItem.fromDataItem(dataItem);
             DataMap config = dataMapItem.getDataMap();
             Log.d(TAG, "Config DataItem updated:" + config);
             updateUiForConfigDataMap(config);
           }
-          else if (path.equals(DigitalWatchFaceUtil.DATA_PATH))
+          else if (path.equals(Const.DATA_PATH))
           {
             DataMapItem dataMapItem = DataMapItem.fromDataItem(dataItem);
             DataMap config = dataMapItem.getDataMap();
@@ -474,7 +476,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       for (final String key : config.keySet())
       {
         if (!config.containsKey(key)) continue;
-        if (DigitalWatchFaceUtil.CONFIG_KEY_BACKGROUND.equals(key))
+        if (Const.CONFIG_KEY_BACKGROUND.equals(key))
         {
           mBackgroundPresent = config.getBoolean(key);
         }
@@ -483,7 +485,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     }
 
     @Override  // GoogleApiClient.ConnectionCallbacks
-    public void onConnected(Bundle connectionHint)
+    public void onConnected(final Bundle connectionHint)
     {
       Log.d(TAG, "onConnected: " + connectionHint);
       Wearable.DataApi.addListener(mGoogleApiClient, Engine.this);

@@ -30,17 +30,10 @@ import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
+import com.j.jface.Const;
 
 public final class DigitalWatchFaceUtil
 {
-  /**
-   * The path for the {@link DataItem} containing {@link DigitalWatchFaceService} configuration.
-   */
-  public static final String CONFIG_PATH = "/jwatch/Conf";
-  public static final String DATA_PATH = "/jwatch/Data";
-
-  public static final String CONFIG_KEY_BACKGROUND = "background";
-
   /**
    * Name of the default interactive mode digits color and the ambient mode digits color.
    */
@@ -84,11 +77,10 @@ public final class DigitalWatchFaceUtil
          String localNode = getLocalNodeResult.getNode().getId();
          Uri uri = new Uri.Builder()
           .scheme("wear")
-          .path(DigitalWatchFaceUtil.CONFIG_PATH)
+          .path(Const.CONFIG_PATH)
           .authority(localNode)
           .build();
-         Wearable.DataApi.getDataItem(client, uri)
-          .setResultCallback(new DataItemResultCallback(callback));
+         Wearable.DataApi.getDataItem(client, uri).setResultCallback(new DataItemResultCallback(callback));
        }
      }
     );
@@ -127,7 +119,7 @@ public final class DigitalWatchFaceUtil
    */
   public static void putConfigDataItem(GoogleApiClient googleApiClient, DataMap newConfig)
   {
-    PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(CONFIG_PATH);
+    PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(Const.CONFIG_PATH);
     DataMap configToPut = putDataMapRequest.getDataMap();
     configToPut.putAll(newConfig);
     Wearable.DataApi.putDataItem(googleApiClient, putDataMapRequest.asPutDataRequest())
@@ -174,7 +166,5 @@ public final class DigitalWatchFaceUtil
     }
   }
 
-  private DigitalWatchFaceUtil()
-  {
-  }
+  private DigitalWatchFaceUtil() {}
 }

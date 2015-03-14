@@ -36,6 +36,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.Wearable;
+import com.j.jface.Const;
 
 /**
  * The watch-side config activity for {@link DigitalWatchFaceService}, which allows for setting the
@@ -174,7 +175,7 @@ public class DigitalWatchFaceWearableConfigActivity extends Activity implements
   private void updateConfigDataItem(final boolean background)
   {
     DataMap configKeysToOverwrite = new DataMap();
-    configKeysToOverwrite.putBoolean(DigitalWatchFaceUtil.CONFIG_KEY_BACKGROUND, background);
+    configKeysToOverwrite.putBoolean(Const.CONFIG_KEY_BACKGROUND, background);
     DigitalWatchFaceUtil.overwriteKeysInConfigDataMap(mGoogleApiClient, configKeysToOverwrite);
   }
 

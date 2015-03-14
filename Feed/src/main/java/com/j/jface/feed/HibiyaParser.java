@@ -41,13 +41,13 @@ public class HibiyaParser extends FeedParser
         minute = srcTable.nextInt();
       else if (p.startsWith("/p")) {
         final DataMap departure = new DataMap();
-        departure.putInt(Const.TAG_DEPTIME, hour * 3600 + minute * 60);
-        departure.putBoolean(Const.TAG_SHIHATSU, shihatsu);
+        departure.putInt(Const.DATA_KEY_DEPTIME, hour * 3600 + minute * 60);
+        departure.putBoolean(Const.DATA_KEY_SHIHATSU, shihatsu);
         buildData.add(departure);
         shihatsu = false;
       }
     }
-    result.getDataMap().putDataMapArrayList(Const.TAG_DEPLIST, buildData);
+    result.getDataMap().putDataMapArrayList(Const.DATA_KEY_DEPLIST, buildData);
     return result;
   }
 }
