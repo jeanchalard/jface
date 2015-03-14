@@ -21,6 +21,7 @@ import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.support.wearable.view.BoxInsetLayout;
 import android.support.wearable.view.WearableListView;
@@ -35,8 +36,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.Wearable;
-
-import org.jetbrains.annotations.NotNull;
 
 /**
  * The watch-side config activity for {@link DigitalWatchFaceService}, which allows for setting the
@@ -63,7 +62,7 @@ public class DigitalWatchFaceWearableConfigActivity extends Activity implements
     content.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener()
     {
       @Override
-      public WindowInsets onApplyWindowInsets(@NotNull View v, @NotNull WindowInsets insets)
+      public WindowInsets onApplyWindowInsets(@NonNull View v, @NonNull WindowInsets insets)
       {
         if (!insets.isRound())
         {
@@ -188,9 +187,9 @@ public class DigitalWatchFaceWearableConfigActivity extends Activity implements
       mOptions = options;
     }
 
-    @NotNull
+    @NonNull
     @Override
-    public OptionItemViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType)
+    public OptionItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
     {
       return new OptionItemViewHolder(new OptionItem(parent.getContext()));
     }
@@ -244,17 +243,17 @@ public class DigitalWatchFaceWearableConfigActivity extends Activity implements
     private static final float SHRINK_LABEL_ALPHA = .5f;
     private static final float EXPAND_LABEL_ALPHA = 1f;
 
-    @NotNull
+    @NonNull
     private final TextView mLabel;
 
-    @NotNull
+    @NonNull
     private final ObjectAnimator mExpandLabelAnimator;
-    @NotNull
+    @NonNull
     private final AnimatorSet mExpandAnimator;
 
-    @NotNull
+    @NonNull
     private final ObjectAnimator mShrinkLabelAnimator;
-    @NotNull
+    @NonNull
     private final AnimatorSet mShrinkAnimator;
 
     public OptionItem(Context context)

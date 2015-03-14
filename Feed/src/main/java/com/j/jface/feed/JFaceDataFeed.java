@@ -55,8 +55,8 @@ public class JFaceDataFeed implements ResultCallback<DataApi.DataItemResult>
     PendingResult<DataApi.DataItemResult> pendingResult = Wearable.DataApi.putDataItem(client, putDataReq);
   }
 
-  public void load() {
-    FeedLoader.startAllLoads();
+  public void load(@NonNull final GoogleApiClient client) {
+    FeedLoader.startAllLoads(new UpdateHandler());
   }
 
 
