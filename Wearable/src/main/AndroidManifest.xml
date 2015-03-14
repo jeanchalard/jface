@@ -46,10 +46,10 @@
                     android:resource="@drawable/preview_digital_circular" />
             <meta-data
                     android:name="com.google.android.wearable.watchface.companionConfigurationAction"
-                    android:value="com.j.jface.face.CONFIG_DIGITAL" />
+                    android:value="com.j.jface.CONFIG_DIGITAL" />
             <meta-data
                     android:name="com.google.android.wearable.watchface.wearableConfigurationAction"
-                    android:value="com.j.jface.face.CONFIG_DIGITAL" />
+                    android:value="com.j.jface.CONFIG_DIGITAL" />
             <intent-filter>
                 <action android:name="android.service.wallpaper.WallpaperService" />
                 <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
@@ -64,7 +64,7 @@
                 android:name=".DigitalWatchFaceWearableConfigActivity"
                 android:label="@string/digital_config_name">
             <intent-filter>
-                <action android:name="com.j.jface.face.CONFIG_DIGITAL" />
+                <action android:name="com.j.jface.CONFIG_DIGITAL" />
                 <category android:name="com.google.android.wearable.watchface.category.WEARABLE_CONFIGURATION" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
