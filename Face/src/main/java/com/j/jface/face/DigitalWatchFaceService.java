@@ -46,7 +46,9 @@ import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
-import com.j.jface.face.R;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -77,6 +79,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
    */
   private static final long MUTE_UPDATE_RATE_MS = TimeUnit.MINUTES.toMillis(1);
 
+  @NotNull
   @Override
   public Engine onCreateEngine()
   {
@@ -109,7 +112,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     final Handler mUpdateTimeHandler = new Handler()
     {
       @Override
-      public void handleMessage(Message message)
+      public void handleMessage(@NotNull Message message)
       {
         switch (message.what)
         {
@@ -136,7 +139,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver()
     {
       @Override
-      public void onReceive(Context context, Intent intent)
+      public void onReceive(Context context, @NotNull Intent intent)
       {
         mTime.clear(intent.getStringExtra("time-zone"));
         mTime.setToNow();
@@ -192,6 +195,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       super.onDestroy();
     }
 
+    @NotNull
     private Paint createTextPaint(final int defaultInteractiveColor, final Typeface typeface)
     {
       Paint paint = new Paint();
@@ -265,7 +269,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     }
 
     @Override
-    public void onPropertiesChanged(Bundle properties)
+    public void onPropertiesChanged(@NotNull Bundle properties)
     {
       super.onPropertiesChanged(properties);
 
@@ -306,7 +310,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       updateTimer();
     }
 
-    private void adjustPaintColorToCurrentMode(Paint paint, int interactiveColor,
+    private void adjustPaintColorToCurrentMode(@NotNull Paint paint, int interactiveColor,
                                                int ambientColor)
     {
       paint.setColor(isInAmbientMode() ? ambientColor : interactiveColor);
@@ -346,7 +350,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       }
     }
 
-    private void updatePaintIfInteractive(Paint paint, int interactiveColor)
+    private void updatePaintIfInteractive(@Nullable Paint paint, int interactiveColor)
     {
       if (!isInAmbientMode() && paint != null)
       {
@@ -355,7 +359,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     }
 
     @Override
-    public void onDraw(final Canvas canvas, final Rect bounds)
+    public void onDraw(@NotNull final Canvas canvas, @NotNull final Rect bounds)
     {
       mTime.setToNow();
 
@@ -412,7 +416,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
        new DigitalWatchFaceUtil.FetchConfigDataMapCallback()
        {
          @Override
-         public void onConfigDataMapFetched(DataMap startupConfig)
+         public void onConfigDataMapFetched(@NotNull DataMap startupConfig)
          {
            // If the DataItem hasn't been created yet or some keys are missing,
            // use the default values.
@@ -425,14 +429,14 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       );
     }
 
-    private void setDefaultValuesForMissingConfigKeys(final DataMap config)
+    private void setDefaultValuesForMissingConfigKeys(@NotNull final DataMap config)
     {
       if (!config.containsKey(DigitalWatchFaceUtil.CONFIG_KEY_BACKGROUND))
         config.putBoolean(DigitalWatchFaceUtil.CONFIG_KEY_BACKGROUND, true);
     }
 
     @Override // DataApi.DataListener
-    public void onDataChanged(DataEventBuffer dataEvents)
+    public void onDataChanged(@NotNull DataEventBuffer dataEvents)
     {
       try
       {
@@ -466,7 +470,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       }
     }
 
-    private void updateUiForConfigDataMap(final DataMap config)
+    private void updateUiForConfigDataMap(@NotNull final DataMap config)
     {
       for (final String key : config.keySet())
       {

@@ -36,6 +36,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.Wearable;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * The watch-side config activity for {@link DigitalWatchFaceService}, which allows for setting the
  * background.
@@ -61,7 +63,7 @@ public class DigitalWatchFaceWearableConfigActivity extends Activity implements
     content.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener()
     {
       @Override
-      public WindowInsets onApplyWindowInsets(View v, WindowInsets insets)
+      public WindowInsets onApplyWindowInsets(@NotNull View v, @NotNull WindowInsets insets)
       {
         if (!insets.isRound())
         {
@@ -186,8 +188,9 @@ public class DigitalWatchFaceWearableConfigActivity extends Activity implements
       mOptions = options;
     }
 
+    @NotNull
     @Override
-    public OptionItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
+    public OptionItemViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType)
     {
       return new OptionItemViewHolder(new OptionItem(parent.getContext()));
     }
@@ -241,12 +244,17 @@ public class DigitalWatchFaceWearableConfigActivity extends Activity implements
     private static final float SHRINK_LABEL_ALPHA = .5f;
     private static final float EXPAND_LABEL_ALPHA = 1f;
 
+    @NotNull
     private final TextView mLabel;
 
+    @NotNull
     private final ObjectAnimator mExpandLabelAnimator;
+    @NotNull
     private final AnimatorSet mExpandAnimator;
 
+    @NotNull
     private final ObjectAnimator mShrinkLabelAnimator;
+    @NotNull
     private final AnimatorSet mShrinkAnimator;
 
     public OptionItem(Context context)

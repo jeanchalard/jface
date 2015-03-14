@@ -26,6 +26,8 @@ import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -39,7 +41,7 @@ public class DigitalWatchFaceConfigListenerService extends WearableListenerServi
     private GoogleApiClient mGoogleApiClient;
 
     @Override // WearableListenerService
-    public void onMessageReceived(MessageEvent messageEvent) {
+    public void onMessageReceived(@NotNull MessageEvent messageEvent) {
         if (!messageEvent.getPath().equals(DigitalWatchFaceUtil.CONFIG_PATH)) {
             return;
         }

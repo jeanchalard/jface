@@ -30,6 +30,8 @@ import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
 
+import org.jetbrains.annotations.NotNull;
+
 public final class DigitalWatchFaceUtil
 {
   /**
@@ -59,7 +61,7 @@ public final class DigitalWatchFaceUtil
     void onConfigDataMapFetched(DataMap config);
   }
 
-  private static int parseColor(String colorName)
+  private static int parseColor(@NotNull String colorName)
   {
     return Color.parseColor(colorName.toLowerCase());
   }
@@ -78,7 +80,7 @@ public final class DigitalWatchFaceUtil
      new ResultCallback<NodeApi.GetLocalNodeResult>()
      {
        @Override
-       public void onResult(NodeApi.GetLocalNodeResult getLocalNodeResult)
+       public void onResult(@NotNull NodeApi.GetLocalNodeResult getLocalNodeResult)
        {
          String localNode = getLocalNodeResult.getNode().getId();
          Uri uri = new Uri.Builder()
@@ -133,7 +135,7 @@ public final class DigitalWatchFaceUtil
      .setResultCallback(new ResultCallback<DataApi.DataItemResult>()
      {
        @Override
-       public void onResult(DataApi.DataItemResult dataItemResult)
+       public void onResult(@NotNull DataApi.DataItemResult dataItemResult)
        {
          if (Log.isLoggable("J", Log.DEBUG))
          {
@@ -154,7 +156,7 @@ public final class DigitalWatchFaceUtil
     }
 
     @Override
-    public void onResult(DataApi.DataItemResult dataItemResult)
+    public void onResult(@NotNull DataApi.DataItemResult dataItemResult)
     {
       if (dataItemResult.getStatus().isSuccess())
       {
