@@ -349,19 +349,32 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       return isVisible() && !isInAmbientMode();
     }
 
-    private void updateConfigDataItemAndUiOnStartup()
+    private void updateConfigAndData()
     {
-      DigitalWatchFaceUtil.fetchConfigDataMap(mGoogleApiClient,
+      DigitalWatchFaceUtil.fetchData(mGoogleApiClient, Const.CONFIG_PATH,
        new DigitalWatchFaceUtil.FetchConfigDataMapCallback()
        {
          @Override
-         public void onConfigDataMapFetched(@NonNull DataMap startupConfig)
+         public void onDataFetched(@NonNull DataMap startupConfig)
          {
-           // If the DataItem hasn't been created yet or some keys are missing,
-           // use the default values.
+           Log.e("\033[31mCONF\033[0m", "a");
            setDefaultValuesForMissingConfigKeys(startupConfig);
            DigitalWatchFaceUtil.putConfigDataItem(mGoogleApiClient, startupConfig);
            updateUiForConfigDataMap(startupConfig);
+         }
+       }
+      );
+      DigitalWatchFaceUtil.fetchData(mGoogleApiClient, Const.DATA_PATH,
+       new DigitalWatchFaceUtil.FetchConfigDataMapCallback()
+       {
+         @Override
+         public void onDataFetched(@NonNull DataMap data)
+         {
+           Log.e("\033[31mDATA\033[0m", "a");
+           for (final String key : data.keySet())
+           {
+             Log.e("D", key);
+           }
          }
        }
       );
@@ -417,7 +430,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     {
       Log.d(TAG, "onConnected: " + connectionHint);
       Wearable.DataApi.addListener(mGoogleApiClient, Engine.this);
-      updateConfigDataItemAndUiOnStartup();
+      updateConfigAndData();
     }
 
     @Override  // GoogleApiClient.ConnectionCallbacks
