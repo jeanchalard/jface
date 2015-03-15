@@ -54,35 +54,16 @@ import com.j.jface.R;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Sample digital watch face with blinking colons and seconds. In ambient mode, the seconds are
- * replaced with an AM/PM indicator and the colons don't blink. On devices with low-bit ambient
- * mode, the text is drawn without anti-aliasing in ambient mode. On devices which require burn-in
- * protection, the hours are drawn in normal rather than bold. The time is drawn with less contrast
- * and without seconds in mute mode.
- */
 public class DigitalWatchFaceService extends CanvasWatchFaceService
 {
   private static final String TAG = "J";
-  private static final Typeface BOLD_TYPEFACE =
-   Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
-  private static final Typeface NORMAL_TYPEFACE =
-   Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
+  private static final Typeface BOLD_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
+  private static final Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
 
-  /**
-   * Update rate in milliseconds for normal (not ambient and not mute) mode. We update every
-   * second.
-   */
   private static final long NORMAL_UPDATE_RATE_MS = 1000;
-
-  /**
-   * Update rate in milliseconds for mute mode. We update every minute, like in ambient mode.
-   */
   private static final long MUTE_UPDATE_RATE_MS = TimeUnit.MINUTES.toMillis(1);
 
-  @NonNull
-  @Override
-  public Engine onCreateEngine()
+  @NonNull @Override public Engine onCreateEngine()
   {
     return new Engine();
   }
@@ -90,21 +71,11 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
   private class Engine extends CanvasWatchFaceService.Engine implements DataApi.DataListener,
    GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
   {
-    /**
-     * Alpha value for drawing time when in mute mode.
-     */
     static final int MUTE_ALPHA = 100;
-
-    /**
-     * Alpha value for drawing time when not in mute mode.
-     */
     static final int NORMAL_ALPHA = 255;
 
     static final int MSG_UPDATE_TIME = 0;
 
-    /**
-     * How often {@link #mUpdateTimeHandler} ticks in milliseconds.
-     */
     long mInteractiveUpdateRateMs = NORMAL_UPDATE_RATE_MS;
 
     /**
@@ -137,8 +108,20 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
      .addApi(Wearable.API)
      .build();
 
-    final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver()
+    final TimezoneBroadcastReceiver mTimeZoneReceiver = new TimezoneBroadcastReceiver();
+    private final class TimezoneBroadcastReceiver extends BroadcastReceiver
     {
+      public void register()
+      {
+        unregister();
+        IntentFilter filter = new IntentFilter(Intent.ACTION_TIMEZONE_CHANGED);
+        DigitalWatchFaceService.this.registerReceiver(mTimeZoneReceiver, filter);
+      }
+      public void unregister()
+      {
+        try { DigitalWatchFaceService.this.unregisterReceiver(mTimeZoneReceiver); }
+        catch (IllegalArgumentException e) {} // Non mais
+      }
       @Override
       public void onReceive(Context context, @NonNull Intent intent)
       {
@@ -146,7 +129,6 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
         mTime.setToNow();
       }
     };
-    boolean mRegisteredTimeZoneReceiver = false;
 
     Drawable mBackground;
     Paint mBackgroundPaint;
@@ -215,7 +197,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       {
         mGoogleApiClient.connect();
 
-        registerReceiver();
+        mTimeZoneReceiver.register();
 
         // Update time zone in case it changed while we weren't visible.
         mTime.clear(TimeZone.getDefault().getID());
@@ -223,7 +205,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       }
       else
       {
-        unregisterReceiver();
+        mTimeZoneReceiver.unregister();
 
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
         {
@@ -235,27 +217,6 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       // Whether the timer should be running depends on whether we're visible (as well as
       // whether we're in ambient mode), so we may need to start or stop the timer.
       updateTimer();
-    }
-
-    private void registerReceiver()
-    {
-      if (mRegisteredTimeZoneReceiver)
-      {
-        return;
-      }
-      mRegisteredTimeZoneReceiver = true;
-      IntentFilter filter = new IntentFilter(Intent.ACTION_TIMEZONE_CHANGED);
-      DigitalWatchFaceService.this.registerReceiver(mTimeZoneReceiver, filter);
-    }
-
-    private void unregisterReceiver()
-    {
-      if (!mRegisteredTimeZoneReceiver)
-      {
-        return;
-      }
-      mRegisteredTimeZoneReceiver = false;
-      DigitalWatchFaceService.this.unregisterReceiver(mTimeZoneReceiver);
     }
 
     @Override
@@ -423,7 +384,6 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
            // use the default values.
            setDefaultValuesForMissingConfigKeys(startupConfig);
            DigitalWatchFaceUtil.putConfigDataItem(mGoogleApiClient, startupConfig);
-
            updateUiForConfigDataMap(startupConfig);
          }
        }
@@ -473,14 +433,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
 
     private void updateUiForConfigDataMap(@NonNull final DataMap config)
     {
-      for (final String key : config.keySet())
-      {
-        if (!config.containsKey(key)) continue;
-        if (Const.CONFIG_KEY_BACKGROUND.equals(key))
-        {
-          mBackgroundPresent = config.getBoolean(key);
-        }
-      }
+      mBackgroundPresent = config.getBoolean(Const.CONFIG_KEY_BACKGROUND, mBackgroundPresent);
       invalidate();
     }
 

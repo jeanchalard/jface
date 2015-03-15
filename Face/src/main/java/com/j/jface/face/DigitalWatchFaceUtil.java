@@ -74,11 +74,8 @@ public final class DigitalWatchFaceUtil
        @Override
        public void onResult(@NonNull NodeApi.GetLocalNodeResult getLocalNodeResult)
        {
-         String localNode = getLocalNodeResult.getNode().getId();
-         Uri uri = new Uri.Builder()
-          .scheme("wear")
+         Uri uri = new Uri.Builder().scheme("wear").authority(getLocalNodeResult.getNode().getId())
           .path(Const.CONFIG_PATH)
-          .authority(localNode)
           .build();
          Wearable.DataApi.getDataItem(client, uri).setResultCallback(new DataItemResultCallback(callback));
        }
