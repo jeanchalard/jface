@@ -30,7 +30,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
@@ -128,7 +127,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
         mTime.clear(intent.getStringExtra("time-zone"));
         mTime.setToNow();
       }
-    };
+    }
 
     Drawable mBackground;
     Paint mBackgroundPaint;
@@ -196,9 +195,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       if (visible)
       {
         mGoogleApiClient.connect();
-
         mTimeZoneReceiver.register();
-
         // Update time zone in case it changed while we weren't visible.
         mTime.clear(TimeZone.getDefault().getID());
         mTime.setToNow();
@@ -206,7 +203,6 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       else
       {
         mTimeZoneReceiver.unregister();
-
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
         {
           Wearable.DataApi.removeListener(mGoogleApiClient, this);
@@ -234,12 +230,9 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     public void onPropertiesChanged(@NonNull Bundle properties)
     {
       super.onPropertiesChanged(properties);
-
       boolean burnInProtection = properties.getBoolean(PROPERTY_BURN_IN_PROTECTION, false);
       mPaint.setTypeface(burnInProtection ? NORMAL_TYPEFACE : BOLD_TYPEFACE);
-
       mLowBitAmbient = properties.getBoolean(PROPERTY_LOW_BIT_AMBIENT, false);
-
 //      Log.d(TAG, "onPropertiesChanged: burn-in protection = " + burnInProtection
 //       + ", low-bit ambient = " + mLowBitAmbient);
     }
@@ -299,25 +292,10 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
 
     public void setInteractiveUpdateRateMs(long updateRateMs)
     {
-      if (updateRateMs == mInteractiveUpdateRateMs)
-      {
-        return;
-      }
+      if (updateRateMs == mInteractiveUpdateRateMs) return;
       mInteractiveUpdateRateMs = updateRateMs;
-
       // Stop and restart the timer so the new update rate takes effect immediately.
-      if (shouldTimerBeRunning())
-      {
-        updateTimer();
-      }
-    }
-
-    private void updatePaintIfInteractive(@Nullable Paint paint, int interactiveColor)
-    {
-      if (!isInAmbientMode() && paint != null)
-      {
-        paint.setColor(interactiveColor);
-      }
+      if (shouldTimerBeRunning()) updateTimer();
     }
 
     @Override
@@ -357,7 +335,6 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
      */
     private void updateTimer()
     {
-      Log.d(TAG, "updateTimer");
       mUpdateTimeHandler.removeMessages(MSG_UPDATE_TIME);
       if (shouldTimerBeRunning())
         mUpdateTimeHandler.sendEmptyMessage(MSG_UPDATE_TIME);
@@ -403,10 +380,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       {
         for (final DataEvent dataEvent : dataEvents)
         {
-          if (dataEvent.getType() != DataEvent.TYPE_CHANGED)
-          {
-            continue;
-          }
+          if (dataEvent.getType() != DataEvent.TYPE_CHANGED) continue;
 
           final DataItem dataItem = dataEvent.getDataItem();
           final String path = dataItem.getUri().getPath();
@@ -425,7 +399,8 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
               Log.d(TAG, "GOT DATA ! " + key + " = " + config.getDataMapArrayList(key));
           }
         }
-      } finally
+      }
+      finally
       {
         dataEvents.close();
       }
