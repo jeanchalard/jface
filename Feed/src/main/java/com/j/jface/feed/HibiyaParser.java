@@ -30,21 +30,21 @@ public class HibiyaParser extends FeedParser
     srcTable.useDelimiter("(\\s|<|>)+");
     int hour = -1;
     int minute = -1;
-    boolean shihatsu = false;
+    boolean 始発 = false;
     while (srcTable.hasNext()) {
       final String p = srcTable.next();
       if (p.startsWith("class=\"hour\""))
         hour = srcTable.nextInt();
       else if ("class=\"item02\"".equals(p))
-        shihatsu = true;
+        始発 = true;
       else if ("class=\"info02\"".equals(p))
         minute = srcTable.nextInt();
       else if (p.startsWith("/p")) {
         final DataMap departure = new DataMap();
         departure.putInt(Const.DATA_KEY_DEPTIME, hour * 3600 + minute * 60);
-        departure.putBoolean(Const.DATA_KEY_SHIHATSU, shihatsu);
+        departure.putBoolean(Const.DATA_KEY_始発, 始発);
         buildData.add(departure);
-        shihatsu = false;
+        始発 = false;
       }
     }
     result.getDataMap().putDataMapArrayList(Const.DATA_KEY_DEPLIST, buildData);

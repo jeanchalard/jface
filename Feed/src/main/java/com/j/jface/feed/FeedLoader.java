@@ -2,6 +2,8 @@ package com.j.jface.feed;
 
 import android.support.annotation.NonNull;
 
+import com.j.jface.Const;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,10 +25,14 @@ public class FeedLoader
     public DataSource(final String n, final String u, final Class<? extends FeedParser> p) { name = n; url = u; parser = p; }
   }
   private static final DataSource[] DATA_SOURCES = {
-   new DataSource("日比谷線・北千住・平日",
+   new DataSource(Const.日比谷線_北千住_平日,
     "http://www.tokyometro.jp/station/kita-senju/timetable/hibiya/a/index.html", HibiyaParser.class),
-   new DataSource("日比谷線・北千住・休日",
-    "http://www.tokyometro.jp/station/kita-senju/timetable/hibiya/a/holiday.html", HibiyaParser.class)
+   new DataSource(Const.日比谷線_北千住_休日,
+    "http://www.tokyometro.jp/station/kita-senju/timetable/hibiya/a/holiday.html", HibiyaParser.class),
+   new DataSource(Const.日比谷線_六本木_平日,
+    "http://www.tokyometro.jp/station/roppongi/timetable/hibiya/b/index.html", HibiyaParser.class),
+   new DataSource(Const.日比谷線_六本木_休日,
+    "http://www.tokyometro.jp/station/roppongi/timetable/hibiya/b/holiday.html", HibiyaParser.class)
   };
 
   public static void startAllLoads(@NonNull final UpdateHandler handler) {
