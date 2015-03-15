@@ -14,7 +14,7 @@
  limitations under the License.
 -->
 <resources>
-    <string name="app_name">WatchFace</string>
+    <string name="app_name">JFace</string>
     <string name="digital_name">A J Face</string>
     <string name="digital_background_present">Background ?</string>
     <string name="digital_config_name">Digital watch face configuration</string>

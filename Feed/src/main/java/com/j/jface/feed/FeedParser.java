@@ -2,7 +2,7 @@ package com.j.jface.feed;
 
 import android.support.annotation.NonNull;
 
-import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.DataMap;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,9 +10,9 @@ import java.io.InputStream;
 
 public abstract class FeedParser
 {
-  @NonNull abstract PutDataMapRequest parseStream(@NonNull final String dataName, @NonNull final InputStream src) throws IOException;
+  @NonNull abstract DataMap parseStream(@NonNull final String dataName, @NonNull final InputStream src) throws IOException;
 
-  String find(@NonNull final BufferedReader src, @NonNull final String s) throws IOException {
+  protected String find(@NonNull final BufferedReader src, @NonNull final String s) throws IOException {
     int index = 0;
     int expected = s.codePointAt(index);
     int offset = 0;

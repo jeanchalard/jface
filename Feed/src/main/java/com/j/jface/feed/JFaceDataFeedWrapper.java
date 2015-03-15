@@ -84,8 +84,6 @@ public class JFaceDataFeedWrapper extends Activity
   public void onConnected(@Nullable final Bundle connectionHint)
   {
     Log.d(TAG, "onConnected : " + connectionHint);
-    if (null == mW || null == mGoogleApiClient) return;
-    mW.onConnected(mGoogleApiClient, connectionHint);
   }
 
   @Override

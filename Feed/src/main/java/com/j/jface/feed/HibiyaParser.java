@@ -3,7 +3,6 @@ package com.j.jface.feed;
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.wearable.DataMap;
-import com.google.android.gms.wearable.PutDataMapRequest;
 import com.j.jface.Const;
 
 import java.io.BufferedInputStream;
@@ -17,9 +16,9 @@ import java.util.Scanner;
 public class HibiyaParser extends FeedParser
 {
   @Override @NonNull
-  public PutDataMapRequest parseStream(@NonNull final String dataName, @NonNull final InputStream srcStream) throws IOException
+  public DataMap parseStream(@NonNull final String dataName, @NonNull final InputStream srcStream) throws IOException
   {
-    final PutDataMapRequest result = PutDataMapRequest.create(Const.DATA_PATH);
+    final DataMap result = new DataMap();
     final BufferedReader src = new BufferedReader(new InputStreamReader(new BufferedInputStream(srcStream)));
     if (null == find(src, "table summary=\"平日の時刻表\"") || null == find(src, "</tr>")) {
       Logger.L("Argh, data not at expected format for " + dataName);
@@ -47,7 +46,7 @@ public class HibiyaParser extends FeedParser
         始発 = false;
       }
     }
-    result.getDataMap().putDataMapArrayList(Const.DATA_KEY_DEPLIST, buildData);
+    result.putDataMapArrayList(dataName, buildData);
     return result;
   }
 }
