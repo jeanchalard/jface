@@ -24,6 +24,7 @@ import android.view.View;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.wearable.Wearable;
 
 /**
@@ -48,7 +49,7 @@ public class JFaceDataFeedWrapper extends Activity
     mGoogleApiClient = new GoogleApiClient.Builder(this)
      .addConnectionCallbacks(this)
      .addOnConnectionFailedListener(this)
-     .addApi(Wearable.API)
+     .addApi(Wearable.API).addApi(LocationServices.API)
      .build();
   }
 
@@ -84,6 +85,8 @@ public class JFaceDataFeedWrapper extends Activity
   public void onConnected(@Nullable final Bundle connectionHint)
   {
     Log.d(TAG, "onConnected : " + connectionHint);
+    if (null == mW) return;
+    mW.onConnected(mGoogleApiClient);
   }
 
   @Override

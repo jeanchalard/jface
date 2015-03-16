@@ -1,12 +1,14 @@
 package com.j.jface.feed;
 
 import android.app.Activity;
+import android.location.Location;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
 import com.j.jface.R;
@@ -57,6 +59,11 @@ public class JFaceDataFeed
   {
     Logger.L("Start loading");
     FeedLoader.startAllLoads(new UpdateHandler(client));
+  }
+
+  public void onConnected(@NonNull final GoogleApiClient client)
+  {
+    final Location l = LocationServices.FusedLocationApi.getLastLocation(client);
   }
 
   // Save for the future, in case we need it
