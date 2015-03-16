@@ -38,6 +38,7 @@ public final class DigitalWatchFaceUtil
    */
   public static final int COLOR_VALUE_DEFAULT_AND_AMBIENT_DIGITS = parseColor("White");
   public static final int COLOR_VALUE_DEFAULT_AND_AMBIENT_SECONDS = parseColor("Grey");
+  public static final int COLOR_VALUE_DEFAULT_AND_AMBIENT_DEPARTURE = parseColor("LightGrey");
 
   /**
    * Callback interface to perform an action with the current config {@link DataMap} for

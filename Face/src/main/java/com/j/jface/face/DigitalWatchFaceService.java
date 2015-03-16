@@ -21,10 +21,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -132,15 +134,20 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
 
     final DataStore mDataStore = new DataStore();
     Drawable mBackground;
+    Bitmap mHibiyaIcon;
     Paint mBackgroundPaint;
     Paint mPaint;
     Paint mSecondsPaint;
+    Paint mDeparturePaint;
     boolean mMute;
     Time mTime;
     float mYOffset;
+    float mDepartureYOffset;
+    float mIconToDepartureTextPadding;
     boolean mBackgroundPresent = true;
     private final int mDigitsColor = DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_DIGITS;
     private final int mSecondsColor = DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECONDS;
+    private final int mDepartureColor = DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_DEPARTURE;
 
     /**
      * Whether the display supports fewer bits for each color in ambient mode. When true, we
@@ -162,12 +169,16 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
        .build());
       Resources resources = DigitalWatchFaceService.this.getResources();
       mYOffset = resources.getDimension(R.dimen.digital_y_offset);
+      mDepartureYOffset = resources.getDimension(R.dimen.departure_y_offset);
+      mIconToDepartureTextPadding = resources.getDimension(R.dimen.icon_to_departure_text_padding);
 
       mBackground = resources.getDrawable(R.drawable.bg);
+      mHibiyaIcon = ((BitmapDrawable)resources.getDrawable(R.drawable.hibiya)).getBitmap();
       mBackgroundPaint = new Paint();
       mBackgroundPaint.setColor(0xFF000000);
       mPaint = createTextPaint(mDigitsColor, NORMAL_TYPEFACE);
       mSecondsPaint = createTextPaint(mSecondsColor, NORMAL_TYPEFACE);
+      mDeparturePaint = createTextPaint(mDepartureColor, NORMAL_TYPEFACE);
 
       mTime = new Time();
     }
@@ -226,6 +237,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       Resources resources = DigitalWatchFaceService.this.getResources();
       mPaint.setTextSize(resources.getDimension(R.dimen.time_text_size));
       mSecondsPaint.setTextSize(resources.getDimensionPixelSize(R.dimen.seconds_text_size));
+      mDeparturePaint.setTextSize(resources.getDimensionPixelSize(R.dimen.departure_text_size));
     }
 
     @Override
@@ -304,20 +316,6 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     public void onDraw(@NonNull final Canvas canvas, @NonNull final Rect bounds)
     {
       mTime.setToNow();
-      final Pair<Departure, Departure> nextDepartures =
-       mDataStore.findNextDepartures(Const.日比谷線_北千住_平日, mTime);
-
-      if (null != nextDepartures)
-      {
-        Log.e("NEXTD", String.format("%02d:%02d",
-         nextDepartures.first.mTime / 3600,
-         (nextDepartures.first.mTime % 3600) / 60)
-         + (nextDepartures.first.m始発 ? "始発" : ""));
-        Log.e("THEN", String.format("%02d:%02d",
-         nextDepartures.second.mTime / 3600,
-         (nextDepartures.second.mTime % 3600) / 60)
-         + (nextDepartures.second.m始発 ? "始発" : ""));
-      }
 
       // Draw the background.
       // TODO: only update the relevant part of the display.
@@ -340,6 +338,32 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
         final float secondsOffset = center + mPaint.measureText(minutes) + 6;
         final String seconds = String.format("%02d", mTime.second);
         canvas.drawText(seconds, secondsOffset, mYOffset, mSecondsPaint);
+      }
+
+      // Draw the departures
+      final Pair<Departure, Departure> nextDepartures =
+       mDataStore.findNextDepartures(Const.日比谷線_北千住_平日, mTime);
+
+      if (null != nextDepartures) // If data is not yet available this returns null
+      {
+        final String text = String.format("%02d:%02d",
+         nextDepartures.first.mTime / 3600,
+         (nextDepartures.first.mTime % 3600) / 60)
+         + (nextDepartures.first.m始発 ? "始" : "") + " :: "
+
+         + String.format("%02d:%02d",
+         nextDepartures.second.mTime / 3600,
+         (nextDepartures.second.mTime % 3600) / 60)
+         + (nextDepartures.second.m始発 ? "始" : "");
+
+        final float departureOffset = mDepartureYOffset + mDeparturePaint.getTextSize() + 2;
+        final float textOffset = center - mDeparturePaint.measureText(text) / 2;
+        canvas.drawBitmap(mHibiyaIcon,
+         textOffset - mHibiyaIcon.getWidth() - mIconToDepartureTextPadding,
+         departureOffset - mHibiyaIcon.getHeight() + 5, // + 5 for alignment because I can't be assed to compute it
+         mBackgroundPaint);
+        canvas.drawText("北千住 → 六本木", textOffset, mDepartureYOffset, mDeparturePaint);
+        canvas.drawText(text, textOffset, departureOffset, mDeparturePaint);
       }
     }
 
