@@ -35,6 +35,7 @@ import android.support.wearable.watchface.WatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.text.format.Time;
 import android.util.Log;
+import android.util.Pair;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
 
@@ -303,6 +304,20 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     public void onDraw(@NonNull final Canvas canvas, @NonNull final Rect bounds)
     {
       mTime.setToNow();
+      final Pair<Departure, Departure> nextDepartures =
+       mDataStore.findNextDepartures(Const.日比谷線_北千住_平日, mTime);
+
+      if (null != nextDepartures)
+      {
+        Log.e("NEXTD", String.format("%02d:%02d",
+         nextDepartures.first.mTime / 3600,
+         (nextDepartures.first.mTime % 3600) / 60)
+         + (nextDepartures.first.m始発 ? "始発" : ""));
+        Log.e("THEN", String.format("%02d:%02d",
+         nextDepartures.second.mTime / 3600,
+         (nextDepartures.second.mTime % 3600) / 60)
+         + (nextDepartures.second.m始発 ? "始発" : ""));
+      }
 
       // Draw the background.
       // TODO: only update the relevant part of the display.
@@ -312,9 +327,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
         mBackground.draw(canvas);
       }
       else
-      {
         canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
-      }
 
       // Draw the time.
       final float center = bounds.width() / 2;
