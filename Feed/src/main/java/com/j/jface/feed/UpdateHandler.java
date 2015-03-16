@@ -23,9 +23,9 @@ public class UpdateHandler
     mClient = client;
   }
 
-  public void handleUpdate(@NonNull final DataMap data)
+  public void handleUpdate(@NonNull final String dataName, @NonNull final DataMap data)
   {
-    PutDataMapRequest request = PutDataMapRequest.create(Const.DATA_PATH);
+    PutDataMapRequest request = PutDataMapRequest.create(Const.DATA_PATH + "/" + dataName);
     request.getDataMap().putAll(data);
     PendingResult<DataApi.DataItemResult> pendingResult =
      Wearable.DataApi.putDataItem(mClient, request.asPutDataRequest());

@@ -48,7 +48,7 @@ public final class DigitalWatchFaceUtil
     /**
      * Callback invoked with the current data for {@link DigitalWatchFaceService}.
      */
-    void onDataFetched(final DataMap data);
+    void onDataFetched(@NonNull final String path, @NonNull final DataMap data);
   }
 
   private static int parseColor(@NonNull String colorName)
@@ -70,6 +70,7 @@ public final class DigitalWatchFaceUtil
     final Uri uri = new Uri.Builder().scheme("wear")
      .path(path)
      .build();
+    Log.e("-->", uri.getPath());
     Wearable.DataApi.getDataItems(client, uri).setResultCallback(new DataItemResultCallback(callback));
   }
 
@@ -89,7 +90,7 @@ public final class DigitalWatchFaceUtil
      new FetchConfigDataMapCallback()
      {
        @Override
-       public void onDataFetched(final DataMap currentConfig)
+       public void onDataFetched(@NonNull final String path, @NonNull final DataMap currentConfig)
        {
          DataMap overwrittenConfig = new DataMap();
          overwrittenConfig.putAll(currentConfig);
@@ -124,11 +125,13 @@ public final class DigitalWatchFaceUtil
     @Override
     public void onResult(@NonNull DataItemBuffer result)
     {
-      if (result.getCount() != 1) throw new RuntimeException("Multiple items ?!");
-      final DataItem item = result.get(0);
-      Log.e("\033[32mRESULT\033[0m", item.toString());
-      if (result.getStatus().isSuccess() && null != item)
-          mCallback.onDataFetched(DataMapItem.fromDataItem(item).getDataMap());
+      if (result.getCount() == 1)
+      {
+        final DataItem item = result.get(0);
+        if (result.getStatus().isSuccess() && null != item)
+          mCallback.onDataFetched(item.getUri().getPath(), DataMapItem.fromDataItem(item).getDataMap());
+      }
+      result.release();
     }
   }
 

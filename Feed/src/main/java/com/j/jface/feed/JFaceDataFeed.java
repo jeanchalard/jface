@@ -50,11 +50,12 @@ public class JFaceDataFeed
   {
     final DataMap dm = new DataMap();
     dm.putString(Const.DATA_KEY_ADHOC, value);
-    new UpdateHandler(client).handleUpdate(dm);
+    new UpdateHandler(client).handleUpdate(Const.DATA_KEY_ADHOC, dm);
   }
 
   public void load(@NonNull final GoogleApiClient client)
   {
+    Logger.L("Start loading");
     FeedLoader.startAllLoads(new UpdateHandler(client));
   }
 

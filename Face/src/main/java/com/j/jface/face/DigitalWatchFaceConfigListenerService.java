@@ -60,7 +60,6 @@ public class DigitalWatchFaceConfigListenerService extends WearableListenerServi
         if (!mGoogleApiClient.isConnected()) {
             ConnectionResult connectionResult =
                     mGoogleApiClient.blockingConnect(30, TimeUnit.SECONDS);
-
             if (!connectionResult.isSuccess()) {
                 Log.e(TAG, "Failed to connect to GoogleApiClient.");
                 return;

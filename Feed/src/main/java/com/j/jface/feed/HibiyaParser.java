@@ -34,7 +34,7 @@ public class HibiyaParser extends FeedParser
       final String p = srcTable.next();
       if (p.startsWith("class=\"hour\""))
         hour = srcTable.nextInt();
-      else if ("class=\"item02\"".equals(p))
+      else if ("class=\"item02\"".equals(p) && "●".equals(srcTable.next()))
         始発 = true;
       else if ("class=\"info02\"".equals(p))
         minute = srcTable.nextInt();
@@ -46,7 +46,7 @@ public class HibiyaParser extends FeedParser
         始発 = false;
       }
     }
-    result.putDataMapArrayList(dataName, buildData);
+    result.putDataMapArrayList(Const.DATA_KEY_DEPLIST, buildData);
     return result;
   }
 }

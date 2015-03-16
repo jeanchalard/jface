@@ -129,6 +129,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       }
     }
 
+    final DataStore mDataStore = new DataStore();
     Drawable mBackground;
     Paint mBackgroundPaint;
     Paint mPaint;
@@ -349,41 +350,51 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       return isVisible() && !isInAmbientMode();
     }
 
+    private void setDefaultValuesForMissingConfigKeys(@NonNull final DataMap config)
+    {
+      if (!config.containsKey(Const.CONFIG_KEY_BACKGROUND))
+        config.putBoolean(Const.CONFIG_KEY_BACKGROUND, true);
+    }
+
+    private void updateDataItem(@NonNull final String path, @NonNull final DataMap data) {
+      if (path.equals(Const.CONFIG_PATH))
+        updateUiForConfigDataMap(data);
+      else if (path.startsWith(Const.DATA_PATH))
+      {
+        final String dataName = path.substring(Const.DATA_PATH.length() + 1); // + 1 for the "/"
+        for (final String key : data.keySet())
+          if (Const.DATA_KEY_DEPLIST.equals(key))
+            mDataStore.putDepartureList(dataName, data.getDataMapArrayList(key));
+          else
+            mDataStore.putGenericData(dataName, data.getString(key));
+      }
+    }
+
     private void updateConfigAndData()
     {
       DigitalWatchFaceUtil.fetchData(mGoogleApiClient, Const.CONFIG_PATH,
        new DigitalWatchFaceUtil.FetchConfigDataMapCallback()
        {
          @Override
-         public void onDataFetched(@NonNull DataMap startupConfig)
+         public void onDataFetched(@NonNull final String path, @NonNull final DataMap startupConfig)
          {
-           Log.e("\033[31mCONF\033[0m", "a");
            setDefaultValuesForMissingConfigKeys(startupConfig);
            DigitalWatchFaceUtil.putConfigDataItem(mGoogleApiClient, startupConfig);
            updateUiForConfigDataMap(startupConfig);
          }
        }
       );
-      DigitalWatchFaceUtil.fetchData(mGoogleApiClient, Const.DATA_PATH,
+      final DigitalWatchFaceUtil.FetchConfigDataMapCallback dataHandler =
        new DigitalWatchFaceUtil.FetchConfigDataMapCallback()
        {
          @Override
-         public void onDataFetched(@NonNull DataMap data)
+         public void onDataFetched(@NonNull final String path, @NonNull final DataMap data)
          {
-           Log.e("\033[31mDATA\033[0m", "a");
-           for (final String key : data.keySet())
-           {
-             Log.e("D", key);
-           }
+           updateDataItem(path, data);
          }
-       }
-      );
-    }
-
-    private void setDefaultValuesForMissingConfigKeys(@NonNull final DataMap config)
-    {
-      if (!config.containsKey(Const.CONFIG_KEY_BACKGROUND))
-        config.putBoolean(Const.CONFIG_KEY_BACKGROUND, true);
+       };
+      for (final String path : Const.ALL_DEPLIST_DATA_PATHS)
+        DigitalWatchFaceUtil.fetchData(mGoogleApiClient, Const.DATA_PATH + "/" + path, dataHandler);
     }
 
     @Override // DataApi.DataListener
@@ -394,23 +405,9 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
         for (final DataEvent dataEvent : dataEvents)
         {
           if (dataEvent.getType() != DataEvent.TYPE_CHANGED) continue;
-
           final DataItem dataItem = dataEvent.getDataItem();
           final String path = dataItem.getUri().getPath();
-          if (path.equals(Const.CONFIG_PATH))
-          {
-            DataMapItem dataMapItem = DataMapItem.fromDataItem(dataItem);
-            DataMap config = dataMapItem.getDataMap();
-            Log.d(TAG, "Config DataItem updated:" + config);
-            updateUiForConfigDataMap(config);
-          }
-          else if (path.equals(Const.DATA_PATH))
-          {
-            DataMapItem dataMapItem = DataMapItem.fromDataItem(dataItem);
-            DataMap config = dataMapItem.getDataMap();
-            for (final String key : config.keySet())
-              Log.d(TAG, "GOT DATA ! " + key + " = " + config.getDataMapArrayList(key));
-          }
+          updateDataItem(path, DataMapItem.fromDataItem(dataItem).getDataMap());
         }
       }
       finally
