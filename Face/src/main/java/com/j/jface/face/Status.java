@@ -7,14 +7,15 @@ import android.text.format.Time;
 
 public enum Status
 {
-  MORNING_WORKDAY_AROUND_HOME("Home, workday, morning", "北千住 → 六本木"),
-  EVENING_WORKDAY_AROUND_WORK("Work, workday, evening", "六本木 → 北千住"),
-  NOWORK_WORKDAY_HOME("At home (workday)", "千住大橋 → 日暮里 / 成田"),
-  NOWORK_HOLIDAY_HOME("At home (holiday)", "千住大橋 → 日暮里 / 成田"),
-  OTHER("No interesting info", null);
+  MORNING_WORKDAY_AROUND_HOME("Home, workday, morning", "北千住 → 六本木", null),
+  EVENING_WORKDAY_AROUND_WORK("Work, workday, evening", "六本木 → 北千住", null),
+  NOWORK_WORKDAY_HOME("At home (workday)", "千住大橋 → 日暮里", "千住大橋 → 成田"),
+  NOWORK_HOLIDAY_HOME("At home (holiday)", "千住大橋 → 日暮里", "千住大橋 → 成田"),
+  OTHER("No interesting info", null, null);
 
   public final String description;
-  public final String header;
+  public final String header1;
+  public final String header2;
 
   private static final int DUNNO = 0;
   private static final int HOME = 1;
@@ -22,9 +23,10 @@ public enum Status
   private static final int TŌKYŌ = 3;
   private static final int TRAVEL = 4;
 
-  private Status(final String d, final String h) {
+  private Status(@NonNull final String d, @NonNull final String h1, @NonNull final String h2) {
     description = d;
-    header = h;
+    header1 = h1;
+    header2 = h2;
   }
 
   private static int getSymbolicLocation(@Nullable final Location location) {

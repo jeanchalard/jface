@@ -68,9 +68,11 @@ public class Draw
     if (null != params.departures1) // If data is not yet available this is null
     {
       final float departure2y =
-       drawDeparturePair(params.departures1, center, drawTools.departurePosY, params, drawTools, canvas);
+       drawDeparturePair(params.departures1, params.status.header1,
+        center, drawTools.departurePosY, params, drawTools, canvas);
       if (null != params.departures2)
-        drawDeparturePair(params.departures2, center, departure2y, params, drawTools, canvas);
+        drawDeparturePair(params.departures2, params.status.header2,
+         center, departure2y, params, drawTools, canvas);
     }
 
     canvas.drawTextOnPath(
@@ -79,6 +81,7 @@ public class Draw
   }
 
   private static float drawDeparturePair(@NonNull final Pair<Departure, Departure> departures,
+                                         @Nullable final String header,
                                          final float center, final float y,
                                          @NonNull final Params params, @NonNull final DrawTools drawTools,
                                          @NonNull Canvas canvas)
@@ -94,7 +97,8 @@ public class Draw
      textOffset - icon.getWidth() - drawTools.iconToDepartureXPadding,
      departureOffset - icon.getHeight() + 5, // + 5 for alignment because I can't be assed to compute it
      drawTools.imagePaint);
-    canvas.drawText(params.status.header, center, y, drawTools.departurePaint);
+    if (null != header)
+      canvas.drawText(header, center, y, drawTools.departurePaint);
     canvas.drawText(text, center, departureOffset, drawTools.departurePaint);
     return departureOffset + drawTools.departurePaint.getTextSize() + 2;
   }
