@@ -18,7 +18,6 @@ package com.j.jface.face;
 
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -58,7 +57,6 @@ public final class DigitalWatchFaceUtil
     final Uri uri = new Uri.Builder().scheme("wear")
      .path(path)
      .build();
-    Log.e("-->", uri.getPath());
     Wearable.DataApi.getDataItems(client, uri).setResultCallback(new DataItemResultCallback(callback));
   }
 

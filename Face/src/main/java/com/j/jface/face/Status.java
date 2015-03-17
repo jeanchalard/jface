@@ -43,7 +43,7 @@ public enum Status
 
     // TODO : take altitude into account to figure out if I'm on 4th floor or have already left
     if (workDay
-     && (time.hour <= 8 && time.hour >= 11)
+     && (time.hour >= 8 && time.hour <= 11)
      && (DUNNO == symbolicLocation || HOME == symbolicLocation)) return MORNING_WORKDAY_AROUND_HOME;
 
     if (workDay

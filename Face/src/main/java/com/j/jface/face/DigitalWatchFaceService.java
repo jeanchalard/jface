@@ -302,6 +302,9 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
           {
             mDataStore.putGenericData(dataName, data.getString(key));
             Log.e("RECEIVED " + key, data.getString(key));
+            if (Const.DATA_KEY_ADHOC.equals(key)) {
+              mTime.set(Long.parseLong(data.getString(key)));
+            }
           }
       }
     }
