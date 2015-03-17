@@ -69,10 +69,10 @@ public class Draw
     {
       final float departure2y =
        drawDeparturePair(params.departures1, params.status.header1,
-        center, drawTools.departurePosY, params, drawTools, canvas);
+        drawTools.departurePosX, drawTools.departurePosY, params, drawTools, canvas);
       if (null != params.departures2)
         drawDeparturePair(params.departures2, params.status.header2,
-         center, departure2y, params, drawTools, canvas);
+         drawTools.departurePosX, departure2y, params, drawTools, canvas);
     }
 
     canvas.drawTextOnPath(
@@ -82,24 +82,22 @@ public class Draw
 
   private static float drawDeparturePair(@NonNull final Pair<Departure, Departure> departures,
                                          @Nullable final String header,
-                                         final float center, final float y,
+                                         final float x, final float y,
                                          @NonNull final Params params, @NonNull final DrawTools drawTools,
                                          @NonNull Canvas canvas)
   {
-    final String text = String.format("%02d:%02d%s :: %02d:%02d%s",
+    final String text = String.format("%02d:%02d%s ▶ %02d:%02d%s",
      departures.first.time / 3600, (departures.first.time % 3600) / 60, departures.first.extra,
      departures.second.time / 3600, (departures.second.time % 3600) / 60, departures.second.extra);
 
     final Bitmap icon = drawTools.getIconForStatus(params.status);
     final float departureOffset = y + drawTools.departurePaint.getTextSize() + 2;
-    final float textOffset = center - drawTools.departurePaint.measureText(text) / 2;
     canvas.drawBitmap(icon,
-     textOffset - icon.getWidth() - drawTools.iconToDepartureXPadding,
+     x - icon.getWidth() - drawTools.iconToDepartureXPadding,
      departureOffset - icon.getHeight() + 5, // + 5 for alignment because I can't be assed to compute it
      drawTools.imagePaint);
-    if (null != header)
-      canvas.drawText(header, center, y, drawTools.departurePaint);
-    canvas.drawText(text, center, departureOffset, drawTools.departurePaint);
+    if (null != header) canvas.drawText(header, x, y, drawTools.departurePaint);
+    canvas.drawText(text, x, departureOffset, drawTools.departurePaint);
     return departureOffset + drawTools.departurePaint.getTextSize() + 2;
   }
 }

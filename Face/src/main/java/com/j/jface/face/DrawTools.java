@@ -19,6 +19,7 @@ public class DrawTools
   private static final int SCREEN_SIZE = 320;
 
   public final float timePosY;
+  public final float departurePosX;
   public final float departurePosY;
   public final float iconToDepartureXPadding;
 
@@ -40,7 +41,6 @@ public class DrawTools
     minutesPaint = createTextPaint(0xFFFFFFFF, NORMAL_TYPEFACE);
     secondsPaint = createTextPaint(0xFF888888, NORMAL_TYPEFACE);
     departurePaint = createTextPaint(0xFFCCCCCC, NORMAL_TYPEFACE);
-    departurePaint.setTextAlign(Paint.Align.CENTER);
     statusPaint = createTextPaint(0xFFCCCCCC, NORMAL_TYPEFACE);
     statusPaint.setTextAlign(Paint.Align.CENTER);
 
@@ -70,6 +70,7 @@ public class DrawTools
     statusPaint.setTextSize(statusFontSize);
 
     timePosY = 75;
+    departurePosX = 82;
     departurePosY = 120;
     iconToDepartureXPadding = 7;
   }
