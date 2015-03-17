@@ -20,7 +20,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -34,7 +33,6 @@ import android.text.format.Time;
 import android.util.Log;
 import android.util.Pair;
 import android.view.SurfaceHolder;
-import android.view.WindowInsets;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -182,15 +180,6 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       // Whether the timer should be running depends on whether we're visible (as well as
       // whether we're in ambient mode), so we may need to start or stop the timer.
       updateTimer();
-    }
-
-    @Override
-    public void onApplyWindowInsets(final WindowInsets insets)
-    {
-      super.onApplyWindowInsets(insets);
-
-      // Load resources that have alternate values for round watches.
-      Resources resources = DigitalWatchFaceService.this.getResources();
     }
 
     @Override
