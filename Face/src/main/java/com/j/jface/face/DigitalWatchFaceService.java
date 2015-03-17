@@ -21,13 +21,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.Rect;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -51,7 +46,6 @@ import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
 import com.j.jface.Const;
-import com.j.jface.R;
 
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -128,15 +122,9 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     }
 
     final DataStore mDataStore = new DataStore();
-    final DrawTools mDrawTools = new DrawTools();
-    Drawable mBackground;
-    Bitmap mHibiyaIcon;
-    Path mArc;
-    boolean mMute;
+    DrawTools mDrawTools = new DrawTools(null);
     Time mTime;
-    float mYOffset;
-    float mDepartureYOffset;
-    float mIconToDepartureTextPadding;
+    boolean mMute;
     boolean mBackgroundPresent = true;
 
     /**
@@ -157,16 +145,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
        .setShowUnreadCountIndicator(true)
        .setShowSystemUiTime(false)
        .build());
-      Resources resources = DigitalWatchFaceService.this.getResources();
-      mYOffset = resources.getDimension(R.dimen.digital_y_offset);
-      mDepartureYOffset = resources.getDimension(R.dimen.departure_y_offset);
-      mIconToDepartureTextPadding = resources.getDimension(R.dimen.icon_to_departure_text_padding);
-
-      mBackground = resources.getDrawable(R.drawable.bg);
-      mHibiyaIcon = ((BitmapDrawable)resources.getDrawable(R.drawable.hibiya)).getBitmap();
-      mArc = new Path();
-      mArc.addArc(22, 22, 298, 298, -269, 358);
-
+      mDrawTools = new DrawTools(DigitalWatchFaceService.this.getResources());
       mTime = new Time();
     }
 
@@ -268,24 +247,23 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       // Draw the background.
       // TODO: only update the relevant part of the display.
       if (mBackgroundPresent)
-      {
-        mBackground.setBounds(0, 0, bounds.width(), bounds.height());
-        mBackground.draw(canvas);
-      }
+        mDrawTools.background.draw(canvas);
       else
         canvas.drawRect(0, 0, bounds.width(), bounds.height(), mDrawTools.imagePaint);
 
       // Draw the time.
       final float center = bounds.width() / 2;
       final String hours = String.format("%02d", mTime.hour);
-      canvas.drawText(hours, center - mDrawTools.minutesPaint.measureText(hours) - 2, mYOffset, mDrawTools.minutesPaint);
+      canvas.drawText(hours,
+       center - mDrawTools.minutesPaint.measureText(hours) - 2, mDrawTools.timePosY,
+       mDrawTools.minutesPaint);
       final String minutes = String.format("%02d", mTime.minute);
-      canvas.drawText(minutes, center + 2, mYOffset, mDrawTools.minutesPaint);
+      canvas.drawText(minutes, center + 2, mDrawTools.timePosY, mDrawTools.minutesPaint);
       if (!isInAmbientMode() && !mMute)
       {
         final float secondsOffset = center + mDrawTools.minutesPaint.measureText(minutes) + 6;
         final String seconds = String.format("%02d", mTime.second);
-        canvas.drawText(seconds, secondsOffset, mYOffset, mDrawTools.secondsPaint);
+        canvas.drawText(seconds, secondsOffset, mDrawTools.timePosY, mDrawTools.secondsPaint);
       }
 
       // Draw the departures
@@ -304,20 +282,19 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
          (nextDepartures.second.mTime % 3600) / 60)
          + (nextDepartures.second.m始発 ? "始" : "");
 
-        final float departureOffset = mDepartureYOffset + mDrawTools.departurePaint.getTextSize() + 2;
+        final float departureOffset = mDrawTools.departurePosY + mDrawTools.departurePaint.getTextSize() + 2;
         final float textOffset = center - mDrawTools.departurePaint.measureText(text) / 2;
-        canvas.drawBitmap(mHibiyaIcon,
-         textOffset - mHibiyaIcon.getWidth() - mIconToDepartureTextPadding,
-         departureOffset - mHibiyaIcon.getHeight() + 5, // + 5 for alignment because I can't be assed to compute it
+        canvas.drawBitmap(mDrawTools.hibiyaIcon,
+         textOffset - mDrawTools.hibiyaIcon.getWidth() - mDrawTools.iconToDepartureXPadding,
+         departureOffset - mDrawTools.hibiyaIcon.getHeight() + 5, // + 5 for alignment because I can't be assed to compute it
          mDrawTools.imagePaint);
-        canvas.drawText("北千住 → 六本木", center, mDepartureYOffset, mDrawTools.departurePaint);
+        canvas.drawText("北千住 → 六本木", center, mDrawTools.departurePosY, mDrawTools.departurePaint);
         canvas.drawText(text, center, departureOffset, mDrawTools.departurePaint);
       }
 
-      mDrawTools.departurePaint.setTextAlign(Paint.Align.CENTER);
       canvas.drawTextOnPath(
        String.format("%04d/%02d/%02d - STATUS STATUS STATUS STATUS STATUS", mTime.year, mTime.month + 1, mTime.monthDay),
-       mArc, 0, 0, mDrawTools.departurePaint);
+       mDrawTools.watchContourPath, 0, 0, mDrawTools.statusPaint);
     }
 
     /**
