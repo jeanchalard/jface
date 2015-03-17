@@ -7,6 +7,8 @@ import android.support.annotation.Nullable;
 import android.text.format.Time;
 import android.util.Pair;
 
+import com.j.jface.Const;
+
 public class Draw
 {
   public static class Params {
@@ -47,9 +49,16 @@ public class Draw
     canvas.drawText(minutes, center + 2, drawTools.timePosY, drawTools.minutesPaint);
     if (!params.isInAmbientMode && !params.isInMuteMode)
     {
-      final float secondsOffset = center + drawTools.minutesPaint.measureText(minutes) + 6;
+      final float secondsOffset = drawTools.minutesPaint.measureText(minutes) + 6;
       final String seconds = String.format("%02d", params.time.second);
-      canvas.drawText(seconds, secondsOffset, drawTools.timePosY, drawTools.secondsPaint);
+      canvas.drawText(seconds, center + secondsOffset, drawTools.timePosY, drawTools.secondsPaint);
+      final String monthDay = String.format("%02d/%02d", params.time.month + 1, params.time.monthDay);
+      final float hoursSize = drawTools.minutesPaint.measureText(hours) + 6;
+      final float monthDaySize = drawTools.secondsPaint.measureText(monthDay);
+//      canvas.drawText(monthDay, center - hoursSize - monthDaySize, drawTools.timePosY - drawTools.secondsPaint.getTextSize(), drawTools.secondsPaint);
+      final String weekDay = Const.WEEKDAYS[params.time.weekDay];
+      final float weekDaySize = drawTools.secondsPaint.measureText(weekDay);
+      canvas.drawText(weekDay, center - hoursSize - weekDaySize, drawTools.timePosY, drawTools.secondsPaint);
     }
 
     if (null != params.departures) // If data is not yet available this is null
