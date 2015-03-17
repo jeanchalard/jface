@@ -244,10 +244,26 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     {
       mTime.setToNow();
       final Status status = Status.getStatus(mTime, null);
-      final Pair<Departure, Departure> nextDepartures =
-       mDataStore.findNextDepartures(Const.日比谷線_北千住_平日, mTime);
+      final Pair<Departure, Departure> departures;
+      switch (status) {
+        case MORNING_WORKDAY_AROUND_HOME:
+          departures = mDataStore.findNextDepartures(Const.日比谷線_北千住_平日, mTime);
+          break;
+        case EVENING_WORKDAY_AROUND_WORK:
+          departures = mDataStore.findNextDepartures(Const.日比谷線_六本木_平日, mTime);
+          break;
+        case NOWORK_WORKDAY_HOME:
+          departures = mDataStore.findNextDepartures(Const.京成線_上野方面_平日, mTime);
+          break;
+        case NOWORK_HOLIDAY_HOME:
+          departures = mDataStore.findNextDepartures(Const.京成線_上野方面_休日, mTime);
+          break;
+        default:
+          departures = null;
+      }
+
       final Draw.Params params = new Draw.Params(mIsBackgroundPresent, isInAmbientMode(), mIsInMuteMode,
-       nextDepartures, status, mTime);
+       departures, status, mTime);
       Draw.draw(mDrawTools, params, canvas, bounds);
     }
 

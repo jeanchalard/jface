@@ -7,16 +7,23 @@ import android.text.format.Time;
 
 public enum Status
 {
-  MORNING_WORKDAY_AROUND_HOME,
-  EVENING_WORKDAY_AROUND_WORK,
-  NOWORK_HOME,
-  OTHER;
+  MORNING_WORKDAY_AROUND_HOME("Home, workday, morning"),
+  EVENING_WORKDAY_AROUND_WORK("Work, workday, evening"),
+  NOWORK_WORKDAY_HOME("At home (workday)"),
+  NOWORK_HOLIDAY_HOME("At home (holiday)"),
+  OTHER("No interesting info");
+
+  public final String description;
 
   private static final int DUNNO = 0;
   private static final int HOME = 1;
   private static final int WORK = 2;
   private static final int TŌKYŌ = 3;
   private static final int TRAVEL = 4;
+
+  private Status(final String d) {
+    description = d;
+  }
 
   private static int getSymbolicLocation(@Nullable final Location location) {
     return DUNNO;
@@ -27,9 +34,8 @@ public enum Status
     if (TRAVEL == symbolicLocation) return OTHER;
 
     final boolean workDay;
-    workDay = (time.weekDay >= Time.MONDAY && time.weekDay <= Time.FRIDAY);
     // TODO : figure out national holidays
-    if (!workDay && (DUNNO == symbolicLocation || HOME == symbolicLocation)) return NOWORK_HOME;
+    workDay = (time.weekDay >= Time.MONDAY && time.weekDay <= Time.FRIDAY);
 
     // TODO : take altitude into account to figure out if I'm on 4th floor or have already left
     if (workDay
@@ -39,6 +45,9 @@ public enum Status
     if (workDay
      && ((time.hour >= 18 && time.hour <= 23) || time.hour <= 0)
      && (DUNNO == symbolicLocation || WORK == symbolicLocation)) return EVENING_WORKDAY_AROUND_WORK;
+
+    if (DUNNO == symbolicLocation || HOME == symbolicLocation)
+      return workDay ? NOWORK_WORKDAY_HOME : NOWORK_HOLIDAY_HOME;
 
     return OTHER;
   }
