@@ -243,11 +243,11 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     public void onDraw(@NonNull final Canvas canvas, @NonNull final Rect bounds)
     {
       mTime.setToNow();
-      // Draw the departures
+      final Status status = Status.getStatus(mTime, null);
       final Pair<Departure, Departure> nextDepartures =
        mDataStore.findNextDepartures(Const.日比谷線_北千住_平日, mTime);
       final Draw.Params params = new Draw.Params(mIsBackgroundPresent, isInAmbientMode(), mIsInMuteMode,
-       nextDepartures, mTime);
+       nextDepartures, status, mTime);
       Draw.draw(mDrawTools, params, canvas, bounds);
     }
 

@@ -14,13 +14,15 @@ public class Draw
     final boolean isInAmbientMode;
     final boolean isInMuteMode;
     @Nullable final Pair<Departure, Departure> departures;
+    @NonNull final Status status;
     @NonNull final Time time;
     public Params(final boolean backgroundPresent, final boolean inAmbientMode, final boolean inMuteMode,
-                  @Nullable final Pair<Departure, Departure> d, @NonNull final Time t) {
+                  @Nullable final Pair<Departure, Departure> d,  @NonNull final Status s, @NonNull final Time t) {
       isBackgroundPresent = backgroundPresent;
       isInAmbientMode = inAmbientMode;
       isInMuteMode = inMuteMode;
       departures = d;
+      status = s;
       time = t;
     }
   }
