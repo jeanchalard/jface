@@ -7,7 +7,7 @@ public class Const
   public static final String CONFIG_PATH = "/jwatch/Conf";
 
   public static final String DATA_KEY_DEPTIME = "depTime";
-  public static final String DATA_KEY_始発 = "始発";
+  public static final String DATA_KEY_EXTRA = "extra";
   public static final String DATA_KEY_DEPLIST = "depList";
   public static final String DATA_KEY_ADHOC = "adHoc";
   public static final String CONFIG_KEY_BACKGROUND = "background";

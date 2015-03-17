@@ -29,10 +29,9 @@ public class DataStore
   public void putDepartureList(final String dataName, final ArrayList<DataMap> departureList)
   {
     final ArrayList<Departure> departures = new ArrayList<>();
-    Log.e("\033[33mKEY\033[0m", dataName);
     for (final DataMap map : departureList)
       departures.add(new Departure(map.getInt(Const.DATA_KEY_DEPTIME),
-                                   map.getBoolean(Const.DATA_KEY_始発)));
+                                   map.getString(Const.DATA_KEY_EXTRA)));
     Collections.sort(departures);
     mDepartures.put(dataName, departures);
   }

@@ -67,12 +67,12 @@ public class Draw
       final String text = String.format("%02d:%02d",
        params.departures.first.time / 3600,
        (params.departures.first.time % 3600) / 60)
-       + (params.departures.first.始発 ? "始" : "") + " :: "
+       + params.departures.first.extra + " :: "
 
        + String.format("%02d:%02d",
        params.departures.second.time / 3600,
        (params.departures.second.time % 3600) / 60)
-       + (params.departures.second.始発 ? "始" : "");
+       + params.departures.second.extra;
 
       final Bitmap icon = drawTools.getIconForStatus(params.status);
       final float departureOffset = drawTools.departurePosY + drawTools.departurePaint.getTextSize() + 2;

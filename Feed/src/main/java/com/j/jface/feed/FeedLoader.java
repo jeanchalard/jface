@@ -32,7 +32,11 @@ public class FeedLoader
    new DataSource(Const.日比谷線_六本木_平日,
     "http://www.tokyometro.jp/station/roppongi/timetable/hibiya/b/index.html", HibiyaParser.class),
    new DataSource(Const.日比谷線_六本木_休日,
-    "http://www.tokyometro.jp/station/roppongi/timetable/hibiya/b/holiday.html", HibiyaParser.class)
+    "http://www.tokyometro.jp/station/roppongi/timetable/hibiya/b/holiday.html", HibiyaParser.class),
+   new DataSource(Const.京成線_上野方面_平日,
+    "http://keisei.ekitan.com/norikae/pc/T5?uid=69927&dir=33&path=20150317202933491&USR=PC&dw=0&slCode=254-4&d=1&rsf=%90%E7%8F%5A%91%E5%8B%B4", KeiseiParser.class),
+   new DataSource(Const.京成線_上野方面_休日,
+    "http://keisei.ekitan.com/norikae/pc/T5?uid=69927&dir=55&path=201503180555727&USR=PC&dw=0&slCode=254-4&d=2&rsf=%90%E7%8F%5A%91%E5%8B%B4", KeiseiParser.class)
   };
 
   public static void startAllLoads(@NonNull final UpdateHandler handler) {
@@ -49,6 +53,8 @@ public class FeedLoader
       try
       {
         urlConnection = (HttpURLConnection)url.openConnection();
+        if (url.getAuthority().startsWith("keisei"))
+          urlConnection.addRequestProperty("User-Agent", "Mozilla");
         InputStream in = new BufferedInputStream(urlConnection.getInputStream());
         final FeedParser parser = ds.parser.newInstance();
         handler.handleUpdate(ds.name, parser.parseStream(ds.name, in));
