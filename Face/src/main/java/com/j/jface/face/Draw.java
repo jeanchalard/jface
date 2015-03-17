@@ -70,12 +70,12 @@ public class Draw
        textOffset - drawTools.hibiyaIcon.getWidth() - drawTools.iconToDepartureXPadding,
        departureOffset - drawTools.hibiyaIcon.getHeight() + 5, // + 5 for alignment because I can't be assed to compute it
        drawTools.imagePaint);
-      canvas.drawText("北千住 → 六本木", center, drawTools.departurePosY, drawTools.departurePaint);
+      canvas.drawText(params.status.header, center, drawTools.departurePosY, drawTools.departurePaint);
       canvas.drawText(text, center, departureOffset, drawTools.departurePaint);
     }
 
     canvas.drawTextOnPath(
-     String.format("%04d/%02d/%02d - STATUS STATUS STATUS STATUS STATUS", params.time.year, params.time.month + 1, params.time.monthDay),
+     String.format("%04d/%02d/%02d - " + params.status.description, params.time.year, params.time.month + 1, params.time.monthDay),
      drawTools.watchContourPath, 0, 0, drawTools.statusPaint);
   }
 }
