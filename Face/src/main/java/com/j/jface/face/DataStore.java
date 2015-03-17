@@ -47,14 +47,14 @@ public class DataStore
     final ArrayList<Departure> deps = mDepartures.get(key);
     if (null == deps) return null;
     for (final Departure d : deps)
-      if (d.mTime >= secs) return d;
+      if (d.time >= secs) return d;
     return deps.get(0);
   }
 
   @Nullable public Pair<Departure, Departure> findNextDepartures(@NonNull final String key, @NonNull final Time time) {
     final Departure first = findClosestDeparture(key, time);
     if (null == first) return null;
-    final Departure second = findClosestDeparture(key, first.mTime + 1);
+    final Departure second = findClosestDeparture(key, first.time + 1);
     return new Pair(first, second);
   }
 }

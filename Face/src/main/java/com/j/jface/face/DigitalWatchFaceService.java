@@ -124,8 +124,8 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     final DataStore mDataStore = new DataStore();
     DrawTools mDrawTools = new DrawTools(null);
     Time mTime;
-    boolean mMute;
-    boolean mBackgroundPresent = true;
+    boolean mIsInMuteMode;
+    boolean mIsBackgroundPresent = true;
 
     /**
      * Whether the display supports fewer bits for each color in ambient mode. When true, we
@@ -228,7 +228,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       boolean inMuteMode = interruptionFilter == WatchFaceService.INTERRUPTION_FILTER_NONE;
       // We only need to update once a minute in mute mode.
       setInteractiveUpdateRateMs(inMuteMode ? MUTE_UPDATE_RATE_MS : NORMAL_UPDATE_RATE_MS);
-      mMute = inMuteMode;
+      mIsInMuteMode = inMuteMode;
     }
 
     public void setInteractiveUpdateRateMs(long updateRateMs)
@@ -243,58 +243,12 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     public void onDraw(@NonNull final Canvas canvas, @NonNull final Rect bounds)
     {
       mTime.setToNow();
-
-      // Draw the background.
-      // TODO: only update the relevant part of the display.
-      if (mBackgroundPresent)
-        mDrawTools.background.draw(canvas);
-      else
-        canvas.drawRect(0, 0, bounds.width(), bounds.height(), mDrawTools.imagePaint);
-
-      // Draw the time.
-      final float center = bounds.width() / 2;
-      final String hours = String.format("%02d", mTime.hour);
-      canvas.drawText(hours,
-       center - mDrawTools.minutesPaint.measureText(hours) - 2, mDrawTools.timePosY,
-       mDrawTools.minutesPaint);
-      final String minutes = String.format("%02d", mTime.minute);
-      canvas.drawText(minutes, center + 2, mDrawTools.timePosY, mDrawTools.minutesPaint);
-      if (!isInAmbientMode() && !mMute)
-      {
-        final float secondsOffset = center + mDrawTools.minutesPaint.measureText(minutes) + 6;
-        final String seconds = String.format("%02d", mTime.second);
-        canvas.drawText(seconds, secondsOffset, mDrawTools.timePosY, mDrawTools.secondsPaint);
-      }
-
       // Draw the departures
       final Pair<Departure, Departure> nextDepartures =
        mDataStore.findNextDepartures(Const.日比谷線_北千住_平日, mTime);
-
-      if (null != nextDepartures) // If data is not yet available this returns null
-      {
-        final String text = String.format("%02d:%02d",
-         nextDepartures.first.mTime / 3600,
-         (nextDepartures.first.mTime % 3600) / 60)
-         + (nextDepartures.first.m始発 ? "始" : "") + " :: "
-
-         + String.format("%02d:%02d",
-         nextDepartures.second.mTime / 3600,
-         (nextDepartures.second.mTime % 3600) / 60)
-         + (nextDepartures.second.m始発 ? "始" : "");
-
-        final float departureOffset = mDrawTools.departurePosY + mDrawTools.departurePaint.getTextSize() + 2;
-        final float textOffset = center - mDrawTools.departurePaint.measureText(text) / 2;
-        canvas.drawBitmap(mDrawTools.hibiyaIcon,
-         textOffset - mDrawTools.hibiyaIcon.getWidth() - mDrawTools.iconToDepartureXPadding,
-         departureOffset - mDrawTools.hibiyaIcon.getHeight() + 5, // + 5 for alignment because I can't be assed to compute it
-         mDrawTools.imagePaint);
-        canvas.drawText("北千住 → 六本木", center, mDrawTools.departurePosY, mDrawTools.departurePaint);
-        canvas.drawText(text, center, departureOffset, mDrawTools.departurePaint);
-      }
-
-      canvas.drawTextOnPath(
-       String.format("%04d/%02d/%02d - STATUS STATUS STATUS STATUS STATUS", mTime.year, mTime.month + 1, mTime.monthDay),
-       mDrawTools.watchContourPath, 0, 0, mDrawTools.statusPaint);
+      final Draw.Params params = new Draw.Params(mIsBackgroundPresent, isInAmbientMode(), mIsInMuteMode,
+       nextDepartures, mTime);
+      Draw.draw(mDrawTools, params, canvas, bounds);
     }
 
     /**
@@ -385,7 +339,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
 
     private void updateUiForConfigDataMap(@NonNull final DataMap config)
     {
-      mBackgroundPresent = config.getBoolean(Const.CONFIG_KEY_BACKGROUND, mBackgroundPresent);
+      mIsBackgroundPresent = config.getBoolean(Const.CONFIG_KEY_BACKGROUND, mIsBackgroundPresent);
       invalidate();
     }
 
