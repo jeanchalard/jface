@@ -244,26 +244,32 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     {
       mTime.setToNow();
       final Status status = Status.getStatus(mTime, null);
-      final Pair<Departure, Departure> departures;
+      final Pair<Departure, Departure> departures1;
+      final Pair<Departure, Departure> departures2;
       switch (status) {
         case MORNING_WORKDAY_AROUND_HOME:
-          departures = mDataStore.findNextDepartures(Const.日比谷線_北千住_平日, mTime);
+          departures1 = mDataStore.findNextDepartures(Const.日比谷線_北千住_平日, mTime);
+          departures2 = null;
           break;
         case EVENING_WORKDAY_AROUND_WORK:
-          departures = mDataStore.findNextDepartures(Const.日比谷線_六本木_平日, mTime);
+          departures1 = mDataStore.findNextDepartures(Const.日比谷線_六本木_平日, mTime);
+          departures2 = null;
           break;
         case NOWORK_WORKDAY_HOME:
-          departures = mDataStore.findNextDepartures(Const.京成線_上野方面_平日, mTime);
+          departures1 = mDataStore.findNextDepartures(Const.京成線_上野方面_平日, mTime);
+          departures2 = mDataStore.findNextDepartures(Const.京成線_成田方面_平日, mTime);
           break;
         case NOWORK_HOLIDAY_HOME:
-          departures = mDataStore.findNextDepartures(Const.京成線_上野方面_休日, mTime);
+          departures1 = mDataStore.findNextDepartures(Const.京成線_上野方面_休日, mTime);
+          departures2 = mDataStore.findNextDepartures(Const.京成線_成田方面_休日, mTime);
           break;
         default:
-          departures = null;
+          departures1 = null;
+          departures2 = null;
       }
 
       final Draw.Params params = new Draw.Params(mIsBackgroundPresent, isInAmbientMode(), mIsInMuteMode,
-       departures, status, mTime);
+       departures1, departures2, status, mTime);
       Draw.draw(mDrawTools, params, canvas, bounds);
     }
 

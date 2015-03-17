@@ -9,8 +9,8 @@ public enum Status
 {
   MORNING_WORKDAY_AROUND_HOME("Home, workday, morning", "北千住 → 六本木"),
   EVENING_WORKDAY_AROUND_WORK("Work, workday, evening", "六本木 → 北千住"),
-  NOWORK_WORKDAY_HOME("At home (workday)", "千住大橋"),
-  NOWORK_HOLIDAY_HOME("At home (holiday)", "千住大橋"),
+  NOWORK_WORKDAY_HOME("At home (workday)", "千住大橋 → 日暮里 / 成田"),
+  NOWORK_HOLIDAY_HOME("At home (holiday)", "千住大橋 → 日暮里 / 成田"),
   OTHER("No interesting info", null);
 
   public final String description;
