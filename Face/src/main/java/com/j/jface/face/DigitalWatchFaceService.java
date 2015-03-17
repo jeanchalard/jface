@@ -26,7 +26,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -60,8 +59,6 @@ import java.util.concurrent.TimeUnit;
 public class DigitalWatchFaceService extends CanvasWatchFaceService
 {
   private static final String TAG = "J";
-  private static final Typeface BOLD_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
-  private static final Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
 
   private static final long NORMAL_UPDATE_RATE_MS = 1000;
   private static final long MUTE_UPDATE_RATE_MS = TimeUnit.MINUTES.toMillis(1);
@@ -74,9 +71,6 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
   private class Engine extends CanvasWatchFaceService.Engine implements DataApi.DataListener,
    GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
   {
-    static final int MUTE_ALPHA = 100;
-    static final int NORMAL_ALPHA = 255;
-
     static final int MSG_UPDATE_TIME = 0;
 
     long mInteractiveUpdateRateMs = NORMAL_UPDATE_RATE_MS;
@@ -134,12 +128,9 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     }
 
     final DataStore mDataStore = new DataStore();
+    final DrawTools mDrawTools = new DrawTools();
     Drawable mBackground;
     Bitmap mHibiyaIcon;
-    Paint mBackgroundPaint;
-    Paint mMinutesPaint;
-    Paint mSecondsPaint;
-    Paint mDeparturePaint;
     Path mArc;
     boolean mMute;
     Time mTime;
@@ -147,9 +138,6 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     float mDepartureYOffset;
     float mIconToDepartureTextPadding;
     boolean mBackgroundPresent = true;
-    private final int mDigitsColor = DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_DIGITS;
-    private final int mSecondsColor = DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECONDS;
-    private final int mDepartureColor = DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_DEPARTURE;
 
     /**
      * Whether the display supports fewer bits for each color in ambient mode. When true, we
@@ -176,11 +164,6 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
 
       mBackground = resources.getDrawable(R.drawable.bg);
       mHibiyaIcon = ((BitmapDrawable)resources.getDrawable(R.drawable.hibiya)).getBitmap();
-      mBackgroundPaint = new Paint();
-      mBackgroundPaint.setColor(0xFF000000);
-      mMinutesPaint = createTextPaint(mDigitsColor, NORMAL_TYPEFACE);
-      mSecondsPaint = createTextPaint(mSecondsColor, NORMAL_TYPEFACE);
-      mDeparturePaint = createTextPaint(mDepartureColor, NORMAL_TYPEFACE);
       mArc = new Path();
       mArc.addArc(22, 22, 298, 298, -269, 358);
 
@@ -192,16 +175,6 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     {
       mUpdateTimeHandler.removeMessages(MSG_UPDATE_TIME);
       super.onDestroy();
-    }
-
-    @NonNull
-    private Paint createTextPaint(final int defaultInteractiveColor, final Typeface typeface)
-    {
-      Paint paint = new Paint();
-      paint.setColor(defaultInteractiveColor);
-      paint.setTypeface(typeface);
-      paint.setAntiAlias(true);
-      return paint;
     }
 
     @Override
@@ -239,43 +212,28 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
 
       // Load resources that have alternate values for round watches.
       Resources resources = DigitalWatchFaceService.this.getResources();
-      mMinutesPaint.setTextSize(resources.getDimension(R.dimen.time_text_size));
-      mSecondsPaint.setTextSize(resources.getDimensionPixelSize(R.dimen.seconds_text_size));
-      mDeparturePaint.setTextSize(resources.getDimensionPixelSize(R.dimen.departure_text_size));
     }
 
     @Override
     public void onPropertiesChanged(@NonNull Bundle properties)
     {
       super.onPropertiesChanged(properties);
-      boolean burnInProtection = properties.getBoolean(PROPERTY_BURN_IN_PROTECTION, false);
-      mMinutesPaint.setTypeface(burnInProtection ? NORMAL_TYPEFACE : BOLD_TYPEFACE);
       mLowBitAmbient = properties.getBoolean(PROPERTY_LOW_BIT_AMBIENT, false);
-//      Log.d(TAG, "onPropertiesChanged: burn-in protection = " + burnInProtection
-//       + ", low-bit ambient = " + mLowBitAmbient);
+      mDrawTools.onPropertiesChanged(properties.getBoolean(PROPERTY_BURN_IN_PROTECTION, false), mLowBitAmbient);
     }
 
     @Override
     public void onTimeTick()
     {
       super.onTimeTick();
-//      Log.d(TAG, "onTimeTick: ambient = " + isInAmbientMode());
       invalidate();
     }
 
     @Override
-    public void onAmbientModeChanged(boolean inAmbientMode)
+    public void onAmbientModeChanged(final boolean inAmbientMode)
     {
       super.onAmbientModeChanged(inAmbientMode);
-      Log.d(TAG, "onAmbientModeChanged: " + inAmbientMode);
-      adjustPaintColorToCurrentMode(mBackgroundPaint, 0xFF000000, 0xFF000000);
-      adjustPaintColorToCurrentMode(mMinutesPaint, mDigitsColor,
-       DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_DIGITS);
-      if (mLowBitAmbient)
-      {
-        boolean antiAlias = !inAmbientMode;
-        mMinutesPaint.setAntiAlias(antiAlias);
-      }
+      mDrawTools.onAmbientModeChanged(inAmbientMode, mLowBitAmbient);
       invalidate();
 
       // Whether the timer should be running depends on whether we're in ambient mode (as well
@@ -283,29 +241,15 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       updateTimer();
     }
 
-    private void adjustPaintColorToCurrentMode(@NonNull Paint paint, int interactiveColor,
-                                               int ambientColor)
-    {
-      paint.setColor(isInAmbientMode() ? ambientColor : interactiveColor);
-    }
-
     @Override
     public void onInterruptionFilterChanged(int interruptionFilter)
     {
       Log.d(TAG, "onInterruptionFilterChanged: " + interruptionFilter);
       super.onInterruptionFilterChanged(interruptionFilter);
-
       boolean inMuteMode = interruptionFilter == WatchFaceService.INTERRUPTION_FILTER_NONE;
       // We only need to update once a minute in mute mode.
       setInteractiveUpdateRateMs(inMuteMode ? MUTE_UPDATE_RATE_MS : NORMAL_UPDATE_RATE_MS);
-
-      if (mMute != inMuteMode)
-      {
-        mMute = inMuteMode;
-        int alpha = inMuteMode ? MUTE_ALPHA : NORMAL_ALPHA;
-        mMinutesPaint.setAlpha(alpha);
-        invalidate();
-      }
+      mMute = inMuteMode;
     }
 
     public void setInteractiveUpdateRateMs(long updateRateMs)
@@ -329,19 +273,19 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
         mBackground.draw(canvas);
       }
       else
-        canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
+        canvas.drawRect(0, 0, bounds.width(), bounds.height(), mDrawTools.imagePaint);
 
       // Draw the time.
       final float center = bounds.width() / 2;
       final String hours = String.format("%02d", mTime.hour);
-      canvas.drawText(hours, center - mMinutesPaint.measureText(hours) - 2, mYOffset, mMinutesPaint);
+      canvas.drawText(hours, center - mDrawTools.minutesPaint.measureText(hours) - 2, mYOffset, mDrawTools.minutesPaint);
       final String minutes = String.format("%02d", mTime.minute);
-      canvas.drawText(minutes, center + 2, mYOffset, mMinutesPaint);
+      canvas.drawText(minutes, center + 2, mYOffset, mDrawTools.minutesPaint);
       if (!isInAmbientMode() && !mMute)
       {
-        final float secondsOffset = center + mMinutesPaint.measureText(minutes) + 6;
+        final float secondsOffset = center + mDrawTools.minutesPaint.measureText(minutes) + 6;
         final String seconds = String.format("%02d", mTime.second);
-        canvas.drawText(seconds, secondsOffset, mYOffset, mSecondsPaint);
+        canvas.drawText(seconds, secondsOffset, mYOffset, mDrawTools.secondsPaint);
       }
 
       // Draw the departures
@@ -360,20 +304,20 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
          (nextDepartures.second.mTime % 3600) / 60)
          + (nextDepartures.second.m始発 ? "始" : "");
 
-        final float departureOffset = mDepartureYOffset + mDeparturePaint.getTextSize() + 2;
-        final float textOffset = center - mDeparturePaint.measureText(text) / 2;
+        final float departureOffset = mDepartureYOffset + mDrawTools.departurePaint.getTextSize() + 2;
+        final float textOffset = center - mDrawTools.departurePaint.measureText(text) / 2;
         canvas.drawBitmap(mHibiyaIcon,
          textOffset - mHibiyaIcon.getWidth() - mIconToDepartureTextPadding,
          departureOffset - mHibiyaIcon.getHeight() + 5, // + 5 for alignment because I can't be assed to compute it
-         mBackgroundPaint);
-        canvas.drawText("北千住 → 六本木", center, mDepartureYOffset, mDeparturePaint);
-        canvas.drawText(text, center, departureOffset, mDeparturePaint);
+         mDrawTools.imagePaint);
+        canvas.drawText("北千住 → 六本木", center, mDepartureYOffset, mDrawTools.departurePaint);
+        canvas.drawText(text, center, departureOffset, mDrawTools.departurePaint);
       }
 
-      mDeparturePaint.setTextAlign(Paint.Align.CENTER);
+      mDrawTools.departurePaint.setTextAlign(Paint.Align.CENTER);
       canvas.drawTextOnPath(
        String.format("%04d/%02d/%02d - STATUS STATUS STATUS STATUS STATUS", mTime.year, mTime.month + 1, mTime.monthDay),
-       mArc, 0, 0, mDeparturePaint);
+       mArc, 0, 0, mDrawTools.departurePaint);
     }
 
     /**

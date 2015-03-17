@@ -16,7 +16,6 @@
 
 package com.j.jface.face;
 
-import android.graphics.Color;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -34,13 +33,6 @@ import com.j.jface.Const;
 public final class DigitalWatchFaceUtil
 {
   /**
-   * Name of the default interactive mode digits color and the ambient mode digits color.
-   */
-  public static final int COLOR_VALUE_DEFAULT_AND_AMBIENT_DIGITS = parseColor("White");
-  public static final int COLOR_VALUE_DEFAULT_AND_AMBIENT_SECONDS = parseColor("Grey");
-  public static final int COLOR_VALUE_DEFAULT_AND_AMBIENT_DEPARTURE = parseColor("LightGrey");
-
-  /**
    * Callback interface to perform an action with the current config {@link DataMap} for
    * {@link DigitalWatchFaceService}.
    */
@@ -50,11 +42,6 @@ public final class DigitalWatchFaceUtil
      * Callback invoked with the current data for {@link DigitalWatchFaceService}.
      */
     void onDataFetched(@NonNull final String path, @NonNull final DataMap data);
-  }
-
-  private static int parseColor(@NonNull String colorName)
-  {
-    return Color.parseColor(colorName.toLowerCase());
   }
 
   /**
