@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 public class FeedLoader
 {
-  static ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 500, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+  static ThreadPoolExecutor executor = new ThreadPoolExecutor(4, 4, 500, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
 
   private static class DataSource {
     public final String name;
