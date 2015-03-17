@@ -11,7 +11,7 @@ public enum Status
   EVENING_WORKDAY_AROUND_WORK("Work, workday, evening", "六本木 → 北千住", null),
   NOWORK_WORKDAY_HOME("At home (workday)", "千住大橋 → 日暮里", "千住大橋 → 成田"),
   NOWORK_HOLIDAY_HOME("At home (holiday)", "千住大橋 → 日暮里", "千住大橋 → 成田"),
-  OTHER("No interesting info", null, null);
+  OTHER("Freestyle", null, null);
 
   public final String description;
   public final String header1;
