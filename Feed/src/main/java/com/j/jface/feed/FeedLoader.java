@@ -41,9 +41,8 @@ public class FeedLoader
   }
 
   private static void startLoadDataSource(@NonNull final DataSource ds, @NonNull final UpdateHandler handler) {
-    URL u = null;
-    try { u = new URL(ds.url); } catch (MalformedURLException e) {} // Can't happen because we know the URL is valid
-    final URL url = u;
+    final URL url;
+    try { url = new URL(ds.url); } catch (MalformedURLException e) { return; } // Can't happen because the URL is valid
     executor.execute(new Runnable() { public void run()
     {
       HttpURLConnection urlConnection = null;

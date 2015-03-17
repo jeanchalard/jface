@@ -1,5 +1,6 @@
 package com.j.jface.face;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
@@ -73,11 +74,12 @@ public class Draw
        (params.departures.second.time % 3600) / 60)
        + (params.departures.second.始発 ? "始" : "");
 
+      final Bitmap icon = drawTools.getIconForStatus(params.status);
       final float departureOffset = drawTools.departurePosY + drawTools.departurePaint.getTextSize() + 2;
       final float textOffset = center - drawTools.departurePaint.measureText(text) / 2;
-      canvas.drawBitmap(drawTools.hibiyaIcon,
-       textOffset - drawTools.hibiyaIcon.getWidth() - drawTools.iconToDepartureXPadding,
-       departureOffset - drawTools.hibiyaIcon.getHeight() + 5, // + 5 for alignment because I can't be assed to compute it
+      canvas.drawBitmap(icon,
+       textOffset - icon.getWidth() - drawTools.iconToDepartureXPadding,
+       departureOffset - icon.getHeight() + 5, // + 5 for alignment because I can't be assed to compute it
        drawTools.imagePaint);
       canvas.drawText(params.status.header, center, drawTools.departurePosY, drawTools.departurePaint);
       canvas.drawText(text, center, departureOffset, drawTools.departurePaint);

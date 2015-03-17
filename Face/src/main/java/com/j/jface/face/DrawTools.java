@@ -32,6 +32,7 @@ public class DrawTools
 
   public final Drawable background;
   public final Bitmap hibiyaIcon;
+  public final Bitmap keiseiIcon;
 
   public DrawTools(final Resources resources) {
     imagePaint = new Paint();
@@ -54,9 +55,11 @@ public class DrawTools
       background = resources.getDrawable(R.drawable.bg);
       background.setBounds(0, 0, SCREEN_SIZE, SCREEN_SIZE);
       hibiyaIcon = ((BitmapDrawable)resources.getDrawable(R.drawable.hibiya)).getBitmap();
+      keiseiIcon = ((BitmapDrawable)resources.getDrawable(R.drawable.keisei)).getBitmap();
     } else {
       background = new ColorDrawable();
       hibiyaIcon = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+      keiseiIcon = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
     }
 
     // We can afford to do this because we know what device we are running on, but otherwise we should
@@ -69,6 +72,19 @@ public class DrawTools
     timePosY = 75;
     departurePosY = 120;
     iconToDepartureXPadding = 7;
+  }
+
+  public Bitmap getIconForStatus(final Status status) {
+    switch (status) {
+      case MORNING_WORKDAY_AROUND_HOME:
+      case EVENING_WORKDAY_AROUND_WORK:
+        return hibiyaIcon;
+      case NOWORK_WORKDAY_HOME:
+      case NOWORK_HOLIDAY_HOME:
+        return keiseiIcon;
+      default:
+        return null;
+    }
   }
 
   @NonNull
