@@ -289,6 +289,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     }
 
     private void updateDataItem(@NonNull final String path, @NonNull final DataMap data) {
+      Log.e("RECEIVED data", path);
       if (path.equals(Const.CONFIG_PATH))
         updateUiForConfigDataMap(data);
       else if (path.startsWith(Const.DATA_PATH))
@@ -298,7 +299,10 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
           if (Const.DATA_KEY_DEPLIST.equals(key))
             mDataStore.putDepartureList(dataName, data.getDataMapArrayList(key));
           else
+          {
             mDataStore.putGenericData(dataName, data.getString(key));
+            Log.e("RECEIVED " + key, data.getString(key));
+          }
       }
     }
 
@@ -357,7 +361,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     @Override  // GoogleApiClient.ConnectionCallbacks
     public void onConnected(final Bundle connectionHint)
     {
-      Log.d(TAG, "onConnected: " + connectionHint);
+      Log.d(TAG, "onConnected : " + connectionHint);
       Wearable.DataApi.addListener(mGoogleApiClient, Engine.this);
       updateConfigAndData();
     }
@@ -365,13 +369,13 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     @Override  // GoogleApiClient.ConnectionCallbacks
     public void onConnectionSuspended(int cause)
     {
-      Log.d(TAG, "onConnectionSuspended: " + cause);
+      Log.d(TAG, "onConnectionSuspended : " + cause);
     }
 
     @Override  // GoogleApiClient.OnConnectionFailedListener
     public void onConnectionFailed(ConnectionResult result)
     {
-      Log.d(TAG, "onConnectionFailed: " + result);
+      Log.d(TAG, "onConnectionFailed : " + result);
     }
   }
 }
