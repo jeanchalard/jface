@@ -7,12 +7,12 @@ import android.text.format.Time;
 
 public enum Status
 {
-  MORNING_WORKDAY_AROUND_HOME("Home, workday, morning", "北千住 → 六本木", null),
-  EVENING_WORKDAY_AROUND_WORK("Work, workday, evening", "六本木 → 北千住", null),
-  NOWORK_WORKDAY_HOME("At home (workday)", "千住大橋 → 日暮里", "千住大橋 → 成田"),
-  NOWORK_HOLIDAY_HOME("At home (holiday)", "千住大橋 → 日暮里", "千住大橋 → 成田"),
-  NIPPORI_WORKDAY("Nippori (workday)", "日暮里 → 千住大橋", null),
-  NIPPORI_HOLIDAY("Nippori (holiday)", "日暮里 → 千住大橋", null),
+  COMMUTE_MORNING_平日("Home, workday, morning", "北千住 → 六本木", null),
+  COMMUTE_EVENING_休日("Work, workday, evening", "六本木 → 北千住", null),
+  HOME_平日("At home (workday)", "千住大橋 → 日暮里", "千住大橋 → 成田"),
+  HOME_休日("At home (holiday)", "千住大橋 → 日暮里", "千住大橋 → 成田"),
+  日暮里_平日("Nippori (workday)", "日暮里 → 千住大橋", null),
+  日暮里_休日("Nippori (holiday)", "日暮里 → 千住大橋", null),
   OTHER("Freestyle", null, null);
 
   public final String description;
@@ -22,7 +22,7 @@ public enum Status
   private static final int DUNNO = 0;
   private static final int HOME = 1;
   private static final int WORK = 2;
-  private static final int NIPPORI = 3;
+  private static final int 日暮里 = 3;
   private static final int TŌKYŌ = 4;
   private static final int TRAVEL = 5;
 
@@ -47,14 +47,14 @@ public enum Status
     // TODO : take altitude into account to figure out if I'm on 4th floor or have already left
     if (workDay
      && (time.hour >= 8 && time.hour <= 11)
-     && (DUNNO == symbolicLocation || HOME == symbolicLocation)) return MORNING_WORKDAY_AROUND_HOME;
+     && (DUNNO == symbolicLocation || HOME == symbolicLocation)) return COMMUTE_MORNING_平日;
 
     if (workDay
      && ((time.hour >= 18 && time.hour <= 23) || time.hour <= 0)
-     && (DUNNO == symbolicLocation || WORK == symbolicLocation)) return EVENING_WORKDAY_AROUND_WORK;
+     && (DUNNO == symbolicLocation || WORK == symbolicLocation)) return COMMUTE_EVENING_休日;
 
     if (DUNNO == symbolicLocation || HOME == symbolicLocation)
-      return workDay ? NOWORK_WORKDAY_HOME : NOWORK_HOLIDAY_HOME;
+      return workDay ? HOME_平日 : HOME_休日;
 
     return OTHER;
   }

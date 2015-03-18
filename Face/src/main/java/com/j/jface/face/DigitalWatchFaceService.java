@@ -236,19 +236,19 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       final Pair<Departure, Departure> departures1;
       final Pair<Departure, Departure> departures2;
       switch (status) {
-        case MORNING_WORKDAY_AROUND_HOME:
+        case COMMUTE_MORNING_平日:
           departures1 = mDataStore.findNextDepartures(Const.日比谷線_北千住_平日, mTime);
           departures2 = null;
           break;
-        case EVENING_WORKDAY_AROUND_WORK:
+        case COMMUTE_EVENING_休日:
           departures1 = mDataStore.findNextDepartures(Const.日比谷線_六本木_平日, mTime);
           departures2 = null;
           break;
-        case NOWORK_WORKDAY_HOME:
+        case HOME_平日:
           departures1 = mDataStore.findNextDepartures(Const.京成線_上野方面_平日, mTime);
           departures2 = mDataStore.findNextDepartures(Const.京成線_成田方面_平日, mTime);
           break;
-        case NOWORK_HOLIDAY_HOME:
+        case HOME_休日:
           departures1 = mDataStore.findNextDepartures(Const.京成線_上野方面_休日, mTime);
           departures2 = mDataStore.findNextDepartures(Const.京成線_成田方面_休日, mTime);
           break;

@@ -77,11 +77,11 @@ public class DrawTools
 
   public Bitmap getIconForStatus(final Status status) {
     switch (status) {
-      case MORNING_WORKDAY_AROUND_HOME:
-      case EVENING_WORKDAY_AROUND_WORK:
+      case COMMUTE_MORNING_平日:
+      case COMMUTE_EVENING_休日:
         return hibiyaIcon;
-      case NOWORK_WORKDAY_HOME:
-      case NOWORK_HOLIDAY_HOME:
+      case HOME_平日:
+      case HOME_休日:
         return keiseiIcon;
       default:
         return null;
