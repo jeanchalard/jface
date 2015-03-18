@@ -1,0 +1,14 @@
+- Geofence. Figure out in which of the areas we are.
+- Pressure. Figure out the altitude.
+- Timezones. Display all three interesting timezones.
+- Design.
+  - Where to put the date
+  - Where to put other timezones
+  - How to use the contour text
+  - Better use of the 2 lines
+- Destinations. Figure out arrival time.
+- Nippori. Read data, install geofence.
+- Animations. In and out animations on display transitions.
+- Background. Show the reflection face background moving according to gyroscope.
+- Automation. Retreive stuff automatically every now and then. Hook on geofences ?
+- Cleanup. Remove logs.
