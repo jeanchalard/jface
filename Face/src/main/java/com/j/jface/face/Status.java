@@ -11,6 +11,8 @@ public enum Status
   EVENING_WORKDAY_AROUND_WORK("Work, workday, evening", "六本木 → 北千住", null),
   NOWORK_WORKDAY_HOME("At home (workday)", "千住大橋 → 日暮里", "千住大橋 → 成田"),
   NOWORK_HOLIDAY_HOME("At home (holiday)", "千住大橋 → 日暮里", "千住大橋 → 成田"),
+  NIPPORI_WORKDAY("Nippori (workday)", "日暮里 → 千住大橋", null),
+  NIPPORI_HOLIDAY("Nippori (holiday)", "日暮里 → 千住大橋", null),
   OTHER("Freestyle", null, null);
 
   public final String description;
@@ -20,8 +22,9 @@ public enum Status
   private static final int DUNNO = 0;
   private static final int HOME = 1;
   private static final int WORK = 2;
-  private static final int TŌKYŌ = 3;
-  private static final int TRAVEL = 4;
+  private static final int NIPPORI = 3;
+  private static final int TŌKYŌ = 4;
+  private static final int TRAVEL = 5;
 
   private Status(@NonNull final String d, @NonNull final String h1, @NonNull final String h2) {
     description = d;
