@@ -1,5 +1,4 @@
 - Geofence. Figure out in which of the areas we are.
-- Pressure. Figure out the altitude.
 - Timezones. Display all three interesting timezones.
 - Design.
   - Where to put the date
@@ -11,4 +10,5 @@
 - Animations. In and out animations on display transitions.
 - Background. Show the reflection face background moving according to gyroscope.
 - Automation. Retreive stuff automatically every now and then. Hook on geofences ?
-- Cleanup. Remove logs.
+- Cleanup. Remove logs and stop allocating in onDraw.
+
