@@ -3,7 +3,6 @@ package com.j.jface.face;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.format.Time;
-import android.util.Log;
 import android.util.Pair;
 
 import com.google.android.gms.wearable.DataMap;
@@ -47,7 +46,9 @@ public class DataStore
     if (null == deps) return null;
     for (final Departure d : deps)
       if (d.time >= secs) return d;
-    return deps.get(0);
+    final Departure d = deps.get(0);
+    if (d.time > secs + 30 * 60) return null; // More than 30 minutes in the future : don't display anything
+    return d;
   }
 
   @Nullable public Pair<Departure, Departure> findNextDepartures(@NonNull final String key, @NonNull final Time time) {

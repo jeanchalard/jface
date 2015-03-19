@@ -86,9 +86,14 @@ public class Draw
                                          @NonNull final Params params, @NonNull final DrawTools drawTools,
                                          @NonNull Canvas canvas)
   {
-    final String text = String.format("%02d:%02d%s ▶ %02d:%02d%s",
-     departures.first.time / 3600, (departures.first.time % 3600) / 60, departures.first.extra,
-     departures.second.time / 3600, (departures.second.time % 3600) / 60, departures.second.extra);
+    final String text;
+    if (null != departures.second)
+      text = String.format("%02d:%02d%s ▶ %02d:%02d%s",
+       departures.first.time / 3600, (departures.first.time % 3600) / 60, departures.first.extra,
+       departures.second.time / 3600, (departures.second.time % 3600) / 60, departures.second.extra);
+    else
+      text = String.format("%02d:%02d%s ▶ 終了",
+       departures.first.time / 3600, (departures.first.time % 3600) / 60, departures.first.extra);
 
     final Bitmap icon = drawTools.getIconForStatus(params.status);
     final float departureOffset = y + drawTools.departurePaint.getTextSize() + 2;
