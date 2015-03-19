@@ -13,19 +13,22 @@ import com.j.jface.Const;
 public class Draw
 {
   public static class Params {
-    final boolean isBackgroundPresent;
-    final boolean isInAmbientMode;
-    final boolean isInMuteMode;
-    @Nullable final Pair<Departure, Departure> departures1;
-    @Nullable final Pair<Departure, Departure> departures2;
-    @NonNull final Status status;
-    @NonNull final Time time;
+    public final boolean isBackgroundPresent;
+    public final boolean isInAmbientMode;
+    public final boolean isInMuteMode;
+    public final float pressure;
+    @Nullable public final Pair<Departure, Departure> departures1;
+    @Nullable public final Pair<Departure, Departure> departures2;
+    @NonNull public final Status status;
+    @NonNull public final Time time;
     public Params(final boolean backgroundPresent, final boolean inAmbientMode, final boolean inMuteMode,
+                  final float p,
                   @Nullable final Pair<Departure, Departure> d1, @Nullable final Pair<Departure, Departure> d2,
                   @NonNull final Status s, @NonNull final Time t) {
       isBackgroundPresent = backgroundPresent;
       isInAmbientMode = inAmbientMode;
       isInMuteMode = inMuteMode;
+      pressure = p;
       departures1 = d1;
       departures2 = d2;
       status = s;
@@ -76,7 +79,7 @@ public class Draw
     }
 
     canvas.drawTextOnPath(
-     String.format("%04d/%02d/%02d - " + params.status.description, params.time.year, params.time.month + 1, params.time.monthDay),
+     String.format("%04d/%02d/%02d - %.1fhPa", params.time.year, params.time.month + 1, params.time.monthDay, params.pressure),
      drawTools.watchContourPath, 0, 0, drawTools.statusPaint);
   }
 

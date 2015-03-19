@@ -120,6 +120,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     }
 
     final DataStore mDataStore = new DataStore();
+    Sensors mSensors;
     DrawTools mDrawTools = new DrawTools(null);
     Time mTime;
     boolean mIsInMuteMode;
@@ -145,6 +146,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
        .build());
       mDrawTools = new DrawTools(DigitalWatchFaceService.this.getResources());
       mTime = new Time();
+      mSensors = new Sensors(DigitalWatchFaceService.this);
     }
 
     @Override
@@ -202,6 +204,10 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     {
       super.onAmbientModeChanged(inAmbientMode);
       mDrawTools.onAmbientModeChanged(inAmbientMode, mLowBitAmbient);
+      if (inAmbientMode)
+        mSensors.stop();
+      else
+        mSensors.start();
       invalidate();
 
       // Whether the timer should be running depends on whether we're in ambient mode (as well
@@ -258,7 +264,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       }
 
       final Draw.Params params = new Draw.Params(mIsBackgroundPresent, isInAmbientMode(), mIsInMuteMode,
-       departures1, departures2, status, mTime);
+       mSensors.mPressure, departures1, departures2, status, mTime);
       Draw.draw(mDrawTools, params, canvas, bounds);
     }
 
