@@ -4,8 +4,8 @@ import android.support.annotation.NonNull;
 
 public class Logger
 {
-  private static JFaceDataFeed logger;
-  public static void setLogger(final JFaceDataFeed l) {
+  private static GeofenceTransitionReceiver logger;
+  public static void setLogger(final GeofenceTransitionReceiver l) {
     logger = l;
   }
   public static void L(@NonNull final String s) {

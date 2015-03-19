@@ -17,6 +17,7 @@
 package com.j.jface.feed;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
@@ -47,6 +48,9 @@ public class JFaceDataFeedWrapper extends Activity
     {
       throw new RuntimeException(e);
     }
+    final Intent i = new Intent(this, GeofenceTransitionReceiverService.class);
+    i.setAction(GeofenceTransitionReceiver.ACTION_MANUAL_START);
+    startService(i);
   }
 
   // Interface callbacks

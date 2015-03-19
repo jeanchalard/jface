@@ -1,4 +1,7 @@
 - Geofence. Figure out in which of the areas we are.
+  - Save to DataApi so that the watch can see it
+  - Display on the face
+  - When we know where we are and it works, make use of it
 - Timezones. Display all three interesting timezones.
 - Design.
   - Where to put the date
