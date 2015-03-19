@@ -55,6 +55,6 @@ public class DataStore
     final Departure first = findClosestDeparture(key, time);
     if (null == first) return null;
     final Departure second = findClosestDeparture(key, first.time + 1);
-    return new Pair(first, second);
+    return new Pair<>(first, second);
   }
 }
