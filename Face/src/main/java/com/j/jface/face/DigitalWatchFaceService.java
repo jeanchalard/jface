@@ -240,8 +240,8 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     {
       mTime.setToNow();
       final Status status = Status.getStatus(mTime, null);
-      final Pair<Departure, Departure> departures1;
-      final Pair<Departure, Departure> departures2;
+      final Triplet<Departure> departures1;
+      final Triplet<Departure> departures2;
       switch (status) {
         case COMMUTE_MORNING_平日:
           departures1 = mDataStore.findNextDepartures(Const.日比谷線_北千住_平日, mTime);

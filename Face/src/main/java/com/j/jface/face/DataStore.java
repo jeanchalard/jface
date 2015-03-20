@@ -3,7 +3,6 @@ package com.j.jface.face;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.format.Time;
-import android.util.Pair;
 
 import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
@@ -51,10 +50,12 @@ public class DataStore
     return d;
   }
 
-  @Nullable public Pair<Departure, Departure> findNextDepartures(@NonNull final String key, @NonNull final Time time) {
+  @Nullable public Triplet<Departure> findNextDepartures(@NonNull final String key, @NonNull final Time time) {
     final Departure first = findClosestDeparture(key, time);
     if (null == first) return null;
     final Departure second = findClosestDeparture(key, first.time + 1);
-    return new Pair<>(first, second);
+    if (null == second) return new Triplet(first, null, null);
+    final Departure third = findClosestDeparture(key, second.time + 1);
+    return new Triplet<>(first, second, third);
   }
 }

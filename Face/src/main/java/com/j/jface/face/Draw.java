@@ -6,7 +6,6 @@ import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.format.Time;
-import android.util.Pair;
 
 import com.j.jface.Const;
 
@@ -22,13 +21,13 @@ public class Draw
     public final boolean isInAmbientMode;
     public final boolean isInMuteMode;
     public final float pressure;
-    @Nullable public final Pair<Departure, Departure> departures1;
-    @Nullable public final Pair<Departure, Departure> departures2;
+    @Nullable public final Triplet<Departure> departures1;
+    @Nullable public final Triplet<Departure> departures2;
     @NonNull public final Status status;
     @NonNull public final Time time;
     public Params(final boolean backgroundPresent, final boolean inAmbientMode, final boolean inMuteMode,
                   final float p,
-                  @Nullable final Pair<Departure, Departure> d1, @Nullable final Pair<Departure, Departure> d2,
+                  @Nullable final Triplet<Departure> d1, @Nullable final Triplet<Departure> d2,
                   @NonNull final Status s, @NonNull final Time t) {
       isBackgroundPresent = backgroundPresent;
       isInAmbientMode = inAmbientMode;
@@ -76,10 +75,10 @@ public class Draw
     if (null != params.departures1) // If data is not yet available this is null
     {
       final float departure2y =
-       drawDeparturePair(params.departures1, params.status.header1,
+       drawDepartureSet(params.departures1, params.status.header1,
         drawTools.departurePosX, drawTools.departurePosY, params, drawTools, canvas);
       if (null != params.departures2)
-        drawDeparturePair(params.departures2, params.status.header2,
+        drawDepartureSet(params.departures2, params.status.header2,
          drawTools.departurePosX, departure2y, params, drawTools, canvas);
     }
 
@@ -88,11 +87,11 @@ public class Draw
      drawTools.watchContourPath, 0, 0, drawTools.statusPaint);
   }
 
-  private static float drawDeparturePair(@NonNull final Pair<Departure, Departure> departures,
-                                         @Nullable final String header,
-                                         final float x, final float y,
-                                         @NonNull final Params params, @NonNull final DrawTools drawTools,
-                                         @NonNull Canvas canvas)
+  private static float drawDepartureSet(@NonNull final Triplet<Departure> departures,
+                                        @Nullable final String header,
+                                        final float x, final float y,
+                                        @NonNull final Params params, @NonNull final DrawTools drawTools,
+                                        @NonNull Canvas canvas)
   {
     final String text;
     if (null != departures.second)
