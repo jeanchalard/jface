@@ -31,7 +31,6 @@ import android.support.wearable.watchface.WatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.text.format.Time;
 import android.util.Log;
-import android.util.Pair;
 import android.view.SurfaceHolder;
 
 import com.google.android.gms.common.ConnectionResult;

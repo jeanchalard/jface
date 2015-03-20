@@ -15,9 +15,9 @@ public enum Status
   日暮里_休日("Nippori (holiday)", "日暮里 ▶ 千住大橋", null),
   OTHER("Freestyle", null, null);
 
-  public final String description;
-  public final String header1;
-  public final String header2;
+  @NonNull public final String description;
+  @NonNull public final String header1;
+  @Nullable public final String header2;
 
   private static final int DUNNO = 0;
   private static final int HOME = 1;

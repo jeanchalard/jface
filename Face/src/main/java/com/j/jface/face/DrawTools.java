@@ -10,13 +10,13 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 
+import com.j.jface.Const;
 import com.j.jface.R;
 
 public class DrawTools
 {
   private static final Typeface BOLD_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
   private static final Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
-  private static final int SCREEN_SIZE = 320;
 
   public final float timePosY;
   public final float departurePosX;
@@ -48,12 +48,12 @@ public class DrawTools
     final int contourPadding = 2;
     watchContourPath = new Path();
     watchContourPath.addArc(statusFontSize + contourPadding, statusFontSize + contourPadding, // top, left
-     SCREEN_SIZE - statusFontSize - contourPadding, SCREEN_SIZE - statusFontSize - contourPadding, // bottom, right
+     Const.SCREEN_SIZE - statusFontSize - contourPadding, Const.SCREEN_SIZE - statusFontSize - contourPadding, // bottom, right
      -269, 358); // startAngle, sweepAngle
 
     if (null != resources) {
       background = resources.getDrawable(R.drawable.bg);
-      background.setBounds(0, 0, SCREEN_SIZE, SCREEN_SIZE);
+      background.setBounds(0, 0, Const.SCREEN_SIZE, Const.SCREEN_SIZE);
       hibiyaIcon = ((BitmapDrawable)resources.getDrawable(R.drawable.hibiya)).getBitmap();
       keiseiIcon = ((BitmapDrawable)resources.getDrawable(R.drawable.keisei)).getBitmap();
     } else {

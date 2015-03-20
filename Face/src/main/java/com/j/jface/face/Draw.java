@@ -2,6 +2,7 @@ package com.j.jface.face;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,7 +14,7 @@ public class Draw
 {
   BitmapCache mCache;
   public Draw() {
-    mCache = new BitmapCache();
+    mCache = new BitmapCache(0, 0, 0, -1, new Paint());
   }
 
   public static class Params {
@@ -74,12 +75,28 @@ public class Draw
 
     if (null != params.departures1) // If data is not yet available this is null
     {
-      final float departure2y =
-       drawDepartureSet(params.departures1, params.status.header1,
-        drawTools.departurePosX, drawTools.departurePosY, params, drawTools, canvas);
+      // Draw header
+      canvas.drawText(params.status.header1,
+       drawTools.departurePosX, drawTools.departurePosY, drawTools.departurePaint);
+      // Draw icon
+      final float y1 = drawTools.departurePosY + drawTools.departurePaint.getTextSize() + 2;
+      drawIcon(drawTools.departurePosX, y1, params, drawTools, canvas);
+      // Draw departures
+      final float y1e = drawDepartureSet(params.departures1, params.status.header1,
+       drawTools.departurePosX, y1, params, drawTools, canvas);
+
       if (null != params.departures2)
+      {
+        // Draw header
+        if (null != params.status.header2) canvas.drawText(params.status.header2,
+         drawTools.departurePosX, y1e, drawTools.departurePaint);
+        // Draw icon
+        final float y2 = y1e + drawTools.departurePaint.getTextSize() + 2;
+        drawIcon(drawTools.departurePosX, y2, params, drawTools, canvas);
+        // Draw departures
         drawDepartureSet(params.departures2, params.status.header2,
-         drawTools.departurePosX, departure2y, params, drawTools, canvas);
+         drawTools.departurePosX, y2, params, drawTools, canvas);
+      }
     }
 
     canvas.drawTextOnPath(
@@ -87,29 +104,53 @@ public class Draw
      drawTools.watchContourPath, 0, 0, drawTools.statusPaint);
   }
 
-  private static float drawDepartureSet(@NonNull final Triplet<Departure> departures,
+  private final static String separator = " ◈ ";
+  private float drawDepartureSet(@NonNull final Triplet<Departure> departures,
                                         @Nullable final String header,
                                         final float x, final float y,
                                         @NonNull final Params params, @NonNull final DrawTools drawTools,
-                                        @NonNull Canvas canvas)
+                                        @NonNull final Canvas canvas)
   {
     final String text;
-    if (null != departures.second)
-      text = String.format("%02d:%02d%s ◈ %02d:%02d%s",
-       departures.first.time / 3600, (departures.first.time % 3600) / 60, departures.first.extra,
-       departures.second.time / 3600, (departures.second.time % 3600) / 60, departures.second.extra);
-    else
+    final float sizeNow, sizeNext, sizeTotal;
+    if (null == departures.second)
+    {
       text = String.format("%02d:%02d%s ◈ 終了",
        departures.first.time / 3600, (departures.first.time % 3600) / 60, departures.first.extra);
+      sizeNow = drawTools.departurePaint.measureText(text);
+      sizeNext = 0;
+      sizeTotal = sizeNow;
+    }
+    else
+    {
+      final String text1 = formatDeparture(departures.first);
+      final String text2 = formatDeparture(departures.second);
+      final String text3 = null == departures.third ? "終了" : formatDeparture(departures.third);
+      text = text1 + separator + text2 + separator + text3;
+      sizeNow = drawTools.departurePaint.measureText(text1 + separator + text2);
+      sizeNext = drawTools.departurePaint.measureText(text2 + separator + text3);
+      sizeTotal = drawTools.departurePaint.measureText(text);
+    }
 
+    final float height = drawTools.departurePaint.getTextSize() + 2;
+    mCache = new BitmapCache(sizeNow, sizeNext, sizeTotal - sizeNext, departures.first.time, drawTools.departurePaint);
+    mCache.clear();
+    mCache.drawText(text, drawTools.departurePaint);
+    mCache.drawOn(canvas, x, y, drawTools.imagePaint);
+    return y + height;
+  }
+
+  private static String formatDeparture(final Departure dep)
+  {
+    return String.format("%02d:%02d%s", dep.time / 3600, (dep.time % 3600) / 60, dep.extra);
+  }
+
+  private static void drawIcon(final float x, final float y, @NonNull final Params params,
+                               @NonNull final DrawTools drawTools, @NonNull final Canvas canvas) {
     final Bitmap icon = drawTools.getIconForStatus(params.status);
-    final float departureOffset = y + drawTools.departurePaint.getTextSize() + 2;
     canvas.drawBitmap(icon,
      x - icon.getWidth() - drawTools.iconToDepartureXPadding,
-     departureOffset - icon.getHeight() + 5, // + 5 for alignment because I can't be assed to compute it
+     y - icon.getHeight() + 5, // + 5 for alignment because I can't be assed to compute it
      drawTools.imagePaint);
-    if (null != header) canvas.drawText(header, x, y, drawTools.departurePaint);
-    canvas.drawText(text, x, departureOffset, drawTools.departurePaint);
-    return departureOffset + drawTools.departurePaint.getTextSize() + 2;
   }
 }
