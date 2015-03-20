@@ -265,7 +265,8 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
 
       final Draw.Params params = new Draw.Params(mIsBackgroundPresent, isInAmbientMode(), mIsInMuteMode,
        mSensors.mPressure, departures1, departures2, status, mTime);
-      mDraw.draw(mDrawTools, params, canvas, bounds);
+      if (mDraw.draw(mDrawTools, params, canvas, bounds))
+        invalidate();
     }
 
     /**

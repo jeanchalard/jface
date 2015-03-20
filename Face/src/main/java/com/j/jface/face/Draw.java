@@ -41,8 +41,8 @@ public class Draw
     }
   }
 
-  public void draw(@NonNull final DrawTools drawTools, @NonNull final Params params,
-                   @NonNull final Canvas canvas, @NonNull final Rect bounds)
+  public boolean draw(@NonNull final DrawTools drawTools, @NonNull final Params params,
+                      @NonNull final Canvas canvas, @NonNull final Rect bounds)
   {
     // Draw the background.
     // TODO: only update the relevant part of the display.
@@ -73,39 +73,44 @@ public class Draw
       canvas.drawText(weekDay, center - hoursSize - weekDaySize, drawTools.timePosY, drawTools.secondsPaint);
     }
 
+    boolean mustInvalidate = false;
     if (null != params.departures1) // If data is not yet available this is null
     {
+      final float lineHeight = drawTools.departurePaint.getTextSize() + 2;
       // Draw header
       canvas.drawText(params.status.header1,
        drawTools.departurePosX, drawTools.departurePosY, drawTools.departurePaint);
       // Draw icon
-      final float y1 = drawTools.departurePosY + drawTools.departurePaint.getTextSize() + 2;
+      final float y1 = drawTools.departurePosY + lineHeight;
       drawIcon(drawTools.departurePosX, y1, params, drawTools, canvas);
       // Draw departures
-      final float y1e = drawDepartureSet(params.departures1, drawTools.departurePosX, y1, drawTools, canvas);
+      mustInvalidate |= drawDepartureSet(params.departures1, drawTools.departurePosX, y1, drawTools, canvas);
 
       if (null != params.departures2)
       {
         // Draw header
+        final float y1e = y1 + lineHeight;
         if (null != params.status.header2) canvas.drawText(params.status.header2,
          drawTools.departurePosX, y1e, drawTools.departurePaint);
         // Draw icon
-        final float y2 = y1e + drawTools.departurePaint.getTextSize() + 2;
+        final float y2 = y1e + lineHeight;
         drawIcon(drawTools.departurePosX, y2, params, drawTools, canvas);
         // Draw departures
-        drawDepartureSet(params.departures2, drawTools.departurePosX, y2, drawTools, canvas);
+        mustInvalidate |= drawDepartureSet(params.departures2, drawTools.departurePosX, y2, drawTools, canvas);
       }
     }
 
     canvas.drawTextOnPath(
      String.format("%04d/%02d/%02d - %.1fhPa", params.time.year, params.time.month + 1, params.time.monthDay, params.pressure),
      drawTools.watchContourPath, 0, 0, drawTools.statusPaint);
+
+    return mustInvalidate;
   }
 
   private final static String separator = " ◈ ";
-  private float drawDepartureSet(@NonNull final Triplet<Departure> departures,
-                                        final float x, final float y,
-                                        @NonNull final DrawTools drawTools, @NonNull final Canvas canvas)
+  private boolean drawDepartureSet(@NonNull final Triplet<Departure> departures,
+                                   final float x, final float y,
+                                   @NonNull final DrawTools drawTools, @NonNull final Canvas canvas)
   {
     final String text;
     final float sizeNow, sizeNext, sizeTotal;
@@ -135,8 +140,7 @@ public class Draw
       mCache.clear();
       mCache.drawText(text);
     }
-    mCache.drawOn(canvas, x, y, drawTools.imagePaint);
-    return y + drawTools.departurePaint.getTextSize() + 2;
+    return mCache.drawOn(canvas, x, y, drawTools.imagePaint);
   }
 
   private static String formatDeparture(final Departure dep)
