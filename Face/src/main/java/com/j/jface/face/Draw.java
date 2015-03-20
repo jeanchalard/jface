@@ -82,8 +82,7 @@ public class Draw
       final float y1 = drawTools.departurePosY + drawTools.departurePaint.getTextSize() + 2;
       drawIcon(drawTools.departurePosX, y1, params, drawTools, canvas);
       // Draw departures
-      final float y1e = drawDepartureSet(params.departures1, params.status.header1,
-       drawTools.departurePosX, y1, params, drawTools, canvas);
+      final float y1e = drawDepartureSet(params.departures1, drawTools.departurePosX, y1, drawTools, canvas);
 
       if (null != params.departures2)
       {
@@ -94,8 +93,7 @@ public class Draw
         final float y2 = y1e + drawTools.departurePaint.getTextSize() + 2;
         drawIcon(drawTools.departurePosX, y2, params, drawTools, canvas);
         // Draw departures
-        drawDepartureSet(params.departures2, params.status.header2,
-         drawTools.departurePosX, y2, params, drawTools, canvas);
+        drawDepartureSet(params.departures2, drawTools.departurePosX, y2, drawTools, canvas);
       }
     }
 
@@ -106,10 +104,8 @@ public class Draw
 
   private final static String separator = " ◈ ";
   private float drawDepartureSet(@NonNull final Triplet<Departure> departures,
-                                        @Nullable final String header,
                                         final float x, final float y,
-                                        @NonNull final Params params, @NonNull final DrawTools drawTools,
-                                        @NonNull final Canvas canvas)
+                                        @NonNull final DrawTools drawTools, @NonNull final Canvas canvas)
   {
     final String text;
     final float sizeNow, sizeNext, sizeTotal;
