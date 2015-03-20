@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
@@ -78,13 +79,9 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
         {
           case MSG_UPDATE_TIME:
             invalidate();
-            if (shouldTimerBeRunning())
-            {
-              long timeMs = System.currentTimeMillis();
-              long delayMs =
-               mInteractiveUpdateRateMs - (timeMs % mInteractiveUpdateRateMs);
-              mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs);
-            }
+            final long nextUpdateTime = nextUpdateTime();
+            final long now = System.currentTimeMillis();
+            mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, nextUpdateTime - now);
             break;
         }
       }
@@ -122,7 +119,8 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     Sensors mSensors;
     Draw mDraw = new Draw();
     DrawTools mDrawTools = new DrawTools(null);
-    Time mTime;
+    @NonNull final Time mTime = new Time();
+    @Nullable Departure mNextDeparture;
     boolean mIsInMuteMode;
     boolean mIsBackgroundPresent = true;
 
@@ -145,8 +143,8 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
        .setShowSystemUiTime(false)
        .build());
       mDrawTools = new DrawTools(DigitalWatchFaceService.this.getResources());
-      mTime = new Time();
       mSensors = new Sensors(DigitalWatchFaceService.this);
+      mTime.setToNow();
     }
 
     @Override
@@ -193,13 +191,6 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     }
 
     @Override
-    public void onTimeTick()
-    {
-      super.onTimeTick();
-      invalidate();
-    }
-
-    @Override
     public void onAmbientModeChanged(final boolean inAmbientMode)
     {
       super.onAmbientModeChanged(inAmbientMode);
@@ -231,7 +222,25 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       if (updateRateMs == mInteractiveUpdateRateMs) return;
       mInteractiveUpdateRateMs = updateRateMs;
       // Stop and restart the timer so the new update rate takes effect immediately.
-      if (shouldTimerBeRunning()) updateTimer();
+      updateTimer();
+    }
+
+    public long nextUpdateTime() {
+      boolean active = isVisible() && !isInAmbientMode();
+      mTime.setToNow();
+      final int d = (mTime.hour * 3600 + mTime.minute * 60) % 86400;
+      final boolean mustWakeForAnimation = (!active && null != mNextDeparture && mNextDeparture.time == d);
+
+      final long now = System.currentTimeMillis();
+      // If active, every second, otherwise every minute
+      if (active)
+        return now + 1000 - now % 1000;
+      else
+      {
+        long nextFrameTime = now + 60000 - now % 60000 - (mustWakeForAnimation ? Const.ANIM_DURATION + 500 : 0);
+        if (nextFrameTime < now) return now + 1000 - now % 1000;
+        return nextFrameTime;
+      }
     }
 
     @Override
@@ -267,6 +276,13 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
        mSensors.mPressure, departures1, departures2, status, mTime);
       if (mDraw.draw(mDrawTools, params, canvas, bounds))
         invalidate();
+
+      if (null == departures1)
+        mNextDeparture = null;
+      else if (null == departures2)
+        mNextDeparture = departures1.first;
+      else
+        mNextDeparture = departures1.first.time < departures2.first.time ? departures1.first : departures2.first;
     }
 
     /**
@@ -276,17 +292,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     private void updateTimer()
     {
       mUpdateTimeHandler.removeMessages(MSG_UPDATE_TIME);
-      if (shouldTimerBeRunning())
-        mUpdateTimeHandler.sendEmptyMessage(MSG_UPDATE_TIME);
-    }
-
-    /**
-     * Returns whether the {@link #mUpdateTimeHandler} timer should be running. The timer should
-     * only run when we're visible and in interactive mode.
-     */
-    private boolean shouldTimerBeRunning()
-    {
-      return isVisible() && !isInAmbientMode();
+      mUpdateTimeHandler.sendEmptyMessage(MSG_UPDATE_TIME);
     }
 
     private void setDefaultValuesForMissingConfigKeys(@NonNull final DataMap config)
@@ -313,6 +319,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
               mTime.set(Long.parseLong(data.getString(key)));
             }
           }
+        updateTimer();
       }
     }
 
