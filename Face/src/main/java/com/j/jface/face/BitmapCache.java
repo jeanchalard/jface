@@ -14,18 +14,18 @@ public class BitmapCache
   private static final Canvas sCanvas = new Canvas(sCache);
   private final int mSizeNow, mSizeNext, mOffsetNext;
   private final int mVerticalShift;
-  private final int mDate;
+  public final int mTime;
   private final Paint mPaint;
   private Rect mSrc, mDst;
 
-  public BitmapCache(final float sizeNow, final float sizeNext, final float offsetNext, final int date, final Paint p)
+  public BitmapCache(final float sizeNow, final float sizeNext, final float offsetNext, final int time, final Paint p)
   {
     mSizeNow = (int)Math.ceil(sizeNow);
     mSizeNext = (int)Math.ceil(sizeNext + 1);
     mOffsetNext = (int)offsetNext;
     mSrc = new Rect(); mDst = new Rect();
     mSrc.top = 0; mSrc.bottom = HEIGHT;
-    mDate = -1;
+    mTime = time;
     mPaint = p;
     mVerticalShift = -p.getFontMetricsInt().top;
   }
@@ -35,9 +35,9 @@ public class BitmapCache
     sCache.eraseColor(0);
   }
 
-  public void drawText(final String text, final Paint p)
+  public void drawText(final String text)
   {
-    sCanvas.drawText(text, 0, mVerticalShift, p);
+    sCanvas.drawText(text, 0, mVerticalShift, mPaint);
   }
 
   public void drawOn(final Canvas canvas, final float x, final float y, final Paint p)

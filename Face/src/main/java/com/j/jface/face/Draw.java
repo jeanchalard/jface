@@ -132,12 +132,15 @@ public class Draw
       sizeTotal = drawTools.departurePaint.measureText(text);
     }
 
-    final float height = drawTools.departurePaint.getTextSize() + 2;
-    mCache = new BitmapCache(sizeNow, sizeNext, sizeTotal - sizeNext, departures.first.time, drawTools.departurePaint);
-    mCache.clear();
-    mCache.drawText(text, drawTools.departurePaint);
+    if (departures.first.time != mCache.mTime)
+    {
+      mCache = new BitmapCache(sizeNow, sizeNext, sizeTotal - sizeNext, departures.first.time,
+       drawTools.departurePaint);
+      mCache.clear();
+      mCache.drawText(text);
+    }
     mCache.drawOn(canvas, x, y, drawTools.imagePaint);
-    return y + height;
+    return y + drawTools.departurePaint.getTextSize() + 2;
   }
 
   private static String formatDeparture(final Departure dep)
