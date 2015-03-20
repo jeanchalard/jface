@@ -302,7 +302,6 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     }
 
     private void updateDataItem(@NonNull final String path, @NonNull final DataMap data) {
-      Log.e("RECEIVED data", path);
       if (path.equals(Const.CONFIG_PATH))
         updateUiForConfigDataMap(data);
       else if (path.startsWith(Const.DATA_PATH))

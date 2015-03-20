@@ -43,18 +43,22 @@ public class DataStore
     final int secs = time % 86400;
     final ArrayList<Departure> deps = mDepartures.get(key);
     if (null == deps) return null;
+    Departure nextDeparture = null;
     for (final Departure d : deps)
-      if (d.time >= secs) return d;
-    final Departure d = deps.get(0);
-    if (d.time > secs + 30 * 60) return null; // More than 30 minutes in the future : don't display anything
-    return d;
+      if (d.time >= secs) {
+        nextDeparture = d;
+        break;
+      }
+    if (null == nextDeparture) nextDeparture = deps.get(0);
+    if (nextDeparture.time > secs + 30 * 60) return null; // More than 30 minutes in the future : don't display anything
+    return nextDeparture;
   }
 
   @Nullable public Triplet<Departure> findNextDepartures(@NonNull final String key, @NonNull final Time time) {
     final Departure first = findClosestDeparture(key, time);
     if (null == first) return null;
     final Departure second = findClosestDeparture(key, first.time + 1);
-    if (null == second) return new Triplet(first, null, null);
+    if (null == second) return new Triplet<>(first, null, null);
     final Departure third = findClosestDeparture(key, second.time + 1);
     return new Triplet<>(first, second, third);
   }

@@ -12,7 +12,7 @@ import com.j.jface.Util;
 
 public class BitmapCache
 {
-  private static final int HEIGHT = 25;
+  private static final int HEIGHT = 30;
   private static final Bitmap sCache = Bitmap.createBitmap(Const.SCREEN_SIZE, HEIGHT, Bitmap.Config.ARGB_8888);
   private static final Canvas sCanvas = new Canvas(sCache);
   private final Interpolator interpolator = new DecelerateInterpolator(1.0f);
