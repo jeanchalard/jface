@@ -121,6 +121,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
 
     final DataStore mDataStore = new DataStore();
     Sensors mSensors;
+    Draw mDraw = new Draw();
     DrawTools mDrawTools = new DrawTools(null);
     Time mTime;
     boolean mIsInMuteMode;
@@ -265,7 +266,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
 
       final Draw.Params params = new Draw.Params(mIsBackgroundPresent, isInAmbientMode(), mIsInMuteMode,
        mSensors.mPressure, departures1, departures2, status, mTime);
-      Draw.draw(mDrawTools, params, canvas, bounds);
+      mDraw.draw(mDrawTools, params, canvas, bounds);
     }
 
     /**

@@ -7,12 +7,12 @@ import android.text.format.Time;
 
 public enum Status
 {
-  COMMUTE_MORNING_平日("Home, workday, morning", "北千住 → 六本木", null),
-  COMMUTE_EVENING_休日("Work, workday, evening", "六本木 → 北千住", null),
-  HOME_平日("At home (workday)", "千住大橋 → 日暮里", "千住大橋 → 成田"),
-  HOME_休日("At home (holiday)", "千住大橋 → 日暮里", "千住大橋 → 成田"),
-  日暮里_平日("Nippori (workday)", "日暮里 → 千住大橋", null),
-  日暮里_休日("Nippori (holiday)", "日暮里 → 千住大橋", null),
+  COMMUTE_MORNING_平日("Home, workday, morning", "北千住 ▶ 六本木", null),
+  COMMUTE_EVENING_休日("Work, workday, evening", "六本木 ▶ 北千住", null),
+  HOME_平日("At home (workday)", "千住大橋 ▶ 日暮里", "千住大橋 ▶ 成田"),
+  HOME_休日("At home (holiday)", "千住大橋 ▶ 日暮里", "千住大橋 ▶ 成田"),
+  日暮里_平日("Nippori (workday)", "日暮里 ▶ 千住大橋", null),
+  日暮里_休日("Nippori (holiday)", "日暮里 ▶ 千住大橋", null),
   OTHER("Freestyle", null, null);
 
   public final String description;

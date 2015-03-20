@@ -12,6 +12,11 @@ import com.j.jface.Const;
 
 public class Draw
 {
+  BitmapCache mCache;
+  public Draw() {
+    mCache = new BitmapCache();
+  }
+
   public static class Params {
     public final boolean isBackgroundPresent;
     public final boolean isInAmbientMode;
@@ -36,8 +41,8 @@ public class Draw
     }
   }
 
-  public static void draw(@NonNull final DrawTools drawTools, @NonNull final Params params,
-                          @NonNull final Canvas canvas, @NonNull final Rect bounds)
+  public void draw(@NonNull final DrawTools drawTools, @NonNull final Params params,
+                   @NonNull final Canvas canvas, @NonNull final Rect bounds)
   {
     // Draw the background.
     // TODO: only update the relevant part of the display.
@@ -91,11 +96,11 @@ public class Draw
   {
     final String text;
     if (null != departures.second)
-      text = String.format("%02d:%02d%s ▶ %02d:%02d%s",
+      text = String.format("%02d:%02d%s ◈ %02d:%02d%s",
        departures.first.time / 3600, (departures.first.time % 3600) / 60, departures.first.extra,
        departures.second.time / 3600, (departures.second.time % 3600) / 60, departures.second.extra);
     else
-      text = String.format("%02d:%02d%s ▶ 終了",
+      text = String.format("%02d:%02d%s ◈ 終了",
        departures.first.time / 3600, (departures.first.time % 3600) / 60, departures.first.extra);
 
     final Bitmap icon = drawTools.getIconForStatus(params.status);
