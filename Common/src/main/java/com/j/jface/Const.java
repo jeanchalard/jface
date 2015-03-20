@@ -3,6 +3,8 @@ package com.j.jface;
 public class Const
 {
   public static final int SCREEN_SIZE = 320;
+  public static final int ANIM_DURATION = 1000; // milliseconds
+  public static final long SECONDS_TO_UTC = -9 * 3600;
 
   public static final String[] WEEKDAYS = { "日", "月", "火", "水", "木", "金", "土", "日" };
   public static final String DATA_PATH = "/jwatch/Data";
