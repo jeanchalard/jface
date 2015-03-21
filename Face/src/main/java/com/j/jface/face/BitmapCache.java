@@ -44,9 +44,9 @@ public class BitmapCache
     mCache.eraseColor(0);
   }
 
-  public void drawText(final String text)
+  public void drawText(final CharSequence text)
   {
-    mCanvas.drawText(text, 0, mVerticalShift, mPaint);
+    mCanvas.drawText(text, 0, text.length(), 0, mVerticalShift, mPaint);
   }
 
   public boolean drawOn(final Canvas canvas, final float x, final float y, final Paint p)
