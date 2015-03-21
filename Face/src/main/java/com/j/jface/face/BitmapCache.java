@@ -13,35 +13,40 @@ import com.j.jface.Util;
 public class BitmapCache
 {
   private static final int HEIGHT = 30;
-  private static final Bitmap sCache = Bitmap.createBitmap(Const.SCREEN_SIZE, HEIGHT, Bitmap.Config.ARGB_8888);
-  private static final Canvas sCanvas = new Canvas(sCache);
-  private final Interpolator interpolator = new DecelerateInterpolator(1.0f);
+  private final Bitmap mCache;
+  private final Canvas mCanvas;
+  private final Interpolator interpolator = new DecelerateInterpolator(3.0f);
   private final int mSizeNow, mSizeNext, mOffsetNext;
   private final int mVerticalShift;
-  public final int mTime;
+  public final Triplet<Departure> mDepartures;
+  private final int mTime;
   private final Paint mPaint;
   private Rect mSrc, mDst;
 
-  public BitmapCache(final float sizeNow, final float sizeNext, final float offsetNext, final int time, final Paint p)
+  public BitmapCache(final float sizeNow, final float sizeNext, final float offsetNext,
+                     final Triplet<Departure> departures, final Paint p)
   {
+    mCache = Bitmap.createBitmap(Const.SCREEN_SIZE, HEIGHT, Bitmap.Config.ARGB_8888);
+    mCanvas = new Canvas(mCache);
     mSizeNow = (int)Math.ceil(sizeNow);
     mSizeNext = (int)Math.ceil(sizeNext + 1);
     mOffsetNext = (int)offsetNext;
     mSrc = new Rect(); mDst = new Rect();
     mSrc.top = 0; mSrc.bottom = HEIGHT;
-    mTime = time;
+    mDepartures = departures;
+    mTime = null == departures ? -1 : departures.first.time;
     mPaint = p;
     mVerticalShift = -p.getFontMetricsInt().top;
   }
 
   public void clear()
   {
-    sCache.eraseColor(0);
+    mCache.eraseColor(0);
   }
 
   public void drawText(final String text)
   {
-    sCanvas.drawText(text, 0, mVerticalShift, mPaint);
+    mCanvas.drawText(text, 0, mVerticalShift, mPaint);
   }
 
   public boolean drawOn(final Canvas canvas, final float x, final float y, final Paint p)
@@ -60,7 +65,7 @@ public class BitmapCache
     mDst.left = (int)x; mDst.right = mDst.left + size;
     mDst.top = (int)(y - mVerticalShift); mDst.bottom = mDst.top + HEIGHT;
 
-    canvas.drawBitmap(sCache, mSrc, mDst, p);
+    canvas.drawBitmap(mCache, mSrc, mDst, p);
     return remainingTimeToDeparture < Const.ANIM_DURATION + 1000;
   }
 }

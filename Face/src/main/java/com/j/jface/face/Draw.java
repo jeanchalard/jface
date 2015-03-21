@@ -7,14 +7,16 @@ import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.format.Time;
+import android.util.Log;
 
 import com.j.jface.Const;
 
 public class Draw
 {
-  BitmapCache mCache;
+  BitmapCache[] mCache;
   public Draw() {
-    mCache = new BitmapCache(0, 0, 0, -1, new Paint());
+    mCache = new BitmapCache[] { new BitmapCache(0, 0, 0, null, new Paint()),
+      new BitmapCache(0, 0, 0, null, new Paint()) };
   }
 
   public static class Params {
@@ -44,6 +46,8 @@ public class Draw
   public boolean draw(@NonNull final DrawTools drawTools, @NonNull final Params params,
                       @NonNull final Canvas canvas, @NonNull final Rect bounds)
   {
+    long start = System.currentTimeMillis();
+
     // Draw the background.
     // TODO: only update the relevant part of the display.
     if (params.isBackgroundPresent)
@@ -84,7 +88,7 @@ public class Draw
       final float y1 = drawTools.departurePosY + lineHeight;
       drawIcon(drawTools.departurePosX, y1, params, drawTools, canvas);
       // Draw departures
-      mustInvalidate |= drawDepartureSet(params.departures1, drawTools.departurePosX, y1, drawTools, canvas);
+      mustInvalidate |= drawDepartureSet(0, params.departures1, drawTools.departurePosX, y1, drawTools, canvas);
 
       if (null != params.departures2)
       {
@@ -96,7 +100,7 @@ public class Draw
         final float y2 = y1e + lineHeight;
         drawIcon(drawTools.departurePosX, y2, params, drawTools, canvas);
         // Draw departures
-        mustInvalidate |= drawDepartureSet(params.departures2, drawTools.departurePosX, y2, drawTools, canvas);
+        mustInvalidate |= drawDepartureSet(1, params.departures2, drawTools.departurePosX, y2, drawTools, canvas);
       }
     }
 
@@ -104,11 +108,14 @@ public class Draw
      String.format("%04d/%02d/%02d - %.1fhPa", params.time.year, params.time.month + 1, params.time.monthDay, params.pressure),
      drawTools.watchContourPath, 0, 0, drawTools.statusPaint);
 
+    long finish = System.currentTimeMillis();
+    Log.e("TIME", "" + (finish - start));
+
     return mustInvalidate;
   }
 
   private final static String separator = " ◈ ";
-  private boolean drawDepartureSet(@NonNull final Triplet<Departure> departures,
+  private boolean drawDepartureSet(final int index, @NonNull final Triplet<Departure> departures,
                                    final float x, final float y,
                                    @NonNull final DrawTools drawTools, @NonNull final Canvas canvas)
   {
@@ -133,14 +140,15 @@ public class Draw
       sizeTotal = drawTools.departurePaint.measureText(text);
     }
 
-    if (departures.first.time != mCache.mTime)
+    BitmapCache cache = mCache[index];
+    if (null == cache.mDepartures || departures.first != cache.mDepartures.first)
     {
-      mCache = new BitmapCache(sizeNow, sizeNext, sizeTotal - sizeNext, departures.first.time,
-       drawTools.departurePaint);
-      mCache.clear();
-      mCache.drawText(text);
+      cache = new BitmapCache(sizeNow, sizeNext, sizeTotal - sizeNext, departures, drawTools.departurePaint);
+      cache.clear();
+      cache.drawText(text);
+      mCache[index] = cache;
     }
-    return mCache.drawOn(canvas, x, y, drawTools.imagePaint);
+    return cache.drawOn(canvas, x, y, drawTools.imagePaint);
   }
 
   private static String formatDeparture(final Departure dep)
