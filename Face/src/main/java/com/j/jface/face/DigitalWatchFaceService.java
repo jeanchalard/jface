@@ -121,8 +121,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     DrawTools mDrawTools = new DrawTools(null);
     @NonNull final Time mTime = new Time();
     @Nullable Departure mNextDeparture;
-    boolean mIsInMuteMode;
-    boolean mIsBackgroundPresent = true;
+    int mModeFlags = Draw.BACKGROUND_PRESENT; // Default mode is background on, mute off, ambient off
 
     /**
      * Whether the display supports fewer bits for each color in ambient mode. When true, we
@@ -213,8 +212,16 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       super.onInterruptionFilterChanged(interruptionFilter);
       boolean inMuteMode = interruptionFilter == WatchFaceService.INTERRUPTION_FILTER_NONE;
       // We only need to update once a minute in mute mode.
-      setInteractiveUpdateRateMs(inMuteMode ? MUTE_UPDATE_RATE_MS : NORMAL_UPDATE_RATE_MS);
-      mIsInMuteMode = inMuteMode;
+      if (inMuteMode)
+      {
+        setInteractiveUpdateRateMs(MUTE_UPDATE_RATE_MS);
+        mModeFlags |= Draw.MUTE_MODE;
+      }
+      else
+      {
+        setInteractiveUpdateRateMs(NORMAL_UPDATE_RATE_MS);
+        mModeFlags &= ~Draw.MUTE_MODE;
+      }
     }
 
     public void setInteractiveUpdateRateMs(long updateRateMs)
@@ -272,9 +279,10 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
           departures2 = null;
       }
 
-      final Draw.Params params = new Draw.Params(mIsBackgroundPresent, isInAmbientMode(), mIsInMuteMode,
-       mSensors.mPressure, departures1, departures2, status, mTime);
-      if (mDraw.draw(mDrawTools, params, canvas, bounds))
+      final int ambientFlag = isInAmbientMode() ? Draw.AMBIENT_MODE : 0;
+      final Draw.Params params = new Draw.Params(
+       mSensors.mPressure, departures1, departures2, status);
+      if (mDraw.draw(mDrawTools, mModeFlags | ambientFlag, params, canvas, bounds, mTime))
         invalidate();
 
       if (null == departures1)
@@ -369,7 +377,12 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
 
     private void updateUiForConfigDataMap(@NonNull final DataMap config)
     {
-      mIsBackgroundPresent = config.getBoolean(Const.CONFIG_KEY_BACKGROUND, mIsBackgroundPresent);
+      final boolean isBackgroundPresent = config.getBoolean(Const.CONFIG_KEY_BACKGROUND,
+       0 != (mModeFlags & Draw.BACKGROUND_PRESENT));
+      if (isBackgroundPresent)
+        mModeFlags |= Draw.BACKGROUND_PRESENT;
+      else
+        mModeFlags &= ~Draw.BACKGROUND_PRESENT;
       invalidate();
     }
 

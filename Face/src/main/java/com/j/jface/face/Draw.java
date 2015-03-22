@@ -13,6 +13,10 @@ import com.j.jface.Const;
 
 public class Draw
 {
+  public static final int BACKGROUND_PRESENT = 1;
+  public static final int AMBIENT_MODE = 2;
+  public static final int MUTE_MODE = 4;
+
   private BitmapCache[] mCache;
   public Draw() {
     mCache = new BitmapCache[] { new BitmapCache(0, 0, 0, null, new Paint()),
@@ -20,60 +24,52 @@ public class Draw
   }
 
   public static class Params {
-    public final boolean isBackgroundPresent;
-    public final boolean isInAmbientMode;
-    public final boolean isInMuteMode;
     public final float pressure;
     @Nullable public final Triplet<Departure> departures1;
     @Nullable public final Triplet<Departure> departures2;
     @NonNull public final Status status;
-    @NonNull public final Time time;
-    public Params(final boolean backgroundPresent, final boolean inAmbientMode, final boolean inMuteMode,
-                  final float p,
+    public Params(final float p,
                   @Nullable final Triplet<Departure> d1, @Nullable final Triplet<Departure> d2,
-                  @NonNull final Status s, @NonNull final Time t) {
-      isBackgroundPresent = backgroundPresent;
-      isInAmbientMode = inAmbientMode;
-      isInMuteMode = inMuteMode;
+                  @NonNull final Status s) {
       pressure = p;
       departures1 = d1;
       departures2 = d2;
       status = s;
-      time = t;
     }
   }
 
   final StringBuilder mTmpSb = new StringBuilder(256);
   final char[] mTmpChr = new char[256];
-  public boolean draw(@NonNull final DrawTools drawTools, @NonNull final Params params,
-                      @NonNull final Canvas canvas, @NonNull final Rect bounds)
+  public boolean draw(@NonNull final DrawTools drawTools, final int modeFlags, @NonNull final Params params,
+                      @NonNull final Canvas canvas, @NonNull final Rect bounds,
+                      @NonNull final Time time)
   {
     long start = System.currentTimeMillis();
 
     // Draw the background.
     // TODO: only update the relevant part of the display.
-    if (params.isBackgroundPresent)
+    if (0 != (BACKGROUND_PRESENT & modeFlags))
       drawTools.background.draw(canvas);
     else
       canvas.drawRect(0, 0, bounds.width(), bounds.height(), drawTools.imagePaint);
 
     // Draw the time.
     final float center = bounds.width() / 2;
-    Formatter.format2Digits(mTmpSb, params.time.hour);
+    Formatter.format2Digits(mTmpSb, time.hour);
     final float hoursSize = drawTools.minutesPaint.measureText(mTmpSb, 0, 2);
     canvas.drawText(mTmpSb, 0, 2, center - hoursSize - 2, drawTools.timePosY, drawTools.minutesPaint);
-    Formatter.format2Digits(mTmpSb, params.time.minute);
+    Formatter.format2Digits(mTmpSb, time.minute);
     canvas.drawText(mTmpSb, 0, 2, center + 2, drawTools.timePosY, drawTools.minutesPaint);
     final float secondsOffset = drawTools.minutesPaint.measureText(mTmpSb, 0, 2) + 6;
 
-    if (!params.isInAmbientMode && !params.isInMuteMode)
+    if (0 == ((AMBIENT_MODE | MUTE_MODE) & modeFlags))
     {
-      Formatter.format2Digits(mTmpSb, params.time.second);
+      Formatter.format2Digits(mTmpSb, time.second);
       canvas.drawText(mTmpSb, 0, 2, center + secondsOffset, drawTools.timePosY, drawTools.secondsPaint);
-//      final String monthDay = String.format("%02d/%02d", params.time.month + 1, params.time.monthDay);
+//      final String monthDay = String.format("%02d/%02d", time.month + 1, time.monthDay);
 //      final float monthDaySize = drawTools.secondsPaint.measureText(monthDay);
 //      canvas.drawText(monthDay, center - hoursSize - monthDaySize, drawTools.timePosY - drawTools.secondsPaint.getTextSize(), drawTools.secondsPaint);
-      final String weekDay = Const.WEEKDAYS[params.time.weekDay];
+      final String weekDay = Const.WEEKDAYS[time.weekDay];
       final float weekDaySize = drawTools.secondsPaint.measureText(weekDay);
       canvas.drawText(weekDay, center - hoursSize - 6 - weekDaySize, drawTools.timePosY, drawTools.secondsPaint);
     }
@@ -105,7 +101,7 @@ public class Draw
       }
     }
 
-    final int borderTextLength = Formatter.formatBorder(mTmpChr, params);
+    final int borderTextLength = Formatter.formatBorder(mTmpChr, time, params.pressure);
     canvas.drawTextOnPath(mTmpChr, 0, borderTextLength, drawTools.watchContourPath, 0, 0, drawTools.statusPaint);
 
     long finish = System.currentTimeMillis();

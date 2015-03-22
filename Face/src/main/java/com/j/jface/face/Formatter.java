@@ -1,5 +1,8 @@
 package com.j.jface.face;
 
+import android.support.annotation.NonNull;
+import android.text.format.Time;
+
 public class Formatter
 {
   public static CharSequence format2Digits(final StringBuilder buffer, final int n)
@@ -10,30 +13,30 @@ public class Formatter
     return buffer;
   }
 
-  public static int formatBorder(final char[] buffer, final Draw.Params p)
+  public static int formatBorder(final char[] buffer, @NonNull final Time time, final float pressure)
   {
     int i = -1;
-    buffer[++i] = (char) ('0' + (p.time.year / 1000) % 10);
-    buffer[++i] = (char) ('0' + (p.time.year / 100) % 10);
-    buffer[++i] = (char) ('0' + (p.time.year / 10) % 10);
-    buffer[++i] = (char) ('0' + p.time.year % 10);
+    buffer[++i] = (char) ('0' + (time.year / 1000) % 10);
+    buffer[++i] = (char) ('0' + (time.year / 100) % 10);
+    buffer[++i] = (char) ('0' + (time.year / 10) % 10);
+    buffer[++i] = (char) ('0' + time.year % 10);
     buffer[++i] = '/';
-    final int month = p.time.month + 1;
+    final int month = time.month + 1;
     buffer[++i] = (char) ('0' + (month / 10) % 10);
     buffer[++i] = (char) ('0' + month % 10);
     buffer[++i] = '/';
-    buffer[++i] = (char) ('0' + (p.time.monthDay / 10) % 10);
-    buffer[++i] = (char) ('0' + p.time.monthDay % 10);
+    buffer[++i] = (char) ('0' + (time.monthDay / 10) % 10);
+    buffer[++i] = (char) ('0' + time.monthDay % 10);
     buffer[++i] = ' ';
     buffer[++i] = '-';
     buffer[++i] = ' ';
-    if (p.pressure > 1000)
-      buffer[++i] = (char) ('0' + (int) (p.pressure / 1000));
-    buffer[++i] = (char) ('0' + (int) ((p.pressure / 100) % 10));
-    buffer[++i] = (char) ('0' + (int) ((p.pressure / 10) % 10));
-    buffer[++i] = (char) ('0' + (int) (p.pressure % 10));
+    if (pressure > 1000)
+      buffer[++i] = (char) ('0' + (int) (pressure / 1000));
+    buffer[++i] = (char) ('0' + (int) ((pressure / 100) % 10));
+    buffer[++i] = (char) ('0' + (int) ((pressure / 10) % 10));
+    buffer[++i] = (char) ('0' + (int) (pressure % 10));
     buffer[++i] = '.';
-    buffer[++i] = (char) ('0' + Math.round(p.pressure * 10) % 10);
+    buffer[++i] = (char) ('0' + Math.round(pressure * 10) % 10);
     buffer[++i] = 'h';
     buffer[++i] = 'P';
     buffer[++i] = 'a';
