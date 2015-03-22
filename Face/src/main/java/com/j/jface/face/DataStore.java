@@ -40,17 +40,23 @@ public class DataStore
   }
 
   @Nullable public Departure findClosestDeparture(@NonNull final String key, @NonNull final int time) {
-    final int secs = time % 86400;
+    final int secsSinceMidnight = time % 86400;
     final ArrayList<Departure> deps = mDepartures.get(key);
     if (null == deps) return null;
     Departure nextDeparture = null;
-    for (final Departure d : deps)
-      if (d.time >= secs) {
+    final int len = deps.size();
+    // Loop with an index to avoid iterator allocation
+    for (int i = 0; i < len; ++i)
+    {
+      final Departure d = deps.get(i);
+      if (d.time >= secsSinceMidnight)
+      {
         nextDeparture = d;
         break;
       }
+    }
     if (null == nextDeparture) nextDeparture = deps.get(0);
-    if (nextDeparture.time > secs + 30 * 60) return null; // More than 30 minutes in the future : don't display anything
+    if (nextDeparture.time > secsSinceMidnight + 30 * 60) return null; // More than 30 minutes in the future : don't display anything
     return nextDeparture;
   }
 

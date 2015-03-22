@@ -14,7 +14,6 @@ import com.j.jface.Const;
 public class Draw
 {
   private BitmapCache[] mCache;
-  private final Formatter mFormatter = new Formatter();
   public Draw() {
     mCache = new BitmapCache[] { new BitmapCache(0, 0, 0, null, new Paint()),
       new BitmapCache(0, 0, 0, null, new Paint()) };
@@ -44,6 +43,8 @@ public class Draw
     }
   }
 
+  final StringBuilder mTmpSb = new StringBuilder(256);
+  final char[] mTmpChr = new char[256];
   public boolean draw(@NonNull final DrawTools drawTools, @NonNull final Params params,
                       @NonNull final Canvas canvas, @NonNull final Rect bounds)
   {
@@ -58,25 +59,23 @@ public class Draw
 
     // Draw the time.
     final float center = bounds.width() / 2;
-    final CharSequence hours = mFormatter.format2Digits(params.time.hour);
-    canvas.drawText(hours, 0, 2,
-     center - drawTools.minutesPaint.measureText(hours, 0, 2) - 2, drawTools.timePosY,
-     drawTools.minutesPaint);
-    final CharSequence minutes = mFormatter.format2Digits(params.time.minute);
-    canvas.drawText(minutes, 0, 2, center + 2, drawTools.timePosY, drawTools.minutesPaint);
+    Formatter.format2Digits(mTmpSb, params.time.hour);
+    final float hoursSize = drawTools.minutesPaint.measureText(mTmpSb, 0, 2);
+    canvas.drawText(mTmpSb, 0, 2, center - hoursSize - 2, drawTools.timePosY, drawTools.minutesPaint);
+    Formatter.format2Digits(mTmpSb, params.time.minute);
+    canvas.drawText(mTmpSb, 0, 2, center + 2, drawTools.timePosY, drawTools.minutesPaint);
+    final float secondsOffset = drawTools.minutesPaint.measureText(mTmpSb, 0, 2) + 6;
 
     if (!params.isInAmbientMode && !params.isInMuteMode)
     {
-      final float secondsOffset = drawTools.minutesPaint.measureText(minutes, 0, 2) + 6;
-      final CharSequence seconds = mFormatter.format2Digits(params.time.second);
-      canvas.drawText(seconds, 0, 2, center + secondsOffset, drawTools.timePosY, drawTools.secondsPaint);
-      final float hoursSize = drawTools.minutesPaint.measureText(hours, 0, 2) + 6;
+      Formatter.format2Digits(mTmpSb, params.time.second);
+      canvas.drawText(mTmpSb, 0, 2, center + secondsOffset, drawTools.timePosY, drawTools.secondsPaint);
 //      final String monthDay = String.format("%02d/%02d", params.time.month + 1, params.time.monthDay);
 //      final float monthDaySize = drawTools.secondsPaint.measureText(monthDay);
 //      canvas.drawText(monthDay, center - hoursSize - monthDaySize, drawTools.timePosY - drawTools.secondsPaint.getTextSize(), drawTools.secondsPaint);
       final String weekDay = Const.WEEKDAYS[params.time.weekDay];
       final float weekDaySize = drawTools.secondsPaint.measureText(weekDay);
-      canvas.drawText(weekDay, center - hoursSize - weekDaySize, drawTools.timePosY, drawTools.secondsPaint);
+      canvas.drawText(weekDay, center - hoursSize - 6 - weekDaySize, drawTools.timePosY, drawTools.secondsPaint);
     }
 
     boolean mustInvalidate = false;
@@ -106,8 +105,8 @@ public class Draw
       }
     }
 
-    final String borderText = mFormatter.formatBorder(params).toString();
-    canvas.drawTextOnPath(borderText, drawTools.watchContourPath, 0, 0, drawTools.statusPaint);
+    final int borderTextLength = Formatter.formatBorder(mTmpChr, params);
+    canvas.drawTextOnPath(mTmpChr, 0, borderTextLength, drawTools.watchContourPath, 0, 0, drawTools.statusPaint);
 
     long finish = System.currentTimeMillis();
     Log.e("TIME", "" + (finish - start));
@@ -124,9 +123,9 @@ public class Draw
     final float sizeNow, sizeNext, sizeTotal;
     if (null == departures.second)
     {
-      text = mFormatter.formatDeparture(departures.first, 0);
-      mFormatter.append(separator);
-      mFormatter.append("終了");
+      text = Formatter.formatDeparture(mTmpSb, departures.first, 0);
+      mTmpSb.append(separator);
+      mTmpSb.append("終了");
       sizeNow = drawTools.departurePaint.measureText(text, 0, text.length());
       sizeNext = 0;
       sizeTotal = sizeNow;
@@ -134,17 +133,17 @@ public class Draw
     else
     {
       // Here starts deep magic manipulating the internal buffer of the formatter
-      text = mFormatter.formatDeparture(departures.first, 0);
+      text = Formatter.formatDeparture(mTmpSb, departures.first, 0);
       final int dep1Length = text.length();
-      mFormatter.append(separator);
+      mTmpSb.append(separator);
       final int dep2Start = text.length();
-      final CharSequence text2 = mFormatter.formatDeparture(departures.second, text.length());
+      Formatter.formatDeparture(mTmpSb, departures.second, text.length());
       final int dep2Length = text.length();
-      mFormatter.append(separator);
+      mTmpSb.append(separator);
       if (null == departures.third)
-        mFormatter.append("終了");
+        mTmpSb.append("終了");
       else
-        mFormatter.formatDeparture(departures.third, text.length());
+        Formatter.formatDeparture(mTmpSb, departures.third, text.length());
       sizeNow = drawTools.departurePaint.measureText(text, 0, dep2Length);
       sizeNext = drawTools.departurePaint.measureText(text, dep2Start, text.length());
       sizeTotal = drawTools.departurePaint.measureText(text, 0, text.length());
