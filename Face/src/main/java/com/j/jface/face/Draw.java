@@ -24,17 +24,11 @@ public class Draw
   }
 
   public static class Params {
-    public final float pressure;
     @Nullable public final Triplet<Departure> departures1;
     @Nullable public final Triplet<Departure> departures2;
-    @NonNull public final Status status;
-    public Params(final float p,
-                  @Nullable final Triplet<Departure> d1, @Nullable final Triplet<Departure> d2,
-                  @NonNull final Status s) {
-      pressure = p;
+    public Params(@Nullable final Triplet<Departure> d1, @Nullable final Triplet<Departure> d2) {
       departures1 = d1;
       departures2 = d2;
-      status = s;
     }
   }
 
@@ -42,7 +36,7 @@ public class Draw
   final char[] mTmpChr = new char[256];
   public boolean draw(@NonNull final DrawTools drawTools, final int modeFlags, @NonNull final Params params,
                       @NonNull final Canvas canvas, @NonNull final Rect bounds,
-                      @NonNull final Time time)
+                      @NonNull final Status status, @NonNull final Time time, @NonNull final Sensors sensors)
   {
     long start = System.currentTimeMillis();
 
@@ -79,11 +73,10 @@ public class Draw
     {
       final float lineHeight = drawTools.departurePaint.getTextSize() + 2;
       // Draw header
-      canvas.drawText(params.status.header1,
-       drawTools.departurePosX, drawTools.departurePosY, drawTools.departurePaint);
+      canvas.drawText(status.header1, drawTools.departurePosX, drawTools.departurePosY, drawTools.departurePaint);
       // Draw icon
       final float y1 = drawTools.departurePosY + lineHeight;
-      drawIcon(drawTools.departurePosX, y1, params, drawTools, canvas);
+      drawIcon(drawTools.departurePosX, y1, status, drawTools, canvas);
       // Draw departures
       mustInvalidate |= drawDepartureSet(0, params.departures1, drawTools.departurePosX, y1, drawTools, canvas);
 
@@ -91,17 +84,17 @@ public class Draw
       {
         // Draw header
         final float y1e = y1 + lineHeight;
-        if (null != params.status.header2) canvas.drawText(params.status.header2,
-         drawTools.departurePosX, y1e, drawTools.departurePaint);
+        if (null != status.header2)
+          canvas.drawText(status.header2, drawTools.departurePosX, y1e, drawTools.departurePaint);
         // Draw icon
         final float y2 = y1e + lineHeight;
-        drawIcon(drawTools.departurePosX, y2, params, drawTools, canvas);
+        drawIcon(drawTools.departurePosX, y2, status, drawTools, canvas);
         // Draw departures
         mustInvalidate |= drawDepartureSet(1, params.departures2, drawTools.departurePosX, y2, drawTools, canvas);
       }
     }
 
-    final int borderTextLength = Formatter.formatBorder(mTmpChr, time, params.pressure);
+    final int borderTextLength = Formatter.formatBorder(mTmpChr, time, sensors.mPressure);
     canvas.drawTextOnPath(mTmpChr, 0, borderTextLength, drawTools.watchContourPath, 0, 0, drawTools.statusPaint);
 
     long finish = System.currentTimeMillis();
@@ -156,9 +149,9 @@ public class Draw
     return cache.drawOn(canvas, x, y, drawTools.imagePaint);
   }
 
-  private static void drawIcon(final float x, final float y, @NonNull final Params params,
+  private static void drawIcon(final float x, final float y, @NonNull final Status status,
                                @NonNull final DrawTools drawTools, @NonNull final Canvas canvas) {
-    final Bitmap icon = drawTools.getIconForStatus(params.status);
+    final Bitmap icon = drawTools.getIconForStatus(status);
     canvas.drawBitmap(icon,
      x - icon.getWidth() - drawTools.iconToDepartureXPadding,
      y - icon.getHeight() + 5, // + 5 for alignment because I can't be assed to compute it
