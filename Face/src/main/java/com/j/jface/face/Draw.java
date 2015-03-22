@@ -23,19 +23,12 @@ public class Draw
       new BitmapCache(0, 0, 0, null, new Paint()) };
   }
 
-  public static class Params {
-    @Nullable public final Triplet<Departure> departures1;
-    @Nullable public final Triplet<Departure> departures2;
-    public Params(@Nullable final Triplet<Departure> d1, @Nullable final Triplet<Departure> d2) {
-      departures1 = d1;
-      departures2 = d2;
-    }
-  }
-
   final StringBuilder mTmpSb = new StringBuilder(256);
   final char[] mTmpChr = new char[256];
-  public boolean draw(@NonNull final DrawTools drawTools, final int modeFlags, @NonNull final Params params,
+  public boolean draw(@NonNull final DrawTools drawTools, final int modeFlags,
                       @NonNull final Canvas canvas, @NonNull final Rect bounds,
+                      @Nullable final Triplet<Departure> departures1,
+                      @Nullable final Triplet<Departure> departures2,
                       @NonNull final Status status, @NonNull final Time time, @NonNull final Sensors sensors)
   {
     long start = System.currentTimeMillis();
@@ -69,7 +62,7 @@ public class Draw
     }
 
     boolean mustInvalidate = false;
-    if (null != params.departures1) // If data is not yet available this is null
+    if (null != departures1) // If data is not yet available this is null
     {
       final float lineHeight = drawTools.departurePaint.getTextSize() + 2;
       // Draw header
@@ -78,9 +71,9 @@ public class Draw
       final float y1 = drawTools.departurePosY + lineHeight;
       drawIcon(drawTools.departurePosX, y1, status, drawTools, canvas);
       // Draw departures
-      mustInvalidate |= drawDepartureSet(0, params.departures1, drawTools.departurePosX, y1, drawTools, canvas);
+      mustInvalidate = drawDepartureSet(0, departures1, drawTools.departurePosX, y1, drawTools, canvas);
 
-      if (null != params.departures2)
+      if (null != departures2)
       {
         // Draw header
         final float y1e = y1 + lineHeight;
@@ -90,7 +83,7 @@ public class Draw
         final float y2 = y1e + lineHeight;
         drawIcon(drawTools.departurePosX, y2, status, drawTools, canvas);
         // Draw departures
-        mustInvalidate |= drawDepartureSet(1, params.departures2, drawTools.departurePosX, y2, drawTools, canvas);
+        mustInvalidate |= drawDepartureSet(1, departures2, drawTools.departurePosX, y2, drawTools, canvas);
       }
     }
 
@@ -123,7 +116,6 @@ public class Draw
     {
       // Here starts deep magic manipulating the internal buffer of the formatter
       text = Formatter.formatDeparture(mTmpSb, departures.first, 0);
-      final int dep1Length = text.length();
       mTmpSb.append(separator);
       final int dep2Start = text.length();
       Formatter.formatDeparture(mTmpSb, departures.second, text.length());

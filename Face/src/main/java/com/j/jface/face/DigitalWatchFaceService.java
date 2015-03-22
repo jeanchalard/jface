@@ -280,8 +280,8 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       }
 
       final int ambientFlag = isInAmbientMode() ? Draw.AMBIENT_MODE : 0;
-      final Draw.Params params = new Draw.Params(departures1, departures2);
-      if (mDraw.draw(mDrawTools, mModeFlags | ambientFlag, params, canvas, bounds, status, mTime, mSensors))
+      if (mDraw.draw(mDrawTools, mModeFlags | ambientFlag, canvas, bounds,
+       departures1, departures2, status, mTime, mSensors))
         invalidate();
 
       if (null == departures1)
