@@ -81,6 +81,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
             invalidate();
             final long nextUpdateTime = nextUpdateTime();
             final long now = System.currentTimeMillis();
+            Log.e("\033[32mNEXT UPDATE\033[0m", "" + nextUpdateTime + " : " + (nextUpdateTime - now));
             mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, nextUpdateTime - now);
             break;
         }
@@ -248,6 +249,13 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
         if (nextFrameTime < now) return now + 1000 - now % 1000;
         return nextFrameTime;
       }
+    }
+
+    @Override
+    public void onTimeTick() {
+      super.onTimeTick();
+      Log.e("\033[32mONTIMETICK\033[0m", "" + System.currentTimeMillis());
+      invalidate();
     }
 
     @Override
