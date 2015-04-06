@@ -18,7 +18,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class Client extends Handler implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
 {
   private static final int MSG_PROCESS_QUEUE = 1;
-  private static final int MSG_DISCONNECT = 2;
+  private static final int MSG_CONNECT = 2;
+  private static final int MSG_RUN_ACTIONS = 3;
+  private static final int MSG_DISCONNECT = 4;
   private static final long[] CONNECTION_FAILURES_BACKOFF = { 0, 1000, 10000, 300000 }; // in milliseconds
 
   @NonNull final private GoogleApiClient mClient;
@@ -35,43 +37,45 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
      .build();
   }
 
-
   @Override public void handleMessage(final Message msg)
   {
-    removeMessages(MSG_DISCONNECT);
     switch (msg.what)
     {
-      case MSG_PROCESS_QUEUE: processQueue(); return;
-      case MSG_DISCONNECT: mClient.disconnect(); return;
+      case MSG_PROCESS_QUEUE:
+        proceed();
+        return;
+      case MSG_CONNECT:
+        mClient.connect();
+        return;
+      case MSG_RUN_ACTIONS:
+        final Action a = mUpdates.poll();
+        if (null != a) a.run(mClient);
+        proceed();
+        return;
+      case MSG_DISCONNECT:
+        mClient.disconnect();
+        return;
     }
   }
 
-  private void processQueue()
+  private void proceed()
   {
-    if (mClient.isConnected())
-    {
-      final Action a = mUpdates.poll();
-      if (null != a)
-      {
-        a.run(mClient);
-        runQueue();
-      }
-      else scheduleDisconnect();
-    }
-    else if (mClient.isConnecting()) {} // Do nothing, we'll get connected soon
-    else mClient.connect();
+    final int what;
+    if (!mClient.isConnected()) what = MSG_CONNECT;
+    else if (mClient.isConnecting()) what = MSG_PROCESS_QUEUE; // check again later
+    else if (mUpdates.isEmpty()) what = MSG_DISCONNECT;
+    else what = MSG_RUN_ACTIONS;
+    sendEmptyMessage(what);
   }
 
   public void enqueue(@NonNull final Action action)
   {
     mUpdates.add(action);
-    runQueue();
+    proceed();
   }
 
-  private void runQueue() { sendEmptyMessage(MSG_PROCESS_QUEUE); }
-  private void scheduleDisconnect() { sendEmptyMessageDelayed(MSG_DISCONNECT, 10 * 1000); }
-  @Override public void onConnected(final Bundle bundle) { mConnectionFailures = 0; runQueue(); }
-  @Override public void onConnectionSuspended(final int i) { runQueue(); }
+  @Override public void onConnected(final Bundle bundle) { mConnectionFailures = 0; proceed(); }
+  @Override public void onConnectionSuspended(final int i) { proceed(); }
   @Override public void onConnectionFailed(final ConnectionResult connectionResult)
   {
     if (CONNECTION_FAILURES_BACKOFF.length > ++mConnectionFailures)
