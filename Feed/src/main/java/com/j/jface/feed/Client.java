@@ -1,10 +1,7 @@
 package com.j.jface.feed;
 
 import android.content.Context;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Message;
+import android.os.*;
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -31,7 +28,7 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
 
   public Client(@NonNull final Context context)
   {
-    super(new HandlerThread("client worker").getLooper());
+    super(getInitialLooper());
     mClient = new GoogleApiClient.Builder(context)
      .addConnectionCallbacks(this)
      .addOnConnectionFailedListener(this)
@@ -39,6 +36,11 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
      .build();
   }
 
+  private static Looper getInitialLooper() {
+    final HandlerThread handlerThread = new HandlerThread("client worker", android.os.Process.THREAD_PRIORITY_BACKGROUND);
+    handlerThread.start();
+    return handlerThread.getLooper();
+  }
   @Override public void handleMessage(final Message msg)
   {
     switch (msg.what)
@@ -62,12 +64,13 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
 
   private void proceed()
   {
-    final int what;
-    if (!mClient.isConnected()) what = MSG_CONNECT;
-    else if (mClient.isConnecting()) what = MSG_PROCESS_QUEUE; // check again later
-    else if (mUpdates.isEmpty()) what = MSG_DISCONNECT;
-    else what = MSG_RUN_ACTIONS;
-    sendEmptyMessage(what);
+    removeMessages(MSG_DISCONNECT);
+    final int what; final int delay;
+    if (!mClient.isConnected()) { what = MSG_CONNECT; delay = 0; }
+    else if (mClient.isConnecting()) { what = MSG_PROCESS_QUEUE; delay = 2 * 1000; } // check again in 2 secs
+    else if (mUpdates.isEmpty()) { what = MSG_DISCONNECT; delay = 10 * 1000; } // 10 seconds delay to disconnect
+    else { what = MSG_RUN_ACTIONS; delay = 0; }
+    sendEmptyMessageDelayed(what, delay);
   }
 
   public void enqueue(@NonNull final Action action)

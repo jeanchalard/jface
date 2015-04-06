@@ -21,6 +21,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
 
+import java.io.FileNotFoundException;
+
 /**
  * The phone-side config activity for {@code DigitalWatchFaceService}. Like the watch-side config
  * activity ({@code DigitalWatchFaceWearableConfigActivity}), allows for setting the background
@@ -37,7 +39,14 @@ public class JFaceDataFeedWrapper extends Activity
   protected void onCreate(Bundle savedInstanceState)
   {
     super.onCreate(savedInstanceState);
-    mW = new JFaceDataFeed(this);
+    try
+    {
+      mW = new JFaceDataFeed(this);
+    }
+    catch (FileNotFoundException e)
+    {
+      throw new RuntimeException(e);
+    }
   }
 
   // Interface callbacks
