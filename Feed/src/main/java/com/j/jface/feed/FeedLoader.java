@@ -47,12 +47,12 @@ public class FeedLoader
     "http://keisei.ekitan.com/norikae/pc/T5?dir=52&dw=1&slCode=254-1&d=2", KeiseiParser.class)
   };
 
-  public static void startAllLoads(@NonNull final UpdateHandler handler) {
+  public static void startAllLoads(@NonNull final Client client) {
     for (final DataSource ds : DATA_SOURCES)
-      startLoadDataSource(ds, handler);
+      startLoadDataSource(ds, client);
   }
 
-  private static void startLoadDataSource(@NonNull final DataSource ds, @NonNull final UpdateHandler handler) {
+  private static void startLoadDataSource(@NonNull final DataSource ds, @NonNull final Client client) {
     final URL url;
     try { url = new URL(ds.url); } catch (MalformedURLException e) { return; } // Can't happen because the URL is valid
     executor.execute(new Runnable() { public void run()
@@ -65,7 +65,7 @@ public class FeedLoader
           urlConnection.addRequestProperty("User-Agent", "Mozilla");
         InputStream in = new BufferedInputStream(urlConnection.getInputStream());
         final FeedParser parser = ds.parser.newInstance();
-        handler.handleUpdate(ds.name, parser.parseStream(ds.name, in));
+        client.putData(ds.name, parser.parseStream(ds.name, in));
       } catch (@NonNull InstantiationException | IllegalAccessException e) {} // Nopes never happens
       catch (@NonNull IOException e)
       {

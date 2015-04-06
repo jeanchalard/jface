@@ -10,8 +10,10 @@ import android.support.annotation.NonNull;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.Wearable;
 import com.j.jface.feed.actions.Action;
+import com.j.jface.feed.actions.PutDataAction;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -72,6 +74,17 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
   {
     mUpdates.add(action);
     proceed();
+  }
+
+  // Helper methods to put data and forget about it
+  public void putData(@NonNull final String dataName, @NonNull final String key, @NonNull final String value)
+  {
+    enqueue(new PutDataAction(dataName, key, value));
+  }
+
+  public void putData(@NonNull final String dataName, @NonNull final DataMap map)
+  {
+    enqueue(new PutDataAction(dataName, map));
   }
 
   @Override public void onConnected(final Bundle bundle) { mConnectionFailures = 0; proceed(); }

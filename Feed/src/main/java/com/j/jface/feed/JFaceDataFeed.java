@@ -9,18 +9,16 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
 import com.j.jface.R;
+import com.j.jface.feed.actions.PutDataAction;
 
 public class JFaceDataFeed
 {
-  @NonNull
-  private final Activity mA;
-  @NonNull
-  private final EditText mDataEdit;
-  @NonNull
-  private final TextView mLog;
+  @NonNull private final Activity mA;
+  @NonNull private final EditText mDataEdit;
+  @NonNull private final TextView mLog;
+  @NonNull private final Client mClient;
 
   public JFaceDataFeed(@NonNull final Activity a)
   {
@@ -28,6 +26,7 @@ public class JFaceDataFeed
     mA.setContentView(R.layout.activity_digital_watch_face_config);
     mDataEdit = (EditText) mA.findViewById(R.id.dataItem);
     mLog = (TextView) mA.findViewById(R.id.log);
+    mClient = new Client(a);
     Logger.setLogger(this);
   }
 
@@ -43,22 +42,20 @@ public class JFaceDataFeed
     });
   }
 
-  public void onClickSet(@NonNull final GoogleApiClient client, @NonNull final View button)
+  public void onClickSet(@NonNull final View button)
   {
-    setValue(client, mDataEdit.getText().toString());
+    setValue(mDataEdit.getText().toString());
   }
 
-  private void setValue(@NonNull final GoogleApiClient client, @NonNull final String value)
+  private void setValue(@NonNull final String value)
   {
-    final DataMap dm = new DataMap();
-    dm.putString(Const.DATA_KEY_ADHOC, value);
-    new UpdateHandler(client).handleUpdate(Const.DATA_KEY_ADHOC, dm);
+    mClient.enqueue(new PutDataAction(Const.DATA_KEY_ADHOC, Const.DATA_KEY_ADHOC, value));
   }
 
-  public void load(@NonNull final GoogleApiClient client)
+  public void load()
   {
     Logger.L("Start loading");
-    FeedLoader.startAllLoads(new UpdateHandler(client));
+    FeedLoader.startAllLoads(mClient);
   }
 
   public void onConnected(@NonNull final GoogleApiClient client)
