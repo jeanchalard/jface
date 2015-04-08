@@ -9,7 +9,7 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
-import com.j.jface.Const;
+import com.j.jface.feed.Fences;
 import com.j.jface.feed.Logger;
 
 public class SetupGeofenceAction implements Action, ResultCallback<Status>
@@ -20,7 +20,7 @@ public class SetupGeofenceAction implements Action, ResultCallback<Status>
     mIntent = intent;
   }
 
-  private static Geofence getGeofence(@NonNull final Const.GeofenceParams params)
+  private static Geofence getGeofence(@NonNull final Fences.Params params)
   {
     return new Geofence.Builder()
      .setRequestId(params.name)
@@ -35,9 +35,9 @@ public class SetupGeofenceAction implements Action, ResultCallback<Status>
   {
     final GeofencingRequest request = new GeofencingRequest.Builder()
      .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER | GeofencingRequest.INITIAL_TRIGGER_EXIT)
-     .addGeofence(getGeofence(Const.GEOFENCE_HOME))
-     .addGeofence(getGeofence(Const.GEOFENCE_WORK))
-     .addGeofence(getGeofence(Const.GEOFENCE_NIPPORI))
+     .addGeofence(getGeofence(Fences.HOME))
+     .addGeofence(getGeofence(Fences.WORK))
+     .addGeofence(getGeofence(Fences.NIPPORI))
      .build();
 
     LocationServices.GeofencingApi.addGeofences(client, request, mIntent)

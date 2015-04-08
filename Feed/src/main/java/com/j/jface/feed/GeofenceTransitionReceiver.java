@@ -42,7 +42,6 @@ public class GeofenceTransitionReceiver
   void onHandleIntent(@NonNull final Intent intent)
   {
     final String action = intent.getAction();
-    Log.e("START", "Intent started with action " + action);
     if (ACTION_MANUAL_START.equals(action)) mClient.enqueue(new SetupGeofenceAction(getNotificationIntent()));
     if (ACTION_GEOFENCE.equals(action)) handleGeofenceTransitions(intent);
   }
@@ -59,7 +58,7 @@ public class GeofenceTransitionReceiver
     GeofencingEvent event = GeofencingEvent.fromIntent(intent);
     if (event.hasError())
     {
-      Log.e("Geofencing error", "" + event.getErrorCode());
+      Logger.L("Geofencing error : " + event.getErrorCode());
       return;
     }
 
@@ -71,6 +70,7 @@ public class GeofenceTransitionReceiver
 
   private void handleGeofenceTransition(final Geofence fence, final int transitionType)
   {
+    final Fences.Params params = Fences.paramsFromName(fence.getRequestId());
     final String message;
     if (Geofence.GEOFENCE_TRANSITION_ENTER == transitionType)
       message = "Entered " + fence.getRequestId();
