@@ -81,7 +81,6 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
             invalidate();
             final long nextUpdateTime = nextUpdateTime();
             final long now = System.currentTimeMillis();
-            Log.e("\033[32mNEXT UPDATE\033[0m", "" + nextUpdateTime + " : " + (nextUpdateTime - now));
             mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, nextUpdateTime - now);
             break;
         }
@@ -254,7 +253,6 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     @Override
     public void onTimeTick() {
       super.onTimeTick();
-      Log.e("\033[32mONTIMETICK\033[0m", "" + System.currentTimeMillis());
       invalidate();
     }
 
@@ -336,7 +334,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       }
       else if (path.startsWith(Const.LOCATION_PATH))
       {
-        final String dataName = path.substring(Const.DATA_PATH.length() + 1); // + 1 for the "/"
+        final String dataName = path.substring(Const.LOCATION_PATH.length() + 1); // + 1 for the "/"
         mDataStore.putLocationStatus(dataName, data.getBoolean(Const.DATA_KEY_INSIDE));
       }
     }
@@ -366,6 +364,8 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
        };
       for (final String path : Const.ALL_DEPLIST_DATA_PATHS)
         DigitalWatchFaceUtil.fetchData(mGoogleApiClient, Const.DATA_PATH + "/" + path, dataHandler);
+      for (final String path : Const.ALL_FENCE_NAMES)
+      DigitalWatchFaceUtil.fetchData(mGoogleApiClient, Const.LOCATION_PATH + "/" + path, dataHandler);
     }
 
     @Override // DataApi.DataListener

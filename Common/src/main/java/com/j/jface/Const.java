@@ -37,4 +37,6 @@ public class Const
   public static final String HOME_FENCE_NAME = "home";
   public static final String WORK_FENCE_NAME = "work";
   public static final String NIPPORI_FENCE_NAME = "nippori";
+  public static final String[] ALL_FENCE_NAMES =
+   { HOME_FENCE_NAME, WORK_FENCE_NAME, NIPPORI_FENCE_NAME };
 }

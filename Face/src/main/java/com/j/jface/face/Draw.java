@@ -91,7 +91,7 @@ public class Draw
     canvas.drawTextOnPath(mTmpChr, 0, borderTextLength, drawTools.watchContourPath, 0, 0, drawTools.statusPaint);
 
     long finish = System.currentTimeMillis();
-    Log.e("TIME", "" + (finish - start));
+//    Log.e("TIME", "" + (finish - start));
 
     return mustInvalidate;
   }

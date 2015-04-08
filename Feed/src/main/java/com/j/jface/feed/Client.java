@@ -68,7 +68,7 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
     final int what; final int delay;
     if (!mClient.isConnected()) { what = MSG_CONNECT; delay = 0; }
     else if (mClient.isConnecting()) { what = MSG_PROCESS_QUEUE; delay = 2 * 1000; } // check again in 2 secs
-    else if (mUpdates.isEmpty()) { what = MSG_DISCONNECT; delay = 10 * 1000; } // 10 seconds delay to disconnect
+    else if (mUpdates.isEmpty()) { what = MSG_DISCONNECT; delay = 20 * 1000; } // 10 seconds delay to disconnect
     else { what = MSG_RUN_ACTIONS; delay = 0; }
     sendEmptyMessageDelayed(what, delay);
   }
