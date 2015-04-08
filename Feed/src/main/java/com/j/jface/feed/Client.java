@@ -80,14 +80,19 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
   }
 
   // Helper methods to put data and forget about it
-  public void putData(@NonNull final String dataName, @NonNull final String key, @NonNull final String value)
+  public void putData(@NonNull final String path, @NonNull final String key, @NonNull final String value)
   {
-    enqueue(new PutDataAction(dataName, key, value));
+    enqueue(new PutDataAction(path, key, value));
   }
 
-  public void putData(@NonNull final String dataName, @NonNull final DataMap map)
+  public void putData(@NonNull final String path, @NonNull final String key, final boolean value)
   {
-    enqueue(new PutDataAction(dataName, map));
+    enqueue(new PutDataAction(path, key, value));
+  }
+
+  public void putData(@NonNull final String path, @NonNull final DataMap map)
+  {
+    enqueue(new PutDataAction(path, map));
   }
 
   @Override public void onConnected(final Bundle bundle) { mConnectionFailures = 0; proceed(); }

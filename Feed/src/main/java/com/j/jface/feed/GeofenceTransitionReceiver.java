@@ -12,6 +12,7 @@ import android.util.Log;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
+import com.j.jface.Const;
 import com.j.jface.R;
 import com.j.jface.feed.actions.SetupGeofenceAction;
 
@@ -71,13 +72,19 @@ public class GeofenceTransitionReceiver
   private void handleGeofenceTransition(final Geofence fence, final int transitionType)
   {
     final Fences.Params params = Fences.paramsFromName(fence.getRequestId());
+    if (null == params) return; // Unknown fence
     final String message;
     if (Geofence.GEOFENCE_TRANSITION_ENTER == transitionType)
+    {
       message = "Entered " + fence.getRequestId();
+      mClient.putData(Const.LOCATION_PATH, params.name, true);
+    }
     else if (Geofence.GEOFENCE_TRANSITION_EXIT == transitionType)
+    {
       message = "Exited " + fence.getRequestId();
-    else
-      message = "Unknown event O.o";
+      mClient.putData(Const.LOCATION_PATH, params.name, false);
+    }
+    else message = "Unknown event O.o";
     Logger.L(message);
   }
 

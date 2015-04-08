@@ -65,7 +65,7 @@ public class FeedLoader
           urlConnection.addRequestProperty("User-Agent", "Mozilla");
         InputStream in = new BufferedInputStream(urlConnection.getInputStream());
         final FeedParser parser = ds.parser.newInstance();
-        client.putData(ds.name, parser.parseStream(ds.name, in));
+        client.putData(Const.DATA_PATH + "/" + ds.name, parser.parseStream(ds.name, in));
       } catch (@NonNull InstantiationException | IllegalAccessException e) {} // Nopes never happens
       catch (@NonNull IOException e)
       {
