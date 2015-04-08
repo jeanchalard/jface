@@ -3,7 +3,6 @@ package com.j.jface.face;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.format.Time;
-import android.util.Log;
 
 import com.j.jface.Const;
 
@@ -37,13 +36,12 @@ public enum Status
   private static int getSymbolicLocation(@NonNull final DataStore dataStore)
   {
     final Boolean in日暮里 = dataStore.isWithinFence(Const.NIPPORI_FENCE_NAME);
-    final Boolean atHome = dataStore.isWithinFence(Const.HOME_FENCE_NAME);
-    final Boolean atWork = dataStore.isWithinFence(Const.WORK_FENCE_NAME);
-    Log.e("\033[34mSTATUS\033[0m", "Nippori = " + in日暮里 + " ; atHome = " + atHome + " ; atWork = " + atWork);
     if (null == in日暮里) return DUNNO;
     if (in日暮里) return 日暮里;
+    final Boolean atHome = dataStore.isWithinFence(Const.HOME_FENCE_NAME);
     if (null == atHome) return DUNNO;
     if (atHome) return HOME;
+    final Boolean atWork = dataStore.isWithinFence(Const.WORK_FENCE_NAME);
     if (null == atWork) return DUNNO;
     if (atWork) return WORK;
     // TODO : implement TŌKYŌ

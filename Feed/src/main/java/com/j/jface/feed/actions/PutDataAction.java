@@ -7,11 +7,9 @@ import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataMap;
-import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
-import com.j.jface.feed.Logger;
 
 public class PutDataAction implements Action, ResultCallback<DataApi.DataItemResult>
 {
@@ -44,11 +42,5 @@ public class PutDataAction implements Action, ResultCallback<DataApi.DataItemRes
     pendingResult.setResultCallback(this);
   }
 
-  @Override
-  public void onResult(DataApi.DataItemResult dataItemResult)
-  {
-    final DataMap dm = DataMapItem.fromDataItem(dataItemResult.getDataItem()).getDataMap();
-    for (final String k : dm.keySet())
-      Logger.L(k + "=" + dm.get(k).toString());
-  }
+  @Override public void onResult(DataApi.DataItemResult dataItemResult) {}
 }

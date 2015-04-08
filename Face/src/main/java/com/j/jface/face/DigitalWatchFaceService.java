@@ -280,14 +280,23 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
           departures1 = mDataStore.findNextDepartures(Const.京成線_上野方面_休日, mTime);
           departures2 = mDataStore.findNextDepartures(Const.京成線_成田方面_休日, mTime);
           break;
+        case 日暮里_平日:
+          departures1 = mDataStore.findNextDepartures(Const.京成線_日暮里_平日, mTime);
+          departures2 = null;
+          break;
+        case 日暮里_休日:
+          departures1 = mDataStore.findNextDepartures(Const.京成線_日暮里_休日, mTime);
+          departures2 = null;
+          break;
         default:
           departures1 = null;
           departures2 = null;
       }
 
+      mDataStore.isWithinFence(Const.HOME_FENCE_NAME);
       final int ambientFlag = isInAmbientMode() ? Draw.AMBIENT_MODE : 0;
       if (mDraw.draw(mDrawTools, mModeFlags | ambientFlag, canvas, bounds,
-       departures1, departures2, status, mTime, mSensors))
+       departures1, departures2, status, mTime, mSensors, mDataStore.fenceDescriptor()))
         invalidate();
 
       if (null == departures1)

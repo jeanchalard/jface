@@ -72,7 +72,11 @@ public class GeofenceTransitionReceiver
   private void handleGeofenceTransition(final Geofence fence, final int transitionType)
   {
     final Fences.Params params = Fences.paramsFromName(fence.getRequestId());
-    if (null == params) return; // Unknown fence
+    if (null == params)
+    {
+      Logger.L("Unknown fence : " + fence.getRequestId());
+      return; // Unknown fence
+    }
     final String message;
     if (Geofence.GEOFENCE_TRANSITION_ENTER == transitionType)
     {

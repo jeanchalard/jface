@@ -84,4 +84,15 @@ public class DataStore
   {
     return mLocationStatuses.get(fenceName);
   }
+
+  public String fenceDescriptor()
+  {
+    Boolean b = isWithinFence(Const.HOME_FENCE_NAME);
+    String s = "家 " + (null == b ? "?" : (b ? "◯" : "×"));
+    b = isWithinFence(Const.WORK_FENCE_NAME);
+    s += " ; 社 " + (null == b ? "?" : (b ? "◯" : "×"));
+    b = isWithinFence(Const.NIPPORI_FENCE_NAME);
+    s += " ; 日 " + (null == b ? "?" : (b ? "◯" : "×"));
+    return s;
+  }
 }

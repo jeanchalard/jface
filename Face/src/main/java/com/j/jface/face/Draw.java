@@ -29,7 +29,8 @@ public class Draw
                       @NonNull final Canvas canvas, @NonNull final Rect bounds,
                       @Nullable final Triplet<Departure> departures1,
                       @Nullable final Triplet<Departure> departures2,
-                      @NonNull final Status status, @NonNull final Time time, @NonNull final Sensors sensors)
+                      @NonNull final Status status, @NonNull final Time time, @NonNull final Sensors sensors,
+                      @NonNull final String fenceDescriptor)
   {
     long start = System.currentTimeMillis();
 
@@ -87,8 +88,9 @@ public class Draw
       }
     }
 
-    final int borderTextLength = Formatter.formatBorder(mTmpChr, time, sensors.mPressure);
-    canvas.drawTextOnPath(mTmpChr, 0, borderTextLength, drawTools.watchContourPath, 0, 0, drawTools.statusPaint);
+//    final int borderTextLength = Formatter.formatBorder(mTmpChr, time, sensors.mPressure);
+//    canvas.drawTextOnPath(mTmpChr, 0, borderTextLength, drawTools.watchContourPath, 0, 0, drawTools.statusPaint);
+    canvas.drawTextOnPath(fenceDescriptor, drawTools.watchContourPath, 0, 0, drawTools.statusPaint);
 
     long finish = System.currentTimeMillis();
 //    Log.e("TIME", "" + (finish - start));
