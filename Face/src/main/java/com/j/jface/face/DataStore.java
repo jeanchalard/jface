@@ -3,6 +3,7 @@ package com.j.jface.face;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.format.Time;
+import android.util.Log;
 
 import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
@@ -14,14 +15,22 @@ import java.util.HashMap;
 public class DataStore
 {
   private final HashMap<String, ArrayList<Departure>> mDepartures = new HashMap<>();
+  private final HashMap<String, Boolean> mLocationStatuses = new HashMap<>();
   private final HashMap<String, String> mGenericData = new HashMap<>();
 
-  public void putGenericData(@NonNull final String key, @NonNull final String data) {
+  public void putGenericData(@NonNull final String key, @NonNull final String data)
+  {
     mGenericData.put(key, data);
   }
 
   @NonNull public String getGenericData(@NonNull final String key) {
     return mGenericData.get(key);
+  }
+
+  public void putLocationStatus(final String fenceName, final boolean isInside)
+  {
+    Log.e("\033[34mLOC\033[0m", fenceName + " " + isInside);
+    mLocationStatuses.put(fenceName, isInside);
   }
 
   public void putDepartureList(final String dataName, final ArrayList<DataMap> departureList)
@@ -39,7 +48,8 @@ public class DataStore
     return findClosestDeparture(key, time.hour * 3600 + time.minute * 60);
   }
 
-  @Nullable public Departure findClosestDeparture(@NonNull final String key, @NonNull final int time) {
+  @Nullable public Departure findClosestDeparture(@NonNull final String key, @NonNull final int time)
+  {
     final int secsSinceMidnight = time % 86400;
     final ArrayList<Departure> deps = mDepartures.get(key);
     if (null == deps) return null;
@@ -60,12 +70,18 @@ public class DataStore
     return nextDeparture;
   }
 
-  @Nullable public Triplet<Departure> findNextDepartures(@NonNull final String key, @NonNull final Time time) {
+  @Nullable public Triplet<Departure> findNextDepartures(@NonNull final String key, @NonNull final Time time)
+  {
     final Departure first = findClosestDeparture(key, time);
     if (null == first) return null;
     final Departure second = findClosestDeparture(key, first.time + 1);
     if (null == second) return new Triplet<>(first, null, null);
     final Departure third = findClosestDeparture(key, second.time + 1);
     return new Triplet<>(first, second, third);
+  }
+
+  public Boolean isWithinFence(@NonNull final String fenceName)
+  {
+    return mLocationStatuses.get(fenceName);
   }
 }

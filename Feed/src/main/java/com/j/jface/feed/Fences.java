@@ -2,6 +2,8 @@ package com.j.jface.feed;
 
 import android.support.annotation.Nullable;
 
+import com.j.jface.Const;
+
 public class Fences
 {
   public static class Params
@@ -12,11 +14,11 @@ public class Fences
     { name = n; latitude = lat; longitude = lon; radius = rad; }
   }
   // 1km around the center. That should include home and 北千住.
-  public static final Params HOME = new Params("home", 35.7466148, 139.7996878, 1000);
+  public static final Params HOME = new Params(Const.HOME_FENCE_NAME, 35.7466148, 139.7996878, 1000);
   // For work 400m is enough.
-  public static final Params WORK = new Params("work", 35.6607004, 139.7291515, 400);
+  public static final Params WORK = new Params(Const.WORK_FENCE_NAME, 35.6607004, 139.7291515, 400);
   // For Nippori we want info when heading there, so 2~2.5km should be fine so as not to encroach on home.
-  public static final Params NIPPORI = new Params("nippori", 35.7278246, 139.7715682, 2000);
+  public static final Params NIPPORI = new Params(Const.NIPPORI_FENCE_NAME, 35.7278246, 139.7715682, 2000);
 
   @Nullable public static Params paramsFromName(final String name)
   {

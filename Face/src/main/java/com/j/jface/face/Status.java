@@ -1,9 +1,11 @@
 package com.j.jface.face;
 
-import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.format.Time;
+import android.util.Log;
+
+import com.j.jface.Const;
 
 public enum Status
 {
@@ -32,17 +34,31 @@ public enum Status
     header2 = h2;
   }
 
-  private static int getSymbolicLocation(@Nullable final Location location) {
-    return DUNNO;
+  private static int getSymbolicLocation(@NonNull final DataStore dataStore)
+  {
+    final Boolean in日暮里 = dataStore.isWithinFence(Const.NIPPORI_FENCE_NAME);
+    final Boolean atHome = dataStore.isWithinFence(Const.HOME_FENCE_NAME);
+    final Boolean atWork = dataStore.isWithinFence(Const.WORK_FENCE_NAME);
+    Log.e("\033[34mSTATUS\033[0m", "Nippori = " + in日暮里 + " ; atHome = " + atHome + " ; atWork = " + atWork);
+    if (null == in日暮里) return DUNNO;
+    if (in日暮里) return 日暮里;
+    if (null == atHome) return DUNNO;
+    if (atHome) return HOME;
+    if (null == atWork) return DUNNO;
+    if (atWork) return WORK;
+    // TODO : implement TŌKYŌ
+    return TRAVEL;
   }
 
-  public static Status getStatus(@NonNull final Time time, @Nullable final Location location) {
-    final int symbolicLocation = getSymbolicLocation(location);
+  public static Status getStatus(@NonNull final Time time, @NonNull final DataStore dataStore) {
+    final int symbolicLocation = getSymbolicLocation(dataStore);
     if (TRAVEL == symbolicLocation) return OTHER;
 
     final boolean workDay;
     // TODO : figure out national holidays
     workDay = (time.weekDay >= Time.MONDAY && time.weekDay <= Time.FRIDAY);
+
+    if (日暮里 == symbolicLocation) return workDay ? 日暮里_平日 : 日暮里_休日;
 
     // TODO : take altitude into account to figure out if I'm on 4th floor or have already left
     if (workDay

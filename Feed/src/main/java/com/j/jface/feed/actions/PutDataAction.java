@@ -11,30 +11,29 @@ import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
-import com.j.jface.Const;
 import com.j.jface.feed.Logger;
 
 public class PutDataAction implements Action, ResultCallback<DataApi.DataItemResult>
 {
   @NonNull final PutDataRequest mRequest;
 
-  public PutDataAction(@NonNull final String dataName, @NonNull final String key, @NonNull final String value)
+  public PutDataAction(@NonNull final String path, @NonNull final String key, @NonNull final String value)
   {
-    final PutDataMapRequest dmRequest = PutDataMapRequest.create(Const.DATA_PATH + "/" + dataName);
+    final PutDataMapRequest dmRequest = PutDataMapRequest.create(path);
     dmRequest.getDataMap().putString(key, value);
     mRequest = dmRequest.asPutDataRequest();
   }
 
-  public PutDataAction(@NonNull final String dataName, @NonNull final String key, final boolean value)
+  public PutDataAction(@NonNull final String path, @NonNull final String key, final boolean value)
   {
-    final PutDataMapRequest dmRequest = PutDataMapRequest.create(Const.DATA_PATH + "/" + dataName);
+    final PutDataMapRequest dmRequest = PutDataMapRequest.create(path);
     dmRequest.getDataMap().putBoolean(key, value);
     mRequest = dmRequest.asPutDataRequest();
   }
 
-  public PutDataAction(@NonNull final String dataName, @NonNull final DataMap map)
+  public PutDataAction(@NonNull final String path, @NonNull final DataMap map)
   {
-    final PutDataMapRequest dmRequest = PutDataMapRequest.create(Const.DATA_PATH + "/" + dataName);
+    final PutDataMapRequest dmRequest = PutDataMapRequest.create(path);
     dmRequest.getDataMap().putAll(map);
     mRequest = dmRequest.asPutDataRequest();
   }

@@ -77,12 +77,12 @@ public class GeofenceTransitionReceiver
     if (Geofence.GEOFENCE_TRANSITION_ENTER == transitionType)
     {
       message = "Entered " + fence.getRequestId();
-      mClient.putData(Const.LOCATION_PATH, params.name, true);
+      mClient.putData(Const.LOCATION_PATH + "/" + params.name, Const.DATA_KEY_INSIDE, true);
     }
     else if (Geofence.GEOFENCE_TRANSITION_EXIT == transitionType)
     {
       message = "Exited " + fence.getRequestId();
-      mClient.putData(Const.LOCATION_PATH, params.name, false);
+      mClient.putData(Const.LOCATION_PATH + "/" + params.name, Const.DATA_KEY_INSIDE, false);
     }
     else message = "Unknown event O.o";
     Logger.L(message);

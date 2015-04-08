@@ -262,7 +262,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     public void onDraw(@NonNull final Canvas canvas, @NonNull final Rect bounds)
     {
       mTime.setToNow();
-      final Status status = Status.getStatus(mTime, null);
+      final Status status = Status.getStatus(mTime, mDataStore);
       final Triplet<Departure> departures1;
       final Triplet<Departure> departures2;
       switch (status) {
@@ -333,6 +333,11 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
             }
           }
         updateTimer();
+      }
+      else if (path.startsWith(Const.LOCATION_PATH))
+      {
+        final String dataName = path.substring(Const.DATA_PATH.length() + 1); // + 1 for the "/"
+        mDataStore.putLocationStatus(dataName, data.getBoolean(Const.DATA_KEY_INSIDE));
       }
     }
 

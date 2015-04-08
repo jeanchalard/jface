@@ -15,6 +15,7 @@ public class Const
   public static final String DATA_KEY_EXTRA = "extra";
   public static final String DATA_KEY_DEPLIST = "depList";
   public static final String DATA_KEY_ADHOC = "adHoc";
+  public static final String DATA_KEY_INSIDE = "inside";
   public static final String CONFIG_KEY_BACKGROUND = "background";
 
   public static final String 日比谷線_北千住_平日 = "日比谷線・北千住・平日";
@@ -32,4 +33,8 @@ public class Const
    { 日比谷線_北千住_平日, 日比谷線_北千住_休日, 日比谷線_六本木_平日, 日比谷線_六本木_休日,
     京成線_上野方面_平日, 京成線_上野方面_休日, 京成線_成田方面_平日, 京成線_成田方面_休日,
     京成線_日暮里_平日, 京成線_日暮里_休日 };
+
+  public static final String HOME_FENCE_NAME = "home";
+  public static final String WORK_FENCE_NAME = "work";
+  public static final String NIPPORI_FENCE_NAME = "nippori";
 }
