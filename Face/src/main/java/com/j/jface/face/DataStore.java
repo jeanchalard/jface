@@ -87,12 +87,12 @@ public class DataStore
 
   public String fenceDescriptor()
   {
-    Boolean b = isWithinFence(Const.HOME_FENCE_NAME);
-    String s = "家 " + (null == b ? "?" : (b ? "◯" : "×"));
+    Boolean b = isWithinFence(Const.NIPPORI_FENCE_NAME);
+    if (null != b && b) return "日暮里";
+    b = isWithinFence(Const.HOME_FENCE_NAME);
+    if (null != b && b) return "Home";
     b = isWithinFence(Const.WORK_FENCE_NAME);
-    s += " ; 社 " + (null == b ? "?" : (b ? "◯" : "×"));
-    b = isWithinFence(Const.NIPPORI_FENCE_NAME);
-    s += " ; 日 " + (null == b ? "?" : (b ? "◯" : "×"));
-    return s;
+    if (null != b && b) return "Work";
+    return "Somewhere";
   }
 }

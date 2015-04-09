@@ -7,7 +7,6 @@ import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.format.Time;
-import android.util.Log;
 
 import com.j.jface.Const;
 
@@ -30,9 +29,10 @@ public class Draw
                       @Nullable final Triplet<Departure> departures1,
                       @Nullable final Triplet<Departure> departures2,
                       @NonNull final Status status, @NonNull final Time time, @NonNull final Sensors sensors,
-                      @NonNull final String fenceDescriptor)
+                      @NonNull final String locationDescriptor)
   {
     long start = System.currentTimeMillis();
+    boolean drawFull = 0 == ((AMBIENT_MODE | MUTE_MODE) & modeFlags);
 
     // Draw the background.
     // TODO: only update the relevant part of the display.
@@ -50,7 +50,7 @@ public class Draw
     canvas.drawText(mTmpSb, 0, 2, center + 2, drawTools.timePosY, drawTools.minutesPaint);
     final float secondsOffset = drawTools.minutesPaint.measureText(mTmpSb, 0, 2) + 6;
 
-    if (0 == ((AMBIENT_MODE | MUTE_MODE) & modeFlags))
+    if (drawFull)
     {
       Formatter.format2Digits(mTmpSb, time.second);
       canvas.drawText(mTmpSb, 0, 2, center + secondsOffset, drawTools.timePosY, drawTools.secondsPaint);
@@ -88,9 +88,8 @@ public class Draw
       }
     }
 
-//    final int borderTextLength = Formatter.formatBorder(mTmpChr, time, sensors.mPressure);
-//    canvas.drawTextOnPath(mTmpChr, 0, borderTextLength, drawTools.watchContourPath, 0, 0, drawTools.statusPaint);
-    canvas.drawTextOnPath(fenceDescriptor, drawTools.watchContourPath, 0, 0, drawTools.statusPaint);
+    final int borderTextLength = Formatter.formatBorder(mTmpChr, time, drawFull ? locationDescriptor : null);
+    canvas.drawTextOnPath(mTmpChr, 0, borderTextLength, drawTools.watchContourPath, 0, 0, drawTools.statusPaint);
 
     long finish = System.currentTimeMillis();
 //    Log.e("TIME", "" + (finish - start));

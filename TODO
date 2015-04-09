@@ -1,7 +1,5 @@
 - Geofence. Figure out in which of the areas we are.
-  - Save to DataApi so that the watch can see it
-  - Display on the face
-  - When we know where we are and it works, make use of it
+  - Add Tōkyō geofence
 - Timezones. Display all three interesting timezones.
 - Design.
   - Where to put the date
@@ -9,7 +7,6 @@
   - How to use the contour text
   - Better use of the 2 lines
 - Destinations. Figure out arrival time.
-- Nippori. Read data, install geofence.
 - Background. Show the reflection face background moving according to gyroscope.
 - Automation. Retrieve stuff automatically every now and then. Hook on geofences ?
 - Cleanup. Remove logs and stop allocating in onDraw.
