@@ -296,7 +296,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       mDataStore.isWithinFence(Const.HOME_FENCE_NAME);
       final int ambientFlag = isInAmbientMode() ? Draw.AMBIENT_MODE : 0;
       if (mDraw.draw(mDrawTools, mModeFlags | ambientFlag, canvas, bounds,
-       departures1, departures2, status, mTime, mSensors, mDataStore.fenceDescriptor()))
+       departures1, departures2, status, mTime, mSensors, Status.getSymbolicLocationName(mDataStore)))
         invalidate();
 
       if (null == departures1)

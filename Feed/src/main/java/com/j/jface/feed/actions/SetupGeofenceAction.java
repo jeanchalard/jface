@@ -37,7 +37,8 @@ public class SetupGeofenceAction implements Action, ResultCallback<Status>
      .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER | GeofencingRequest.INITIAL_TRIGGER_EXIT)
      .addGeofence(getGeofence(Fences.HOME))
      .addGeofence(getGeofence(Fences.WORK))
-     .addGeofence(getGeofence(Fences.NIPPORI))
+     .addGeofence(getGeofence(Fences.日暮里))
+     .addGeofence(getGeofence(Fences.東京))
      .build();
 
     LocationServices.GeofencingApi.addGeofences(client, request, mIntent)

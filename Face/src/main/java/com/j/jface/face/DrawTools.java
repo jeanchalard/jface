@@ -82,6 +82,8 @@ public class DrawTools
         return hibiyaIcon;
       case HOME_平日:
       case HOME_休日:
+      case 日暮里_休日:
+      case 日暮里_平日:
         return keiseiIcon;
       default:
         return null;

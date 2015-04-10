@@ -24,10 +24,10 @@ public enum Status
   private static final int HOME = 1;
   private static final int WORK = 2;
   private static final int 日暮里 = 3;
-  private static final int TŌKYŌ = 4;
+  private static final int 東京 = 4;
   private static final int TRAVEL = 5;
 
-  private Status(@NonNull final String d, @NonNull final String h1, @NonNull final String h2) {
+  Status(@NonNull final String d, @NonNull final String h1, @NonNull final String h2) {
     description = d;
     header1 = h1;
     header2 = h2;
@@ -35,7 +35,7 @@ public enum Status
 
   private static int getSymbolicLocation(@NonNull final DataStore dataStore)
   {
-    final Boolean in日暮里 = dataStore.isWithinFence(Const.NIPPORI_FENCE_NAME);
+    final Boolean in日暮里 = dataStore.isWithinFence(Const.日暮里_FENCE_NAME);
     if (null == in日暮里) return DUNNO;
     if (in日暮里) return 日暮里;
     final Boolean atHome = dataStore.isWithinFence(Const.HOME_FENCE_NAME);
@@ -44,8 +44,22 @@ public enum Status
     final Boolean atWork = dataStore.isWithinFence(Const.WORK_FENCE_NAME);
     if (null == atWork) return DUNNO;
     if (atWork) return WORK;
-    // TODO : implement TŌKYŌ
+    final Boolean in東京 = dataStore.isWithinFence(Const.東京_FENCE_NAME);
+    if (null == in東京) return DUNNO;
+    if (in東京) return 東京;
     return TRAVEL;
+  }
+
+  public static String getSymbolicLocationName(@NonNull final DataStore dataStore)
+  {
+    switch (getSymbolicLocation(dataStore))
+    {
+      case 日暮里 : return "日暮里";
+      case HOME  : return "Home";
+      case WORK  : return "Work";
+      case 東京   : return "東京";
+      default    : return "Somewhere";
+    }
   }
 
   public static Status getStatus(@NonNull final Time time, @NonNull final DataStore dataStore) {

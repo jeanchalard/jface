@@ -95,11 +95,11 @@ public class GeofenceTransitionReceiver
 
   public void Log(@NonNull final String s)
   {
-    try
-    {
-      LogInternal(s);
-    }
-    catch (Exception e) {} // Ignore the fuck out of it
+//    try
+//    {
+//      LogInternal(s);
+//    }
+//    catch (Exception e) {} // Ignore the fuck out of it
   }
 
   int notificationNumber = 1;

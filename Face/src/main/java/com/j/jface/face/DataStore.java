@@ -3,7 +3,6 @@ package com.j.jface.face;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.format.Time;
-import android.util.Log;
 
 import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
@@ -29,7 +28,6 @@ public class DataStore
 
   public void putLocationStatus(final String fenceName, final boolean isInside)
   {
-    Log.e("\033[34mLOC\033[0m", fenceName + " " + isInside);
     mLocationStatuses.put(fenceName, isInside);
   }
 
@@ -83,16 +81,5 @@ public class DataStore
   public Boolean isWithinFence(@NonNull final String fenceName)
   {
     return mLocationStatuses.get(fenceName);
-  }
-
-  public String fenceDescriptor()
-  {
-    Boolean b = isWithinFence(Const.NIPPORI_FENCE_NAME);
-    if (null != b && b) return "日暮里";
-    b = isWithinFence(Const.HOME_FENCE_NAME);
-    if (null != b && b) return "Home";
-    b = isWithinFence(Const.WORK_FENCE_NAME);
-    if (null != b && b) return "Work";
-    return "Somewhere";
   }
 }

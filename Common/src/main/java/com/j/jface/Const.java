@@ -36,7 +36,8 @@ public class Const
 
   public static final String HOME_FENCE_NAME = "home";
   public static final String WORK_FENCE_NAME = "work";
-  public static final String NIPPORI_FENCE_NAME = "nippori";
+  public static final String 日暮里_FENCE_NAME = "nippori";
+  public static final String 東京_FENCE_NAME = "tokyo";
   public static final String[] ALL_FENCE_NAMES =
-   { HOME_FENCE_NAME, WORK_FENCE_NAME, NIPPORI_FENCE_NAME };
+   { HOME_FENCE_NAME, WORK_FENCE_NAME, 日暮里_FENCE_NAME, 東京_FENCE_NAME };
 }
