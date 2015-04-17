@@ -43,7 +43,8 @@ public class GeofenceTransitionReceiver
   void onHandleIntent(@NonNull final Intent intent)
   {
     final String action = intent.getAction();
-    if (ACTION_MANUAL_START.equals(action)) mClient.enqueue(new SetupGeofenceAction(getNotificationIntent()));
+    if (Intent.ACTION_BOOT_COMPLETED.equals(action) || ACTION_MANUAL_START.equals(action))
+      mClient.enqueue(new SetupGeofenceAction(getNotificationIntent()));
     if (ACTION_GEOFENCE.equals(action)) handleGeofenceTransitions(intent);
   }
 
@@ -95,11 +96,11 @@ public class GeofenceTransitionReceiver
 
   public void Log(@NonNull final String s)
   {
-//    try
-//    {
-//      LogInternal(s);
-//    }
-//    catch (Exception e) {} // Ignore the fuck out of it
+    try
+    {
+      LogInternal(s);
+    }
+    catch (Exception e) {} // Ignore the fuck out of it
   }
 
   int notificationNumber = 1;
