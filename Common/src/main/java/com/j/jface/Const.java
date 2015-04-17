@@ -16,6 +16,7 @@ public class Const
   public static final String DATA_KEY_DEPLIST = "depList";
   public static final String DATA_KEY_ADHOC = "adHoc";
   public static final String DATA_KEY_INSIDE = "inside";
+  public static final String DATA_KEY_UPDATETIME = "updateTime";
   public static final String CONFIG_KEY_BACKGROUND = "background";
 
   public static final String 日比谷線_北千住_平日 = "日比谷線・北千住・平日";

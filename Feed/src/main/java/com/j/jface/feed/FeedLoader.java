@@ -2,6 +2,7 @@ package com.j.jface.feed;
 
 import android.support.annotation.NonNull;
 
+import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
 
 import java.io.BufferedInputStream;
@@ -65,7 +66,9 @@ public class FeedLoader
           urlConnection.addRequestProperty("User-Agent", "Mozilla");
         InputStream in = new BufferedInputStream(urlConnection.getInputStream());
         final FeedParser parser = ds.parser.newInstance();
-        client.putData(Const.DATA_PATH + "/" + ds.name, parser.parseStream(ds.name, in));
+        final DataMap data = parser.parseStream(ds.name, in);
+        data.putLong(Const.DATA_KEY_UPDATETIME, System.currentTimeMillis());
+        client.putData(Const.DATA_PATH + "/" + ds.name, data);
       } catch (@NonNull InstantiationException | IllegalAccessException e) {} // Nopes never happens
       catch (@NonNull IOException e)
       {
