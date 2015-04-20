@@ -266,7 +266,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       switch (status) {
         case COMMUTE_MORNING_平日:
           departures1 = mDataStore.findNextDepartures(Const.日比谷線_北千住_平日, mTime);
-          departures2 = null;
+          departures2 = mDataStore.findNextDepartures(Const.京成線_上野方面_平日, mTime);
           break;
         case COMMUTE_EVENING_休日:
           departures1 = mDataStore.findNextDepartures(Const.日比谷線_六本木_平日, mTime);
