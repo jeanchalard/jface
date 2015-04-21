@@ -26,8 +26,7 @@ public class Draw
   final char[] mTmpChr = new char[256];
   public boolean draw(@NonNull final DrawTools drawTools, final int modeFlags,
                       @NonNull final Canvas canvas, @NonNull final Rect bounds,
-                      @Nullable final Triplet<Departure> departures1,
-                      @Nullable final Triplet<Departure> departures2,
+                      @Nullable final NextDepartures departures1, @Nullable final NextDepartures departures2,
                       @NonNull final Status status, @NonNull final Time time, @NonNull final Sensors sensors,
                       @NonNull final String locationDescriptor)
   {
@@ -70,7 +69,7 @@ public class Draw
       canvas.drawText(status.header1, drawTools.departurePosX, drawTools.departurePosY, drawTools.departurePaint);
       // Draw icon
       final float y1 = drawTools.departurePosY + lineHeight;
-      drawIcon(drawTools.departurePosX, y1, status, drawTools, canvas);
+      drawIcon(drawTools.departurePosX, y1, departures1, drawTools, canvas);
       // Draw departures
       mustInvalidate = drawDepartureSet(0, departures1, drawTools.departurePosX, y1, drawTools, canvas);
 
@@ -82,7 +81,7 @@ public class Draw
           canvas.drawText(status.header2, drawTools.departurePosX, y1e, drawTools.departurePaint);
         // Draw icon
         final float y2 = y1e + lineHeight;
-        drawIcon(drawTools.departurePosX, y2, status, drawTools, canvas);
+        drawIcon(drawTools.departurePosX, y2, departures2, drawTools, canvas);
         // Draw departures
         mustInvalidate |= drawDepartureSet(1, departures2, drawTools.departurePosX, y2, drawTools, canvas);
       }
@@ -98,7 +97,7 @@ public class Draw
   }
 
   private final static String separator = " ◈ ";
-  private boolean drawDepartureSet(final int index, @NonNull final Triplet<Departure> departures,
+  private boolean drawDepartureSet(final int index, @NonNull final NextDepartures departures,
                                    final float x, final float y,
                                    @NonNull final DrawTools drawTools, @NonNull final Canvas canvas)
   {
@@ -142,9 +141,9 @@ public class Draw
     return cache.drawOn(canvas, x, y, drawTools.imagePaint);
   }
 
-  private static void drawIcon(final float x, final float y, @NonNull final Status status,
+  private static void drawIcon(final float x, final float y, @NonNull final NextDepartures departures,
                                @NonNull final DrawTools drawTools, @NonNull final Canvas canvas) {
-    final Bitmap icon = drawTools.getIconForStatus(status);
+    final Bitmap icon = drawTools.getIconForDepartures(departures);
     canvas.drawBitmap(icon,
      x - icon.getWidth() - drawTools.iconToDepartureXPadding,
      y - icon.getHeight() + 5, // + 5 for alignment because I can't be assed to compute it

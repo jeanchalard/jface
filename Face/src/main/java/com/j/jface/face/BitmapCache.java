@@ -18,13 +18,13 @@ public class BitmapCache
   private final Interpolator interpolator = new DecelerateInterpolator(3.0f);
   private final int mSizeNow, mSizeNext, mOffsetNext;
   private final int mVerticalShift;
-  public final Triplet<Departure> mDepartures;
+  public final NextDepartures mDepartures;
   private final int mTime;
   private final Paint mPaint;
   private Rect mSrc, mDst;
 
   public BitmapCache(final float sizeNow, final float sizeNext, final float offsetNext,
-                     final Triplet<Departure> departures, final Paint p)
+                     final NextDepartures departures, final Paint p)
   {
     mCache = Bitmap.createBitmap(Const.SCREEN_SIZE, HEIGHT, Bitmap.Config.ARGB_8888);
     mCanvas = new Canvas(mCache);

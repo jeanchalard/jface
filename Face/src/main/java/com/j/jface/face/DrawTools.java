@@ -75,15 +75,19 @@ public class DrawTools
     iconToDepartureXPadding = 7;
   }
 
-  public Bitmap getIconForStatus(final Status status) {
-    switch (status) {
-      case COMMUTE_MORNING_平日:
-      case COMMUTE_EVENING_休日:
+  public Bitmap getIconForDepartures(final NextDepartures departures) {
+    switch (departures.key) {
+      case Const.日比谷線_北千住_平日:
+      case Const.日比谷線_北千住_休日:
+      case Const.日比谷線_六本木_平日:
+      case Const.日比谷線_六本木_休日:
         return hibiyaIcon;
-      case HOME_平日:
-      case HOME_休日:
-      case 日暮里_休日:
-      case 日暮里_平日:
+      case Const.京成線_上野方面_平日:
+      case Const.京成線_上野方面_休日:
+      case Const.京成線_成田方面_平日:
+      case Const.京成線_成田方面_休日:
+      case Const.京成線_日暮里_平日:
+      case Const.京成線_日暮里_休日:
         return keiseiIcon;
       default:
         return null;

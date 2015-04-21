@@ -68,14 +68,14 @@ public class DataStore
     return nextDeparture;
   }
 
-  @Nullable public Triplet<Departure> findNextDepartures(@NonNull final String key, @NonNull final Time time)
+  @Nullable public NextDepartures findNextDepartures(@NonNull final String key, @NonNull final Time time)
   {
     final Departure first = findClosestDeparture(key, time);
     if (null == first) return null;
     final Departure second = findClosestDeparture(key, first.time + 1);
-    if (null == second) return new Triplet<>(first, null, null);
+    if (null == second) return new NextDepartures(key, first, null, null);
     final Departure third = findClosestDeparture(key, second.time + 1);
-    return new Triplet<>(first, second, third);
+    return new NextDepartures(key, first, second, third);
   }
 
   public Boolean isWithinFence(@NonNull final String fenceName)

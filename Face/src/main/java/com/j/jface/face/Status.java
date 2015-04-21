@@ -8,7 +8,7 @@ import com.j.jface.Const;
 
 public enum Status
 {
-  COMMUTE_MORNING_平日("Home, workday, morning", "北千住 ▶ 六本木", null),
+  COMMUTE_MORNING_平日("Home, workday, morning", "北千住 ▶ 六本木", "千住大橋 ▶ 町屋"),
   COMMUTE_EVENING_休日("Work, workday, evening", "六本木 ▶ 北千住", null),
   HOME_平日("At home (workday)", "千住大橋 ▶ 日暮里", "千住大橋 ▶ 成田"),
   HOME_休日("At home (holiday)", "千住大橋 ▶ 日暮里", "千住大橋 ▶ 成田"),
