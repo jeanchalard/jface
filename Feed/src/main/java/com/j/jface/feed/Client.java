@@ -1,7 +1,11 @@
 package com.j.jface.feed;
 
 import android.content.Context;
-import android.os.*;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -10,6 +14,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.Wearable;
 import com.j.jface.feed.actions.Action;
+import com.j.jface.FutureValue;
+import com.j.jface.feed.actions.GetDataAction;
 import com.j.jface.feed.actions.PutDataAction;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -77,6 +83,12 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
   {
     mUpdates.add(action);
     proceed();
+  }
+
+  public DataMap getData(@NonNull final String path) {
+    final FutureValue<DataMap> f = new FutureValue<DataMap>();
+    enqueue(new GetDataAction(path, f));
+    return f.get();
   }
 
   // Helper methods to put data and forget about it

@@ -56,6 +56,8 @@ public class FeedLoader
   private static void startLoadDataSource(@NonNull final DataSource ds, @NonNull final Client client) {
     final URL url;
     try { url = new URL(ds.url); } catch (MalformedURLException e) { return; } // Can't happen because the URL is valid
+    final String dataPath = Const.DATA_PATH + "/" + ds.name;
+
     executor.execute(new Runnable() { public void run()
     {
       HttpURLConnection urlConnection = null;
@@ -68,7 +70,7 @@ public class FeedLoader
         final FeedParser parser = ds.parser.newInstance();
         final DataMap data = parser.parseStream(ds.name, in);
         data.putLong(Const.DATA_KEY_UPDATETIME, System.currentTimeMillis());
-        client.putData(Const.DATA_PATH + "/" + ds.name, data);
+        client.putData(dataPath, data);
       } catch (@NonNull InstantiationException | IllegalAccessException e) {} // Nopes never happens
       catch (@NonNull IOException e)
       {
