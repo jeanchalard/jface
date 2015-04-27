@@ -17,12 +17,9 @@
 package com.j.jface.feed;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
-
-import java.io.FileNotFoundException;
 
 /**
  * The phone-side config activity for {@code DigitalWatchFaceService}. Like the watch-side config
@@ -31,8 +28,6 @@ import java.io.FileNotFoundException;
  */
 public class JFaceDataFeedWrapper extends Activity
 {
-  private static final String TAG = "DigitalWatchFaceConfig";
-
   @Nullable private JFaceDataFeed mW;
 
   // Activity callbacks
@@ -40,17 +35,7 @@ public class JFaceDataFeedWrapper extends Activity
   protected void onCreate(Bundle savedInstanceState)
   {
     super.onCreate(savedInstanceState);
-    try
-    {
-      mW = new JFaceDataFeed(this);
-    }
-    catch (FileNotFoundException e)
-    {
-      throw new RuntimeException(e);
-    }
-    final Intent i = new Intent(this, GeofenceTransitionReceiverService.class);
-    i.setAction(GeofenceTransitionReceiver.ACTION_MANUAL_START);
-    startService(i);
+    mW = new JFaceDataFeed(this);
   }
 
   // Interface callbacks
