@@ -46,6 +46,7 @@ public class GeofenceTransitionReceiver
     if (Intent.ACTION_BOOT_COMPLETED.equals(action) || ACTION_MANUAL_START.equals(action))
       mClient.enqueue(new SetupGeofenceAction(getNotificationIntent()));
     if (ACTION_GEOFENCE.equals(action)) handleGeofenceTransitions(intent);
+    FeedLoader.startAllLoads(mClient);
   }
 
   private PendingIntent getNotificationIntent()
@@ -113,10 +114,11 @@ public class GeofenceTransitionReceiver
     final String logString = nowString + " : " + s + "\n";
     mLogFile.write(logString.getBytes());
     final NotificationManager na = (NotificationManager)service.getSystemService(Context.NOTIFICATION_SERVICE);
-    na.notify(++notificationNumber, new Notification.Builder(service)
+    na.notify(++notificationNumber, new Notification.BigTextStyle(new Notification.Builder(service)
      .setSmallIcon(R.drawable.notif)
      .setContentTitle(s)
-     .setContentText(nowString)
+     .setContentText(nowString))
+     .bigText(s)
      .build());
   }
 }

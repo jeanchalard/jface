@@ -54,15 +54,20 @@ public class FeedLoader
   }
 
   private static void startLoadDataSource(@NonNull final DataSource ds, @NonNull final Client client) {
-    final URL url;
-    try { url = new URL(ds.url); } catch (MalformedURLException e) { return; } // Can't happen because the URL is valid
-    final String dataPath = Const.DATA_PATH + "/" + ds.name;
-
     executor.execute(new Runnable() { public void run()
     {
+      final String dataPath = Const.DATA_PATH + "/" + ds.name;
+      final long then = client.getData(dataPath).get(Const.DATA_KEY_UPDATETIME);
+      final long now = System.currentTimeMillis();
+      if (then + Const.UPDATE_DELAY_MILLIS > now)
+      {
+        Logger.L("Update for " + ds.name + " is " + ((then + Const.UPDATE_DELAY_MILLIS - now) / 3600000) + " hours away");
+        return;
+      }
       HttpURLConnection urlConnection = null;
       try
       {
+        final URL url = new URL(ds.url);
         urlConnection = (HttpURLConnection)url.openConnection();
         if (url.getAuthority().startsWith("keisei"))
           urlConnection.addRequestProperty("User-Agent", "Mozilla");
@@ -70,8 +75,9 @@ public class FeedLoader
         final FeedParser parser = ds.parser.newInstance();
         final DataMap data = parser.parseStream(ds.name, in);
         data.putLong(Const.DATA_KEY_UPDATETIME, System.currentTimeMillis());
+        Logger.L("Updated data for " + ds.name);
         client.putData(dataPath, data);
-      } catch (@NonNull InstantiationException | IllegalAccessException e) {} // Nopes never happens
+      } catch (@NonNull InstantiationException | IllegalAccessException | MalformedURLException e) {} // Nopes never happens
       catch (@NonNull IOException e)
       {
         // TODO : Must reschedule
