@@ -23,13 +23,10 @@ public class FeedLoader
       startLoadDataSource(ds, client);
   }
 
-  private static long getLastSuccessfulUpdateDate(@NonNull final Client client, @NonNull final String path)
+  private static DataMap getStatusData(@NonNull final Client client, @NonNull final String path)
   {
-    final DataMap lastStatusData = client.getData(path);
-    if (null == lastStatusData) return 0;
-    final Long lastStatus = lastStatusData.get(Const.DATA_KEY_SUCCESSFUL_UPDATE_DATE);
-    if (null == lastStatus) return 0;
-    return lastStatus;
+    final DataMap data = client.getData(path);
+    return null == data ? new DataMap() : data;
   }
 
   private static void startLoadDataSource(@NonNull final DataSource ds, @NonNull final Client client) {
@@ -37,16 +34,17 @@ public class FeedLoader
     {
       final String dataPath = Const.DATA_PATH + "/" + ds.name;
       final String statusDataPath = dataPath + Const.DATA_PATH_SUFFIX_STATUS;
-      final long lastSuccessfulUpdateDate = getLastSuccessfulUpdateDate(client, statusDataPath);
+      final DataMap statusData = getStatusData(client, statusDataPath);
+      final long lastSuccessfulUpdateDate = statusData.getLong(Const.DATA_KEY_SUCCESSFUL_UPDATE_DATE);
       final long now = System.currentTimeMillis();
       if (lastSuccessfulUpdateDate + Const.UPDATE_DELAY_MILLIS > now)
       {
         Logger.L("Update for " + ds.name + " is " +
          ((lastSuccessfulUpdateDate + Const.UPDATE_DELAY_MILLIS - now) / 3600000) + " hours away");
+        statusData.putLong(Const.DATA_KEY_STATUS_UPDATE_DATE, System.currentTimeMillis());
+        client.putData(statusDataPath, statusData);
         return;
       }
-      final DataMap statusData = new DataMap();
-      statusData.putLong(Const.DATA_KEY_SUCCESSFUL_UPDATE_DATE, lastSuccessfulUpdateDate);
       try
       {
         final URL url = new URL(ds.url);

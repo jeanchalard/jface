@@ -1,10 +1,7 @@
 package com.j.jface.feed;
 
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.text.format.Time;
@@ -13,7 +10,6 @@ import android.util.Log;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 import com.j.jface.Const;
-import com.j.jface.R;
 import com.j.jface.feed.actions.SetupGeofenceAction;
 
 import java.io.File;
@@ -113,12 +109,12 @@ public class GeofenceTransitionReceiver
     final String nowString = t.format3339(false);
     final String logString = nowString + " : " + s + "\n";
     mLogFile.write(logString.getBytes());
-    final NotificationManager na = (NotificationManager)service.getSystemService(Context.NOTIFICATION_SERVICE);
-    na.notify(++notificationNumber, new Notification.BigTextStyle(new Notification.Builder(service)
-     .setSmallIcon(R.drawable.notif)
-     .setContentTitle(s)
-     .setContentText(nowString))
-     .bigText(s)
-     .build());
+//    final NotificationManager na = (NotificationManager)service.getSystemService(Context.NOTIFICATION_SERVICE);
+//    na.notify(++notificationNumber, new Notification.BigTextStyle(new Notification.Builder(service)
+//     .setSmallIcon(R.drawable.notif)
+//     .setContentTitle(s)
+//     .setContentText(nowString))
+//     .bigText(s)
+//     .build());
   }
 }

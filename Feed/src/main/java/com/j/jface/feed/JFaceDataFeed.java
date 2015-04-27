@@ -57,10 +57,9 @@ public class JFaceDataFeed
         mLog.append("\n");
         mLog.append(" Status : " + status);
         mLog.append("\n");
-        if ("Success".equals(status)) return;
         t.set(dataMap.getLong(Const.DATA_KEY_SUCCESSFUL_UPDATE_DATE));
 
-        mLog.append(" Last successful update on " + t.format("%Y/%m/%d %H:%M:%S"));
+        mLog.append(" Data last updated " + t.format("%Y/%m/%d %H:%M:%S\n"));
       }});}};
   }
 
