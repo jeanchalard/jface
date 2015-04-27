@@ -15,9 +15,8 @@ public abstract class FeedParser
   protected String find(@NonNull final BufferedReader src, @NonNull final String s) throws IOException {
     int index = 0;
     int expected = s.codePointAt(index);
-    int offset = 0;
     int read = src.read();
-    final StringBuffer sb = new StringBuffer();
+    final StringBuilder sb = new StringBuilder();
     while (read != -1) {
       if (read == expected) {
         index += Character.charCount(read);
@@ -30,7 +29,6 @@ public abstract class FeedParser
         index = 0;
       }
       sb.appendCodePoint(read);
-      offset += 1;
       read = src.read();
     }
     return null;

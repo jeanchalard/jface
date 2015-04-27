@@ -39,13 +39,21 @@ public class JFaceDataFeedWrapper extends Activity
   }
 
   // Interface callbacks
-  public void onClickSet(@Nullable final View v) {
+  public void onClickSet(@Nullable final View v)
+  {
     if (null == v || null == mW) return;
     mW.onClickSet(v);
   }
 
-  public void onClickLoad(@Nullable final View v) {
+  public void onClickLoad(@Nullable final View v)
+  {
     if (null == mW) return;
     mW.load();
+  }
+
+  public void onClickClear(@Nullable final View v)
+  {
+    if (null == v || null == mW) return;
+    mW.clear();
   }
 }

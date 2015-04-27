@@ -11,6 +11,7 @@ public class Const
   public static final String DATA_PATH = "/jwatch/Data";
   public static final String CONFIG_PATH = "/jwatch/Conf";
   public static final String LOCATION_PATH = "/jwatch/Location";
+  public static final String DATA_PATH_SUFFIX_STATUS = "_status";
 
   public static final String DATA_KEY_DEPTIME = "depTime";
   public static final String DATA_KEY_EXTRA = "extra";

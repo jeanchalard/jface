@@ -1,6 +1,7 @@
 package com.j.jface.feed;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -13,8 +14,10 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.Wearable;
-import com.j.jface.feed.actions.Action;
 import com.j.jface.FutureValue;
+import com.j.jface.feed.actions.Action;
+import com.j.jface.feed.actions.DeleteAllDataAction;
+import com.j.jface.feed.actions.DeleteDataAction;
 import com.j.jface.feed.actions.GetDataAction;
 import com.j.jface.feed.actions.PutDataAction;
 
@@ -22,6 +25,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Client extends Handler implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
 {
+  public interface GetDataCallback { void run(@NonNull final String path, @NonNull final DataMap data); }
+
   private static final int MSG_PROCESS_QUEUE = 1;
   private static final int MSG_CONNECT = 2;
   private static final int MSG_RUN_ACTIONS = 3;
@@ -85,10 +90,16 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
     proceed();
   }
 
-  public DataMap getData(@NonNull final String path) {
-    final FutureValue<DataMap> f = new FutureValue<DataMap>();
+  public DataMap getData(@NonNull final String path)
+  {
+    final FutureValue<DataMap> f = new FutureValue<>();
     enqueue(new GetDataAction(path, f));
     return f.get();
+  }
+
+  public void getData(@NonNull final String path, @NonNull final GetDataCallback callback)
+  {
+    enqueue(new GetDataAction(path, callback));
   }
 
   // Helper methods to put data and forget about it
@@ -105,6 +116,16 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
   public void putData(@NonNull final String path, @NonNull final DataMap map)
   {
     enqueue(new PutDataAction(path, map));
+  }
+
+  public void deleteData(@NonNull final Uri uri)
+  {
+    enqueue(new DeleteDataAction(uri));
+  }
+
+  public void deleteAllData()
+  {
+    enqueue(new DeleteAllDataAction(this));
   }
 
   @Override public void onConnected(final Bundle bundle) { mConnectionFailures = 0; proceed(); }
