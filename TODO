@@ -6,5 +6,4 @@
   - Better use of the 2 lines
 - Destinations. Figure out arrival time.
 - Background. Show the reflection face background moving according to gyroscope.
-- Automation. Retrieve stuff automatically every now and then. Hook on geofences ?
 - Cleanup. Remove logs and stop allocating in onDraw.

@@ -123,7 +123,7 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
     enqueue(new DeleteDataAction(uri));
   }
 
-  public void deleteAllData()
+  public void clearAllData()
   {
     enqueue(new DeleteAllDataAction(this));
   }

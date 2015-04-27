@@ -42,7 +42,7 @@ public class JFaceDataFeedWrapper extends Activity
   public void onClickSet(@Nullable final View v)
   {
     if (null == v || null == mW) return;
-    mW.onClickSet(v);
+    mW.setAdhocData(v);
   }
 
   public void onClickLoad(@Nullable final View v)
@@ -54,6 +54,12 @@ public class JFaceDataFeedWrapper extends Activity
   public void onClickClear(@Nullable final View v)
   {
     if (null == v || null == mW) return;
-    mW.clear();
+    mW.clearAllData();
+  }
+
+  public void onClickRefresh(@Nullable final View v)
+  {
+    if (null == v || null == mW) return;
+    mW.refresh();
   }
 }

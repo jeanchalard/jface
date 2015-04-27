@@ -69,9 +69,15 @@ public class JFaceDataFeed
       client.getData(Const.DATA_PATH + "/" + ds.name + Const.DATA_PATH_SUFFIX_STATUS, showDataCallback());
   }
 
-  public void onClickSet(@NonNull final View button)
+  public void setAdhocData(@NonNull final View button)
   {
     mClient.putData(Const.DATA_KEY_ADHOC, Const.DATA_KEY_ADHOC, mDataEdit.getText().toString());
+  }
+
+  public void refresh()
+  {
+    mLog.setText("");
+    retrieveStatus(mClient);
   }
 
   public void load()
@@ -80,8 +86,8 @@ public class JFaceDataFeed
     FeedLoader.startAllLoads(mClient);
   }
 
-  public void clear()
+  public void clearAllData()
   {
-    mClient.deleteAllData();
+    mClient.clearAllData();
   }
 }
