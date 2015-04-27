@@ -9,7 +9,6 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -53,35 +52,48 @@ public class FeedLoader
       startLoadDataSource(ds, client);
   }
 
+  private static long getLastSuccessfulUpdateDate(@NonNull final Client client, @NonNull final String path)
+  {
+    final DataMap lastStatusData = client.getData(path);
+    if (null == lastStatusData) return 0;
+    final Long lastStatus = lastStatusData.get(Const.DATA_KEY_SUCCESSFUL_UPDATE_DATE);
+    if (null == lastStatus) return 0;
+    return lastStatus;
+  }
+
   private static void startLoadDataSource(@NonNull final DataSource ds, @NonNull final Client client) {
     executor.execute(new Runnable() { public void run()
     {
       final String dataPath = Const.DATA_PATH + "/" + ds.name;
-      final long then = client.getData(dataPath).get(Const.DATA_KEY_UPDATETIME);
+      final String statusDataPath = dataPath + "_status";
+      final long lastSuccessfulUpdateDate = getLastSuccessfulUpdateDate(client, statusDataPath);
       final long now = System.currentTimeMillis();
-      if (then + Const.UPDATE_DELAY_MILLIS > now)
+      if (lastSuccessfulUpdateDate + Const.UPDATE_DELAY_MILLIS > now)
       {
-        Logger.L("Update for " + ds.name + " is " + ((then + Const.UPDATE_DELAY_MILLIS - now) / 3600000) + " hours away");
+        Logger.L("Update for " + ds.name + " is " +
+         ((lastSuccessfulUpdateDate + Const.UPDATE_DELAY_MILLIS - now) / 3600000) + " hours away");
         return;
       }
-      HttpURLConnection urlConnection = null;
+      final DataMap statusData = new DataMap();
+      statusData.putLong(Const.DATA_KEY_SUCCESSFUL_UPDATE_DATE, lastSuccessfulUpdateDate);
       try
       {
         final URL url = new URL(ds.url);
-        urlConnection = (HttpURLConnection)url.openConnection();
+        final HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
         if (url.getAuthority().startsWith("keisei"))
           urlConnection.addRequestProperty("User-Agent", "Mozilla");
         InputStream in = new BufferedInputStream(urlConnection.getInputStream());
         final FeedParser parser = ds.parser.newInstance();
         final DataMap data = parser.parseStream(ds.name, in);
-        data.putLong(Const.DATA_KEY_UPDATETIME, System.currentTimeMillis());
         Logger.L("Updated data for " + ds.name);
         client.putData(dataPath, data);
-      } catch (@NonNull InstantiationException | IllegalAccessException | MalformedURLException e) {} // Nopes never happens
-      catch (@NonNull IOException e)
-      {
-        // TODO : Must reschedule
+        statusData.putLong(Const.DATA_KEY_SUCCESSFUL_UPDATE_DATE, System.currentTimeMillis());
+        statusData.putString(Const.DATA_KEY_LAST_STATUS, "Success");
+      } catch (@NonNull InstantiationException | IllegalAccessException | IOException | RuntimeException e) {
+        statusData.putString(Const.DATA_KEY_LAST_STATUS, "Failure ; " + e.getMessage());
       }
+      statusData.putLong(Const.DATA_KEY_STATUS_UPDATE_DATE, System.currentTimeMillis());
+      client.putData(statusDataPath, statusData);
     }});
   }
 }
