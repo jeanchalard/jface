@@ -27,12 +27,14 @@ public class Draw
   final char[] mTmpChr = new char[256];
   public boolean draw(@NonNull final DrawTools drawTools, final int modeFlags,
                       @NonNull final Canvas canvas, @NonNull final Rect bounds,
-                      @Nullable final Departure departure1, @Nullable final Departure departure2,
+                      @Nullable final Departure departureLine1, @Nullable final Departure departureLine2,
                       @NonNull final Status status, @NonNull final Time time, @NonNull final Sensors sensors,
                       @NonNull final String locationDescriptor)
   {
     long start = System.currentTimeMillis();
     boolean drawFull = 0 == ((AMBIENT_MODE | MUTE_MODE) & modeFlags);
+    final Departure departure1 = null == departureLine1 ? departureLine2 : departureLine1;
+    final Departure departure2 = null == departureLine1 ? null : departureLine2;
 
     // Draw the background.
     // TODO: only update the relevant part of the display.
@@ -70,8 +72,7 @@ public class Draw
       canvas.drawText(departure1.headSign, drawTools.departurePosX, drawTools.departurePosY, drawTools.departurePaint);
       // Draw icon
       final float y1 = drawTools.departurePosY + lineHeight;
-      if (null != departure1)
-        drawIcon(drawTools.departurePosX, y1, departure1.key, drawTools, canvas);
+      drawIcon(drawTools.departurePosX, y1, departure1.key, drawTools, canvas);
       // Draw departures
       mustInvalidate = drawDepartureSet(0, departure1, drawTools.departurePosX, y1, drawTools, canvas);
 
@@ -82,15 +83,17 @@ public class Draw
         canvas.drawText(departure2.headSign, drawTools.departurePosX, y1e, drawTools.departurePaint);
         // Draw icon
         final float y2 = y1e + lineHeight;
-        if (null != departure2)
-          drawIcon(drawTools.departurePosX, y2, departure2.key, drawTools, canvas);
+        drawIcon(drawTools.departurePosX, y2, departure2.key, drawTools, canvas);
         // Draw departures
         mustInvalidate |= drawDepartureSet(1, departure2, drawTools.departurePosX, y2, drawTools, canvas);
       }
     }
 
     final int borderTextLength = Formatter.formatBorder(mTmpChr, time, drawFull ? locationDescriptor : null);
-    canvas.drawTextOnPath(mTmpChr, 0, borderTextLength, drawTools.watchContourPath, 0, 0, drawTools.statusPaint);
+    if (Const.ROUND_SCREEN)
+      canvas.drawTextOnPath(mTmpChr, 0, borderTextLength, drawTools.watchContourPath, 0, 0, drawTools.statusPaint);
+    else
+      canvas.drawText(mTmpChr, 0, borderTextLength, bounds.width() / 2, drawTools.statusPaint.getTextSize(), drawTools.statusPaint);
 
     long finish = System.currentTimeMillis();
 //    Log.e("TIME", "" + (finish - start));
@@ -144,6 +147,7 @@ public class Draw
   private static void drawIcon(final float x, final float y, @NonNull final String key,
                                @NonNull final DrawTools drawTools, @NonNull final Canvas canvas) {
     final Bitmap icon = drawTools.getIconForKey(key);
+    if (null == icon) throw new RuntimeException("Unknown icon for key " + key);
     canvas.drawBitmap(icon,
      x - icon.getWidth() - drawTools.iconToDepartureXPadding,
      y - icon.getHeight() + 5, // + 5 for alignment because I can't be assed to compute it

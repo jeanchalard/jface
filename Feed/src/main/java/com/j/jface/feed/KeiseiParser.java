@@ -21,7 +21,7 @@ public class KeiseiParser extends FeedParser
     final DataMap result = new DataMap();
     final BufferedReader src = new BufferedReader(new InputStreamReader(new BufferedInputStream(srcStream), "Shift_JIS"));
 
-    if (null == find(src, "■京成本線") || null == find(src, "</tr>")) {
+    if (null == find(src, "class=\"name\">") || null == find(src, "</tr>")) {
       Logger.L("Argh, data not at expected format for " + dataName);
       return result;
     }

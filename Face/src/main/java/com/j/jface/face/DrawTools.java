@@ -81,13 +81,21 @@ public class DrawTools
       case Const.日比谷線_北千住_休日:
       case Const.日比谷線_六本木_平日:
       case Const.日比谷線_六本木_休日:
+      case Const.日比谷線_三ノ輪_中目黒方面_平日:
+      case Const.日比谷線_三ノ輪_中目黒方面_休日:
+      case Const.日比谷線_三ノ輪_北千住方面_平日:
+      case Const.日比谷線_三ノ輪_北千住方面_休日:
         return hibiyaIcon;
-      case Const.京成線_上野方面_平日:
-      case Const.京成線_上野方面_休日:
-      case Const.京成線_成田方面_平日:
-      case Const.京成線_成田方面_休日:
-      case Const.京成線_日暮里_平日:
-      case Const.京成線_日暮里_休日:
+      case Const.京成線_千住大橋_上野方面_平日:
+      case Const.京成線_千住大橋_上野方面_休日:
+      case Const.京成線_千住大橋_成田方面_平日:
+      case Const.京成線_千住大橋_成田方面_休日:
+      case Const.京成線_日暮里_千住大橋方面_平日:
+      case Const.京成線_日暮里_千住大橋方面_休日:
+      case Const.京成線_お花茶屋_上野方面_平日:
+      case Const.京成線_お花茶屋_上野方面_休日:
+      case Const.京成線_立石_人形町方面_平日:
+      case Const.京成線_立石_人形町方面_休日:
         return keiseiIcon;
       default:
         return null;
