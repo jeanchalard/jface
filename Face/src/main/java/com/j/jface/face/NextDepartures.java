@@ -1,5 +1,7 @@
 package com.j.jface.face;
 
+import com.j.jface.Departure;
+
 public class NextDepartures
 {
   final String key;

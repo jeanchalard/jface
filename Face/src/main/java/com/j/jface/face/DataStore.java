@@ -6,6 +6,7 @@ import android.text.format.Time;
 
 import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
+import com.j.jface.Departure;
 
 import java.util.ArrayList;
 import java.util.Collections;

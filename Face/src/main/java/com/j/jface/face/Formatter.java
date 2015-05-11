@@ -3,6 +3,8 @@ package com.j.jface.face;
 import android.support.annotation.NonNull;
 import android.text.format.Time;
 
+import com.j.jface.Departure;
+
 public class Formatter
 {
   public static CharSequence format2Digits(final StringBuilder buffer, final int n)

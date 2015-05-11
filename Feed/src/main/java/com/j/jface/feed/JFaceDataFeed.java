@@ -10,7 +10,10 @@ import android.widget.TextView;
 
 import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
+import com.j.jface.Departure;
 import com.j.jface.R;
+
+import java.util.ArrayList;
 
 public class JFaceDataFeed
 {
@@ -41,32 +44,45 @@ public class JFaceDataFeed
   {
     return new Client.GetDataCallback() { public void run(@NonNull final String path, @NonNull final DataMap dataMap) {
       mA.runOnUiThread(new Runnable() { @Override public void run() {
-        mLog.append(
-         path.substring(Const.DATA_PATH.length() + 1, path.length() - Const.DATA_PATH_SUFFIX_STATUS.length()));
+        mLog.append(path);
         mLog.append("\n");
-        final long lastUpdate = dataMap.getLong(Const.DATA_KEY_STATUS_UPDATE_DATE);
-        if (0 == lastUpdate)
+        if (path.endsWith(Const.DATA_PATH_SUFFIX_STATUS))
         {
-          mLog.append(" Never updated\n");
-          return;
+          final long lastUpdate = dataMap.getLong(Const.DATA_KEY_STATUS_UPDATE_DATE);
+          if (0 == lastUpdate)
+          {
+            mLog.append(" Never updated\n");
+            return;
+          }
+          final Time t = new Time();
+          t.set(lastUpdate);
+          final String status = dataMap.getString(Const.DATA_KEY_LAST_STATUS);
+          mLog.append(" Updated on " + t.format("%Y/%m/%d %H:%M:%S"));
+          mLog.append("\n");
+          mLog.append(" Status : " + status);
+          mLog.append("\n");
+          t.set(dataMap.getLong(Const.DATA_KEY_SUCCESSFUL_UPDATE_DATE));
+          mLog.append(" Data last updated " + t.format("%Y/%m/%d %H:%M:%S\n"));
         }
-        final Time t = new Time();
-        t.set(lastUpdate);
-        final String status = dataMap.getString(Const.DATA_KEY_LAST_STATUS);
-        mLog.append(" Updated on " + t.format("%Y/%m/%d %H:%M:%S"));
-        mLog.append("\n");
-        mLog.append(" Status : " + status);
-        mLog.append("\n");
-        t.set(dataMap.getLong(Const.DATA_KEY_SUCCESSFUL_UPDATE_DATE));
-
-        mLog.append(" Data last updated " + t.format("%Y/%m/%d %H:%M:%S\n"));
+        else
+        {
+          final ArrayList<DataMap> departureList = dataMap.getDataMapArrayList(Const.DATA_KEY_DEPLIST);
+          if (null == departureList) return;
+          for (final DataMap map : departureList)
+            mLog.append(new Departure(map.getInt(Const.DATA_KEY_DEPTIME),
+             map.getString(Const.DATA_KEY_EXTRA)).toString() + "・");
+          mLog.append("\n");
+        }
       }});}};
   }
 
   private void retrieveStatus(final Client client)
   {
     for (final DataSource ds : DataSource.ALL_SOURCES)
+    {
       client.getData(Const.DATA_PATH + "/" + ds.name + Const.DATA_PATH_SUFFIX_STATUS, showDataCallback());
+      client.getData(Const.DATA_PATH + "/" + ds.name, showDataCallback());
+    }
   }
 
   public void setAdhocData(@NonNull final View button)

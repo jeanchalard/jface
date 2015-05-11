@@ -44,6 +44,7 @@ import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
 import com.j.jface.Const;
+import com.j.jface.Departure;
 
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -120,7 +121,8 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     Draw mDraw = new Draw();
     DrawTools mDrawTools = new DrawTools(null);
     @NonNull final Time mTime = new Time();
-    @Nullable Departure mNextDeparture;
+    @Nullable
+    Departure mNextDeparture;
     int mModeFlags = Draw.BACKGROUND_PRESENT; // Default mode is background on, mute off, ambient off
 
     /**
