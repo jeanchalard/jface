@@ -75,8 +75,8 @@ public class DrawTools
     iconToDepartureXPadding = 7;
   }
 
-  public Bitmap getIconForDepartures(final NextDepartures departures) {
-    switch (departures.key) {
+  public Bitmap getIconForKey(final String key) {
+    switch (key) {
       case Const.日比谷線_北千住_平日:
       case Const.日比谷線_北千住_休日:
       case Const.日比谷線_六本木_平日:

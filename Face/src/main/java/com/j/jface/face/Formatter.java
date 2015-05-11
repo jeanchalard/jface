@@ -38,12 +38,34 @@ public class Formatter
     return ++i;
   }
 
-  public static CharSequence formatDeparture(final StringBuilder buffer, final Departure dep, final int offset)
+  public static CharSequence formatFirstDeparture(final StringBuilder buffer, final Departure dep, final int offset)
   {
+    if (null == dep)
+    {
+      buffer.setLength(offset);
+      buffer.append("終了");
+      return buffer;
+    }
     buffer.setLength(offset + 5);
     int i = offset - 1;
     buffer.setCharAt(++i, (char) ('0' + dep.time / 36000));
     buffer.setCharAt(++i, (char) ('0' + (dep.time / 3600) % 10));
+    buffer.setCharAt(++i, ':');
+    buffer.setCharAt(++i, (char) ('0' + (dep.time % 3600) / 600));
+    buffer.setCharAt(++i, (char) ('0' + (dep.time % 600) / 60));
+    buffer.append(dep.extra);
+    return buffer;
+  }
+
+  public static CharSequence formatNextDeparture(final StringBuilder buffer, final Departure dep, final int offset)
+  {
+    if (null == dep)
+    {
+      buffer.append("終了");
+      return buffer;
+    }
+    buffer.setLength(offset + 3);
+    int i = offset - 1;
     buffer.setCharAt(++i, ':');
     buffer.setCharAt(++i, (char) ('0' + (dep.time % 3600) / 600));
     buffer.setCharAt(++i, (char) ('0' + (dep.time % 600) / 60));

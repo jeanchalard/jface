@@ -263,50 +263,50 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     {
       mTime.setToNow();
       final Status status = Status.getStatus(mTime, mDataStore);
-      final NextDepartures departures1;
-      final NextDepartures departures2;
+      final Departure departure1;
+      final Departure departure2;
       switch (status) {
         case COMMUTE_MORNING_平日:
-          departures1 = mDataStore.findNextDepartures(Const.日比谷線_北千住_平日, mTime);
-          departures2 = mDataStore.findNextDepartures(Const.京成線_上野方面_平日, mTime);
+          departure1 = mDataStore.findClosestDeparture(Const.日比谷線_北千住_平日, mTime);
+          departure2 = mDataStore.findClosestDeparture(Const.京成線_上野方面_平日, mTime);
           break;
         case COMMUTE_EVENING_休日:
-          departures1 = mDataStore.findNextDepartures(Const.日比谷線_六本木_平日, mTime);
-          departures2 = null;
+          departure1 = mDataStore.findClosestDeparture(Const.日比谷線_六本木_平日, mTime);
+          departure2 = null;
           break;
         case HOME_平日:
-          departures1 = mDataStore.findNextDepartures(Const.京成線_上野方面_平日, mTime);
-          departures2 = mDataStore.findNextDepartures(Const.京成線_成田方面_平日, mTime);
+          departure1 = mDataStore.findClosestDeparture(Const.京成線_上野方面_平日, mTime);
+          departure2 = mDataStore.findClosestDeparture(Const.京成線_成田方面_平日, mTime);
           break;
         case HOME_休日:
-          departures1 = mDataStore.findNextDepartures(Const.京成線_上野方面_休日, mTime);
-          departures2 = mDataStore.findNextDepartures(Const.京成線_成田方面_休日, mTime);
+          departure1 = mDataStore.findClosestDeparture(Const.京成線_上野方面_休日, mTime);
+          departure2 = mDataStore.findClosestDeparture(Const.京成線_成田方面_休日, mTime);
           break;
         case 日暮里_平日:
-          departures1 = mDataStore.findNextDepartures(Const.京成線_日暮里_平日, mTime);
-          departures2 = null;
+          departure1 = mDataStore.findClosestDeparture(Const.京成線_日暮里_平日, mTime);
+          departure2 = null;
           break;
         case 日暮里_休日:
-          departures1 = mDataStore.findNextDepartures(Const.京成線_日暮里_休日, mTime);
-          departures2 = null;
+          departure1 = mDataStore.findClosestDeparture(Const.京成線_日暮里_休日, mTime);
+          departure2 = null;
           break;
         default:
-          departures1 = null;
-          departures2 = null;
+          departure1 = null;
+          departure2 = null;
       }
 
       mDataStore.isWithinFence(Const.HOME_FENCE_NAME);
       final int ambientFlag = isInAmbientMode() ? Draw.AMBIENT_MODE : 0;
       if (mDraw.draw(mDrawTools, mModeFlags | ambientFlag, canvas, bounds,
-       departures1, departures2, status, mTime, mSensors, Status.getSymbolicLocationName(mDataStore)))
+       departure1, departure2, status, mTime, mSensors, Status.getSymbolicLocationName(mDataStore)))
         invalidate();
 
-      if (null == departures1)
+      if (null == departure1)
         mNextDeparture = null;
-      else if (null == departures2)
-        mNextDeparture = departures1.first;
+      else if (null == departure2)
+        mNextDeparture = departure1;
       else
-        mNextDeparture = departures1.first.time < departures2.first.time ? departures1.first : departures2.first;
+        mNextDeparture = departure1.time < departure2.time ? departure1 : departure2;
     }
 
     /**

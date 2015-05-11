@@ -14,10 +14,10 @@ public enum Status
   HOME_休日("At home (holiday)", "千住大橋 ▶ 日暮里", "千住大橋 ▶ 成田"),
   日暮里_平日("Nippori (workday)", "日暮里 ▶ 千住大橋", null),
   日暮里_休日("Nippori (holiday)", "日暮里 ▶ 千住大橋", null),
-  OTHER("Freestyle", null, null);
+  OTHER("Somewhere", null, null);
 
   @NonNull public final String description;
-  @NonNull public final String header1;
+  @Nullable public final String header1;
   @Nullable public final String header2;
 
   private static final int DUNNO = 0;
@@ -27,7 +27,7 @@ public enum Status
   private static final int 東京 = 4;
   private static final int TRAVEL = 5;
 
-  Status(@NonNull final String d, @NonNull final String h1, @NonNull final String h2) {
+  Status(@NonNull final String d, @Nullable final String h1, @Nullable final String h2) {
     description = d;
     header1 = h1;
     header2 = h2;
@@ -72,9 +72,8 @@ public enum Status
 
     if (日暮里 == symbolicLocation) return workDay ? 日暮里_平日 : 日暮里_休日;
 
-    // TODO : take altitude into account to figure out if I'm on 4th floor or have already left
     if (workDay
-     && (time.hour >= 8 && time.hour <= 11)
+     && (time.hour >= 6 && time.hour <= 11)
      && (DUNNO == symbolicLocation || HOME == symbolicLocation)) return COMMUTE_MORNING_平日;
 
     if (workDay

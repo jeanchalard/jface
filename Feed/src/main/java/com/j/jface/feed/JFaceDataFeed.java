@@ -70,7 +70,7 @@ public class JFaceDataFeed
           if (null == departureList) return;
           for (final DataMap map : departureList)
             mLog.append(new Departure(map.getInt(Const.DATA_KEY_DEPTIME),
-             map.getString(Const.DATA_KEY_EXTRA)).toString() + "・");
+             map.getString(Const.DATA_KEY_EXTRA), "", null).toString() + "・");
           mLog.append("\n");
         }
       }});}};

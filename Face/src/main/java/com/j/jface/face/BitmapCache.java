@@ -8,6 +8,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 
 import com.j.jface.Const;
+import com.j.jface.Departure;
 import com.j.jface.Util;
 
 public class BitmapCache
@@ -18,13 +19,13 @@ public class BitmapCache
   private final Interpolator interpolator = new DecelerateInterpolator(3.0f);
   private final int mSizeNow, mSizeNext, mOffsetNext;
   private final int mVerticalShift;
-  public final NextDepartures mDepartures;
+  public final Departure mNextDeparture;
   private final int mTime;
   private final Paint mPaint;
   private Rect mSrc, mDst;
 
   public BitmapCache(final float sizeNow, final float sizeNext, final float offsetNext,
-                     final NextDepartures departures, final Paint p)
+                     final Departure nextDeparture, final Paint p)
   {
     mCache = Bitmap.createBitmap(Const.SCREEN_SIZE, HEIGHT, Bitmap.Config.ARGB_8888);
     mCanvas = new Canvas(mCache);
@@ -33,8 +34,8 @@ public class BitmapCache
     mOffsetNext = (int)offsetNext;
     mSrc = new Rect(); mDst = new Rect();
     mSrc.top = 0; mSrc.bottom = HEIGHT;
-    mDepartures = departures;
-    mTime = null == departures ? -1 : departures.first.time;
+    mNextDeparture = nextDeparture;
+    mTime = null == nextDeparture ? -1 : nextDeparture.time;
     mPaint = p;
     mVerticalShift = -p.getFontMetricsInt().top;
   }

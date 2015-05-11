@@ -32,14 +32,32 @@ public class DataStore
     mLocationStatuses.put(fenceName, isInside);
   }
 
+  @NonNull private ArrayList<Departure> relink(@NonNull final ArrayList<Departure> src)
+  {
+    final int lastIndex = src.size() - 1;
+    final ArrayList<Departure> dst = new ArrayList<>(lastIndex + 1);
+    for (int i = 0; i <= lastIndex; ++i) dst.add(null);
+    Departure lastDep = src.get(lastIndex);
+    dst.set(lastIndex, lastDep);
+    for (int i = lastIndex - 1; i >= 0; --i)
+    {
+      final Departure d = src.get(i);
+      lastDep = new Departure(d.time, d.extra, d.key, lastDep);
+      dst.set(i, lastDep);
+    }
+    return dst;
+  }
+
   public void putDepartureList(final String dataName, final ArrayList<DataMap> departureList)
   {
-    final ArrayList<Departure> departures = new ArrayList<>();
+    final ArrayList<Departure> tmpDeps = new ArrayList<>();
     for (final DataMap map : departureList)
-      departures.add(new Departure(map.getInt(Const.DATA_KEY_DEPTIME),
-                                   map.getString(Const.DATA_KEY_EXTRA)));
-    Collections.sort(departures);
-    mDepartures.put(dataName, departures);
+      tmpDeps.add(new Departure(map.getInt(Const.DATA_KEY_DEPTIME),
+                                   map.getString(Const.DATA_KEY_EXTRA),
+                                   dataName, null));
+    Collections.sort(tmpDeps);
+    final ArrayList<Departure> a = relink(tmpDeps);
+    mDepartures.put(dataName, a);
   }
 
   @Nullable public Departure findClosestDeparture(@NonNull final String key, @NonNull final Time time)
@@ -67,16 +85,6 @@ public class DataStore
     if (null == nextDeparture) nextDeparture = deps.get(0);
     if (nextDeparture.time > secsSinceMidnight + 30 * 60) return null; // More than 30 minutes in the future : don't display anything
     return nextDeparture;
-  }
-
-  @Nullable public NextDepartures findNextDepartures(@NonNull final String key, @NonNull final Time time)
-  {
-    final Departure first = findClosestDeparture(key, time);
-    if (null == first) return null;
-    final Departure second = findClosestDeparture(key, first.time + 1);
-    if (null == second) return new NextDepartures(key, first, null, null);
-    final Departure third = findClosestDeparture(key, second.time + 1);
-    return new NextDepartures(key, first, second, third);
   }
 
   public Boolean isWithinFence(@NonNull final String fenceName)

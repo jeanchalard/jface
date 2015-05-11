@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.text.format.Time;
 
 import com.j.jface.Const;
+import com.j.jface.Departure;
 
 public class Draw
 {
@@ -26,7 +27,7 @@ public class Draw
   final char[] mTmpChr = new char[256];
   public boolean draw(@NonNull final DrawTools drawTools, final int modeFlags,
                       @NonNull final Canvas canvas, @NonNull final Rect bounds,
-                      @Nullable final NextDepartures departures1, @Nullable final NextDepartures departures2,
+                      @Nullable final Departure departure1, @Nullable final Departure departure2,
                       @NonNull final Status status, @NonNull final Time time, @NonNull final Sensors sensors,
                       @NonNull final String locationDescriptor)
   {
@@ -62,28 +63,29 @@ public class Draw
     }
 
     boolean mustInvalidate = false;
-    if (null != departures1) // If data is not yet available this is null
+    if (null != status.header1)
     {
       final float lineHeight = drawTools.departurePaint.getTextSize() + 2;
       // Draw header
       canvas.drawText(status.header1, drawTools.departurePosX, drawTools.departurePosY, drawTools.departurePaint);
       // Draw icon
       final float y1 = drawTools.departurePosY + lineHeight;
-      drawIcon(drawTools.departurePosX, y1, departures1, drawTools, canvas);
+      if (null != departure1)
+        drawIcon(drawTools.departurePosX, y1, departure1.key, drawTools, canvas);
       // Draw departures
-      mustInvalidate = drawDepartureSet(0, departures1, drawTools.departurePosX, y1, drawTools, canvas);
+      mustInvalidate = drawDepartureSet(0, departure1, drawTools.departurePosX, y1, drawTools, canvas);
 
-      if (null != departures2)
+      // Draw header
+      if (null != status.header2)
       {
-        // Draw header
         final float y1e = y1 + lineHeight;
-        if (null != status.header2)
-          canvas.drawText(status.header2, drawTools.departurePosX, y1e, drawTools.departurePaint);
+        canvas.drawText(status.header2, drawTools.departurePosX, y1e, drawTools.departurePaint);
         // Draw icon
         final float y2 = y1e + lineHeight;
-        drawIcon(drawTools.departurePosX, y2, departures2, drawTools, canvas);
+        if (null != departure2)
+          drawIcon(drawTools.departurePosX, y2, departure2.key, drawTools, canvas);
         // Draw departures
-        mustInvalidate |= drawDepartureSet(1, departures2, drawTools.departurePosX, y2, drawTools, canvas);
+        mustInvalidate |= drawDepartureSet(1, departure2, drawTools.departurePosX, y2, drawTools, canvas);
       }
     }
 
@@ -97,43 +99,40 @@ public class Draw
   }
 
   private final static String separator = " ◈ ";
-  private boolean drawDepartureSet(final int index, @NonNull final NextDepartures departures,
+  private boolean drawDepartureSet(final int index, @Nullable final Departure departure,
                                    final float x, final float y,
                                    @NonNull final DrawTools drawTools, @NonNull final Canvas canvas)
   {
-    final CharSequence text;
     final float sizeNow, sizeNext, sizeTotal;
-    if (null == departures.second)
+    final CharSequence text = Formatter.formatFirstDeparture(mTmpSb, departure, 0);
+    if (null == departure)
     {
-      text = Formatter.formatDeparture(mTmpSb, departures.first, 0);
-      mTmpSb.append(separator);
-      mTmpSb.append("終了");
       sizeNow = drawTools.departurePaint.measureText(text, 0, text.length());
       sizeNext = 0;
       sizeTotal = sizeNow;
     }
     else
     {
-      // Here starts deep magic manipulating the internal buffer of the formatter
-      text = Formatter.formatDeparture(mTmpSb, departures.first, 0);
-      mTmpSb.append(separator);
-      final int dep2Start = text.length();
-      Formatter.formatDeparture(mTmpSb, departures.second, text.length());
-      final int dep2Length = text.length();
-      mTmpSb.append(separator);
-      if (null == departures.third)
-        mTmpSb.append("終了");
-      else
-        Formatter.formatDeparture(mTmpSb, departures.third, text.length());
-      sizeNow = drawTools.departurePaint.measureText(text, 0, dep2Length);
-      sizeNext = drawTools.departurePaint.measureText(text, dep2Start, text.length());
+      Departure nd = departure.next;
+      int endOfNextToLast = text.length();
+      final int startOfSecond = endOfNextToLast + separator.length();
+      for (int d = 1; d < 1 + Const.DISPLAYED_DEPARTURES_PER_LINE; ++d)
+      {
+        endOfNextToLast = text.length();
+        mTmpSb.append(separator);
+        Formatter.formatNextDeparture(mTmpSb, nd, text.length());
+        if (null == nd) break;
+        nd = nd.next;
+      }
+      sizeNow = drawTools.departurePaint.measureText(text, 0, endOfNextToLast);
+      sizeNext = drawTools.departurePaint.measureText(text, startOfSecond, text.length());
       sizeTotal = drawTools.departurePaint.measureText(text, 0, text.length());
     }
 
     BitmapCache cache = mCache[index];
-    if (null == cache.mDepartures || departures.first != cache.mDepartures.first)
+    if (null == cache.mNextDeparture || departure != cache.mNextDeparture)
     {
-      cache = new BitmapCache(sizeNow, sizeNext, sizeTotal - sizeNext, departures, drawTools.departurePaint);
+      cache = new BitmapCache(sizeNow, sizeNext, sizeTotal - sizeNext, departure, drawTools.departurePaint);
       cache.clear();
       cache.drawText(text);
       mCache[index] = cache;
@@ -141,9 +140,9 @@ public class Draw
     return cache.drawOn(canvas, x, y, drawTools.imagePaint);
   }
 
-  private static void drawIcon(final float x, final float y, @NonNull final NextDepartures departures,
+  private static void drawIcon(final float x, final float y, @NonNull final String key,
                                @NonNull final DrawTools drawTools, @NonNull final Canvas canvas) {
-    final Bitmap icon = drawTools.getIconForDepartures(departures);
+    final Bitmap icon = drawTools.getIconForKey(key);
     canvas.drawBitmap(icon,
      x - icon.getWidth() - drawTools.iconToDepartureXPadding,
      y - icon.getHeight() + 5, // + 5 for alignment because I can't be assed to compute it

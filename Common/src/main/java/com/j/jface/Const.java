@@ -6,6 +6,7 @@ public class Const
   public static final int ANIM_DURATION = 1000; // milliseconds
   public static final long SECONDS_TO_UTC = -9 * 3600;
   public static final long UPDATE_DELAY_MILLIS = 7 * 24 * 60 * 60 * 1000; // One week in millis
+  public static final int DISPLAYED_DEPARTURES_PER_LINE = 3;
 
   public static final String[] WEEKDAYS = { "日", "月", "火", "水", "木", "金", "土", "日" };
   public static final String DATA_PATH = "/jwatch/Data";

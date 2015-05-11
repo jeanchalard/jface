@@ -2,18 +2,26 @@ package com.j.jface;
 
 // import android.support.annotation.Nullable;
 
+import java.util.Locale;
+
 public class Departure implements Comparable<Departure>
 {
   public final int time;
+  public final int dTime;
   public final String extra;
+  public final String key;
+  public final Departure next;
 
-  public Departure(final int time, final String extra) {
+  public Departure(final int time, final String extra, final String key, final Departure next) {
     this.time = time;
+    this.dTime = time < 3 * 3600 ? time + 86400 : time;
     this.extra = extra;
+    this.key = key;
+    this.next = next;
   }
 
   public String toString() {
-    return Integer.toString(time / 3600) + ":" + Integer.toString((time % 3600) / 60) + extra;
+    return String.format(Locale.ROOT, "%02d:%02d", time / 3600, (time % 3600) / 60) + extra;
   }
 
   @Override
@@ -21,7 +29,7 @@ public class Departure implements Comparable<Departure>
   public int compareTo(final Departure another)
   {
     if (null == another) return 1;
-    final int result = Integer.compare(time, another.time);
+    final int result = Integer.compare(dTime, another.dTime);
     if (0 != result) return result;
     return extra.compareTo(another.extra);
   }
