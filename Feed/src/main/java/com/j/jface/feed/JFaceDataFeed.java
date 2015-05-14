@@ -1,21 +1,25 @@
 package com.j.jface.feed;
 
+import android.app.ActionBar;
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v4.view.ViewPager;
 import android.text.format.Time;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
 import com.j.jface.Departure;
-import com.j.jface.R;
 
 import java.util.ArrayList;
 
-public class JFaceDataFeed
+public class JFaceDataFeed implements ActionBar.TabListener
 {
   @NonNull private final Activity mA;
   @NonNull private final EditText mDataEdit;
@@ -25,12 +29,25 @@ public class JFaceDataFeed
   public JFaceDataFeed(@NonNull final Activity a)
   {
     mA = a;
-    mA.setContentView(R.layout.activity_digital_watch_face_config);
-    mDataEdit = (EditText) mA.findViewById(R.id.dataItem);
-    mLog = (TextView) mA.findViewById(R.id.log);
+//    final ActionBar bar = mA.getActionBar();
+//    bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+//    bar.addTab(bar.newTab().setText("Logs & Data").setTabListener(this));
+//    bar.addTab(bar.newTab().setText("Debug tools").setTabListener(this));
+
+    final ViewPager pager = new ViewPager(mA);
+    final LayoutParams lp = new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+    pager.setAdapter(new JFaceDataFeedFragment.PagerAdapter(mA.getFragmentManager()));
+    pager.setId(10001);
+    mA.setContentView(pager, lp);
+
+
+//    mDataEdit = (EditText) mA.findViewById(R.id.dataItem);
+//    mLog = (TextView) mA.findViewById(R.id.log);
+mDataEdit = new EditText(mA);
+mLog = new TextView(mA);
     mClient = new Client(a);
-    startGeofenceService(mA);
-    retrieveStatus(mClient);
+//    startGeofenceService(mA);
+//    retrieveStatus(mClient);
   }
 
   private void startGeofenceService(final Activity activity)
@@ -87,7 +104,7 @@ public class JFaceDataFeed
 
   public void setAdhocData(@NonNull final View button)
   {
-    mClient.putData(Const.DATA_KEY_ADHOC, Const.DATA_KEY_ADHOC, mDataEdit.getText().toString());
+    mClient.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_ADHOC, Const.DATA_KEY_ADHOC, mDataEdit.getText().toString());
   }
 
   public void refresh()
@@ -105,5 +122,23 @@ public class JFaceDataFeed
   public void clearAllData()
   {
     mClient.clearAllData();
+  }
+
+  @Override
+  public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft)
+  {
+
+  }
+
+  @Override
+  public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft)
+  {
+
+  }
+
+  @Override
+  public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft)
+  {
+
   }
 }
