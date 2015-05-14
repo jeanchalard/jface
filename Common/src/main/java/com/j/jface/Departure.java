@@ -1,6 +1,6 @@
 package com.j.jface;
 
-// import android.support.annotation.Nullable;
+import android.support.annotation.Nullable;
 
 import java.util.Locale;
 
@@ -25,8 +25,7 @@ public class Departure implements Comparable<Departure>
   }
 
   @Override
-//  public int compareTo(@Nullable final Departure another)
-  public int compareTo(final Departure another)
+  public int compareTo(@Nullable final Departure another)
   {
     if (null == another) return 1;
     final int result = Integer.compare(dTime, another.dTime);

@@ -18,6 +18,7 @@ dependencies {
     compile 'com.android.support:support-v13:21.0.+'
     wearApp project(':Face')
     compile project(':Common')
+    compile 'com.android.support:support-annotations:22.1.1'
 }
 
 // The sample build uses multiple directories to
