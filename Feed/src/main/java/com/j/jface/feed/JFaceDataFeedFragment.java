@@ -35,8 +35,7 @@ public class JFaceDataFeedFragment extends Fragment
       return fragment;
     }
 
-    @Override
-    public int getCount()
+    @Override public int getCount()
     {
       return RESOURCES.length;
     }

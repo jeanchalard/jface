@@ -19,9 +19,10 @@ import com.j.jface.Departure;
 
 import java.util.ArrayList;
 
-public class JFaceDataFeed implements ActionBar.TabListener
+public class JFaceDataFeed implements ActionBar.TabListener, ViewPager.OnPageChangeListener
 {
   @NonNull private final Activity mA;
+  @NonNull private final ViewPager mPager;
   @NonNull private final EditText mDataEdit;
   @NonNull private final TextView mLog;
   @NonNull private final Client mClient;
@@ -29,17 +30,17 @@ public class JFaceDataFeed implements ActionBar.TabListener
   public JFaceDataFeed(@NonNull final Activity a)
   {
     mA = a;
-//    final ActionBar bar = mA.getActionBar();
-//    bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-//    bar.addTab(bar.newTab().setText("Logs & Data").setTabListener(this));
-//    bar.addTab(bar.newTab().setText("Debug tools").setTabListener(this));
-
-    final ViewPager pager = new ViewPager(mA);
+    mPager = new ViewPager(mA);
     final LayoutParams lp = new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-    pager.setAdapter(new JFaceDataFeedFragment.PagerAdapter(mA.getFragmentManager()));
-    pager.setId(10001);
-    mA.setContentView(pager, lp);
+    mPager.setAdapter(new JFaceDataFeedFragment.PagerAdapter(mA.getFragmentManager()));
+    mPager.setOnPageChangeListener(this);
+    mPager.setId(10001);
+    mA.setContentView(mPager, lp);
 
+    final ActionBar bar = mA.getActionBar();
+    bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+    bar.addTab(bar.newTab().setText("Logs & Data").setTabListener(this));
+    bar.addTab(bar.newTab().setText("Debug tools").setTabListener(this));
 
 //    mDataEdit = (EditText) mA.findViewById(R.id.dataItem);
 //    mLog = (TextView) mA.findViewById(R.id.log);
@@ -124,21 +125,18 @@ mLog = new TextView(mA);
     mClient.clearAllData();
   }
 
-  @Override
-  public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft)
+  // Tab management
+  @Override public void onTabSelected(final ActionBar.Tab tab, final FragmentTransaction ft)
   {
-
+    mPager.setCurrentItem(tab.getPosition());
+  }
+  @Override public void onPageSelected(final int position)
+  {
+    mA.getActionBar().setSelectedNavigationItem(position);
   }
 
-  @Override
-  public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft)
-  {
-
-  }
-
-  @Override
-  public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft)
-  {
-
-  }
+  @Override public void onTabUnselected(final ActionBar.Tab tab, final FragmentTransaction ft) {}
+  @Override public void onTabReselected(final ActionBar.Tab tab, final FragmentTransaction ft) {}
+  @Override public void onPageScrolled(final int position, final float positionOffset, final int positionOffsetPixels) {}
+  @Override public void onPageScrollStateChanged(final int state) {}
 }
