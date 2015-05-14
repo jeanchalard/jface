@@ -13,8 +13,8 @@ import com.j.jface.R;
 public class JFaceDataFeedFragment extends Fragment
 {
   private static final String RESOURCE = "resource";
-  private static final int[] RESOURCES = { R.layout.activity_digital_watch_face_config,
-                                           R.layout.activity_digital_watch_face_config };
+  private static final int[] RESOURCES = { R.layout.debug_app_tab_1,
+                                           R.layout.debug_app_tab_2 };
 
   @Override public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle icicle)
   {
