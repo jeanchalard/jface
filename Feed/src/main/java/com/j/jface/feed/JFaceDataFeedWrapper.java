@@ -19,7 +19,6 @@ package com.j.jface.feed;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.view.View;
 
 /**
  * The phone-side config activity for {@code DigitalWatchFaceService}. Like the watch-side config
@@ -36,30 +35,5 @@ public class JFaceDataFeedWrapper extends Activity
   {
     super.onCreate(savedInstanceState);
     mW = new JFaceDataFeed(this);
-  }
-
-  // Interface callbacks
-  public void onClickSet(@Nullable final View v)
-  {
-    if (null == v || null == mW) return;
-    mW.setAdhocData(v);
-  }
-
-  public void onClickLoad(@Nullable final View v)
-  {
-    if (null == mW) return;
-    mW.load();
-  }
-
-  public void onClickClear(@Nullable final View v)
-  {
-    if (null == v || null == mW) return;
-    mW.clearAllData();
-  }
-
-  public void onClickRefresh(@Nullable final View v)
-  {
-    if (null == v || null == mW) return;
-    mW.refresh();
   }
 }

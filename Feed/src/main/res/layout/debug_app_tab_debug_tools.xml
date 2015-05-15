@@ -18,48 +18,28 @@
               android:layout_height="match_parent"
               android:orientation="vertical">
 
-  <ScrollView
-    android:layout_width="match_parent"
-    android:layout_height="0px"
-    android:layout_weight="1"
-    android:id="@+id/scrollView">
-
-    <TextView
-      android:layout_width="fill_parent"
-      android:layout_height="wrap_content"
-      android:id="@+id/log"/>
-
-  </ScrollView>
-
   <LinearLayout
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_weight="0"
     android:layout_gravity="center_horizontal"
     android:gravity="center_horizontal"
     android:focusable="false">
 
-    <Button
-      android:layout_width="wrap_content"
+    <EditText
+      android:id="@+id/adHocDataEdit"
+      android:text=""
+      android:layout_width="0px"
       android:layout_height="wrap_content"
-      android:text="Refresh"
-      android:layout_margin="8dp"
-      android:onClick="onClickRefresh"/>
+      android:layout_weight="1"/>
 
     <Button
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="Load"
-      android:layout_margin="8dp"
-      android:onClick="onClickLoad"/>
-
-    <Button
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="Clear"
+      android:layout_weight="0"
+      android:text="Set"
       android:nestedScrollingEnabled="false"
-      android:onClick="onClickClear"
+      android:id="@+id/button_set"
       android:layout_margin="8dp"/>
 
   </LinearLayout>
