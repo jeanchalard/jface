@@ -73,8 +73,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
      */
     final Handler mUpdateTimeHandler = new Handler()
     {
-      @Override
-      public void handleMessage(@NonNull Message message)
+      @Override public void handleMessage(@NonNull Message message)
       {
         switch (message.what)
         {

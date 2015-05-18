@@ -3,8 +3,10 @@ package com.j.jface.feed;
 import android.app.Fragment;
 import android.support.annotation.NonNull;
 import android.text.format.Time;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;

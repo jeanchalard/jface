@@ -1,23 +1,107 @@
 package com.j.jface.feed;
 
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
+import android.text.format.Time;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.NumberPicker;
+import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.j.jface.Const;
 import com.j.jface.R;
 
-public class TabDebugTools extends WrappedFragment implements View.OnClickListener
+public class TabDebugTools extends WrappedFragment implements View.OnClickListener, NumberPicker.OnValueChangeListener, TimePicker.OnTimeChangedListener
 {
+  private static final int MSG_UPDATE_TIME = 1;
+  private static final int GRACE_FOR_UPDATE = 3000;
+
   @NonNull final Client mClient;
   @NonNull final EditText mDataEdit;
+  long mOffset = 0;
+  boolean mTicking = false;
+  @NonNull final Time mTime1, mTime2;
+  @NonNull final NumberPicker mDaysOffsetUI;
+  @NonNull final TimePicker mTimeUI;
+  @NonNull final NumberPicker mSecondsUI;
+  @NonNull final TextView mOffsetLabel;
+
+  private static class TabDebugToolsHandler extends Handler
+  {
+    private final TabDebugTools p;
+    public TabDebugToolsHandler(final TabDebugTools p) { this.p = p; }
+    @Override public void handleMessage(@NonNull Message message)
+    {
+      switch (message.what)
+      {
+        case MSG_UPDATE_TIME:
+          p.tick();
+          sendEmptyMessageDelayed(MSG_UPDATE_TIME, 1000);
+      }
+    }
+  };
+  private Handler mHandler = new TabDebugToolsHandler(this);
 
   public TabDebugTools(@NonNull final Args a, @NonNull final Client b)
   {
     super(a.inflater.inflate(R.layout.debug_app_tab_debug_tools, a.container, false));
     mClient = b;
+    mTime1 = new Time(); mTime2 = new Time();
     mDataEdit = (EditText)mView.findViewById(R.id.adHocDataEdit);
     mView.findViewById(R.id.button_set).setOnClickListener(this);
+    mDaysOffsetUI = (NumberPicker)mView.findViewById(R.id.daysOffsetUI);
+    mDaysOffsetUI.setMinValue(0); mDaysOffsetUI.setMaxValue(14);
+    mTimeUI = (TimePicker)mView.findViewById(R.id.timeUI);
+    mSecondsUI = (NumberPicker)mView.findViewById(R.id.secondsUI);
+    mSecondsUI.setMinValue(0); mSecondsUI.setMaxValue(59);
+    mOffsetLabel = (TextView)mView.findViewById(R.id.offsetLabel);
+    mTimeUI.setIs24HourView(true); // sanity
+    tick();
+    mHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, 1000);
+
+    mSecondsUI.setOnValueChangedListener(this);
+    mTimeUI.setOnTimeChangedListener(this);
+    mDaysOffsetUI.setOnValueChangedListener(this);
+  }
+
+  private void tick()
+  {
+    mTicking = true;
+    mTime1.set(System.currentTimeMillis() + mOffset);
+    mTimeUI.setCurrentMinute(mTime1.hour);
+    mTimeUI.setCurrentMinute(mTime1.minute);
+    mSecondsUI.setValue(mTime1.second);
+
+    mTime2.setToNow();
+    mOffsetLabel.setText(Long.toString(mOffset));
+    mTicking = false;
+  }
+
+  @Override public void onValueChange(final NumberPicker picker, final int oldVal, final int newVal)
+  {
+    updateOffset();
+  }
+
+  @Override public void onTimeChanged(final TimePicker view, final int hourOfDay, final int minute)
+  {
+    updateOffset();
+  }
+
+  private void updateOffset()
+  {
+    if (mTicking) return;
+    mHandler.removeMessages(MSG_UPDATE_TIME);
+    mTime2.setToNow();
+    final int second = mSecondsUI.getValue();
+    final int minute = mTimeUI.getCurrentMinute();
+    final int hour = mTimeUI.getCurrentHour();
+    mTime1.set(second, minute, hour, mTime2.monthDay, mTime2.month, mTime2.year);
+    final int dayOffset = mDaysOffsetUI.getValue();
+    mTime1.set(mTime1.toMillis(true) + dayOffset * 86400000 - GRACE_FOR_UPDATE);
+    mOffset = mTime1.toMillis(true) - mTime2.toMillis(true);
+    mHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, GRACE_FOR_UPDATE);
   }
 
   @Override public void onClick(final View v)
