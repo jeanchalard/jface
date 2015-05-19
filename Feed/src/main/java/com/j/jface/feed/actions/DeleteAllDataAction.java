@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataItemBuffer;
 import com.google.android.gms.wearable.Wearable;
 import com.j.jface.feed.Client;

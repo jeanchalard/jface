@@ -22,6 +22,8 @@ public class Const
   public static final String DATA_KEY_SUCCESSFUL_UPDATE_DATE = "updateTime";
   public static final String DATA_KEY_LAST_STATUS = "lastStatus";
   public static final String DATA_KEY_STATUS_UPDATE_DATE = "lastStatusDate";
+  public static final String DATA_KEY_DEBUG_TIME_OFFSET = "debugTimeOffset";
+  public static final String DATA_KEY_DEBUG_FENCES = "debugFences";
   public static final String CONFIG_KEY_BACKGROUND = "background";
 
   public static final String 日比谷線_北千住_平日 = "日比谷線・北千住・平日";

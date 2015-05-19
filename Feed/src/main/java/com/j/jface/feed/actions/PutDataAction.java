@@ -29,6 +29,13 @@ public class PutDataAction implements Action, ResultCallback<DataApi.DataItemRes
     mRequest = dmRequest.asPutDataRequest();
   }
 
+  public PutDataAction(@NonNull final String path, @NonNull final String key, final long value)
+  {
+    final PutDataMapRequest dmRequest = PutDataMapRequest.create(path);
+    dmRequest.getDataMap().putLong(key, value);
+    mRequest = dmRequest.asPutDataRequest();
+  }
+
   public PutDataAction(@NonNull final String path, @NonNull final DataMap map)
   {
     final PutDataMapRequest dmRequest = PutDataMapRequest.create(path);

@@ -102,11 +102,15 @@ public class TabDebugTools extends WrappedFragment implements View.OnClickListen
     mTime1.set(mTime1.toMillis(true) + dayOffset * 86400000 - GRACE_FOR_UPDATE);
     mOffset = mTime1.toMillis(true) - mTime2.toMillis(true);
     mHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, GRACE_FOR_UPDATE);
+    mClient.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_DEBUG_TIME_OFFSET, Const.DATA_KEY_DEBUG_TIME_OFFSET, mOffset);
   }
 
   private void updateFences()
   {
-
+    int fences = 0;
+    for (int i = 0; i < mFenceUIs.length; ++i)
+      fences |= mFenceUIs[i].isChecked() ? 1 << i : 0;
+    mClient.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_DEBUG_FENCES, Const.DATA_KEY_DEBUG_FENCES, fences);
   }
 
   @Override public void onClick(final View v)

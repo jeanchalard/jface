@@ -113,6 +113,11 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
     enqueue(new PutDataAction(path, key, value));
   }
 
+  public void putData(@NonNull final String path, @NonNull final String key, final long value)
+  {
+    enqueue(new PutDataAction(path, key, value));
+  }
+
   public void putData(@NonNull final String path, @NonNull final DataMap map)
   {
     enqueue(new PutDataAction(path, map));
