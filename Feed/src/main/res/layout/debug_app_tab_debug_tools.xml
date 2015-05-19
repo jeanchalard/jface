@@ -45,14 +45,50 @@
   </LinearLayout>
 
   <LinearLayout
-    android:layout_width="fill_parent"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content">
+
+    <CheckBox
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:text="Home"
+      android:id="@+id/fence1"/>
+
+    <CheckBox
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:text="Work"
+      android:id="@+id/fence2"/>
+
+    <CheckBox
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:id="@+id/fence3"
+      android:text="日暮里"/>
+
+    <CheckBox
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:text="東京"
+      android:id="@+id/fence4"/>
+  </LinearLayout>
+
+  <LinearLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp">
 
     <NumberPicker
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_weight="1"
-      android:id="@+id/daysOffsetUI"/>
+      android:id="@+id/daysOffsetUI"
+      android:layout_marginTop="16dp"/>
 
     <TimePicker
       android:layout_width="wrap_content"
@@ -66,16 +102,32 @@
       android:layout_height="wrap_content"
       android:layout_weight="1"
       android:id="@+id/secondsUI"
-      android:focusableInTouchMode="true"/>
+      android:focusableInTouchMode="true"
+      android:layout_marginTop="16dp"/>
 
   </LinearLayout>
 
-  <TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceLarge"
-    android:text="Large Text"
-    android:id="@+id/offsetLabel"
-    android:layout_gravity="center_horizontal"/>
+  <LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <TextView
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:textAppearance="?android:attr/textAppearanceLarge"
+      android:text="Large Text"
+      android:id="@+id/offsetLabel"
+      android:layout_gravity="center_horizontal"
+      android:layout_weight="5"/>
+
+    <Button
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Now"
+      android:id="@+id/button_now"
+      android:layout_weight="1"/>
+  </LinearLayout>
 
 </LinearLayout>

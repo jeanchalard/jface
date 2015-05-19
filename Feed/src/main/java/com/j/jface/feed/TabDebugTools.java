@@ -5,6 +5,7 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.text.format.Time;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.TextView;
@@ -27,6 +28,7 @@ public class TabDebugTools extends WrappedFragment implements View.OnClickListen
   @NonNull final TimePicker mTimeUI;
   @NonNull final NumberPicker mSecondsUI;
   @NonNull final TextView mOffsetLabel;
+  @NonNull final CheckBox[] mFenceUIs;
 
   private static class TabDebugToolsHandler extends Handler
   {
@@ -51,6 +53,7 @@ public class TabDebugTools extends WrappedFragment implements View.OnClickListen
     mTime1 = new Time(); mTime2 = new Time();
     mDataEdit = (EditText)mView.findViewById(R.id.adHocDataEdit);
     mView.findViewById(R.id.button_set).setOnClickListener(this);
+    mView.findViewById(R.id.button_now).setOnClickListener(this);
     mDaysOffsetUI = (NumberPicker)mView.findViewById(R.id.daysOffsetUI);
     mDaysOffsetUI.setMinValue(0); mDaysOffsetUI.setMaxValue(14);
     mTimeUI = (TimePicker)mView.findViewById(R.id.timeUI);
@@ -64,6 +67,13 @@ public class TabDebugTools extends WrappedFragment implements View.OnClickListen
     mSecondsUI.setOnValueChangedListener(this);
     mTimeUI.setOnTimeChangedListener(this);
     mDaysOffsetUI.setOnValueChangedListener(this);
+
+    mFenceUIs = new CheckBox[4];
+    mFenceUIs[0] = (CheckBox)mView.findViewById(R.id.fence1);
+    mFenceUIs[1] = (CheckBox)mView.findViewById(R.id.fence2);
+    mFenceUIs[2] = (CheckBox)mView.findViewById(R.id.fence3);
+    mFenceUIs[3] = (CheckBox)mView.findViewById(R.id.fence4);
+    for (final CheckBox c : mFenceUIs) c.setOnClickListener(this);
   }
 
   private void tick()
@@ -77,16 +87,6 @@ public class TabDebugTools extends WrappedFragment implements View.OnClickListen
     mTime2.setToNow();
     mOffsetLabel.setText(Long.toString(mOffset));
     mTicking = false;
-  }
-
-  @Override public void onValueChange(final NumberPicker picker, final int oldVal, final int newVal)
-  {
-    updateOffset();
-  }
-
-  @Override public void onTimeChanged(final TimePicker view, final int hourOfDay, final int minute)
-  {
-    updateOffset();
   }
 
   private void updateOffset()
@@ -104,6 +104,11 @@ public class TabDebugTools extends WrappedFragment implements View.OnClickListen
     mHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, GRACE_FOR_UPDATE);
   }
 
+  private void updateFences()
+  {
+
+  }
+
   @Override public void onClick(final View v)
   {
     switch (v.getId())
@@ -112,6 +117,24 @@ public class TabDebugTools extends WrappedFragment implements View.OnClickListen
         mClient.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_ADHOC,
          Const.DATA_KEY_ADHOC, mDataEdit.getText().toString());
         break;
+      case R.id.button_now:
+        mOffset = 0;
+        tick();
+        updateOffset();
+        mHandler.removeMessages(MSG_UPDATE_TIME);
+        mHandler.sendEmptyMessage(MSG_UPDATE_TIME);
+      default:
+        updateFences();
     }
+  }
+
+  @Override public void onValueChange(final NumberPicker picker, final int oldVal, final int newVal)
+  {
+    updateOffset();
+  }
+
+  @Override public void onTimeChanged(final TimePicker view, final int hourOfDay, final int minute)
+  {
+    updateOffset();
   }
 }
