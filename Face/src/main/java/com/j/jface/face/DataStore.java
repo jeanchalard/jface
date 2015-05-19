@@ -81,6 +81,11 @@ public class DataStore
 
   public Boolean isWithinFence(@NonNull final String fenceName)
   {
-    return mLocationStatuses.get(fenceName);
+    if (0 == mDebugFences)
+      return mLocationStatuses.get(fenceName);
+    for (int i = Const.ALL_FENCE_NAMES.length - 1; i >= 0; --i)
+      if (Const.ALL_FENCE_NAMES[i].equals(fenceName))
+        return (mDebugFences & (1 << i)) != 0;
+    return Boolean.FALSE;
   }
 }
