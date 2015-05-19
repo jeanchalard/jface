@@ -80,7 +80,7 @@ public class TabDebugTools extends WrappedFragment implements View.OnClickListen
   {
     mTicking = true;
     mTime1.set(System.currentTimeMillis() + mOffset);
-    mTimeUI.setCurrentMinute(mTime1.hour);
+    mTimeUI.setCurrentHour(mTime1.hour);
     mTimeUI.setCurrentMinute(mTime1.minute);
     mSecondsUI.setValue(mTime1.second);
 
@@ -89,7 +89,7 @@ public class TabDebugTools extends WrappedFragment implements View.OnClickListen
     mTicking = false;
   }
 
-  private void updateOffset()
+  private void updateOffset(final int grace)
   {
     if (mTicking) return;
     mHandler.removeMessages(MSG_UPDATE_TIME);
@@ -99,9 +99,9 @@ public class TabDebugTools extends WrappedFragment implements View.OnClickListen
     final int hour = mTimeUI.getCurrentHour();
     mTime1.set(second, minute, hour, mTime2.monthDay, mTime2.month, mTime2.year);
     final int dayOffset = mDaysOffsetUI.getValue();
-    mTime1.set(mTime1.toMillis(true) + dayOffset * 86400000 - GRACE_FOR_UPDATE);
+    mTime1.set(mTime1.toMillis(true) + dayOffset * 86400000 - grace);
     mOffset = mTime1.toMillis(true) - mTime2.toMillis(true);
-    mHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, GRACE_FOR_UPDATE);
+    mHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, grace);
     mClient.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_DEBUG_TIME_OFFSET, Const.DATA_KEY_DEBUG_TIME_OFFSET, mOffset);
   }
 
@@ -124,7 +124,7 @@ public class TabDebugTools extends WrappedFragment implements View.OnClickListen
       case R.id.button_now:
         mOffset = 0;
         tick();
-        updateOffset();
+        updateOffset(0);
         mHandler.removeMessages(MSG_UPDATE_TIME);
         mHandler.sendEmptyMessage(MSG_UPDATE_TIME);
       default:
@@ -134,11 +134,11 @@ public class TabDebugTools extends WrappedFragment implements View.OnClickListen
 
   @Override public void onValueChange(final NumberPicker picker, final int oldVal, final int newVal)
   {
-    updateOffset();
+    updateOffset(GRACE_FOR_UPDATE);
   }
 
   @Override public void onTimeChanged(final TimePicker view, final int hourOfDay, final int minute)
   {
-    updateOffset();
+    updateOffset(GRACE_FOR_UPDATE);
   }
 }

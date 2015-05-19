@@ -16,16 +16,8 @@ public class DataStore
 {
   private final HashMap<String, ArrayList<Departure>> mDepartures = new HashMap<>();
   private final HashMap<String, Boolean> mLocationStatuses = new HashMap<>();
-  private final HashMap<String, String> mGenericData = new HashMap<>();
-
-  public void putGenericData(@NonNull final String key, @NonNull final String data)
-  {
-    mGenericData.put(key, data);
-  }
-
-  @NonNull public String getGenericData(@NonNull final String key) {
-    return mGenericData.get(key);
-  }
+  public long mTimeOffset;
+  public long mDebugFences;
 
   public void putLocationStatus(final String fenceName, final boolean isInside)
   {

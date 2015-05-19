@@ -261,6 +261,9 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     public void onDraw(@NonNull final Canvas canvas, @NonNull final Rect bounds)
     {
       mTime.setToNow();
+      final long timeOffset = mDataStore.mTimeOffset;
+      if (0 != timeOffset)
+        mTime.set(mTime.toMillis(true) + timeOffset);
       final Status status = Status.getStatus(mTime, mDataStore);
       final Departure departure1;
       final Departure departure2;
@@ -333,13 +336,10 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
         for (final String key : data.keySet())
           if (Const.DATA_KEY_DEPLIST.equals(key))
             mDataStore.putDepartureList(dataName, data.getDataMapArrayList(key));
-          else
-          {
-            mDataStore.putGenericData(dataName, data.getString(key));
-            if (Const.DATA_KEY_ADHOC.equals(key)) {
-              mTime.set(Long.parseLong(data.getString(key)));
-            }
-          }
+          else if (Const.DATA_KEY_DEBUG_FENCES.equals(key))
+            mDataStore.mDebugFences = data.getLong(key);
+          else if (Const.DATA_KEY_DEBUG_TIME_OFFSET.equals(key))
+            mDataStore.mTimeOffset = data.getLong(key);
         updateTimer();
       }
       else if (path.startsWith(Const.LOCATION_PATH))
