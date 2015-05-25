@@ -24,6 +24,11 @@ public class DataStore
     mLocationStatuses.put(fenceName, isInside);
   }
 
+  public long currentTimeMillis()
+  {
+    return System.currentTimeMillis() + mTimeOffset * 1000;
+  }
+
   @NonNull private ArrayList<Departure> relink(@NonNull final ArrayList<Departure> src)
   {
     final int lastIndex = src.size() - 1;

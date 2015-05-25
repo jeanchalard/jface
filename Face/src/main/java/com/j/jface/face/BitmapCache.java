@@ -9,11 +9,10 @@ import android.view.animation.Interpolator;
 
 import com.j.jface.Const;
 import com.j.jface.Departure;
-import com.j.jface.Util;
 
 public class BitmapCache
 {
-  private static final int HEIGHT = 30;
+  private static final int HEIGHT = 200;
   private final Bitmap mCache;
   private final Canvas mCanvas;
   private final Interpolator interpolator = new DecelerateInterpolator(3.0f);
@@ -52,11 +51,11 @@ public class BitmapCache
 
   public boolean drawOn(final Canvas canvas, final float x, final float y, final Paint p)
   {
-    final long timeOfChange = Util.msSinceUTCMidnightForDeparture(mTime + 60);
-    final long now = System.currentTimeMillis() % 86400000;
-    final long remainingTimeToDeparture = timeOfChange - now; // 10000 - now % 10000;
+    final long timeOfChange = (mTime + 60) * 1000;
+    final long msSinceLocalMidnight = (System.currentTimeMillis() - Const.MILLISECONDS_TO_UTC) % 86400000;
+    final long remainingTimeToDeparture = timeOfChange - msSinceLocalMidnight; // 10000 - now % 10000;
     final float iVal;
-    if (remainingTimeToDeparture < Const.ANIM_DURATION)
+    if (remainingTimeToDeparture < Const.ANIM_DURATION && remainingTimeToDeparture > 0)
       iVal = interpolator.getInterpolation(
        ((float)(Const.ANIM_DURATION - remainingTimeToDeparture)) / Const.ANIM_DURATION);
     else

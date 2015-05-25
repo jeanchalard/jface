@@ -80,7 +80,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
           case MSG_UPDATE_TIME:
             invalidate();
             final long nextUpdateTime = nextUpdateTime();
-            final long now = System.currentTimeMillis();
+            final long now = mDataStore.currentTimeMillis();
             mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, nextUpdateTime - now);
             break;
         }
@@ -239,7 +239,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       final int d = (mTime.hour * 3600 + mTime.minute * 60) % 86400;
       final boolean mustWakeForAnimation = (!active && null != mNextDeparture && mNextDeparture.time == d);
 
-      final long now = System.currentTimeMillis();
+      final long now = mDataStore.currentTimeMillis();
       // If active, every second, otherwise every minute
       if (active)
         return now + 1000 - now % 1000;
