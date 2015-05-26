@@ -103,35 +103,36 @@ public class Draw
                                    final float x, final float y,
                                    @NonNull final DrawTools drawTools, @NonNull final Canvas canvas)
   {
+    if (null == departure) return false;
     BitmapCache cache = mCache[index];
     if (null == cache.mNextDeparture || departure != cache.mNextDeparture)
     {
-      final float sizeNow, sizeNext, sizeTotal;
       final CharSequence text = Formatter.formatFirstDeparture(mTmpSb, departure, 0);
-      if (null == departure)
+      Departure nd = departure.next;
+      int endOfNextToLast = 0;
+      final int startOfSecond;
+      if (null == nd)
       {
-        sizeNow = drawTools.departurePaint.measureText(text, 0, text.length());
-        sizeNext = 0;
-        sizeTotal = sizeNow;
+        startOfSecond = text.length();
+        endOfNextToLast = text.length();
       }
       else
       {
-        Departure nd = departure.next;
-        int endOfNextToLast = text.length();
-        final int startOfSecond = endOfNextToLast + separator.length();
-        for (int d = 1; d < 1 + Const.DISPLAYED_DEPARTURES_PER_LINE; ++d)
+        startOfSecond = text.length() + separator.length();
+        int d;
+        for (d = 1; null != nd && d < 1 + Const.DISPLAYED_DEPARTURES_PER_LINE; ++d)
         {
           endOfNextToLast = text.length();
           mTmpSb.append(separator);
           Formatter.formatNextDeparture(mTmpSb, nd, text.length());
-          if (null == nd) break;
           nd = nd.next;
         }
-        sizeNow = drawTools.departurePaint.measureText(text, 0, endOfNextToLast);
-        sizeNext = drawTools.departurePaint.measureText(text, startOfSecond, text.length());
-        sizeTotal = drawTools.departurePaint.measureText(text, 0, text.length());
+        if (d < 1 + Const.DISPLAYED_DEPARTURES_PER_LINE) endOfNextToLast = text.length();
       }
 
+      final float sizeNext = drawTools.departurePaint.measureText(text, startOfSecond, text.length());
+      final float sizeNow = drawTools.departurePaint.measureText(text, 0, endOfNextToLast);
+      final float sizeTotal = drawTools.departurePaint.measureText(text, 0, text.length());
       cache = new BitmapCache(sizeNow, sizeNext, sizeTotal - sizeNext, departure, drawTools.departurePaint);
       cache.clear();
       cache.drawText(text);

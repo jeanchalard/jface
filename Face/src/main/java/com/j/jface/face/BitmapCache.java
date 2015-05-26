@@ -34,7 +34,7 @@ public class BitmapCache
     mSrc = new Rect(); mDst = new Rect();
     mSrc.top = 0; mSrc.bottom = HEIGHT;
     mNextDeparture = nextDeparture;
-    mTime = null == nextDeparture ? -1 : nextDeparture.time;
+    mTime = null == nextDeparture ? -1 : nextDeparture.dTime;
     mPaint = p;
     mVerticalShift = -p.getFontMetricsInt().top;
   }

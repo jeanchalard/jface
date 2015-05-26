@@ -31,12 +31,13 @@ public class DataStore
 
   @NonNull private ArrayList<Departure> relink(@NonNull final ArrayList<Departure> src)
   {
-    final int lastIndex = src.size() - 1;
-    final ArrayList<Departure> dst = new ArrayList<>(lastIndex + 1);
-    for (int i = 0; i <= lastIndex; ++i) dst.add(null);
-    Departure lastDep = src.get(lastIndex);
-    dst.set(lastIndex, lastDep);
-    for (int i = lastIndex - 1; i >= 0; --i)
+    final int srcSize = src.size();
+    final ArrayList<Departure> dst = new ArrayList<>(srcSize + 1);
+    for (int i = 0; i <= srcSize; ++i) dst.add(null);
+    Departure lastDep = src.get(srcSize - 1);
+    lastDep = new Departure(-1, lastDep.extra, lastDep.key, null);
+    dst.set(srcSize, lastDep);
+    for (int i = srcSize - 1; i >= 0; --i)
     {
       final Departure d = src.get(i);
       lastDep = new Departure(d.time, d.extra, d.key, lastDep);
@@ -64,7 +65,9 @@ public class DataStore
 
   @Nullable public Departure findClosestDeparture(@NonNull final String key, @NonNull final int time)
   {
-    final int secsSinceMidnight = time % 86400;
+    final int secsSinceRealMidnight = time % 86400;
+    final int secsSinceLogicalMidnight =
+     secsSinceRealMidnight < 3 * 3600 ? secsSinceRealMidnight + 86400 : secsSinceRealMidnight;
     final ArrayList<Departure> deps = mDepartures.get(key);
     if (null == deps) return null;
     Departure nextDeparture = null;
@@ -73,14 +76,14 @@ public class DataStore
     for (int i = 0; i < len; ++i)
     {
       final Departure d = deps.get(i);
-      if (d.time >= secsSinceMidnight)
+      if (d.dTime >= secsSinceLogicalMidnight)
       {
         nextDeparture = d;
         break;
       }
     }
     if (null == nextDeparture) nextDeparture = deps.get(0);
-    if (nextDeparture.time > secsSinceMidnight + 30 * 60) return null; // More than 30 minutes in the future : don't display anything
+    if (nextDeparture.time > secsSinceRealMidnight + 30 * 60) return null; // More than 30 minutes in the future : don't display anything
     return nextDeparture;
   }
 

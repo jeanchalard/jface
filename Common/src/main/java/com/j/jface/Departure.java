@@ -32,4 +32,9 @@ public class Departure implements Comparable<Departure>
     if (0 != result) return result;
     return extra.compareTo(another.extra);
   }
+
+  public boolean is終了()
+  {
+    return time < 0;
+  }
 }

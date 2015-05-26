@@ -40,7 +40,7 @@ public class Formatter
 
   public static CharSequence formatFirstDeparture(final StringBuilder buffer, final Departure dep, final int offset)
   {
-    if (null == dep)
+    if (dep.is終了())
     {
       buffer.setLength(offset);
       buffer.append("終了");
@@ -59,7 +59,7 @@ public class Formatter
 
   public static CharSequence formatNextDeparture(final StringBuilder buffer, final Departure dep, final int offset)
   {
-    if (null == dep)
+    if (dep.is終了())
     {
       buffer.append("終了");
       return buffer;

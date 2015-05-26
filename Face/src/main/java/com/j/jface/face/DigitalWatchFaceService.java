@@ -308,7 +308,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       else if (null == departure2)
         mNextDeparture = departure1;
       else
-        mNextDeparture = departure1.time < departure2.time ? departure1 : departure2;
+        mNextDeparture = departure1.dTime < departure2.dTime ? departure1 : departure2;
     }
 
     /**
