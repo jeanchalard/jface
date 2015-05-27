@@ -63,11 +63,11 @@ public class Draw
     }
 
     boolean mustInvalidate = false;
-    if (null != status.header1)
+    if (null != departure1)
     {
       final float lineHeight = drawTools.departurePaint.getTextSize() + 2;
       // Draw header
-      canvas.drawText(status.header1, drawTools.departurePosX, drawTools.departurePosY, drawTools.departurePaint);
+      canvas.drawText(departure1.headSign, drawTools.departurePosX, drawTools.departurePosY, drawTools.departurePaint);
       // Draw icon
       final float y1 = drawTools.departurePosY + lineHeight;
       if (null != departure1)
@@ -76,10 +76,10 @@ public class Draw
       mustInvalidate = drawDepartureSet(0, departure1, drawTools.departurePosX, y1, drawTools, canvas);
 
       // Draw header
-      if (null != status.header2)
+      if (null != departure2)
       {
         final float y1e = y1 + lineHeight;
-        canvas.drawText(status.header2, drawTools.departurePosX, y1e, drawTools.departurePaint);
+        canvas.drawText(departure2.headSign, drawTools.departurePosX, y1e, drawTools.departurePaint);
         // Draw icon
         final float y2 = y1e + lineHeight;
         if (null != departure2)

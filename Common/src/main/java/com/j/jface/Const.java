@@ -1,5 +1,7 @@
 package com.j.jface;
 
+import java.util.HashMap;
+
 public class Const
 {
   public static final int SCREEN_SIZE = 320;
@@ -36,6 +38,20 @@ public class Const
   public static final String 京成線_成田方面_休日 = "京成線・成田方面・休日";
   public static final String 京成線_日暮里_平日 = "京成線・日暮里・平日";
   public static final String 京成線_日暮里_休日 = "京成線・日暮里・休日";
+
+  public static final HashMap<String, String> HEADSIGNS = new HashMap <>();
+  static {
+    HEADSIGNS.put(日比谷線_北千住_平日, "北千住 ▶ 六本木");
+    HEADSIGNS.put(日比谷線_北千住_休日, "北千住 ▶ 六本木");
+    HEADSIGNS.put(日比谷線_六本木_平日, "六本木 ▶ 北千住");
+    HEADSIGNS.put(日比谷線_六本木_休日, "六本木 ▶ 北千住");
+    HEADSIGNS.put(京成線_上野方面_平日, "千住大橋 ▶ 日暮里");
+    HEADSIGNS.put(京成線_上野方面_休日, "千住大橋 ▶ 日暮里");
+    HEADSIGNS.put(京成線_成田方面_平日, "千住大橋 ▶ 成田");
+    HEADSIGNS.put(京成線_成田方面_休日, "千住大橋 ▶ 成田");
+    HEADSIGNS.put(京成線_日暮里_平日, "千住大橋 ▶ 日暮里");
+    HEADSIGNS.put(京成線_日暮里_休日, "千住大橋 ▶ 日暮里");
+  }
 
   public static final String[] ALL_DEPLIST_DATA_PATHS =
    { 日比谷線_北千住_平日, 日比谷線_北千住_休日, 日比谷線_六本木_平日, 日比谷線_六本木_休日,

@@ -1,24 +1,21 @@
 package com.j.jface.face;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.format.Time;
 
 import com.j.jface.Const;
 
 public enum Status
 {
-  COMMUTE_MORNING_平日("Home, workday, morning", "北千住 ▶ 六本木", "千住大橋 ▶ 町屋"),
-  COMMUTE_EVENING_休日("Work, workday, evening", "六本木 ▶ 北千住", null),
-  HOME_平日("At home (workday)", "千住大橋 ▶ 日暮里", "千住大橋 ▶ 成田"),
-  HOME_休日("At home (holiday)", "千住大橋 ▶ 日暮里", "千住大橋 ▶ 成田"),
-  日暮里_平日("Nippori (workday)", "日暮里 ▶ 千住大橋", null),
-  日暮里_休日("Nippori (holiday)", "日暮里 ▶ 千住大橋", null),
-  OTHER("Somewhere", null, null);
+  COMMUTE_MORNING_平日("Home, workday, morning"), // "北千住 ▶ 六本木", "千住大橋 ▶ 町屋"),
+  COMMUTE_EVENING_休日("Work, workday, evening"), // "六本木 ▶ 北千住", null),
+  HOME_平日("At home (workday)"), // "千住大橋 ▶ 日暮里", "千住大橋 ▶ 成田"),
+  HOME_休日("At home (holiday)"), // "千住大橋 ▶ 日暮里", "千住大橋 ▶ 成田"),
+  日暮里_平日("Nippori (workday)"), // "日暮里 ▶ 千住大橋", null),
+  日暮里_休日("Nippori (holiday)"), // "日暮里 ▶ 千住大橋", null),
+  OTHER("Somewhere"); //, null, null);
 
   @NonNull public final String description;
-  @Nullable public final String header1;
-  @Nullable public final String header2;
 
   private static final int DUNNO = 0;
   private static final int HOME = 1;
@@ -27,11 +24,7 @@ public enum Status
   private static final int 東京 = 4;
   private static final int TRAVEL = 5;
 
-  Status(@NonNull final String d, @Nullable final String h1, @Nullable final String h2) {
-    description = d;
-    header1 = h1;
-    header2 = h2;
-  }
+  Status(@NonNull final String d) { description = d; }
 
   private static int getSymbolicLocation(@NonNull final DataStore dataStore)
   {

@@ -10,6 +10,7 @@ public class Departure implements Comparable<Departure>
   public final int dTime;
   public final String extra;
   public final String key;
+  public final String headSign;
   public final Departure next;
 
   public Departure(final int time, final String extra, final String key, final Departure next) {
@@ -18,6 +19,7 @@ public class Departure implements Comparable<Departure>
     this.extra = extra;
     this.key = key;
     this.next = next;
+    this.headSign = Const.HEADSIGNS.get(key);
   }
 
   public String toString() {
