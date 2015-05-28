@@ -34,7 +34,7 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
   private static final long[] CONNECTION_FAILURES_BACKOFF = { 0, 1000, 10000, 300000 }; // in milliseconds
 
   @NonNull final private GoogleApiClient mClient;
-  @NonNull final private ConcurrentLinkedQueue<Action> mUpdates = new ConcurrentLinkedQueue<Action>();
+  @NonNull final private ConcurrentLinkedQueue<Action> mUpdates = new ConcurrentLinkedQueue<>();
   private int mConnectionFailures = 0;
 
   public Client(@NonNull final Context context)

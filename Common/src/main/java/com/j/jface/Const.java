@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class Const
 {
-  public static final boolean RIO_MODE = true;
+  public static final boolean RIO_MODE = false;
   public static final boolean ROUND_SCREEN = !RIO_MODE;
   public static final int SCREEN_SIZE = RIO_MODE ? 280 : 320;
 

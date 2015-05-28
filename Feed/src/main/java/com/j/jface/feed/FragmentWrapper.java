@@ -19,6 +19,11 @@ public class FragmentWrapper<T extends WrappedFragment> extends Fragment
     arg = a;
   }
 
+  public FragmentWrapper()
+  {
+    throw new RuntimeException("Nopes. Stop making crap.");
+  }
+
   @Override public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle icicle)
   {
     try
@@ -38,7 +43,6 @@ public class FragmentWrapper<T extends WrappedFragment> extends Fragment
   private static Class<?> wrappedClass(final Class<?> c)
   {
     final ParameterizedType pt = (ParameterizedType)c.getGenericSuperclass();
-    final Class<?> rt = (Class)pt.getRawType();
     final Type t = pt.getActualTypeArguments()[0];
     return (Class)t;
   }
