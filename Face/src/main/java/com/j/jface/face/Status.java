@@ -75,8 +75,8 @@ public enum Status
       case 日暮里 : return "日暮里";
       case 千住大橋 :
       case 三ノ輪 : return "Home";
-      case 六本木 :
-      case 立石   : return "Work";
+      case 六本木 : return "六本木";
+      case 立石   : return "立石";
       case 東京   : return "東京";
       default    : return "Somewhere";
     }
@@ -119,7 +119,7 @@ public enum Status
       return workDay ? COMMUTE_MORNING_平日_RIO : COMMUTE_MORNING_休日_RIO;
 
     if (((time.weekDay == Time.WEDNESDAY && time.hour >= 22) || (time.weekDay == Time.THURSDAY && time.hour < 1))
-     && DUNNO == symbolicLocation || 六本木 == symbolicLocation)
+     && (DUNNO == symbolicLocation || 六本木 == symbolicLocation))
       return JUGGLING_水曜_RIO;
 
     if ((time.hour >= 17 || time.hour <= 0)
