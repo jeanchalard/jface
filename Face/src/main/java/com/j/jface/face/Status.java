@@ -118,11 +118,11 @@ public enum Status
      && (DUNNO == symbolicLocation || 三ノ輪 == symbolicLocation))
       return workDay ? COMMUTE_MORNING_平日_RIO : COMMUTE_MORNING_休日_RIO;
 
-    if (((time.weekDay == Time.WEDNESDAY && time.hour > 22) || (time.weekDay == Time.THURSDAY && time.hour < 1))
+    if (((time.weekDay == Time.WEDNESDAY && time.hour >= 22) || (time.weekDay == Time.THURSDAY && time.hour < 1))
      && DUNNO == symbolicLocation || 六本木 == symbolicLocation)
       return JUGGLING_水曜_RIO;
 
-    if (((time.hour >= 17 && time.hour <= 23) || time.hour <= 0)
+    if ((time.hour >= 17 || time.hour <= 0)
      && (DUNNO == symbolicLocation || 立石 == symbolicLocation))
     {
       if (time.weekDay == Time.WEDNESDAY) return COMMUTE_水曜_RIO;

@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class Const
 {
-  public static final boolean RIO_MODE = false;
+  public static final boolean RIO_MODE = true;
   public static final boolean ROUND_SCREEN = !RIO_MODE;
   public static final int SCREEN_SIZE = RIO_MODE ? 280 : 320;
 
@@ -96,7 +96,7 @@ public class Const
   public static final String 立石_FENCE_NAME = "立石";
   public static final String 三ノ輪_FENCE_NAME = "三ノ輪";
   public static final String[] J_FENCE_NAMES =
-   {千住大橋_FENCE_NAME, 六本木_FENCE_NAME, 日暮里_FENCE_NAME, 東京_FENCE_NAME };
+   { 千住大橋_FENCE_NAME, 六本木_FENCE_NAME, 日暮里_FENCE_NAME, 東京_FENCE_NAME };
   public static final String[] RIO_FENCE_NAMES =
    { 三ノ輪_FENCE_NAME, 立石_FENCE_NAME, 六本木_FENCE_NAME, 東京_FENCE_NAME };
   public static final String[] ALL_FENCE_NAMES = RIO_MODE ? RIO_FENCE_NAMES : J_FENCE_NAMES;

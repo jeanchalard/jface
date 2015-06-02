@@ -51,21 +51,23 @@ public class BitmapCache
 
   public boolean drawOn(final Canvas canvas, final float x, final float y, final Paint p)
   {
-    final long timeOfChange = (mTime + 60) * 1000;
-    final long msSinceLocalMidnight = (System.currentTimeMillis() - Const.MILLISECONDS_TO_UTC) % 86400000;
-    final long remainingTimeToDeparture = timeOfChange - msSinceLocalMidnight; // 10000 - now % 10000;
-    final float iVal;
-    if (remainingTimeToDeparture < Const.ANIM_DURATION && remainingTimeToDeparture > 0)
-      iVal = interpolator.getInterpolation(
-       ((float)(Const.ANIM_DURATION - remainingTimeToDeparture)) / Const.ANIM_DURATION);
-    else
-      iVal = 0;
+//    TODO: the following does not work. At all.
+//    final long timeOfChange = (mTime + 60) * 1000;
+//    final long msSinceLocalMidnight = (System.currentTimeMillis() - Const.MILLISECONDS_TO_UTC) % 86400000;
+//    final long remainingTimeToDeparture = timeOfChange - msSinceLocalMidnight; // 10000 - now % 10000;
+//    final float iVal;
+//    if (remainingTimeToDeparture < Const.ANIM_DURATION && remainingTimeToDeparture > 0)
+//      iVal = interpolator.getInterpolation(
+//       ((float)(Const.ANIM_DURATION - remainingTimeToDeparture)) / Const.ANIM_DURATION);
+//    else
+//      iVal = 0;
+    final float iVal = 0;
     final int size = Math.round(mSizeNow + (mSizeNext - mSizeNow) * iVal);
     mSrc.left = Math.round(mOffsetNext * iVal); mSrc.right = mSrc.left + size;
     mDst.left = (int)x; mDst.right = mDst.left + size;
     mDst.top = (int)(y - mVerticalShift); mDst.bottom = mDst.top + HEIGHT;
 
     canvas.drawBitmap(mCache, mSrc, mDst, p);
-    return remainingTimeToDeparture < Const.ANIM_DURATION + 1000;
+    return false; // remainingTimeToDeparture < Const.ANIM_DURATION + 1000;
   }
 }

@@ -9,6 +9,7 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
+import com.j.jface.Const;
 import com.j.jface.feed.Fences;
 import com.j.jface.feed.Logger;
 
@@ -33,13 +34,11 @@ public class SetupGeofenceAction implements Action, ResultCallback<Status>
 
   @Override public void run(@NonNull final GoogleApiClient client)
   {
-    final GeofencingRequest request = new GeofencingRequest.Builder()
-     .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER | GeofencingRequest.INITIAL_TRIGGER_EXIT)
-     .addGeofence(getGeofence(Fences.千住大橋))
-     .addGeofence(getGeofence(Fences.六本木))
-     .addGeofence(getGeofence(Fences.日暮里))
-     .addGeofence(getGeofence(Fences.東京))
-     .build();
+    final GeofencingRequest.Builder builder = new GeofencingRequest.Builder()
+     .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER | GeofencingRequest.INITIAL_TRIGGER_EXIT);
+    for (final String fence : Const.ALL_FENCE_NAMES)
+      builder.addGeofence(getGeofence(Fences.paramsFromName(fence)));
+    final GeofencingRequest request = builder.build();
 
     LocationServices.GeofencingApi.addGeofences(client, request, mIntent)
      .setResultCallback(this);

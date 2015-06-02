@@ -74,6 +74,7 @@ public class TabDebugTools extends WrappedFragment implements View.OnClickListen
     mFenceUIs[2] = (CheckBox)mView.findViewById(R.id.fence3);
     mFenceUIs[3] = (CheckBox)mView.findViewById(R.id.fence4);
     for (final CheckBox c : mFenceUIs) c.setOnClickListener(this);
+    if (Const.RIO_MODE) mFenceUIs[2].setText("六本木");
   }
 
   private void tick()
