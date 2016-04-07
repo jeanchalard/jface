@@ -1,5 +1,6 @@
 package com.j.jface.feed;
 
+import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.support.annotation.NonNull;
@@ -16,6 +17,7 @@ public class JFaceDataFeedPager extends FragmentPagerAdapter
   }
 
   @Override
+  @SuppressLint("ValidFragment")
   public Fragment getItem(final int position)
   {
     switch (position)
