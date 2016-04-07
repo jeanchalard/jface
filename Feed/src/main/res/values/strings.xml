@@ -19,8 +19,9 @@
   <string name="digital_config_hours">Hours</string>
   <string name="digital_config_minutes">Minutes</string>
   <string name="digital_config_seconds">Seconds</string>
-  <string name="drawer_closed_desc">JFace</string>
+  <string name="drawer_closed_desc">J Face</string>
   <string name="drawer_open_desc">What to do</string>
+  <string name="data_feed_title">J Face</string>
 
   <string name="title_no_device_connected">No wearable device is currently connected.</string>
   <string name="ok_no_device_connected">OK</string>

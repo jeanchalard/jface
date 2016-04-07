@@ -17,8 +17,10 @@
 package com.j.jface.feed;
 
 import android.app.Activity;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.MenuItem;
 
 /**
  * The activity wrapper for the host app for Jface.
@@ -28,10 +30,27 @@ public class JFaceDataFeedWrapper extends Activity
   @Nullable private JFaceDataFeed mW;
 
   // Activity callbacks
-  @Override
-  protected void onCreate(Bundle savedInstanceState)
+  @Override protected void onCreate(Bundle savedInstanceState)
   {
     super.onCreate(savedInstanceState);
     mW = new JFaceDataFeed(this);
+  }
+
+  @Override public void onConfigurationChanged(final Configuration c)
+  {
+    super.onConfigurationChanged(c);
+    mW.onConfigurationChanged(c);
+  }
+
+  @Override public boolean onOptionsItemSelected(final MenuItem i)
+  {
+    if (mW.onOptionsItemSelected(i)) return true;
+    return super.onOptionsItemSelected(i);
+  }
+
+  @Override public void onPostCreate(final Bundle b)
+  {
+    super.onPostCreate(b);
+    mW.onPostCreate(b);
   }
 }

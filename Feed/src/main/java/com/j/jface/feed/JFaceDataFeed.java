@@ -3,8 +3,13 @@ package com.j.jface.feed;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -17,6 +22,7 @@ import com.j.jface.R;
 public class JFaceDataFeed
 {
   @NonNull private final Activity mA;
+  @NonNull private final ActionBarDrawerToggle mDrawerToggle;
 
   public JFaceDataFeed(@NonNull final Activity a)
   {
@@ -30,7 +36,7 @@ public class JFaceDataFeed
     list.setOnItemClickListener(new AdapterView.OnItemClickListener()
     {
       private final Client mClient = new Client(a);
-      @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+      @Override public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id)
       {
         final Fragment f = getFragmentForPosition(position, mClient);
         a.getFragmentManager().beginTransaction()
@@ -41,7 +47,30 @@ public class JFaceDataFeed
       }
     });
 
+    //noinspection ConstantConditions
+    list.getOnItemClickListener().onItemClick(null, null, 0, 0); // Switch to the first fragment
+
+    final Toolbar toolbar = (Toolbar)a.findViewById(R.id.dataFeedToolbar);
+    toolbar.setTitle(R.string.data_feed_title);
+    mDrawerToggle = new ActionBarDrawerToggle(a, drawer, toolbar, R.string.drawer_open_desc, R.string.drawer_closed_desc);
+
     startGeofenceService(a);
+  }
+
+  // Handling the drawer.
+  public void onConfigurationChanged(final Configuration c)
+  {
+    mDrawerToggle.onConfigurationChanged(c);
+  }
+
+  public boolean onOptionsItemSelected(final MenuItem i)
+  {
+    return mDrawerToggle.onOptionsItemSelected(i);
+  }
+
+  public void onPostCreate(final Bundle b)
+  {
+    mDrawerToggle.syncState();
   }
 
   private static FragmentWrapper<?> getFragmentForPosition(final int position, final Client client)
