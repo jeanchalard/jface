@@ -1,12 +1,12 @@
 repositories {
     flatDir {
-        dirs '/home/jchalard/sdk/extras/android/m2repository/com/android/support/support-annotations/22.1.1'
+        dirs '/home/jchalard/android/sdk/extras/android/m2repository/com/android/support/support-annotations/23.1.1'
     }
 }
 
 apply plugin: 'java'
 
 dependencies {
-    compile 'com.android.support:support-annotations:22.1.1'
+    compile 'com.android.support:support-annotations:23.1.1'
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
