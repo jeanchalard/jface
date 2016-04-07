@@ -1,4 +1,4 @@
-package com.j.jface.feed;
+package com.j.jface.feed.fragments;
 
 import android.app.Fragment;
 import android.support.annotation.NonNull;
@@ -10,16 +10,20 @@ import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
 import com.j.jface.Departure;
 import com.j.jface.R;
+import com.j.jface.feed.Client;
+import com.j.jface.feed.DataSource;
+import com.j.jface.feed.FeedLoader;
+import com.j.jface.feed.WrappedFragment;
 
 import java.util.ArrayList;
 
-public class TabLogsAndData extends WrappedFragment implements View.OnClickListener
+public class LogsAndDataFragment extends WrappedFragment implements View.OnClickListener
 {
   @NonNull private final Fragment mF;
   @NonNull private final Client mClient;
   @NonNull private final TextView mLog;
 
-  public TabLogsAndData(@NonNull final WrappedFragment.Args a, @NonNull final Client b)
+  public LogsAndDataFragment(@NonNull final WrappedFragment.Args a, @NonNull final Client b)
   {
     super(a.inflater.inflate(R.layout.debug_app_tab_logs_and_data, a.container, false));
     mF = a.fragment;

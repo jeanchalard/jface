@@ -2,7 +2,7 @@ package com.j.jface.feed;
 
 import com.j.jface.Const;
 
-class DataSource
+public class DataSource
 {
   public final String name;
   public final String url;

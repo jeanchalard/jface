@@ -1,4 +1,4 @@
-package com.j.jface.feed;
+package com.j.jface.feed.fragments;
 
 import android.os.Handler;
 import android.os.Message;
@@ -13,8 +13,10 @@ import android.widget.TimePicker;
 
 import com.j.jface.Const;
 import com.j.jface.R;
+import com.j.jface.feed.Client;
+import com.j.jface.feed.WrappedFragment;
 
-public class TabDebugTools extends WrappedFragment implements View.OnClickListener, NumberPicker.OnValueChangeListener, TimePicker.OnTimeChangedListener
+public class DebugToolsFragment extends WrappedFragment implements View.OnClickListener, NumberPicker.OnValueChangeListener, TimePicker.OnTimeChangedListener
 {
   private static final int MSG_UPDATE_TIME = 1;
   private static final int GRACE_FOR_UPDATE = 3000;
@@ -33,8 +35,8 @@ public class TabDebugTools extends WrappedFragment implements View.OnClickListen
 
   private static class TabDebugToolsHandler extends Handler
   {
-    private final TabDebugTools p;
-    public TabDebugToolsHandler(final TabDebugTools p) { this.p = p; }
+    private final DebugToolsFragment p;
+    public TabDebugToolsHandler(final DebugToolsFragment p) { this.p = p; }
     @Override public void handleMessage(@NonNull Message message)
     {
       switch (message.what)
@@ -47,7 +49,7 @@ public class TabDebugTools extends WrappedFragment implements View.OnClickListen
   };
   private Handler mHandler = new TabDebugToolsHandler(this);
 
-  public TabDebugTools(@NonNull final Args a, @NonNull final Client b)
+  public DebugToolsFragment(@NonNull final Args a, @NonNull final Client b)
   {
     super(a.inflater.inflate(R.layout.debug_app_tab_debug_tools, a.container, false));
     mClient = b;
