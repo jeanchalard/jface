@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <color name="drawer_background">#606060</color>
+  <color name="drawer_text">#D0D0D0</color>
+  <color name="drawer_separator">#C0C0C0</color>
+</resources>

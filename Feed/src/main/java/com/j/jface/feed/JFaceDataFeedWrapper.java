@@ -21,9 +21,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 /**
- * The phone-side config activity for {@code DigitalWatchFaceService}. Like the watch-side config
- * activity ({@code DigitalWatchFaceWearableConfigActivity}), allows for setting the background
- * color. Additionally, enables setting the color for hour, minute and second digits.
+ * The activity wrapper for the host app for Jface.
  */
 public class JFaceDataFeedWrapper extends Activity
 {

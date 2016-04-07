@@ -16,6 +16,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-wearable:8.3.0'
     compile 'com.google.android.gms:play-services:8.4.0'
     compile 'com.android.support:support-annotations:23.1.1'
+    compile 'com.android.support:support-v4:23.2.1'
     compile 'com.android.support:support-v13:23.1.1'
     wearApp project(':Face')
     compile project(':Common')
