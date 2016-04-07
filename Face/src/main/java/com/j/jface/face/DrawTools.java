@@ -69,9 +69,9 @@ public class DrawTools
     departurePaint.setTextSize(23);
     statusPaint.setTextSize(statusFontSize);
 
-    timePosY = 75;
-    departurePosX = 82;
-    departurePosY = 120;
+    timePosY = Const.ROUND_SCREEN ? 75 : 60;
+    departurePosX = Const.SCREEN_SIZE / 4;
+    departurePosY = timePosY + 45;
     iconToDepartureXPadding = 7;
   }
 
