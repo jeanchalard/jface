@@ -25,7 +25,8 @@ public class TabDebugTools extends WrappedFragment implements View.OnClickListen
   boolean mTicking = false;
   @NonNull final Time mTime1, mTime2;
   @NonNull final NumberPicker mDaysOffsetUI;
-  @NonNull final TimePicker mTimeUI;
+  @NonNull final NumberPicker mHoursUI;
+  @NonNull final NumberPicker mMinutesUI;
   @NonNull final NumberPicker mSecondsUI;
   @NonNull final TextView mOffsetLabel;
   @NonNull final CheckBox[] mFenceUIs;
@@ -56,16 +57,19 @@ public class TabDebugTools extends WrappedFragment implements View.OnClickListen
     mView.findViewById(R.id.button_now).setOnClickListener(this);
     mDaysOffsetUI = (NumberPicker)mView.findViewById(R.id.daysOffsetUI);
     mDaysOffsetUI.setMinValue(0); mDaysOffsetUI.setMaxValue(14);
-    mTimeUI = (TimePicker)mView.findViewById(R.id.timeUI);
+    mHoursUI = (NumberPicker)mView.findViewById(R.id.hoursUI);
+    mHoursUI.setMinValue(0); mHoursUI.setMaxValue(23);
+    mMinutesUI = (NumberPicker)mView.findViewById(R.id.minutesUI);
+    mMinutesUI.setMinValue(0); mMinutesUI.setMaxValue(59);
     mSecondsUI = (NumberPicker)mView.findViewById(R.id.secondsUI);
     mSecondsUI.setMinValue(0); mSecondsUI.setMaxValue(59);
     mOffsetLabel = (TextView)mView.findViewById(R.id.offsetLabel);
-    mTimeUI.setIs24HourView(true); // sanity
     tick();
     mHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, 1000);
 
+    mHoursUI.setOnValueChangedListener(this);
+    mMinutesUI.setOnValueChangedListener(this);
     mSecondsUI.setOnValueChangedListener(this);
-    mTimeUI.setOnTimeChangedListener(this);
     mDaysOffsetUI.setOnValueChangedListener(this);
 
     mFenceUIs = new CheckBox[4];
@@ -81,8 +85,8 @@ public class TabDebugTools extends WrappedFragment implements View.OnClickListen
   {
     mTicking = true;
     mTime1.set(System.currentTimeMillis() + mOffset);
-    mTimeUI.setCurrentHour(mTime1.hour);
-    mTimeUI.setCurrentMinute(mTime1.minute);
+    mHoursUI.setValue(mTime1.hour);
+    mMinutesUI.setValue(mTime1.minute);
     mSecondsUI.setValue(mTime1.second);
 
     mTime2.setToNow();
@@ -96,8 +100,8 @@ public class TabDebugTools extends WrappedFragment implements View.OnClickListen
     mHandler.removeMessages(MSG_UPDATE_TIME);
     mTime2.setToNow();
     final int second = mSecondsUI.getValue();
-    final int minute = mTimeUI.getCurrentMinute();
-    final int hour = mTimeUI.getCurrentHour();
+    final int minute = mMinutesUI.getValue();
+    final int hour = mHoursUI.getValue();
     mTime1.set(second, minute, hour, mTime2.monthDay, mTime2.month, mTime2.year);
     final int dayOffset = mDaysOffsetUI.getValue();
     mTime1.set(mTime1.toMillis(true) + dayOffset * 86400000 - grace);
