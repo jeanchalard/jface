@@ -51,7 +51,7 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
 
   public DebugToolsFragment(@NonNull final Args a, @NonNull final Client b)
   {
-    super(a.inflater.inflate(R.layout.debug_app_tab_debug_tools, a.container, false));
+    super(a.inflater.inflate(R.layout.fragment_debug_tools, a.container, false));
     mClient = b;
     mTime1 = new Time(); mTime2 = new Time();
     mDataEdit = (EditText)mView.findViewById(R.id.adHocDataEdit);

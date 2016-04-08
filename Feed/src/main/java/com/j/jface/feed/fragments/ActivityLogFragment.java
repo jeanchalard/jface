@@ -26,7 +26,7 @@ public class ActivityLogFragment extends WrappedFragment
 
   public ActivityLogFragment(@NonNull final WrappedFragment.Args a, @NonNull final Client b)
   {
-    super(a.inflater.inflate(R.layout.activity_log_layout, a.container, false));
+    super(a.inflater.inflate(R.layout.fragment_activity_log, a.container, false));
     Log.e("HMMM", "hMM");
     mF = a.fragment;
     mClient = b;

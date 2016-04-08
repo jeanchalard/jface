@@ -25,7 +25,7 @@ public class LogsAndDataFragment extends WrappedFragment implements View.OnClick
 
   public LogsAndDataFragment(@NonNull final WrappedFragment.Args a, @NonNull final Client b)
   {
-    super(a.inflater.inflate(R.layout.debug_app_tab_logs_and_data, a.container, false));
+    super(a.inflater.inflate(R.layout.fragment_logs_and_data, a.container, false));
     mF = a.fragment;
     mLog = (TextView)mView.findViewById(R.id.log);
     mClient = b;
