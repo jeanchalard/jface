@@ -37,7 +37,8 @@ public class LogsAndDataFragment extends WrappedFragment implements View.OnClick
   private Client.GetDataCallback showDataCallback()
   {
     return new Client.GetDataCallback() { public void run(@NonNull final String path, @NonNull final DataMap dataMap) {
-      mF.getActivity().runOnUiThread(new Runnable() { @Override public void run() {
+      mF.getActivity().runOnUiThread(new Runnable() { @Override public void run()
+      {
         mLog.append(path);
         mLog.append("\n");
         if (path.endsWith(Const.DATA_PATH_SUFFIX_STATUS))

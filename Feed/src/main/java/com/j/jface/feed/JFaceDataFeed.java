@@ -18,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.j.jface.R;
+import com.j.jface.feed.fragments.ActivityLogFragment;
 import com.j.jface.feed.fragments.DebugToolsFragment;
 import com.j.jface.feed.fragments.LogsAndDataFragment;
 
@@ -79,7 +80,7 @@ public class JFaceDataFeed
   {
     switch (position)
     {
-      case 0 : return new FragmentWrapper<LogsAndDataFragment>(client){}; // TODO : put the new content there
+      case 0 : return new FragmentWrapper<ActivityLogFragment>(client){}; // TODO : put the new content there
       case 1 : return new FragmentWrapper<LogsAndDataFragment>(client){};
       case 2 : return new FragmentWrapper<DebugToolsFragment>(client){};
     }

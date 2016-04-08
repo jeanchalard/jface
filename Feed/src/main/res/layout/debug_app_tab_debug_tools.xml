@@ -143,7 +143,6 @@
       android:layout_width="0dp"
       android:layout_height="wrap_content"
       android:textAppearance="?android:attr/textAppearanceLarge"
-      android:text="Large Text"
       android:id="@+id/offsetLabel"
       android:layout_gravity="center_horizontal"
       android:layout_weight="5"/>
