@@ -14,8 +14,9 @@ import java.util.HashMap;
 
 public class DataStore
 {
-  private final HashMap<String, ArrayList<Departure>> mDepartures = new HashMap<>();
-  private final HashMap<String, Boolean> mLocationStatuses = new HashMap<>();
+  @NonNull private final HashMap<String, ArrayList<Departure>> mDepartures = new HashMap<>();
+  @NonNull private final HashMap<String, Boolean> mLocationStatuses = new HashMap<>();
+  @NonNull public String mTopic = "";
   public long mTimeOffset;
   public long mDebugFences;
 

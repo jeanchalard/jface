@@ -45,6 +45,7 @@ import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
 import com.j.jface.Const;
 import com.j.jface.Departure;
+import com.j.jface.Util;
 
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -326,7 +327,8 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       mDataStore.isWithinFence(Const.千住大橋_FENCE_NAME);
       final int ambientFlag = isInAmbientMode() ? Draw.AMBIENT_MODE : 0;
       if (mDraw.draw(mDrawTools, mModeFlags | ambientFlag, canvas, bounds,
-       departure1, departure2, status, mTime, mSensors, Status.getSymbolicLocationName(mDataStore)))
+       departure1, departure2, status, mTime, mSensors, Status.getSymbolicLocationName(mDataStore),
+       mDataStore.mTopic))
         invalidate();
 
       if (null == departure1)
@@ -366,6 +368,8 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
             mDataStore.mDebugFences = data.getLong(key);
           else if (Const.DATA_KEY_DEBUG_TIME_OFFSET.equals(key))
             mDataStore.mTimeOffset = data.getLong(key);
+          else if (Const.DATA_KEY_TOPIC.equals(key))
+            mDataStore.mTopic = Util.NonNullString(data.getString(key));
         updateTimer();
       }
       else if (path.startsWith(Const.LOCATION_PATH))

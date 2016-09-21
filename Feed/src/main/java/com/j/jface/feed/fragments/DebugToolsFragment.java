@@ -22,7 +22,7 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
   private static final int GRACE_FOR_UPDATE = 3000;
 
   @NonNull final Client mClient;
-  @NonNull final EditText mDataEdit;
+  @NonNull final EditText mTopicDataEdit;
   long mOffset = 0;
   boolean mTicking = false;
   @NonNull final Time mTime1, mTime2;
@@ -54,7 +54,7 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
     super(a.inflater.inflate(R.layout.fragment_debug_tools, a.container, false));
     mClient = b;
     mTime1 = new Time(); mTime2 = new Time();
-    mDataEdit = (EditText)mView.findViewById(R.id.adHocDataEdit);
+    mTopicDataEdit = (EditText)mView.findViewById(R.id.topicDataEdit);
     mView.findViewById(R.id.button_set).setOnClickListener(this);
     mView.findViewById(R.id.button_now).setOnClickListener(this);
     mDaysOffsetUI = (NumberPicker)mView.findViewById(R.id.daysOffsetUI);
@@ -125,8 +125,8 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
     switch (v.getId())
     {
       case R.id.button_set:
-        mClient.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_ADHOC,
-         Const.DATA_KEY_ADHOC, mDataEdit.getText().toString());
+        mClient.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC,
+         Const.DATA_KEY_TOPIC, mTopicDataEdit.getText().toString());
         break;
       case R.id.button_now:
         mOffset = 0;

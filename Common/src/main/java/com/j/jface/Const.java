@@ -23,6 +23,7 @@ public class Const
   public static final String DATA_KEY_DEPTIME = "depTime";
   public static final String DATA_KEY_EXTRA = "extra";
   public static final String DATA_KEY_DEPLIST = "depList";
+  public static final String DATA_KEY_TOPIC = "topic";
   public static final String DATA_KEY_ADHOC = "adHoc";
   public static final String DATA_KEY_INSIDE = "inside";
   public static final String DATA_KEY_SUCCESSFUL_UPDATE_DATE = "updateTime";

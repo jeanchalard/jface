@@ -29,7 +29,8 @@ public class Draw
                       @NonNull final Canvas canvas, @NonNull final Rect bounds,
                       @Nullable final Departure departureLine1, @Nullable final Departure departureLine2,
                       @NonNull final Status status, @NonNull final Time time, @NonNull final Sensors sensors,
-                      @NonNull final String locationDescriptor)
+                      @NonNull final String locationDescriptor,
+                      @NonNull final String topic)
   {
     long start = System.currentTimeMillis();
     boolean drawFull = 0 == ((AMBIENT_MODE | MUTE_MODE) & modeFlags);
@@ -88,6 +89,8 @@ public class Draw
         mustInvalidate |= drawDepartureSet(1, departure2, drawTools.departurePosX, y2, drawTools, canvas);
       }
     }
+
+    canvas.drawText(topic, center, drawTools.topicPosY, drawTools.topicPaint);
 
     final int borderTextLength = Formatter.formatBorder(mTmpChr, time, drawFull ? locationDescriptor : null);
     if (Const.ROUND_SCREEN)
