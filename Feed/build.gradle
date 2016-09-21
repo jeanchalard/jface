@@ -6,7 +6,7 @@ android {
     compileSdkVersion 23
     buildToolsVersion '23.0.2'
     defaultConfig {
-        applicationId "com.j.jface.feed"
+        applicationId "com.j.jface"
         minSdkVersion 23
         targetSdkVersion 23
         versionCode 1

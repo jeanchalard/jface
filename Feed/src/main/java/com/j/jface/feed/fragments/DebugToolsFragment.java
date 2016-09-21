@@ -125,8 +125,7 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
     switch (v.getId())
     {
       case R.id.button_set:
-        mClient.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC,
-         Const.DATA_KEY_TOPIC, mTopicDataEdit.getText().toString());
+        mClient.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC, Const.DATA_KEY_TOPIC, mTopicDataEdit.getText().toString());
         break;
       case R.id.button_now:
         mOffset = 0;
