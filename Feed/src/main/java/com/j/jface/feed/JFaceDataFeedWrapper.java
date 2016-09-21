@@ -53,4 +53,10 @@ public class JFaceDataFeedWrapper extends Activity
     super.onPostCreate(b);
     mW.onPostCreate(b);
   }
+
+  @Override public void onRequestPermissionsResult(final int requestCode, final String[] permissions, final int[] results)
+  {
+    super.onRequestPermissionsResult(requestCode, permissions, results);
+    mW.onRequestPermissionsResult(requestCode, permissions, results);
+  }
 }

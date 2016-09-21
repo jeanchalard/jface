@@ -1,7 +1,10 @@
 package com.j.jface.feed.actions;
 
+import android.Manifest;
 import android.app.PendingIntent;
+import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -40,8 +43,10 @@ public class SetupGeofenceAction implements Action, ResultCallback<Status>
       builder.addGeofence(getGeofence(Fences.paramsFromName(fence)));
     final GeofencingRequest request = builder.build();
 
-    LocationServices.GeofencingApi.addGeofences(client, request, mIntent)
-     .setResultCallback(this);
+    final int hasPermission = ContextCompat.checkSelfPermission(client.getContext(), Manifest.permission.ACCESS_FINE_LOCATION);
+    if (PackageManager.PERMISSION_GRANTED == hasPermission)
+      LocationServices.GeofencingApi.addGeofences(client, request, mIntent)
+       .setResultCallback(this);
   }
 
   @Override

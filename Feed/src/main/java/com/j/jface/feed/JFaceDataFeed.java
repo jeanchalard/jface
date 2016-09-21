@@ -1,11 +1,15 @@
 package com.j.jface.feed;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
@@ -57,7 +61,13 @@ public class JFaceDataFeed
     toolbar.setTitle(R.string.data_feed_title);
     mDrawerToggle = new ActionBarDrawerToggle(a, drawer, toolbar, R.string.drawer_open_desc, R.string.drawer_closed_desc);
 
-    startGeofenceService(a);
+    if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(mA, Manifest.permission.ACCESS_FINE_LOCATION))
+      startGeofenceService(a);
+  }
+
+  public void onRequestPermissionsResult(final int requestCode, final String[] permissions, final int[] results)
+  {
+    if (0 != permissions.length) startGeofenceService(mA);
   }
 
   // Handling the drawer.
@@ -74,6 +84,7 @@ public class JFaceDataFeed
   public void onPostCreate(final Bundle b)
   {
     mDrawerToggle.syncState();
+    ActivityCompat.requestPermissions(mA, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
   }
 
   private static FragmentWrapper<?> getFragmentForPosition(final int position, final Client client)
