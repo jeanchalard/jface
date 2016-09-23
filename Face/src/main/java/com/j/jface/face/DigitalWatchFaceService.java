@@ -139,9 +139,11 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       setWatchFaceStyle(new WatchFaceStyle.Builder(DigitalWatchFaceService.this)
        .setAmbientPeekMode(WatchFaceStyle.AMBIENT_PEEK_MODE_VISIBLE)
        .setCardPeekMode(WatchFaceStyle.PEEK_MODE_VARIABLE)
-       .setBackgroundVisibility(WatchFaceStyle.BACKGROUND_VISIBILITY_PERSISTENT)
+       .setPeekOpacityMode(WatchFaceStyle.PEEK_OPACITY_MODE_TRANSLUCENT)
+       .setBackgroundVisibility(WatchFaceStyle.BACKGROUND_VISIBILITY_INTERRUPTIVE)
        .setShowUnreadCountIndicator(true)
        .setShowSystemUiTime(false)
+       .setAcceptsTapEvents(true)
        .build());
       mDrawTools = new DrawTools(DigitalWatchFaceService.this.getResources());
       mSensors = new Sensors(DigitalWatchFaceService.this);
@@ -339,6 +341,14 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
         mNextDeparture = departure1.dTime < departure2.dTime ? departure1 : departure2;
     }
 
+    @Override public void onTapCommand(@TapType final int tapType, final int x, final int y, final long eventTime)
+    {
+      if (WatchFaceService.TAP_TYPE_TAP == tapType) {
+
+      }
+      else super.onTapCommand(tapType, x, y, eventTime);
+    }
+
     /**
      * Starts the {@link #mUpdateTimeHandler} timer if it should be running and isn't currently
      * or stops it if it shouldn't be running but currently is.
@@ -406,6 +416,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
         DigitalWatchFaceUtil.fetchData(mGoogleApiClient, Const.DATA_PATH + "/" + path, dataHandler);
       for (final String path : Const.ALL_FENCE_NAMES)
         DigitalWatchFaceUtil.fetchData(mGoogleApiClient, Const.LOCATION_PATH + "/" + path, dataHandler);
+      DigitalWatchFaceUtil.fetchData(mGoogleApiClient, Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC, dataHandler);
     }
 
     @Override // DataApi.DataListener

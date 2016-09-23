@@ -21,7 +21,6 @@ public class DrawTools
   public final float timePosY;
   public final float departurePosX;
   public final float departurePosY;
-  public final float topicPosY;
   public final float iconToDepartureXPadding;
 
   public final Paint imagePaint;
@@ -45,7 +44,7 @@ public class DrawTools
     departurePaint = createTextPaint(0xFFCCCCCC, NORMAL_TYPEFACE);
     statusPaint = createTextPaint(0xFFCCCCCC, NORMAL_TYPEFACE);
     statusPaint.setTextAlign(Paint.Align.CENTER);
-    topicPaint = createTextPaint(0xFFFFFFFF, NORMAL_TYPEFACE);
+    topicPaint = createTextPaint(0xFFAACCAA, NORMAL_TYPEFACE);
     topicPaint.setTextAlign(Paint.Align.CENTER);
 
     final int statusFontSize = 18;
@@ -68,16 +67,15 @@ public class DrawTools
 
     // We can afford to do this because we know what device we are running on, but otherwise we should
     // read this stuff from resources instead. All the values below are in pixels.
-    minutesPaint.setTextSize(38);
+    minutesPaint.setTextSize(48);
     secondsPaint.setTextSize(23);
     departurePaint.setTextSize(23);
     statusPaint.setTextSize(statusFontSize);
-    topicPaint.setTextSize(48);
+    topicPaint.setTextSize(28);
 
     timePosY = Const.ROUND_SCREEN ? 75 : 60;
     departurePosX = Const.SCREEN_SIZE / 4;
     departurePosY = timePosY + 45;
-    topicPosY = Const.SCREEN_SIZE / 2;
     iconToDepartureXPadding = 7;
   }
 

@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.text.format.Time;
 
 import com.j.jface.Const;
@@ -16,6 +17,10 @@ public class Draw
   public static final int BACKGROUND_PRESENT = 1;
   public static final int AMBIENT_MODE = 2;
   public static final int MUTE_MODE = 4;
+
+  private static final int SCHEDULE_ONLY = 1;
+  private static final int TOPIC_ONLY = 2;
+  private static final int BOTH = 3;
 
   private BitmapCache[] mCache;
   public Draw() {
@@ -33,9 +38,33 @@ public class Draw
                       @NonNull final String topic)
   {
     long start = System.currentTimeMillis();
+
     boolean drawFull = 0 == ((AMBIENT_MODE | MUTE_MODE) & modeFlags);
     final Departure departure1 = null == departureLine1 ? departureLine2 : departureLine1;
     final Departure departure2 = null == departureLine1 ? null : departureLine2;
+
+    final int mode;
+    final float topicPosY;
+    if (null == departure1)
+    {
+      mode = TOPIC_ONLY;
+      topicPosY = drawTools.departurePosY;
+    }
+    else if (TextUtils.isEmpty(topic))
+    {
+      mode = BOTH;
+      topicPosY = 0;
+    }
+    else
+    {
+      int lines = 0;
+      for (int index = 0; index != -1; index = topic.indexOf(index)) ++lines;
+      final float topicH = drawTools.topicPaint.getTextSize() * lines;
+      final float lineHeight = drawTools.departurePaint.getTextSize() + 2;
+      final float departuresH = lineHeight * (null == departure2 ? 2 : 4);
+      topicPosY = drawTools.departurePosY + departuresH + lineHeight;
+      mode = BOTH;
+    }
 
     // Draw the background.
     // TODO: only update the relevant part of the display.
@@ -90,7 +119,7 @@ public class Draw
       }
     }
 
-    canvas.drawText(topic, center, drawTools.topicPosY, drawTools.topicPaint);
+    canvas.drawText(topic, center, topicPosY, drawTools.topicPaint);
 
     final int borderTextLength = Formatter.formatBorder(mTmpChr, time, drawFull ? locationDescriptor : null);
     if (Const.ROUND_SCREEN)

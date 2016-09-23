@@ -11,6 +11,7 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
 import com.j.jface.R;
 import com.j.jface.feed.Client;
@@ -81,6 +82,17 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
     mFenceUIs[3] = (CheckBox)mView.findViewById(R.id.fence4);
     for (final CheckBox c : mFenceUIs) c.setOnClickListener(this);
     if (Const.RIO_MODE) mFenceUIs[2].setText("六本木");
+
+    b.getData(Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC, new Client.GetDataCallback() {
+      public void run(@NonNull final String path, @NonNull final DataMap dataMap) {
+        a.fragment.getActivity().runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            mTopicDataEdit.setText(dataMap.getString(Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC));
+          }
+        });
+      }
+    });
   }
 
   private void tick()
