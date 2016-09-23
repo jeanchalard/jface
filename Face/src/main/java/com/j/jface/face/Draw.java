@@ -45,6 +45,7 @@ public class Draw
 
     final int mode;
     final float topicPosY;
+    final String[] topicLines = null == topic ? null : topic.split("\n");
     if (null == departure1)
     {
       mode = TOPIC_ONLY;
@@ -57,9 +58,7 @@ public class Draw
     }
     else
     {
-      int lines = 0;
-      for (int index = 0; index != -1; index = topic.indexOf(index)) ++lines;
-      final float topicH = drawTools.topicPaint.getTextSize() * lines;
+      final float topicH = drawTools.topicPaint.getTextSize() * topicLines.length;
       final float lineHeight = drawTools.departurePaint.getTextSize() + 2;
       final float departuresH = lineHeight * (null == departure2 ? 2 : 4);
       topicPosY = drawTools.departurePosY + departuresH + lineHeight / 2;
@@ -119,7 +118,12 @@ public class Draw
       }
     }
 
-    canvas.drawText(topic, center, topicPosY, drawTools.topicPaint);
+    float ty = topicPosY;
+    for (final String s : topicLines)
+    {
+      canvas.drawText(s, center, ty, drawTools.topicPaint);
+      ty += drawTools.topicPaint.getTextSize() + 2;
+    }
 
     final int borderTextLength = Formatter.formatBorder(mTmpChr, time, drawFull ? locationDescriptor : null);
     if (Const.ROUND_SCREEN)
