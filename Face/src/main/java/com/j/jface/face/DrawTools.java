@@ -67,15 +67,15 @@ public class DrawTools
 
     // We can afford to do this because we know what device we are running on, but otherwise we should
     // read this stuff from resources instead. All the values below are in pixels.
-    minutesPaint.setTextSize(48);
+    minutesPaint.setTextSize(54);
     secondsPaint.setTextSize(23);
     departurePaint.setTextSize(23);
     statusPaint.setTextSize(statusFontSize);
     topicPaint.setTextSize(28);
 
-    timePosY = Const.ROUND_SCREEN ? 75 : 60;
+    timePosY = Const.ROUND_SCREEN ? 85 : 60;
     departurePosX = Const.SCREEN_SIZE / 4;
-    departurePosY = timePosY + 45;
+    departurePosY = timePosY + 36;
     iconToDepartureXPadding = 7;
   }
 

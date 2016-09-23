@@ -62,7 +62,7 @@ public class Draw
       final float topicH = drawTools.topicPaint.getTextSize() * lines;
       final float lineHeight = drawTools.departurePaint.getTextSize() + 2;
       final float departuresH = lineHeight * (null == departure2 ? 2 : 4);
-      topicPosY = drawTools.departurePosY + departuresH + lineHeight;
+      topicPosY = drawTools.departurePosY + departuresH + lineHeight / 2;
       mode = BOTH;
     }
 
@@ -80,7 +80,7 @@ public class Draw
     canvas.drawText(mTmpSb, 0, 2, center - hoursSize - 2, drawTools.timePosY, drawTools.minutesPaint);
     Formatter.format2Digits(mTmpSb, time.minute);
     canvas.drawText(mTmpSb, 0, 2, center + 2, drawTools.timePosY, drawTools.minutesPaint);
-    final float secondsOffset = drawTools.minutesPaint.measureText(mTmpSb, 0, 2) + 6;
+    final float secondsOffset = drawTools.minutesPaint.measureText(mTmpSb, 0, 2) + 12;
 
     if (drawFull)
     {
@@ -91,7 +91,7 @@ public class Draw
 //      canvas.drawText(monthDay, center - hoursSize - monthDaySize, drawTools.timePosY - drawTools.secondsPaint.getTextSize(), drawTools.secondsPaint);
       final String weekDay = Const.WEEKDAYS[time.weekDay];
       final float weekDaySize = drawTools.secondsPaint.measureText(weekDay);
-      canvas.drawText(weekDay, center - hoursSize - 6 - weekDaySize, drawTools.timePosY, drawTools.secondsPaint);
+      canvas.drawText(weekDay, center - hoursSize - 12 - weekDaySize, drawTools.timePosY, drawTools.secondsPaint);
     }
 
     boolean mustInvalidate = false;

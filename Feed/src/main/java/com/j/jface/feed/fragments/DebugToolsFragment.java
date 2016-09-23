@@ -88,7 +88,7 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
         a.fragment.getActivity().runOnUiThread(new Runnable() {
           @Override
           public void run() {
-            mTopicDataEdit.setText(dataMap.getString(Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC));
+            mTopicDataEdit.setText(dataMap.getString(Const.DATA_KEY_TOPIC));
           }
         });
       }
