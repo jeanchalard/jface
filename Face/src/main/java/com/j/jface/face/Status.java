@@ -93,7 +93,7 @@ public enum Status
     if (日暮里 == symbolicLocation) return workDay ? 日暮里_平日_J : 日暮里_休日_J;
 
     if (workDay
-     && (time.hour >= 8 && time.hour <= 11)
+     && (time.hour >= 7 && time.hour <= 12)
      && (DUNNO == symbolicLocation || 千住大橋 == symbolicLocation)) return COMMUTE_MORNING_平日_J;
 
     if (workDay
