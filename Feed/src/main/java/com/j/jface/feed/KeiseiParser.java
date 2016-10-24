@@ -21,7 +21,8 @@ public class KeiseiParser extends FeedParser
     final DataMap result = new DataMap();
     final BufferedReader src = new BufferedReader(new InputStreamReader(new BufferedInputStream(srcStream), "Shift_JIS"));
 
-    if (null == find(src, "class=\"name\">") || null == find(src, "</tr>")) {
+    if (null == find(src, "class=\"name\">") || null == find(src, "</tr>"))
+    {
       Logger.L("Argh, data not at expected format for " + dataName);
       return result;
     }
@@ -31,7 +32,9 @@ public class KeiseiParser extends FeedParser
     int hour = -1;
     int minute = -1;
     boolean 快速 = false;
-    while (srcTable.hasNext()) {
+    boolean willStop = true;
+    while (srcTable.hasNext())
+    {
       final String p = srcTable.next();
       if (p.startsWith("class=\"side01\"") || p.startsWith("class=\"side02\""))
         hour = srcTable.nextInt();
@@ -39,12 +42,19 @@ public class KeiseiParser extends FeedParser
         快速 = true;
       else if ("br".equals(p) && "/".equals(srcTable.next()))
         minute = srcTable.nextInt();
-      else if (p.startsWith("/div")) {
-        final DataMap departure = new DataMap();
-        departure.putInt(Const.DATA_KEY_DEPTIME, hour * 3600 + minute * 60);
-        departure.putString(Const.DATA_KEY_EXTRA, 快速 ? "快" : "");
-        buildData.add(departure);
+      else if ("ス".equals(p) || "イ".equals(p) || "ア特".equals(p) || "快特".equals(p) || "特急".equals(p))
+        willStop = false;
+      else if (p.startsWith("/div"))
+      {
+        if (willStop)
+        {
+          final DataMap departure = new DataMap();
+          departure.putInt(Const.DATA_KEY_DEPTIME, hour * 3600 + minute * 60);
+          departure.putString(Const.DATA_KEY_EXTRA, 快速 ? "快" : "");
+          buildData.add(departure);
+        }
         快速 = false;
+        willStop = true;
       }
     }
     result.putDataMapArrayList(Const.DATA_KEY_DEPLIST, buildData);
