@@ -28,10 +28,14 @@ import com.j.jface.feed.fragments.LogsAndDataFragment;
 
 public class JFaceDataFeed
 {
+  @NonNull private final String LAST_OPEN_FRAGMENT_INDEX = "last_open_fragment_index";
   @NonNull private final Activity mA;
   @NonNull private final ActionBarDrawerToggle mDrawerToggle;
 
-  public JFaceDataFeed(@NonNull final Activity a)
+  // State
+  int mCurrentlyDisplayedFragmentIndex = 0;
+
+  public JFaceDataFeed(@NonNull final Activity a, final Bundle savedInstanceState)
   {
     mA = a;
     final LayoutParams lp = new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
@@ -51,11 +55,13 @@ public class JFaceDataFeed
                               .commit();
         list.setItemChecked(position, true);
         drawer.closeDrawer(list);
+        mCurrentlyDisplayedFragmentIndex = position;
       }
     });
 
     //noinspection ConstantConditions
-    list.getOnItemClickListener().onItemClick(null, null, 0, 0); // Switch to the first fragment
+    mCurrentlyDisplayedFragmentIndex = null == savedInstanceState ? 0 : savedInstanceState.getInt(LAST_OPEN_FRAGMENT_INDEX);
+    list.getOnItemClickListener().onItemClick(null, null, mCurrentlyDisplayedFragmentIndex, 0); // Switch to the initial fragment
 
     final Toolbar toolbar = (Toolbar)a.findViewById(R.id.dataFeedToolbar);
     toolbar.setTitle(R.string.data_feed_title);
@@ -63,6 +69,11 @@ public class JFaceDataFeed
 
     if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(mA, Manifest.permission.ACCESS_FINE_LOCATION))
       startGeofenceService(a);
+  }
+
+  public void onSaveInstanceState(@NonNull Bundle instanceState)
+  {
+    instanceState.putInt(LAST_OPEN_FRAGMENT_INDEX, mCurrentlyDisplayedFragmentIndex);
   }
 
   public void onRequestPermissionsResult(final int requestCode, final String[] permissions, final int[] results)

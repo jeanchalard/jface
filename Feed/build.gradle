@@ -4,10 +4,10 @@ List<String> dirs = [ 'main' ]
 
 android {
     compileSdkVersion 24
-    buildToolsVersion '23.0.2'
+    buildToolsVersion '24.0.2'
     defaultConfig {
         applicationId "com.j.jface"
-        minSdkVersion 24
+        minSdkVersion 23
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
