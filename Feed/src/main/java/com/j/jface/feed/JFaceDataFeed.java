@@ -25,6 +25,7 @@ import com.j.jface.R;
 import com.j.jface.feed.fragments.ActivityLogFragment;
 import com.j.jface.feed.fragments.DebugToolsFragment;
 import com.j.jface.feed.fragments.LogsAndDataFragment;
+import com.j.jface.feed.fragments.MessagesFragment;
 
 public class JFaceDataFeed
 {
@@ -43,7 +44,7 @@ public class JFaceDataFeed
     final DrawerLayout drawer = (DrawerLayout)a.findViewById(R.id.dataFeedDrawer);
 
     final ListView list = (ListView)a.findViewById(R.id.dataFeedDrawerContents);
-    list.setAdapter(new ArrayAdapter<>(a, R.layout.data_feed_drawer_item, new String[] { "Activity log", "Logs & data", "Debug tools" }));
+    list.setAdapter(new ArrayAdapter<>(a, R.layout.data_feed_drawer_item, new String[] { "Messages", "Activity log", "Logs & data", "Debug tools" }));
     list.setOnItemClickListener(new AdapterView.OnItemClickListener()
     {
       private final Client mClient = new Client(a);
@@ -102,9 +103,10 @@ public class JFaceDataFeed
   {
     switch (position)
     {
-      case 0 : return new FragmentWrapper<ActivityLogFragment>(client){}; // TODO : put the new content there
-      case 1 : return new FragmentWrapper<LogsAndDataFragment>(client){};
-      case 2 : return new FragmentWrapper<DebugToolsFragment>(client){};
+      case 0 : return new FragmentWrapper<MessagesFragment>(client){};
+      case 1 : return new FragmentWrapper<ActivityLogFragment>(client){}; // TODO : put the new content there
+      case 2 : return new FragmentWrapper<LogsAndDataFragment>(client){};
+      case 3 : return new FragmentWrapper<DebugToolsFragment>(client){};
     }
     return null;
   }
