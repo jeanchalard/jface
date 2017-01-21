@@ -1,20 +1,4 @@
-/*
- * Copyright (C) 2014 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-package com.j.jface.feed;
+package com.j.jface.lifecycle;
 
 import android.app.Activity;
 import android.content.res.Configuration;
@@ -24,17 +8,19 @@ import android.support.annotation.Nullable;
 import android.view.MenuItem;
 
 /**
- * The activity wrapper for the host app for Jface.
+ * A wrapper for activities.
  */
-public class JFaceDataFeedWrapper extends Activity
+public abstract class ActivityWrapper<T extends WrappedActivity> extends Activity
 {
-  @Nullable private JFaceDataFeed mW;
+  @Nullable private T mW;
 
   // Activity callbacks
-  @Override protected void onCreate(@Nullable final Bundle savedInstanceState)
+  @Override protected void onCreate(@Nullable final Bundle icicle)
   {
     super.onCreate(null);
-    mW = new JFaceDataFeed(this, savedInstanceState);
+    mW = (T)WrapUtils.build(getClass(),
+     new Class[]{WrappedActivity.Args.class},
+     new Object[]{new WrappedActivity.Args(this, icicle)});
   }
 
   @Override public void onSaveInstanceState(@NonNull final Bundle savedInstanceState)

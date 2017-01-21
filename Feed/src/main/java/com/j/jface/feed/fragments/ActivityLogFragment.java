@@ -8,7 +8,7 @@ import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
 import com.j.jface.R;
 import com.j.jface.feed.Client;
-import com.j.jface.feed.WrappedFragment;
+import com.j.jface.lifecycle.WrappedFragment;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;

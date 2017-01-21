@@ -1,4 +1,4 @@
-package com.j.jface.feed;
+package com.j.jface.lifecycle;
 
 import android.app.Fragment;
 import android.os.Bundle;

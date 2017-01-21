@@ -13,7 +13,7 @@ import com.j.jface.R;
 import com.j.jface.feed.Client;
 import com.j.jface.feed.DataSource;
 import com.j.jface.feed.FeedLoader;
-import com.j.jface.feed.WrappedFragment;
+import com.j.jface.lifecycle.WrappedFragment;
 
 import java.util.ArrayList;
 

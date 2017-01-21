@@ -1,4 +1,4 @@
-package com.j.jface.todo;
+package com.j.jface.org.todo;
 
 import com.google.android.gms.location.Geofence;
 

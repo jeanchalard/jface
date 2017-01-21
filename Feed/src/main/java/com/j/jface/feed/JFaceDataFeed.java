@@ -22,36 +22,37 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.j.jface.R;
+import com.j.jface.lifecycle.FragmentWrapper;
+import com.j.jface.lifecycle.WrappedActivity;
 import com.j.jface.feed.fragments.ActivityLogFragment;
 import com.j.jface.feed.fragments.DebugToolsFragment;
 import com.j.jface.feed.fragments.LogsAndDataFragment;
 import com.j.jface.feed.fragments.MessagesFragment;
 
-public class JFaceDataFeed
+public class JFaceDataFeed extends WrappedActivity
 {
   @NonNull private final String LAST_OPEN_FRAGMENT_INDEX = "last_open_fragment_index";
-  @NonNull private final Activity mA;
   @NonNull private final ActionBarDrawerToggle mDrawerToggle;
 
   // State
   int mCurrentlyDisplayedFragmentIndex = 0;
 
-  public JFaceDataFeed(@NonNull final Activity a, final Bundle savedInstanceState)
+  public JFaceDataFeed(@NonNull final Args args)
   {
-    mA = a;
+    super(args);
     final LayoutParams lp = new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-    a.setContentView(R.layout.data_feed_drawer);
-    final DrawerLayout drawer = (DrawerLayout)a.findViewById(R.id.dataFeedDrawer);
+    mA.setContentView(R.layout.data_feed_drawer);
+    final DrawerLayout drawer = (DrawerLayout)mA.findViewById(R.id.dataFeedDrawer);
 
-    final ListView list = (ListView)a.findViewById(R.id.dataFeedDrawerContents);
-    list.setAdapter(new ArrayAdapter<>(a, R.layout.data_feed_drawer_item, new String[] { "Messages", "Activity log", "Logs & data", "Debug tools" }));
+    final ListView list = (ListView)mA.findViewById(R.id.dataFeedDrawerContents);
+    list.setAdapter(new ArrayAdapter<>(mA, R.layout.data_feed_drawer_item, new String[] { "Messages", "Activity log", "Logs & data", "Debug tools" }));
     list.setOnItemClickListener(new AdapterView.OnItemClickListener()
     {
-      private final Client mClient = new Client(a);
+      private final Client mClient = new Client(mA);
       @Override public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id)
       {
         final Fragment f = getFragmentForPosition(position, mClient);
-        a.getFragmentManager().beginTransaction()
+        mA.getFragmentManager().beginTransaction()
                               .replace(R.id.dataFeedContents, f)
                               .commit();
         list.setItemChecked(position, true);
@@ -60,16 +61,16 @@ public class JFaceDataFeed
       }
     });
 
-    //noinspection ConstantConditions
-    mCurrentlyDisplayedFragmentIndex = null == savedInstanceState ? 0 : savedInstanceState.getInt(LAST_OPEN_FRAGMENT_INDEX);
+    final Bundle icicle = args.icicle;
+    mCurrentlyDisplayedFragmentIndex = null == icicle ? 0 : icicle.getInt(LAST_OPEN_FRAGMENT_INDEX);
     list.getOnItemClickListener().onItemClick(null, null, mCurrentlyDisplayedFragmentIndex, 0); // Switch to the initial fragment
 
-    final Toolbar toolbar = (Toolbar)a.findViewById(R.id.dataFeedToolbar);
+    final Toolbar toolbar = (Toolbar)mA.findViewById(R.id.dataFeedToolbar);
     toolbar.setTitle(R.string.data_feed_title);
-    mDrawerToggle = new ActionBarDrawerToggle(a, drawer, toolbar, R.string.drawer_open_desc, R.string.drawer_closed_desc);
+    mDrawerToggle = new ActionBarDrawerToggle(mA, drawer, toolbar, R.string.drawer_open_desc, R.string.drawer_closed_desc);
 
     if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(mA, Manifest.permission.ACCESS_FINE_LOCATION))
-      startGeofenceService(a);
+      startGeofenceService(mA);
   }
 
   public void onSaveInstanceState(@NonNull Bundle instanceState)

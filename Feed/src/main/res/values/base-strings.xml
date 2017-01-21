@@ -15,5 +15,7 @@
  limitations under the License.
 -->
 <resources>
-    <string name="app_name">J Face Data feed</string>
+    <string name="app_name">JApp</string>
+    <string name="feed_name">J Face Data feed</string>
+    <string name="orgtool_name">JOrg</string>
 </resources>

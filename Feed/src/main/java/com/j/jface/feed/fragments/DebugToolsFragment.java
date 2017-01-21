@@ -15,7 +15,7 @@ import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
 import com.j.jface.R;
 import com.j.jface.feed.Client;
-import com.j.jface.feed.WrappedFragment;
+import com.j.jface.lifecycle.WrappedFragment;
 
 public class DebugToolsFragment extends WrappedFragment implements View.OnClickListener, NumberPicker.OnValueChangeListener, TimePicker.OnTimeChangedListener
 {
