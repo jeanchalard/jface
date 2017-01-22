@@ -17,22 +17,25 @@ public class Todo
   @NonNull public final String mText;
   @NonNull public final List<Todo> mRequirements;
   @NonNull public final List<Todo> mDependents;
+  @NonNull public final List<Todo> mChildren;
   @NonNull public final Planning mPlanning;
 
   public Todo(@NonNull final String text,
               @Nullable final Collection<? extends Todo> requirements,
               @Nullable final Collection<? extends Todo> dependents,
+              @Nullable final Collection<? extends Todo> children,
               @Nullable final Planning planning)
   {
     mText = text;
     mRequirements = null == requirements ? Collections.<Todo>emptyList() : Collections.unmodifiableList(new ArrayList<Todo>(requirements));
     mDependents = null == dependents ? Collections.<Todo>emptyList() : (ArrayList<Todo>)Collections.unmodifiableList(new ArrayList<Todo>(dependents));
+    mChildren = null == children ? Collections.<Todo>emptyList() : (ArrayList<Todo>)Collections.unmodifiableList(new ArrayList<Todo>(children));
     mPlanning = null == planning ? new Planning() : planning;
   }
 
   public Todo(@NonNull final String text)
   {
-    this(text, null, null, null);
+    this(text, null, null, null, null);
   }
 
   // Copy constructor with overrides. Any non-null arg is used, while all null is taken from the old Todo.
@@ -40,11 +43,13 @@ public class Todo
               @Nullable final String text,
               @Nullable final Collection<? extends Todo> requirements,
               @Nullable final Collection<? extends Todo> dependents,
+              @Nullable final Collection<? extends Todo> children,
               @Nullable final Planning planning)
   {
     this(null != text ? text : todo.mText,
          null != requirements ? requirements : !todo.mRequirements.isEmpty() ? todo.mRequirements : null,
          null != dependents ? dependents : !todo.mDependents.isEmpty() ? todo.mDependents : null,
+         null != children ? children : !todo.mChildren.isEmpty() ? todo.mChildren : null,
          null != planning ? planning : todo.mPlanning);
   }
 }

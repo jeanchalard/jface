@@ -44,4 +44,5 @@ dependencies {
     compile 'com.android.support:support-v13:24.2.1'
     wearApp project(':Face')
     compile project(':Common')
+    compile 'com.android.support:appcompat-v7:25.1.0'
 }
