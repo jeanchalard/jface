@@ -1,6 +1,7 @@
 package com.j.jface.org.todo;
 
 import com.google.android.gms.location.Geofence;
+import com.j.jface.feed.Fences;
 
 /**
  * A planning descriptor.
@@ -20,16 +21,16 @@ public class Planning
   // Add other patterns here if ever necessary
   public static final int ON_WEEKDAY = 1;
   public static final int ON_WEEKEND = 2;
-  public static final int ON_BUSINESS_HOURS = 4;
-  public static final int ON_WEEKDAY_BUSINESS_HOURS = ON_WEEKDAY | ON_BUSINESS_HOURS;
+  public static final int ON_DAYTIME = 4;
+  public static final int ON_NIGHT = 8;
 
   public final int mLifeline; // Timestamp : when this can be started
   public final int mDeadline; // Timestamp : when this has to be done
   public final int mHardness; // UNKNOWN or *_DEADLINE
   public final int mTimeConstraint; // UNKNOWN or ON_*
-  public final Geofence mWhere; // Typically null
+  public final Fences.Params mWhere; // Typically null
 
-  public Planning(final int lifeline, final int deadline, final int hardness, final int timeConstraint, final Geofence where)
+  public Planning(final int lifeline, final int deadline, final int hardness, final int timeConstraint, final Fences.Params where)
   {
     mLifeline = lifeline;
     mDeadline = deadline;
