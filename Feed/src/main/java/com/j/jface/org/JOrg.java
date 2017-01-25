@@ -38,8 +38,8 @@ public class JOrg extends WrappedActivity
 
     Todo tt[] = {
      new Todo("Inventer une machine à remonter le temps", null, null,
-      Arrays.asList(new Todo("Trouver du plutonium"), new Todo("Acheter un gilet pare-balles", null, null, Arrays.asList(new Todo("Demander aux lybiens")), null, 0), new Todo("Trouver une batterie de 2.21GW")),
-      null, 0), new Todo("Devenir maître du monde"), new Todo("Faire le jeu du futur avec Rubix"), new Todo("")
+      Arrays.asList(new Todo("Trouver du plutonium", null, null, Arrays.asList(new Todo("Acheter un gilet pare-balles"), new Todo("Demander aux lybiens")), null, 0), new Todo("Trouver une batterie de 2.21GW")),
+      null, 0), new Todo("Devenir maître du monde"), new Todo("")
     };
 
     top.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
@@ -75,8 +75,9 @@ public class JOrg extends WrappedActivity
   private View inflateTodo(final Todo t, final int shift)
   {
     final LinearLayout v = (LinearLayout)mA.getLayoutInflater().inflate(R.layout.todo, null);
-    final EditText et = ((EditText)v.findViewById(R.id.todoText));
+    final SelReportEditText et = ((SelReportEditText)v.findViewById(R.id.todoText));
     et.setOnFocusChangeListener(mSoundRouter);
+    et.mListener = mSoundRouter;
     final LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     lp.setMargins(shift, 0, 0, 0);
     v.setLayoutParams(lp);

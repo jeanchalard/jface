@@ -10,17 +10,19 @@ import java.util.ArrayList;
 
 // Class in charge of routing the speech output of the SoundSource
 // to the correct destination, typically a text field.
-public class SoundRouter implements View.OnFocusChangeListener
+public class SoundRouter implements View.OnFocusChangeListener, SelReportEditText.CursorListener
 {
   @Nullable private EditText mFocusedEditText;
   @NonNull private CharSequence mTextBeforeCursor;
   @NonNull private CharSequence mTextAfterCursor;
+  private boolean mEditing;
 
   public SoundRouter()
   {
     mFocusedEditText = null;
     mTextBeforeCursor = "";
     mTextAfterCursor = "";
+    mEditing = false;
   }
 
   @Override public void onFocusChange(@NonNull final View editText, final boolean b)
@@ -28,8 +30,14 @@ public class SoundRouter implements View.OnFocusChangeListener
     if (b)
       mFocusedEditText = (EditText) editText;
     else if (editText == mFocusedEditText)
-    {
       mFocusedEditText = null;
+    reloadBuffers();
+  }
+
+  public void reloadBuffers()
+  {
+    if (null == mFocusedEditText)
+    {
       mTextBeforeCursor = "";
       mTextAfterCursor = "";
       return;
@@ -38,16 +46,51 @@ public class SoundRouter implements View.OnFocusChangeListener
     final int selEnd = mFocusedEditText.getSelectionEnd();
     final CharSequence text = mFocusedEditText.getText();
     mTextBeforeCursor = text.subSequence(0, selStart);
-    mTextAfterCursor = text.subSequence(selEnd, text.length() - selEnd);
+    mTextAfterCursor = text.subSequence(selEnd, text.length());
+    if (mTextBeforeCursor.length() > 0)
+    {
+      if (mTextAfterCursor.length() > 0)
+      {
+        if (mTextAfterCursor.charAt(0) == 0x20 && mTextBeforeCursor.charAt(mTextBeforeCursor.length() - 1) != 0x20)
+          mTextBeforeCursor = TextUtils.concat(mTextBeforeCursor, " ");
+        else if (mTextBeforeCursor.charAt(mTextBeforeCursor.length() - 1) == 0x20 && mTextAfterCursor.charAt(0) != 0x20)
+          mTextAfterCursor = TextUtils.concat(" ", mTextAfterCursor);
+      } else if (mTextBeforeCursor.charAt(mTextBeforeCursor.length() - 1) != 0x20) // Before > 0, After <= 0
+        mTextBeforeCursor = TextUtils.concat(mTextBeforeCursor, " ");
+    }
+    else if (mTextAfterCursor.length() > 0) // && Before <= 0
+      mTextAfterCursor = TextUtils.concat(" ", mTextAfterCursor);
+  }
+
+  @Override public void onCursorMoved(@NonNull final SelReportEditText editText, final int selStart, final int selEnd)
+  {
+    if (editText != mFocusedEditText || mEditing) return;
+    reloadBuffers();
   }
 
   public void onPartialResults(@NonNull final ArrayList<String> results)
   {
-    mFocusedEditText.setText(TextUtils.concat(mTextBeforeCursor, results.get(0), mTextAfterCursor));
+    if (null == mFocusedEditText) return;
+    mEditing = true;
+    mFocusedEditText.beginBatchEdit();
+    final String result;
+    if (mTextBeforeCursor.length() > 0) result = results.get(0);
+    else
+    {
+      final String r = results.get(0);
+      if (r.length() > 1)
+        result = r.substring(0, 1).toUpperCase() + r.substring(1);
+      else result = r.toUpperCase();
+    }
+    mFocusedEditText.setText(TextUtils.concat(mTextBeforeCursor, result, mTextAfterCursor));
+    mFocusedEditText.setSelection(mTextBeforeCursor.length() + result.length());
+    mFocusedEditText.endBatchEdit();
+    mEditing = false;
   }
 
   public void onResults(@NonNull final ArrayList<String> results)
   {
-    mFocusedEditText.setText(TextUtils.concat(mTextBeforeCursor, results.get(0), mTextAfterCursor));
+    onPartialResults(results);
+    reloadBuffers();
   }
 }

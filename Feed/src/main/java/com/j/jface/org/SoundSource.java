@@ -4,12 +4,14 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.support.annotation.NonNull;
 import android.support.v13.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -20,10 +22,9 @@ import java.util.Locale;
 
 // An object that acts as the source for sound / speech and implements visualisation and
 // all the technical details of the lifecycle of the speech recognition objects.
-public class SoundSource implements View.OnClickListener
+public class SoundSource implements View.OnClickListener, RecognitionListener
 {
   @NonNull private final SpeechRecognizer mSpeechRecognizer;
-  @NonNull private final RecognitionListener mRecognitionListener;
   @NonNull private final SoundVisualizer mSoundVisualizer;
   @NonNull private final View mNoSound;
   @NonNull private final Intent mListeningIntent;
@@ -41,6 +42,9 @@ public class SoundSource implements View.OnClickListener
     mListeningIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.FRANCE);
     mListeningIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
     mListeningIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+    mListeningIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
+    mListeningIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 3000);
+    mListeningIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 3000);
     mListeningIntent.putExtra("android.speech.extra.DICTATION_MODE", true);
     mListeningIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, "com.j.jface");
 
@@ -48,12 +52,10 @@ public class SoundSource implements View.OnClickListener
     {
       ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.RECORD_AUDIO}, 1);
       mSpeechRecognizer = null;
-      mRecognitionListener = null;
     }
     else
     {
       mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(activity);
-      mRecognitionListener = new JOrgRecognitionListener(this);
     }
 
     mNoSound = soundSource.findViewById(R.id.no_sound);
@@ -61,6 +63,8 @@ public class SoundSource implements View.OnClickListener
     mActive = mNoSound.getVisibility() == View.INVISIBLE;
     soundSource.setOnClickListener(this);
   }
+
+  // Core methods
 
   public void stopListening()
   {
@@ -70,11 +74,10 @@ public class SoundSource implements View.OnClickListener
   public void startListening()
   {
     if (!mActive) return;
-    mSpeechRecognizer.setRecognitionListener(mRecognitionListener);
+    mSpeechRecognizer.setRecognitionListener(this);
     mSpeechRecognizer.startListening(mListeningIntent);
   }
 
-  // More efficient than stop start :(
   public void restartListening()
   {
     if (!mActive) return;
@@ -82,13 +85,7 @@ public class SoundSource implements View.OnClickListener
     mSpeechRecognizer.startListening(mListeningIntent);
   }
 
-  public void setLastSoundLevel(final float db)
-  {
-    mSoundVisualizer.setLastSoundLevel(db >= 0 ? db : 0);
-  }
-
-  public void onPause() { stopListening(); }
-  public void onResume() { startListening(); }
+  // Click listener, to turn sound on or off
 
   @Override public void onClick(final View v)
   {
@@ -106,13 +103,54 @@ public class SoundSource implements View.OnClickListener
     }
   }
 
-  public void onPartialResults(@NonNull ArrayList<String> results)
+
+  // Recognition listener API, starting with stubs
+
+  @Override public void onReadyForSpeech(final Bundle params) {}
+  @Override public void onBeginningOfSpeech() {}
+  @Override public void onBufferReceived(final byte[] buffer) {}
+  @Override public void onEndOfSpeech() {}
+  @Override public void onEvent(final int eventType, final Bundle params)
   {
-    mRouter.onPartialResults(results);
+    Log.e("Recog", "event " + eventType + " " + params);
   }
 
-  public void onResults(@NonNull ArrayList<String> results)
+  @Override public void onRmsChanged(final float rmsdB)
   {
-    mRouter.onResults(results);
+    mSoundVisualizer.setLastSoundLevel(rmsdB >= 0 ? rmsdB : 0);
   }
+
+  @Override public void onError(final int error)
+  {
+    Log.e("Recog", "error " + error);
+    switch (error)
+    {
+      case SpeechRecognizer.ERROR_NO_MATCH:
+      case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
+        restartListening();
+    }
+  }
+
+  @Override public void onResults(final Bundle results)
+  {
+    final ArrayList<String> r = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+    if (r != null) mRouter.onResults(r);
+    restartListening();
+  }
+
+  @Override public void onPartialResults(final Bundle partialResults)
+  {
+    final ArrayList<String> r = partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+    if (r != null)
+    {
+      Log.e("Recog", "partial " + r.get(0));
+      mRouter.onPartialResults(r);
+    }
+  }
+
+
+  // Lifecycle
+
+  public void onPause() { stopListening(); }
+  public void onResume() { startListening(); }
 }
