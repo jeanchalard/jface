@@ -4,4 +4,5 @@
   <color name="drawer_text">#D0D0D0</color>
   <color name="drawer_separator">#C0C0C0</color>
   <color name="separator_color">#A0A0A0</color>
+  <color name="color_primary">#607360</color>
 </resources>

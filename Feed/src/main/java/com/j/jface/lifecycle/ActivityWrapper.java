@@ -51,4 +51,16 @@ public abstract class ActivityWrapper<T extends WrappedActivity> extends Activit
     super.onRequestPermissionsResult(requestCode, permissions, results);
     mW.onRequestPermissionsResult(requestCode, permissions, results);
   }
+
+  @Override public void onPause()
+  {
+    super.onPause();
+    mW.onPause();
+  }
+
+  @Override public void onResume()
+  {
+    super.onResume();
+    mW.onResume();
+  }
 }

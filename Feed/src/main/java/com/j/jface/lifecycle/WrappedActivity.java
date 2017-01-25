@@ -36,4 +36,6 @@ public class WrappedActivity
   public boolean onOptionsItemSelected(final MenuItem i) { return false; }
   public void onPostCreate(final Bundle b) {}
   public void onRequestPermissionsResult(final int requestCode, final String[] permissions, final int[] results) {}
+  public void onPause() {}
+  public void onResume() {}
 }

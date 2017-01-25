@@ -3,7 +3,7 @@
 
   <!-- Activity themes -->
   <style name="Theme.Base" parent="Theme.AppCompat.NoActionBar">
-
+    <item name="colorPrimary">@color/color_primary</item>
   </style>
 
   <style name="AppTheme" parent="Theme.Base" />
