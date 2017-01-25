@@ -25,19 +25,21 @@ import java.util.List;
 public class JOrg extends WrappedActivity
 {
   private static final int LAYOUT_ANIMATION_DURATION = 100;
-  private final SoundSource mSoundSource;
+  @NonNull private final SoundSource mSoundSource;
+  @NonNull private final SoundRouter mSoundRouter;
 
   public JOrg(@NonNull Args args)
   {
     super(args);
     mA.setContentView(R.layout.org_top);
     final LinearLayout top = (LinearLayout)mA.findViewById(R.id.todoList);
-    mSoundSource = new SoundSource(mA, (ViewGroup)mA.findViewById(R.id.sound_source));
+    mSoundRouter = new SoundRouter();
+    mSoundSource = new SoundSource(mA, mSoundRouter, (ViewGroup)mA.findViewById(R.id.sound_source));
 
     Todo tt[] = {
-     new Todo("foo1", null, null,
-      Arrays.asList(new Todo("subfoo1"), new Todo("subfoo2", null, null, Arrays.asList(new Todo("subsubfoo1")), null, 0)),
-      null, 0), new Todo("foo2")//, new Todo("foo3"), new Todo("foo4")
+     new Todo("Inventer une machine à remonter le temps", null, null,
+      Arrays.asList(new Todo("Trouver du plutonium"), new Todo("Acheter un gilet pare-balles", null, null, Arrays.asList(new Todo("Demander aux lybiens")), null, 0), new Todo("Trouver une batterie de 2.21GW")),
+      null, 0), new Todo("Devenir maître du monde"), new Todo("Faire le jeu du futur avec Rubix"), new Todo("")
     };
 
     top.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
@@ -74,6 +76,7 @@ public class JOrg extends WrappedActivity
   {
     final LinearLayout v = (LinearLayout)mA.getLayoutInflater().inflate(R.layout.todo, null);
     final EditText et = ((EditText)v.findViewById(R.id.todoText));
+    et.setOnFocusChangeListener(mSoundRouter);
     final LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     lp.setMargins(shift, 0, 0, 0);
     v.setLayoutParams(lp);

@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.support.annotation.NonNull;
 import android.support.v13.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
@@ -14,24 +15,27 @@ import android.view.ViewGroup;
 
 import com.j.jface.R;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 // An object that acts as the source for sound / speech and implements visualisation and
 // all the technical details of the lifecycle of the speech recognition objects.
 public class SoundSource implements View.OnClickListener
 {
-  private final SpeechRecognizer mSpeechRecognizer;
-  private final RecognitionListener mRecognitionListener;
-  private final SoundVisualizer mSoundVisualizer;
-  private final View mNoSound;
-  private final Intent mListeningIntent;
+  @NonNull private final SpeechRecognizer mSpeechRecognizer;
+  @NonNull private final RecognitionListener mRecognitionListener;
+  @NonNull private final SoundVisualizer mSoundVisualizer;
+  @NonNull private final View mNoSound;
+  @NonNull private final Intent mListeningIntent;
+  @NonNull private final SoundRouter mRouter;
   private boolean mActive;
 
   // The SoundSource view group needs to be compliant with the spec :
   // - Contain a "no_sound" view that will be toggled visible when the source is off and invisible when it's on
   // - Contain a "sound_visualizer" view with 5 children, the minHeight of which will be animated to reflect sound levels
-  public SoundSource(final Activity activity, final ViewGroup soundSource)
+  public SoundSource(@NonNull final Activity activity, @NonNull final SoundRouter router, @NonNull final ViewGroup soundSource)
   {
+    mRouter = router;
     mSoundVisualizer = new SoundVisualizer(activity.getMainLooper(), (ViewGroup)soundSource.findViewById(R.id.sound_visualizer));
     mListeningIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
     mListeningIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.FRANCE);
@@ -100,5 +104,15 @@ public class SoundSource implements View.OnClickListener
       mSoundVisualizer.resetToNull();
       stopListening();
     }
+  }
+
+  public void onPartialResults(@NonNull ArrayList<String> results)
+  {
+    mRouter.onPartialResults(results);
+  }
+
+  public void onResults(@NonNull ArrayList<String> results)
+  {
+    mRouter.onResults(results);
   }
 }

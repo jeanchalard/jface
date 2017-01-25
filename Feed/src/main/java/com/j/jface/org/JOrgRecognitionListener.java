@@ -18,30 +18,14 @@ public class JOrgRecognitionListener implements RecognitionListener
     mSource = source;
   }
 
-  @Override public void onReadyForSpeech(final Bundle params)
-  {
-    Log.e("Recog", "ready");
-  }
-
-  @Override public void onBeginningOfSpeech()
-  {
-    Log.e("Recog", "Begin");
-  }
+  @Override public void onReadyForSpeech(final Bundle params) {}
+  @Override public void onBeginningOfSpeech() {}
+  @Override public void onBufferReceived(final byte[] buffer) {}
+  @Override public void onEndOfSpeech() {}
 
   @Override public void onRmsChanged(final float rmsdB)
   {
-    Log.e("Recog", "RMS " + rmsdB);
     mSource.setLastSoundLevel(rmsdB);
-  }
-
-  @Override public void onBufferReceived(final byte[] buffer)
-  {
-    Log.e("Recog", "received");
-  }
-
-  @Override public void onEndOfSpeech()
-  {
-    Log.e("Recog", "End");
   }
 
   @Override public void onError(final int error)
@@ -55,23 +39,22 @@ public class JOrgRecognitionListener implements RecognitionListener
     }
   }
 
+  @Override public void onEvent(final int eventType, final Bundle params)
+  {
+    Log.e("Recog", "event " + eventType + " " + params);
+  }
+
   @Override public void onResults(final Bundle results)
   {
-    Log.e("Recog", "results " + results);
-    final ArrayList<String> x = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-    if (x != null) Log.e(">>>", "" + x);
+    final ArrayList<String> r = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+    if (r != null) mSource.onResults(r);
     mSource.restartListening();
   }
 
   @Override public void onPartialResults(final Bundle partialResults)
   {
     Log.e("Recog", "partial " + partialResults);
-    final ArrayList<String> x = partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-    if (x != null) Log.e(">>>", "" + x);
-  }
-
-  @Override public void onEvent(final int eventType, final Bundle params)
-  {
-    Log.e("Recog", "event " + eventType + " " + params);
+    final ArrayList<String> r = partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+    if (r != null) mSource.onPartialResults(r);
   }
 }

@@ -3,10 +3,8 @@ package com.j.jface.org;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
-import android.view.View;
+import android.support.annotation.NonNull;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
 // A class that manages history and shows sound levels in a pretty manner.
 // It needs to be passed the appropriate view to do it : a view with 5 subviews
@@ -15,8 +13,8 @@ public class SoundVisualizer extends Handler
 {
   private static final int UPDATE_SOUND = 1;
 
-  private final float[] mSoundLevels = {0, 0, 0, 0, 0, 0};
-  private final ViewGroup mView;
+  @NonNull private final float[] mSoundLevels = {0, 0, 0, 0, 0, 0};
+  @NonNull private final ViewGroup mView;
 
   public SoundVisualizer(final Looper l, final ViewGroup v)
   {
