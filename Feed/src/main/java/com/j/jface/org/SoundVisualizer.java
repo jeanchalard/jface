@@ -11,7 +11,7 @@ import android.widget.LinearLayout;
 // A class that manages history and shows sound levels in a pretty manner.
 // It needs to be passed the appropriate view to do it : a view with 5 subviews
 // with a set width and a small minimum height that will be used to represent amplitude.
-class SoundVisualizer extends Handler
+public class SoundVisualizer extends Handler
 {
   private static final int UPDATE_SOUND = 1;
 
@@ -45,6 +45,19 @@ class SoundVisualizer extends Handler
     }
   }
 
+  public void resetToActive() { resetTo(0); }
+  public void resetToNull() { resetTo(-3); }
+  private void resetTo(final float f)
+  {
+    mSoundLevels[0] = f;
+    mSoundLevels[1] = f;
+    mSoundLevels[2] = f;
+    mSoundLevels[3] = f;
+    mSoundLevels[4] = f;
+    mSoundLevels[5] = f;
+    updateSoundLevelsVisu(mSoundLevels);
+  }
+
   public void setLastSoundLevel(final float db)
   {
     if (db != mSoundLevels[0])
@@ -56,10 +69,10 @@ class SoundVisualizer extends Handler
 
   private void updateSoundLevelsVisu(final float[] soundLevels)
   {
-    mView.getChildAt(4).setMinimumHeight((int)(10 + soundLevels[1] * 3));
-    mView.getChildAt(3).setMinimumHeight((int)(10 + soundLevels[2] * 3));
-    mView.getChildAt(2).setMinimumHeight((int)(10 + soundLevels[3] * 3));
-    mView.getChildAt(1).setMinimumHeight((int)(10 + soundLevels[4] * 3));
-    mView.getChildAt(0).setMinimumHeight((int)(10 + soundLevels[5] * 3));
+    mView.getChildAt(4).setMinimumHeight((int)(13 + soundLevels[1] * 4));
+    mView.getChildAt(3).setMinimumHeight((int)(13 + soundLevels[2] * 4));
+    mView.getChildAt(2).setMinimumHeight((int)(13 + soundLevels[3] * 4));
+    mView.getChildAt(1).setMinimumHeight((int)(13 + soundLevels[4] * 4));
+    mView.getChildAt(0).setMinimumHeight((int)(13 + soundLevels[5] * 4));
   }
 }

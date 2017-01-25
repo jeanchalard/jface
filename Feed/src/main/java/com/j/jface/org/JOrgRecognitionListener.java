@@ -11,11 +11,11 @@ import java.util.ArrayList;
 // and sends results back to the main activity.
 public class JOrgRecognitionListener implements RecognitionListener
 {
-  final JOrg mParent;
+  final SoundSource mSource;
 
-  public JOrgRecognitionListener(final JOrg parent)
+  public JOrgRecognitionListener(final SoundSource source)
   {
-    mParent = parent;
+    mSource = source;
   }
 
   @Override public void onReadyForSpeech(final Bundle params)
@@ -31,7 +31,7 @@ public class JOrgRecognitionListener implements RecognitionListener
   @Override public void onRmsChanged(final float rmsdB)
   {
     Log.e("Recog", "RMS " + rmsdB);
-    mParent.setLastSoundLevel(rmsdB);
+    mSource.setLastSoundLevel(rmsdB);
   }
 
   @Override public void onBufferReceived(final byte[] buffer)
@@ -51,7 +51,7 @@ public class JOrgRecognitionListener implements RecognitionListener
     {
       case SpeechRecognizer.ERROR_NO_MATCH:
       case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
-      mParent.restartListening();
+      mSource.restartListening();
     }
   }
 
@@ -60,7 +60,7 @@ public class JOrgRecognitionListener implements RecognitionListener
     Log.e("Recog", "results " + results);
     final ArrayList<String> x = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
     if (x != null) Log.e(">>>", "" + x);
-    mParent.restartListening();
+    mSource.restartListening();
   }
 
   @Override public void onPartialResults(final Bundle partialResults)

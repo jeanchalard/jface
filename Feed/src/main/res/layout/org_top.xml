@@ -16,67 +16,7 @@
    app:title="TODO"
    >
 
-  <LinearLayout
-   android:orientation="horizontal"
-   android:layout_height="48dp"
-   android:layout_marginStart="26dp"
-   android:layout_marginEnd="12dp"
-   android:layout_gravity="right"
-   android:gravity="center_horizontal|center_vertical"
-   android:id="@+id/sound_visualizer"
-   android:layout_width="32dp">
-
-    <ImageView
-     android:layout_width="wrap_content"
-     android:layout_height="wrap_content"
-     android:id="@+id/lv1"
-     android:layout_weight="1"
-     android:src="@drawable/sound_level_bar"
-     android:minWidth="4dp"
-     android:layout_marginLeft="1dp"
-     android:layout_marginRight="1dp"/>
-
-    <ImageView
-     android:layout_width="wrap_content"
-     android:layout_height="wrap_content"
-     android:id="@+id/lv2"
-     android:layout_weight="1"
-     android:src="@drawable/sound_level_bar"
-     android:minWidth="4dp"
-     android:layout_marginLeft="1dp"
-     android:layout_marginRight="1dp"/>
-
-    <ImageView
-     android:layout_width="wrap_content"
-     android:layout_height="wrap_content"
-     android:layout_weight="1"
-     android:id="@+id/lv3"
-     android:src="@drawable/sound_level_bar"
-     android:minWidth="4dp"
-     android:layout_marginLeft="1dp"
-     android:layout_marginRight="1dp"/>
-
-    <ImageView
-     android:layout_width="wrap_content"
-     android:layout_height="wrap_content"
-     android:layout_weight="1"
-     android:id="@+id/lv4"
-     android:src="@drawable/sound_level_bar"
-     android:minWidth="4dp"
-     android:layout_marginLeft="1dp"
-     android:layout_marginRight="1dp"/>
-
-    <ImageView
-     android:layout_width="wrap_content"
-     android:layout_height="wrap_content"
-     android:layout_weight="1"
-     android:id="@+id/lv5"
-     android:src="@drawable/sound_level_bar"
-     android:minWidth="4dp"
-     android:layout_marginLeft="1dp"
-     android:layout_marginRight="1dp"/>
-
-  </LinearLayout>
+    <include layout="@layout/sound_visualizer"/>
 
   </android.support.v7.widget.Toolbar>
 

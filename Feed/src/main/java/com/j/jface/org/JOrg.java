@@ -1,15 +1,7 @@
 package com.j.jface.org;
 
-import android.Manifest;
 import android.animation.LayoutTransition;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.speech.RecognitionListener;
-import android.speech.RecognizerIntent;
-import android.speech.SpeechRecognizer;
 import android.support.annotation.NonNull;
-import android.support.v13.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -26,7 +18,6 @@ import com.j.jface.org.todo.TodoUtil;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Main activity class for JOrg.
@@ -34,35 +25,14 @@ import java.util.Locale;
 public class JOrg extends WrappedActivity
 {
   private static final int LAYOUT_ANIMATION_DURATION = 100;
-  private final SpeechRecognizer mSpeechRecognizer;
-  private final RecognitionListener mRecognitionListener;
-  private final SoundVisualizer mSoundVisualizer;
-  private final Intent mListeningIntent;
+  private final SoundSource mSoundSource;
 
   public JOrg(@NonNull Args args)
   {
     super(args);
     mA.setContentView(R.layout.org_top);
     final LinearLayout top = (LinearLayout)mA.findViewById(R.id.todoList);
-
-    mSoundVisualizer = new SoundVisualizer(mA.getMainLooper(), (ViewGroup)mA.findViewById(R.id.sound_visualizer));
-    mListeningIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-    mListeningIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.FRANCE);
-    mListeningIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
-    mListeningIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-    mListeningIntent.putExtra("android.speech.extra.DICTATION_MODE", true);
-    mListeningIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, "com.j.jface");
-    if (ContextCompat.checkSelfPermission(mA, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
-    {
-      ActivityCompat.requestPermissions(mA, new String[]{Manifest.permission.RECORD_AUDIO}, 1);
-      mSpeechRecognizer = null;
-      mRecognitionListener = null;
-    }
-    else
-    {
-      mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(mA);
-      mRecognitionListener = new JOrgRecognitionListener(this);
-    }
+    mSoundSource = new SoundSource(mA, (ViewGroup)mA.findViewById(R.id.sound_source));
 
     Todo tt[] = {
      new Todo("foo1", null, null,
@@ -75,31 +45,15 @@ public class JOrg extends WrappedActivity
     addTodos(Arrays.asList(tt), top, 0);
   }
 
-  public void stopListening()
+  public void onPause()
   {
-    mSpeechRecognizer.destroy();
+    mSoundSource.onPause();
   }
 
-  public void startListening()
+  public void onResume()
   {
-    mSpeechRecognizer.setRecognitionListener(mRecognitionListener);
-    mSpeechRecognizer.startListening(mListeningIntent);
+    mSoundSource.onResume();
   }
-
-  // More efficient than stop start :(
-  public void restartListening()
-  {
-    mSpeechRecognizer.cancel();
-    mSpeechRecognizer.startListening(mListeningIntent);
-  }
-
-  public void setLastSoundLevel(final float db)
-  {
-    mSoundVisualizer.setLastSoundLevel(db >= 0 ? db : 0);
-  }
-
-  public void onPause() { stopListening(); }
-  public void onResume() { startListening(); }
 
   private void addTodos(final List<Todo> l, final LinearLayout topView, final int shift)
   {

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+ xmlns:android="http://schemas.android.com/apk/res/android"
+ xmlns:tools="http://schemas.android.com/tools"
+ android:layout_width="wrap_content"
+ android:layout_height="wrap_content"
+ android:layout_gravity="right"
+ tools:showIn="@layout/org_top"
+ android:layout_marginEnd="12dp"
+ android:id="@+id/sound_source">
+
+  <ImageView
+   android:layout_width="48dp"
+   android:layout_height="48dp"
+   android:src="@drawable/mr_ic_close_dark"
+   android:id="@+id/no_sound"
+   android:layout_weight="1"/>
+
+  <LinearLayout
+   android:orientation="horizontal"
+   android:layout_height="48dp"
+   android:layout_width="32dp"
+   android:gravity="center_horizontal|center_vertical"
+   android:id="@+id/sound_visualizer"
+   android:layout_gravity="center_vertical|center_horizontal">
+
+    <ImageView
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:id="@+id/lv1"
+     android:layout_weight="1"
+     android:src="@drawable/sound_level_bar"
+     android:minWidth="4dp"
+     android:layout_marginLeft="1dp"
+     android:layout_marginRight="1dp"/>
+
+    <ImageView
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:id="@+id/lv2"
+     android:layout_weight="1"
+     android:src="@drawable/sound_level_bar"
+     android:minWidth="4dp"
+     android:layout_marginLeft="1dp"
+     android:layout_marginRight="1dp"/>
+
+    <ImageView
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_weight="1"
+     android:id="@+id/lv3"
+     android:src="@drawable/sound_level_bar"
+     android:minWidth="4dp"
+     android:layout_marginLeft="1dp"
+     android:layout_marginRight="1dp"/>
+
+    <ImageView
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_weight="1"
+     android:id="@+id/lv4"
+     android:src="@drawable/sound_level_bar"
+     android:minWidth="4dp"
+     android:layout_marginLeft="1dp"
+     android:layout_marginRight="1dp"/>
+
+    <ImageView
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_weight="1"
+     android:id="@+id/lv5"
+     android:src="@drawable/sound_level_bar"
+     android:minWidth="4dp"
+     android:layout_marginLeft="1dp"
+     android:layout_marginRight="1dp"/>
+
+  </LinearLayout>
+
+</FrameLayout>
