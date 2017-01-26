@@ -28,15 +28,15 @@ public class SoundSource implements View.OnClickListener, RecognitionListener
   @NonNull private final SoundVisualizer mSoundVisualizer;
   @NonNull private final View mNoSound;
   @NonNull private final Intent mListeningIntent;
-  @NonNull private final SoundRouter mRouter;
+  @NonNull private SoundRouter mRouter;
   private boolean mActive;
 
   // The SoundSource view group needs to be compliant with the spec :
   // - Contain a "no_sound" view that will be toggled visible when the source is off and invisible when it's on
   // - Contain a "sound_visualizer" view with 5 children, the minHeight of which will be animated to reflect sound levels
-  public SoundSource(@NonNull final Activity activity, @NonNull final SoundRouter router, @NonNull final ViewGroup soundSource)
+  public SoundSource(@NonNull final Activity activity, @NonNull final ViewGroup soundSource)
   {
-    mRouter = router;
+    mRouter = SoundRouter.Sink;
     mSoundVisualizer = new SoundVisualizer(activity.getMainLooper(), (ViewGroup)soundSource.findViewById(R.id.sound_visualizer));
     mListeningIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
     mListeningIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.FRANCE);
@@ -49,41 +49,39 @@ public class SoundSource implements View.OnClickListener, RecognitionListener
     mListeningIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, "com.j.jface");
 
     if (ContextCompat.checkSelfPermission(activity, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
-    {
       ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.RECORD_AUDIO}, 1);
-      mSpeechRecognizer = null;
-    }
-    else
-    {
-      mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(activity);
-    }
 
+    mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(activity);
+    mSpeechRecognizer.setRecognitionListener(this);
     mNoSound = soundSource.findViewById(R.id.no_sound);
     mNoSound.setVisibility(View.INVISIBLE);
     mActive = mNoSound.getVisibility() == View.INVISIBLE;
     soundSource.setOnClickListener(this);
   }
 
+  public void setRouter(final EditTextSoundRouter router)
+  {
+    mRouter = router;
+  }
+
   // Core methods
 
   public void stopListening()
   {
+    mSoundVisualizer.resetToNull();
+    mSpeechRecognizer.stopListening();
     mSpeechRecognizer.destroy();
   }
 
   public void startListening()
   {
-    if (!mActive) return;
+    if (!mActive || !mRouter.isRouting()) return;
+    mSoundVisualizer.resetToActive();
+    mSpeechRecognizer.destroy();
     mSpeechRecognizer.setRecognitionListener(this);
     mSpeechRecognizer.startListening(mListeningIntent);
   }
 
-  public void restartListening()
-  {
-    if (!mActive) return;
-    mSpeechRecognizer.cancel();
-    mSpeechRecognizer.startListening(mListeningIntent);
-  }
 
   // Click listener, to turn sound on or off
 
@@ -92,15 +90,9 @@ public class SoundSource implements View.OnClickListener, RecognitionListener
     mActive = !mActive;
     mNoSound.setVisibility(mActive ? View.INVISIBLE : View.VISIBLE);
     if (mActive)
-    {
-      mSoundVisualizer.resetToActive();
       startListening();
-    }
     else
-    {
-      mSoundVisualizer.resetToNull();
       stopListening();
-    }
   }
 
 
@@ -127,7 +119,7 @@ public class SoundSource implements View.OnClickListener, RecognitionListener
     {
       case SpeechRecognizer.ERROR_NO_MATCH:
       case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
-        restartListening();
+        startListening();
     }
   }
 
@@ -135,17 +127,13 @@ public class SoundSource implements View.OnClickListener, RecognitionListener
   {
     final ArrayList<String> r = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
     if (r != null) mRouter.onResults(r);
-    restartListening();
+    startListening();
   }
 
   @Override public void onPartialResults(final Bundle partialResults)
   {
     final ArrayList<String> r = partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-    if (r != null)
-    {
-      Log.e("Recog", "partial " + r.get(0));
-      mRouter.onPartialResults(r);
-    }
+    if (r != null) mRouter.onPartialResults(r);
   }
 
 

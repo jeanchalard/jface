@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -26,15 +25,15 @@ public class JOrg extends WrappedActivity
 {
   private static final int LAYOUT_ANIMATION_DURATION = 100;
   @NonNull private final SoundSource mSoundSource;
-  @NonNull private final SoundRouter mSoundRouter;
+  @NonNull private final EditTextSoundRouter mSoundRouter;
 
   public JOrg(@NonNull Args args)
   {
     super(args);
     mA.setContentView(R.layout.org_top);
     final LinearLayout top = (LinearLayout)mA.findViewById(R.id.todoList);
-    mSoundRouter = new SoundRouter();
-    mSoundSource = new SoundSource(mA, mSoundRouter, (ViewGroup)mA.findViewById(R.id.sound_source));
+    mSoundSource = new SoundSource(mA, (ViewGroup)mA.findViewById(R.id.sound_source));
+    mSoundRouter = new EditTextSoundRouter(mSoundSource);
 
     Todo tt[] = {
      new Todo("Inventer une machine à remonter le temps", null, null,
