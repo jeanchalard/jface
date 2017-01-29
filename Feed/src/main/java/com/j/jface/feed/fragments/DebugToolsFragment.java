@@ -22,22 +22,22 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
   private static final int MSG_UPDATE_TIME = 1;
   private static final int GRACE_FOR_UPDATE = 3000;
 
-  @NonNull final Client mClient;
-  @NonNull final EditText mTopicDataEdit;
-  long mOffset = 0;
-  boolean mTicking = false;
-  @NonNull final Time mTime1, mTime2;
-  @NonNull final NumberPicker mDaysOffsetUI;
-  @NonNull final NumberPicker mHoursUI;
-  @NonNull final NumberPicker mMinutesUI;
-  @NonNull final NumberPicker mSecondsUI;
-  @NonNull final TextView mOffsetLabel;
-  @NonNull final CheckBox[] mFenceUIs;
+  @NonNull private final Client mClient;
+  @NonNull private final EditText mTopicDataEdit;
+  private long mOffset = 0;
+  private boolean mTicking = false;
+  @NonNull private final Time mTime1, mTime2;
+  @NonNull private final NumberPicker mDaysOffsetUI;
+  @NonNull private final NumberPicker mHoursUI;
+  @NonNull private final NumberPicker mMinutesUI;
+  @NonNull private final NumberPicker mSecondsUI;
+  @NonNull private final TextView mOffsetLabel;
+  @NonNull private final CheckBox[] mFenceUIs;
 
   private static class TabDebugToolsHandler extends Handler
   {
     private final DebugToolsFragment p;
-    public TabDebugToolsHandler(final DebugToolsFragment p) { this.p = p; }
+    private TabDebugToolsHandler(final DebugToolsFragment p) { this.p = p; }
     @Override public void handleMessage(@NonNull Message message)
     {
       switch (message.what)
@@ -47,8 +47,8 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
           sendEmptyMessageDelayed(MSG_UPDATE_TIME, 1000);
       }
     }
-  };
-  private Handler mHandler = new TabDebugToolsHandler(this);
+  }
+  private final Handler mHandler = new TabDebugToolsHandler(this);
 
   public DebugToolsFragment(@NonNull final Args a, @NonNull final Client b)
   {

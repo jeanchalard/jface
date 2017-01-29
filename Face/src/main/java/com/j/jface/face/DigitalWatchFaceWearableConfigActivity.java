@@ -108,8 +108,7 @@ public class DigitalWatchFaceWearableConfigActivity extends Activity implements
      })
      .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener()
      {
-       @Override
-       public void onConnectionFailed(ConnectionResult result)
+       @Override public void onConnectionFailed(@NonNull ConnectionResult result)
        {
          if (Log.isLoggable(TAG, Log.DEBUG))
          {
@@ -121,15 +120,13 @@ public class DigitalWatchFaceWearableConfigActivity extends Activity implements
      .build();
   }
 
-  @Override
-  protected void onStart()
+  @Override protected void onStart()
   {
     super.onStart();
     mGoogleApiClient.connect();
   }
 
-  @Override
-  protected void onStop()
+  @Override protected void onStop()
   {
     if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
     {
@@ -184,20 +181,17 @@ public class DigitalWatchFaceWearableConfigActivity extends Activity implements
   {
     private final String[] mOptions;
 
-    public OptionsListAdapter(String[] options)
+    private OptionsListAdapter(String[] options)
     {
       mOptions = options;
     }
 
-    @NonNull
-    @Override
-    public OptionItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
+    @NonNull @Override public OptionItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
     {
       return new OptionItemViewHolder(new OptionItem(parent.getContext()));
     }
 
-    @Override
-    public void onBindViewHolder(WearableListView.ViewHolder holder, int position)
+    @Override public void onBindViewHolder(WearableListView.ViewHolder holder, int position)
     {
       OptionItemViewHolder optionItemViewHolder = (OptionItemViewHolder) holder;
       String optionName = mOptions[position];
@@ -210,22 +204,15 @@ public class DigitalWatchFaceWearableConfigActivity extends Activity implements
        .getDimension(R.dimen.digital_config_option_picker_item_margin);
       // Add margins to first and last item to make it possible for user to tap on them.
       if (position == 0)
-      {
         layoutParams.setMargins(0, optionPickerItemMargin, 0, 0);
-      }
       else if (position == mOptions.length - 1)
-      {
         layoutParams.setMargins(0, 0, 0, optionPickerItemMargin);
-      }
       else
-      {
         layoutParams.setMargins(0, 0, 0, 0);
-      }
       optionItemViewHolder.itemView.setLayoutParams(layoutParams);
     }
 
-    @Override
-    public int getItemCount()
+    @Override public int getItemCount()
     {
       return mOptions.length;
     }
@@ -245,18 +232,13 @@ public class DigitalWatchFaceWearableConfigActivity extends Activity implements
     private static final float SHRINK_LABEL_ALPHA = .5f;
     private static final float EXPAND_LABEL_ALPHA = 1f;
 
-    @NonNull
-    private final TextView mLabel;
+    @NonNull private final TextView mLabel;
 
-    @NonNull
-    private final ObjectAnimator mExpandLabelAnimator;
-    @NonNull
-    private final AnimatorSet mExpandAnimator;
+    @NonNull private final ObjectAnimator mExpandLabelAnimator;
+    @NonNull private final AnimatorSet mExpandAnimator;
 
-    @NonNull
-    private final ObjectAnimator mShrinkLabelAnimator;
-    @NonNull
-    private final AnimatorSet mShrinkAnimator;
+    @NonNull private final ObjectAnimator mShrinkLabelAnimator;
+    @NonNull private final AnimatorSet mShrinkAnimator;
 
     public OptionItem(Context context)
     {
@@ -276,8 +258,7 @@ public class DigitalWatchFaceWearableConfigActivity extends Activity implements
       mExpandAnimator.play(mExpandLabelAnimator);
     }
 
-    @Override
-    public void onCenterPosition(boolean animate)
+    @Override public void onCenterPosition(boolean animate)
     {
       if (animate)
       {
@@ -295,8 +276,7 @@ public class DigitalWatchFaceWearableConfigActivity extends Activity implements
       }
     }
 
-    @Override
-    public void onNonCenterPosition(boolean animate)
+    @Override public void onNonCenterPosition(boolean animate)
     {
       if (animate)
       {
@@ -330,7 +310,7 @@ public class DigitalWatchFaceWearableConfigActivity extends Activity implements
       mOptionItem = optionItem;
     }
 
-    public boolean getValue()
+    private boolean getValue()
     {
       Log.e("Option", mOptionItem.mLabel.getText().toString());
       return mOptionItem.mLabel.getText().toString().equals("Yes");

@@ -1,6 +1,7 @@
 package com.j.jface.face;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.format.Time;
 
 import com.j.jface.Departure;
@@ -15,7 +16,7 @@ public class Formatter
     return buffer;
   }
 
-  public static int formatBorder(final char[] buffer, @NonNull final Time time, final String extra)
+  public static int formatBorder(final char[] buffer, @NonNull final Time time, @Nullable final String extra)
   {
     int i = -1;
     buffer[++i] = (char) ('0' + (time.year / 1000) % 10);

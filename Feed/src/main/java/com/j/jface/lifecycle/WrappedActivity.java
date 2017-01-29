@@ -17,15 +17,15 @@ public class WrappedActivity
 
   public static class Args
   {
-    public final Activity activity;
-    public final Bundle icicle;
-    public Args(final Activity a, final Bundle b)
+    @NonNull public final Activity activity;
+    @Nullable public final Bundle icicle;
+    public Args(@NonNull final Activity a, @Nullable final Bundle b)
     {
       activity = a; icicle = b;
     }
   }
 
-  public WrappedActivity(@NonNull final Args a)
+  protected WrappedActivity(@NonNull final Args a)
   {
     mA = a.activity;
   }

@@ -57,44 +57,52 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
   private static final long NORMAL_UPDATE_RATE_MS = 1000;
   private static final long MUTE_UPDATE_RATE_MS = TimeUnit.MINUTES.toMillis(1);
 
+  private static final int MSG_UPDATE_TIME = 0;
+
   @NonNull @Override public Engine onCreateEngine()
   {
     return new Engine();
   }
 
-  private class Engine extends CanvasWatchFaceService.Engine implements DataApi.DataListener,
-   GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
-  {
-    static final int MSG_UPDATE_TIME = 0;
-
-    long mInteractiveUpdateRateMs = NORMAL_UPDATE_RATE_MS;
-
     /**
      * Handler to update the time periodically in interactive mode.
      */
-    final Handler mUpdateTimeHandler = new Handler()
+    private static class UpdateTimeHandler extends Handler
     {
+      @NonNull private final Engine mEngine;
+      public UpdateTimeHandler(@NonNull final Engine engine)
+      {
+        mEngine = engine;
+      }
+
       @Override public void handleMessage(@NonNull Message message)
       {
         switch (message.what)
         {
           case MSG_UPDATE_TIME:
-            invalidate();
-            final long nextUpdateTime = nextUpdateTime();
-            final long now = mDataStore.currentTimeMillis();
-            mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, nextUpdateTime - now);
+            mEngine.invalidate();
+            final long nextUpdateTime = mEngine.nextUpdateTime();
+            final long now = mEngine.mDataStore.currentTimeMillis();
+            this.sendEmptyMessageDelayed(MSG_UPDATE_TIME, nextUpdateTime - now);
             break;
         }
       }
-    };
+    }
 
-    GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(DigitalWatchFaceService.this)
+  private class Engine extends CanvasWatchFaceService.Engine implements DataApi.DataListener,
+   GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
+  {
+    private long mInteractiveUpdateRateMs = NORMAL_UPDATE_RATE_MS;
+
+    private final Handler mUpdateTimeHandler = new UpdateTimeHandler(this);
+
+    private GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(DigitalWatchFaceService.this)
      .addConnectionCallbacks(this)
      .addOnConnectionFailedListener(this)
      .addApi(Wearable.API)
      .build();
 
-    final TimezoneBroadcastReceiver mTimeZoneReceiver = new TimezoneBroadcastReceiver();
+    private final TimezoneBroadcastReceiver mTimeZoneReceiver = new TimezoneBroadcastReceiver();
     private final class TimezoneBroadcastReceiver extends BroadcastReceiver
     {
       public void register()
@@ -105,6 +113,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       }
       public void unregister()
       {
+        //noinspection EmptyCatchBlock
         try { DigitalWatchFaceService.this.unregisterReceiver(mTimeZoneReceiver); }
         catch (IllegalArgumentException e) {} // Non mais
       }
@@ -116,20 +125,19 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       }
     }
 
-    final DataStore mDataStore = new DataStore();
-    Sensors mSensors;
-    Draw mDraw = new Draw();
-    DrawTools mDrawTools = new DrawTools(null);
-    @NonNull final Time mTime = new Time();
-    @Nullable
-    Departure mNextDeparture;
-    int mModeFlags = Draw.BACKGROUND_PRESENT; // Default mode is background on, mute off, ambient off
+    private final DataStore mDataStore = new DataStore();
+    private Sensors mSensors;
+    private Draw mDraw = new Draw();
+    private DrawTools mDrawTools = new DrawTools(null);
+    @NonNull private final Time mTime = new Time();
+    @Nullable private Departure mNextDeparture;
+    private int mModeFlags = Draw.BACKGROUND_PRESENT; // Default mode is background on, mute off, ambient off
 
     /**
      * Whether the display supports fewer bits for each color in ambient mode. When true, we
      * disable anti-aliasing in ambient mode.
      */
-    boolean mLowBitAmbient;
+    private boolean mLowBitAmbient;
 
     @Override
     public void onCreate(final SurfaceHolder holder)
@@ -434,7 +442,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       }
       finally
       {
-        dataEvents.close();
+        dataEvents.release();
       }
     }
 
@@ -464,7 +472,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     }
 
     @Override  // GoogleApiClient.OnConnectionFailedListener
-    public void onConnectionFailed(ConnectionResult result)
+    public void onConnectionFailed(@NonNull ConnectionResult result)
     {
       Log.d(TAG, "onConnectionFailed : " + result);
     }

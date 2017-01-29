@@ -45,7 +45,7 @@ public class Draw
 
     final int mode;
     final float topicPosY;
-    final String[] topicLines = null == topic ? null : topic.split("\n");
+    final String[] topicLines = topic.split("\n");
     if (null == departure1)
     {
       mode = TOPIC_ONLY;
@@ -131,7 +131,7 @@ public class Draw
     else
       canvas.drawText(mTmpChr, 0, borderTextLength, bounds.width() / 2, drawTools.statusPaint.getTextSize(), drawTools.statusPaint);
 
-    long finish = System.currentTimeMillis();
+//    long finish = System.currentTimeMillis();
 //    Log.e("TIME", "" + (finish - start));
 
     return mustInvalidate;

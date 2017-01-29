@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -15,19 +16,17 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.j.jface.R;
-import com.j.jface.lifecycle.FragmentWrapper;
-import com.j.jface.lifecycle.WrappedActivity;
 import com.j.jface.feed.fragments.ActivityLogFragment;
 import com.j.jface.feed.fragments.DebugToolsFragment;
 import com.j.jface.feed.fragments.LogsAndDataFragment;
 import com.j.jface.feed.fragments.MessagesFragment;
+import com.j.jface.lifecycle.FragmentWrapper;
+import com.j.jface.lifecycle.WrappedActivity;
 
 public class JFaceDataFeed extends WrappedActivity
 {
@@ -35,21 +34,20 @@ public class JFaceDataFeed extends WrappedActivity
   @NonNull private final ActionBarDrawerToggle mDrawerToggle;
 
   // State
-  int mCurrentlyDisplayedFragmentIndex = 0;
+  private int mCurrentlyDisplayedFragmentIndex = 0;
 
   public JFaceDataFeed(@NonNull final Args args)
   {
     super(args);
-    final LayoutParams lp = new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
     mA.setContentView(R.layout.data_feed_drawer);
     final DrawerLayout drawer = (DrawerLayout)mA.findViewById(R.id.dataFeedDrawer);
 
     final ListView list = (ListView)mA.findViewById(R.id.dataFeedDrawerContents);
     list.setAdapter(new ArrayAdapter<>(mA, R.layout.data_feed_drawer_item, new String[] { "Messages", "Activity log", "Logs & data", "Debug tools" }));
-    list.setOnItemClickListener(new AdapterView.OnItemClickListener()
+    final AdapterView.OnItemClickListener listener = new AdapterView.OnItemClickListener()
     {
       private final Client mClient = new Client(mA);
-      @Override public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id)
+      @Override public void onItemClick(@Nullable final AdapterView<?> parent, @Nullable final View view, final int position, final long id)
       {
         final Fragment f = getFragmentForPosition(position, mClient);
         mA.getFragmentManager().beginTransaction()
@@ -59,11 +57,12 @@ public class JFaceDataFeed extends WrappedActivity
         drawer.closeDrawer(list);
         mCurrentlyDisplayedFragmentIndex = position;
       }
-    });
+    };
+    list.setOnItemClickListener(listener);
 
     final Bundle icicle = args.icicle;
     mCurrentlyDisplayedFragmentIndex = null == icicle ? 0 : icicle.getInt(LAST_OPEN_FRAGMENT_INDEX);
-    list.getOnItemClickListener().onItemClick(null, null, mCurrentlyDisplayedFragmentIndex, 0); // Switch to the initial fragment
+    listener.onItemClick(null, null, mCurrentlyDisplayedFragmentIndex, 0); // Switch to the initial fragment
 
     final Toolbar toolbar = (Toolbar)mA.findViewById(R.id.dataFeedToolbar);
     toolbar.setTitle(R.string.data_feed_title);
@@ -100,7 +99,7 @@ public class JFaceDataFeed extends WrappedActivity
     ActivityCompat.requestPermissions(mA, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
   }
 
-  private static FragmentWrapper<?> getFragmentForPosition(final int position, final Client client)
+  @Nullable private static FragmentWrapper<?> getFragmentForPosition(final int position, final Client client)
   {
     switch (position)
     {

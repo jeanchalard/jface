@@ -41,7 +41,7 @@ public class GetDataAction implements Action, ResultCallback<DataItemBuffer>
     Wearable.DataApi.getDataItems(client, uri).setResultCallback(this);
   }
 
-  @Override public void onResult(final DataItemBuffer dataItems)
+  @Override public void onResult(@NonNull final DataItemBuffer dataItems)
   {
     if (dataItems.getCount() == 1)
     {

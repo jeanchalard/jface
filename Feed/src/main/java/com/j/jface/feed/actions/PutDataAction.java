@@ -13,7 +13,7 @@ import com.google.android.gms.wearable.Wearable;
 
 public class PutDataAction implements Action, ResultCallback<DataApi.DataItemResult>
 {
-  @NonNull final PutDataRequest mRequest;
+  @NonNull private final PutDataRequest mRequest;
 
   public PutDataAction(@NonNull final String path, @NonNull final String key, @NonNull final String value)
   {
@@ -49,5 +49,5 @@ public class PutDataAction implements Action, ResultCallback<DataApi.DataItemRes
     pendingResult.setResultCallback(this);
   }
 
-  @Override public void onResult(DataApi.DataItemResult dataItemResult) {}
+  @Override public void onResult(@NonNull DataApi.DataItemResult dataItemResult) {}
 }

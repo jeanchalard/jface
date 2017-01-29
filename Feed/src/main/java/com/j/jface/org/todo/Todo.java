@@ -29,9 +29,9 @@ public class Todo
               final int estimatedTime)
   {
     mText = text;
-    mRequirements = null == requirements ? Collections.<Todo>emptyList() : Collections.unmodifiableList(new ArrayList<Todo>(requirements));
-    mDependents = null == dependents ? Collections.<Todo>emptyList() : Collections.unmodifiableList(new ArrayList<Todo>(dependents));
-    mChildren = null == children ? Collections.<Todo>emptyList() : Collections.unmodifiableList(new ArrayList<Todo>(children));
+    mRequirements = null == requirements ? Collections.<Todo>emptyList() : Collections.unmodifiableList(new ArrayList<>(requirements));
+    mDependents = null == dependents ? Collections.<Todo>emptyList() : Collections.unmodifiableList(new ArrayList<>(dependents));
+    mChildren = null == children ? Collections.<Todo>emptyList() : Collections.unmodifiableList(new ArrayList<>(children));
     mPlanning = null == planning ? new Planning() : planning;
     mEstimatedTime = estimatedTime;
   }

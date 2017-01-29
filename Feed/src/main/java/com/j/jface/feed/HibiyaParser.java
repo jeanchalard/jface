@@ -20,10 +20,8 @@ public class HibiyaParser extends FeedParser
   {
     final DataMap result = new DataMap();
     final BufferedReader src = new BufferedReader(new InputStreamReader(new BufferedInputStream(srcStream)));
-    if (null == find(src, "table summary=\"平日の時刻表\"") || null == find(src, "</tr>")) {
-      Logger.L("Argh, data not at expected format for " + dataName);
+    if (null == find(src, "table summary=\"平日の時刻表\"") || null == find(src, "</tr>"))
       return result;
-    }
     final Scanner srcTable = new Scanner(find(src, "</table>"));
     final ArrayList<DataMap> buildData = new ArrayList<>();
     srcTable.useDelimiter("(\\s|<|>)+");

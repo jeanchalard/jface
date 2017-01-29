@@ -1,6 +1,7 @@
 package com.j.jface.org;
 
 import android.animation.LayoutTransition;
+import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,13 +68,13 @@ public class JOrg extends WrappedActivity
       lp.setMargins(20 + shift, 0, 20, 0);
       separator.setLayoutParams(lp);
       topView.addView(separator);
-      if (null != todo.mChildren) addTodos(todo.mChildren, topView, shift + 25);
+      addTodos(todo.mChildren, topView, shift + 25);
     }
   }
 
   private View inflateTodo(final Todo t, final int shift)
   {
-    final LinearLayout v = (LinearLayout)mA.getLayoutInflater().inflate(R.layout.todo, null);
+    @SuppressLint("InflateParams") final LinearLayout v = (LinearLayout)mA.getLayoutInflater().inflate(R.layout.todo, null);
     final SelReportEditText et = ((SelReportEditText)v.findViewById(R.id.todoText));
     et.setOnFocusChangeListener(mSoundRouter);
     et.mListener = mSoundRouter;

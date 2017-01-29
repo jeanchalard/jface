@@ -16,7 +16,7 @@ public class SoundVisualizer extends Handler
   @NonNull private final float[] mSoundLevels = {0, 0, 0, 0, 0, 0};
   @NonNull private final ViewGroup mView;
 
-  public SoundVisualizer(final Looper l, final ViewGroup v)
+  public SoundVisualizer(@NonNull final Looper l, @NonNull final ViewGroup v)
   {
     super(l);
     mView = v;

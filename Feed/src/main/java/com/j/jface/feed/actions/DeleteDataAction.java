@@ -9,7 +9,7 @@ import com.google.android.gms.wearable.Wearable;
 
 public class DeleteDataAction implements Action
 {
-  final Uri mUri;
+  @NonNull private final Uri mUri;
 
   public DeleteDataAction(@NonNull final Uri uri)
   {

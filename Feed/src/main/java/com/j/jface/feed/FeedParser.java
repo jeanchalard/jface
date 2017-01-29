@@ -1,6 +1,7 @@
 package com.j.jface.feed;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.android.gms.wearable.DataMap;
 
@@ -12,7 +13,7 @@ public abstract class FeedParser
 {
   @NonNull abstract DataMap parseStream(@NonNull final String dataName, @NonNull final InputStream src) throws IOException;
 
-  protected String find(@NonNull final BufferedReader src, @NonNull final String s) throws IOException {
+  @Nullable protected String find(@NonNull final BufferedReader src, @NonNull final String s) throws IOException {
     int index = 0;
     int expected = s.codePointAt(index);
     int read = src.read();

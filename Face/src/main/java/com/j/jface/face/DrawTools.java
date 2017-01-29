@@ -9,6 +9,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.j.jface.Const;
 import com.j.jface.R;
@@ -33,10 +34,10 @@ public class DrawTools
   public final Path watchContourPath;
 
   public final Drawable background;
-  public final Bitmap hibiyaIcon;
-  public final Bitmap keiseiIcon;
+  private final Bitmap hibiyaIcon;
+  private final Bitmap keiseiIcon;
 
-  public DrawTools(final Resources resources) {
+  public DrawTools(@Nullable final Resources resources) {
     imagePaint = new Paint();
     imagePaint.setColor(0xFF000000);
     minutesPaint = createTextPaint(0xFFFFFFFF, NORMAL_TYPEFACE);
@@ -79,7 +80,7 @@ public class DrawTools
     iconToDepartureXPadding = 7;
   }
 
-  public Bitmap getIconForKey(final String key) {
+  @Nullable public Bitmap getIconForKey(final String key) {
     switch (key) {
       case Const.日比谷線_北千住_平日:
       case Const.日比谷線_北千住_休日:
@@ -106,8 +107,7 @@ public class DrawTools
     }
   }
 
-  @NonNull
-  private Paint createTextPaint(final int defaultInteractiveColor, final Typeface typeface)
+  @NonNull private Paint createTextPaint(final int defaultInteractiveColor, final Typeface typeface)
   {
     Paint paint = new Paint();
     paint.setColor(defaultInteractiveColor);

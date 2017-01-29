@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 public class FeedLoader
 {
-  static ThreadPoolExecutor executor = new ThreadPoolExecutor(4, 4, 500, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+  private static final ThreadPoolExecutor executor = new ThreadPoolExecutor(4, 4, 500, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
 
   public static void startAllLoads(@NonNull final Client client) {
     for (final DataSource ds : DataSource.ALL_SOURCES)
@@ -39,8 +39,6 @@ public class FeedLoader
       final long now = System.currentTimeMillis();
       if (lastSuccessfulUpdateDate + Const.UPDATE_DELAY_MILLIS > now)
       {
-        Logger.L("Update for " + ds.name + " is " +
-         ((lastSuccessfulUpdateDate + Const.UPDATE_DELAY_MILLIS - now) / 3600000) + " hours away");
         statusData.putLong(Const.DATA_KEY_STATUS_UPDATE_DATE, System.currentTimeMillis());
         client.putData(statusDataPath, statusData);
         return;
@@ -54,7 +52,6 @@ public class FeedLoader
         InputStream in = new BufferedInputStream(urlConnection.getInputStream());
         final FeedParser parser = ds.parser.newInstance();
         final DataMap data = parser.parseStream(ds.name, in);
-        Logger.L("Updated data for " + ds.name);
         client.putData(dataPath, data);
         statusData.putLong(Const.DATA_KEY_SUCCESSFUL_UPDATE_DATE, System.currentTimeMillis());
         statusData.putString(Const.DATA_KEY_LAST_STATUS, "Success");

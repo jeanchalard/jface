@@ -2,6 +2,7 @@ package com.j.jface;
 
 import java.util.HashMap;
 
+@SuppressWarnings("ConstantConditions")
 public class Const
 {
   public static final boolean RIO_MODE = false;

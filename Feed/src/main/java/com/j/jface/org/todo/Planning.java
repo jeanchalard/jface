@@ -1,6 +1,7 @@
 package com.j.jface.org.todo;
 
-import com.google.android.gms.location.Geofence;
+import android.support.annotation.Nullable;
+
 import com.j.jface.feed.Fences;
 
 /**
@@ -28,9 +29,9 @@ public class Planning
   public final int mDeadline; // Timestamp : when this has to be done
   public final int mHardness; // UNKNOWN or *_DEADLINE
   public final int mTimeConstraint; // UNKNOWN or ON_*
-  public final Fences.Params mWhere; // Typically null
+  @Nullable public final Fences.Params mWhere; // Typically null
 
-  public Planning(final int lifeline, final int deadline, final int hardness, final int timeConstraint, final Fences.Params where)
+  public Planning(final int lifeline, final int deadline, final int hardness, final int timeConstraint, @Nullable final Fences.Params where)
   {
     mLifeline = lifeline;
     mDeadline = deadline;

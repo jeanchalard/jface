@@ -19,18 +19,16 @@ import java.util.GregorianCalendar;
 public class ActivityLogFragment extends WrappedFragment
 {
   @NonNull private final Fragment mF;
-  @NonNull private final Client mClient;
   @NonNull private final TextView mLastActivityMnemonic;
   @NonNull private final TextView mLastActivityStartTime;
 
-  public ActivityLogFragment(@NonNull final WrappedFragment.Args a, @NonNull final Client b)
+  public ActivityLogFragment(@NonNull final WrappedFragment.Args a, @NonNull final Client client)
   {
     super(a.inflater.inflate(R.layout.fragment_activity_log, a.container, false));
     mF = a.fragment;
-    mClient = b;
     mLastActivityMnemonic = (TextView)mView.findViewById(R.id.last_activity_mnemonic);
     mLastActivityStartTime = (TextView)mView.findViewById(R.id.last_activity_start_time);
-    mClient.getData(Const.ACTIVITY_PATH, showDataCallback());
+    client.getData(Const.ACTIVITY_PATH, showDataCallback());
   }
 
   private Client.GetDataCallback showDataCallback()

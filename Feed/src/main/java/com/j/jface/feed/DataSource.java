@@ -8,14 +8,14 @@ public class DataSource
   public final String url;
   public final Class<? extends FeedParser> parser;
 
-  public DataSource(final String n, final String u, final Class<? extends FeedParser> p)
+  private DataSource(final String n, final String u, final Class<? extends FeedParser> p)
   {
     name = n;
     url = u;
     parser = p;
   }
 
-  public static final DataSource[] J_SOURCES = {
+  private static final DataSource[] J_SOURCES = {
    new DataSource(Const.日比谷線_北千住_平日,
     "http://www.tokyometro.jp/station/kita-senju/timetable/hibiya/a/index.html", HibiyaParser.class),
    new DataSource(Const.日比谷線_北千住_休日,
@@ -37,7 +37,7 @@ public class DataSource
    new DataSource(Const.京成線_日暮里_千住大橋方面_休日,
     "http://keisei.ekitan.com/norikae/pc/T5?dir=52&dw=1&slCode=254-1&d=2", KeiseiParser.class)
   };
-  public static final DataSource[] RIO_SOURCES = {
+  private static final DataSource[] RIO_SOURCES = {
    new DataSource(Const.日比谷線_三ノ輪_中目黒方面_平日,
     "http://www.tokyometro.jp/station/minowa/timetable/hibiya/a/index.html", HibiyaParser.class),
    new DataSource(Const.日比谷線_三ノ輪_中目黒方面_休日,

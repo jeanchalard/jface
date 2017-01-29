@@ -43,7 +43,7 @@ public class EditTextSoundRouter implements View.OnFocusChangeListener, SelRepor
     reloadBuffers();
   }
 
-  public void reloadBuffers()
+  private void reloadBuffers()
   {
     if (null == mFocusedEditText)
     {

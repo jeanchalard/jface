@@ -10,7 +10,7 @@ import java.lang.reflect.Type;
  */
 public class WrapUtils
 {
-  public static Class<?> wrappedClass(final Class<?> c)
+  private static Class<?> wrappedClass(final Class<?> c)
   {
     final ParameterizedType pt = (ParameterizedType)c.getGenericSuperclass();
     final Type t = pt.getActualTypeArguments()[0];

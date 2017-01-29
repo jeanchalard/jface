@@ -18,7 +18,7 @@ public class MessagesFragment extends WrappedFragment implements View.OnClickLis
 {
   @NonNull private final Fragment mF;
   @NonNull private final Client mClient;
-  @NonNull final EditText mTopicDataEdit;
+  @NonNull private final EditText mTopicDataEdit;
 
   public MessagesFragment(@NonNull final WrappedFragment.Args a, @NonNull final Client b)
   {

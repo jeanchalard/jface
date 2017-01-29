@@ -4,7 +4,7 @@
  xmlns:tools="http://schemas.android.com/tools"
  android:layout_width="wrap_content"
  android:layout_height="wrap_content"
- android:layout_gravity="right"
+ android:layout_gravity="end"
  tools:showIn="@layout/org_top"
  android:layout_marginEnd="12dp"
  android:id="@+id/sound_source">
@@ -13,8 +13,7 @@
    android:layout_width="48dp"
    android:layout_height="48dp"
    android:src="@drawable/mr_ic_close_dark"
-   android:id="@+id/no_sound"
-   android:layout_weight="1"/>
+   android:id="@+id/no_sound"/>
 
   <LinearLayout
    android:orientation="horizontal"

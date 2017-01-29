@@ -25,15 +25,11 @@ public class GeofenceTransitionReceiver
 
   @NonNull private final Service service;
   @NonNull private final Client mClient;
-  @NonNull private final FileOutputStream mLogFile;
 
   public GeofenceTransitionReceiver(@NonNull final Service s)
   {
     service = s;
     mClient = new Client(service);
-    try { mLogFile = new FileOutputStream(new File(s.getExternalFilesDir(null), "log")); }
-    catch (FileNotFoundException e) { throw new RuntimeException(e); }
-    Logger.setLogger(this);
   }
 
   void onHandleIntent(@NonNull final Intent intent)
@@ -55,11 +51,7 @@ public class GeofenceTransitionReceiver
   private void handleGeofenceTransitions(final Intent intent)
   {
     GeofencingEvent event = GeofencingEvent.fromIntent(intent);
-    if (event.hasError())
-    {
-      Logger.L("Geofencing error : " + event.getErrorCode());
-      return;
-    }
+    if (event.hasError()) return;
 
     final List<Geofence> fences = event.getTriggeringGeofences();
     final int transitionType = event.getGeofenceTransition();
@@ -70,51 +62,10 @@ public class GeofenceTransitionReceiver
   private void handleGeofenceTransition(final Geofence fence, final int transitionType)
   {
     final Fences.Params params = Fences.paramsFromName(fence.getRequestId());
-    if (null == params)
-    {
-      Logger.L("Unknown fence : " + fence.getRequestId());
-      return; // Unknown fence
-    }
-    final String message;
+    if (null == params) return; // Unknown fence
     if (Geofence.GEOFENCE_TRANSITION_ENTER == transitionType)
-    {
-      message = "Entered " + fence.getRequestId();
       mClient.putData(Const.LOCATION_PATH + "/" + params.name, Const.DATA_KEY_INSIDE, true);
-    }
     else if (Geofence.GEOFENCE_TRANSITION_EXIT == transitionType)
-    {
-      message = "Exited " + fence.getRequestId();
       mClient.putData(Const.LOCATION_PATH + "/" + params.name, Const.DATA_KEY_INSIDE, false);
-    }
-    else message = "Unknown event O.o";
-    Logger.L(message);
-  }
-
-
-  public void Log(@NonNull final String s)
-  {
-    try
-    {
-      LogInternal(s);
-    }
-    catch (Exception e) {} // Ignore the fuck out of it
-  }
-
-  int notificationNumber = 1;
-  private void LogInternal(@NonNull final String s) throws IOException
-  {
-    Log.e("JFACE", s);
-    final Time t = new Time();
-    t.setToNow();
-    final String nowString = t.format3339(false);
-    final String logString = nowString + " : " + s + "\n";
-    mLogFile.write(logString.getBytes());
-//    final NotificationManager na = (NotificationManager)service.getSystemService(Context.NOTIFICATION_SERVICE);
-//    na.notify(++notificationNumber, new Notification.BigTextStyle(new Notification.Builder(service)
-//     .setSmallIcon(R.drawable.notif)
-//     .setContentTitle(s)
-//     .setContentText(nowString))
-//     .bigText(s)
-//     .build());
   }
 }

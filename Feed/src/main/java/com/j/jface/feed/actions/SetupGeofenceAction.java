@@ -14,7 +14,6 @@ import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
 import com.j.jface.Const;
 import com.j.jface.feed.Fences;
-import com.j.jface.feed.Logger;
 
 public class SetupGeofenceAction implements Action, ResultCallback<Status>
 {
@@ -40,7 +39,11 @@ public class SetupGeofenceAction implements Action, ResultCallback<Status>
     final GeofencingRequest.Builder builder = new GeofencingRequest.Builder()
      .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER | GeofencingRequest.INITIAL_TRIGGER_EXIT);
     for (final String fence : Const.ALL_FENCE_NAMES)
-      builder.addGeofence(getGeofence(Fences.paramsFromName(fence)));
+    {
+      final Fences.Params params = Fences.paramsFromName(fence);
+      if (null == params) throw new RuntimeException("Bug : Const.ALL_FENCE_NAMES contains a fence name not resolvable by Fences.paramsFromName");
+      else builder.addGeofence(getGeofence(params));
+    }
     final GeofencingRequest request = builder.build();
 
     final int hasPermission = ContextCompat.checkSelfPermission(client.getContext(), Manifest.permission.ACCESS_FINE_LOCATION);
@@ -49,9 +52,5 @@ public class SetupGeofenceAction implements Action, ResultCallback<Status>
        .setResultCallback(this);
   }
 
-  @Override
-  public void onResult(final Status status)
-  {
-    Logger.L("Added geofences : " + status);
-  }
+  @Override public void onResult(@NonNull final Status status) {}
 }

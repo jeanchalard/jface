@@ -58,18 +58,18 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
     {
       case MSG_PROCESS_QUEUE:
         proceed();
-        return;
+        break;
       case MSG_CONNECT:
         mClient.connect();
-        return;
+        break;
       case MSG_RUN_ACTIONS:
         final Action a = mUpdates.poll();
         if (null != a) a.run(mClient);
         proceed();
-        return;
+        break;
       case MSG_DISCONNECT:
         mClient.disconnect();
-        return;
+        break;
     }
   }
 
@@ -135,7 +135,7 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
 
   @Override public void onConnected(final Bundle bundle) { mConnectionFailures = 0; proceed(); }
   @Override public void onConnectionSuspended(final int i) { proceed(); }
-  @Override public void onConnectionFailed(final ConnectionResult connectionResult)
+  @Override public void onConnectionFailed(@NonNull final ConnectionResult connectionResult)
   {
     if (CONNECTION_FAILURES_BACKOFF.length > ++mConnectionFailures)
       sendEmptyMessageDelayed(MSG_PROCESS_QUEUE, CONNECTION_FAILURES_BACKOFF[mConnectionFailures]);

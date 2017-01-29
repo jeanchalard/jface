@@ -14,8 +14,6 @@
  limitations under the License.
 -->
 <resources>
-    <color name="config_activity_background">#000000</color>
     <color name="config_activity_header_text_color">#ffffff</color>
     <color name="color_item_label_color">#ffffffff</color>
-    <color name="color_item_circle_border_color">#424242</color>
 </resources>

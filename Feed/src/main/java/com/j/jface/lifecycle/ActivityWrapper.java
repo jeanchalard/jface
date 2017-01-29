@@ -25,17 +25,20 @@ public abstract class ActivityWrapper<T extends WrappedActivity> extends Activit
 
   @Override public void onSaveInstanceState(@NonNull final Bundle savedInstanceState)
   {
+    assert mW != null;
     mW.onSaveInstanceState(savedInstanceState);
   }
 
   @Override public void onConfigurationChanged(final Configuration c)
   {
     super.onConfigurationChanged(c);
+    assert mW != null;
     mW.onConfigurationChanged(c);
   }
 
   @Override public boolean onOptionsItemSelected(final MenuItem i)
   {
+    assert mW != null;
     if (mW.onOptionsItemSelected(i)) return true;
     return super.onOptionsItemSelected(i);
   }
@@ -43,24 +46,28 @@ public abstract class ActivityWrapper<T extends WrappedActivity> extends Activit
   @Override public void onPostCreate(final Bundle b)
   {
     super.onPostCreate(b);
+    assert mW != null;
     mW.onPostCreate(b);
   }
 
-  @Override public void onRequestPermissionsResult(final int requestCode, final String[] permissions, final int[] results)
+  @Override public void onRequestPermissionsResult(final int requestCode, @NonNull final String[] permissions, @NonNull final int[] results)
   {
     super.onRequestPermissionsResult(requestCode, permissions, results);
+    assert mW != null;
     mW.onRequestPermissionsResult(requestCode, permissions, results);
   }
 
   @Override public void onPause()
   {
     super.onPause();
+    assert mW != null;
     mW.onPause();
   }
 
   @Override public void onResume()
   {
     super.onResume();
+    assert mW != null;
     mW.onResume();
   }
 }

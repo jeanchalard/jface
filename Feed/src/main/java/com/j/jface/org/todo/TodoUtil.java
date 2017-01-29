@@ -1,10 +1,13 @@
 package com.j.jface.org.todo;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import com.j.jface.feed.Fences;
 
 public class TodoUtil
 {
-  public static String timeConstraintString(final int timeConstraint)
+  @NonNull public static String timeConstraintString(final int timeConstraint)
   {
     switch (timeConstraint)
     {
@@ -20,7 +23,7 @@ public class TodoUtil
     }
   }
 
-  public static String whereString(final Fences.Params where)
+  @NonNull public static String whereString(@Nullable final Fences.Params where)
   {
     if (null == where) return "Anywhere";
     return where.name;

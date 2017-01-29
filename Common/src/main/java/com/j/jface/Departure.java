@@ -11,9 +11,9 @@ public class Departure implements Comparable<Departure>
   public final String extra;
   public final String key;
   public final String headSign;
-  public final Departure next;
+  @Nullable public final Departure next;
 
-  public Departure(final int time, final String extra, final String key, final Departure next) {
+  public Departure(final int time, final String extra, final String key, @Nullable final Departure next) {
     this.time = time;
     this.dTime = time < 3 * 3600 ? time + 86400 : time;
     this.extra = extra;

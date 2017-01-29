@@ -10,7 +10,7 @@ import com.j.jface.feed.Client;
 
 public class DeleteAllDataAction implements Action, ResultCallback<DataItemBuffer>
 {
-  @NonNull final Client mClient;
+  @NonNull private final Client mClient;
 
   public DeleteAllDataAction(@NonNull final Client client)
   {

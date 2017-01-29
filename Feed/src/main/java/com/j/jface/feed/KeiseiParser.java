@@ -22,10 +22,7 @@ public class KeiseiParser extends FeedParser
     final BufferedReader src = new BufferedReader(new InputStreamReader(new BufferedInputStream(srcStream), "Shift_JIS"));
 
     if (null == find(src, "class=\"name\">") || null == find(src, "</tr>"))
-    {
-      Logger.L("Argh, data not at expected format for " + dataName);
       return result;
-    }
     final Scanner srcTable = new Scanner(find(src, "</table>"));
     final ArrayList<DataMap> buildData = new ArrayList<>();
     srcTable.useDelimiter("(\\s|<|>|&)+");
