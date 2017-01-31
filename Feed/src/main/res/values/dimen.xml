@@ -2,5 +2,6 @@
 <resources>
   <dimen name="drawer_text_size">24sp</dimen>
   <dimen name="big_text_size">30sp</dimen>
-  <dimen name="todo_text_size">12sp</dimen>
+  <dimen name="todo_text_size">13sp</dimen>
+  <dimen name="todo_details_text_size">13sp</dimen>
 </resources>
