@@ -5,6 +5,8 @@ import java.util.HashMap;
 @SuppressWarnings("ConstantConditions")
 public class Const
 {
+  public static final String APP_PACKAGE = "com.j.jface";
+
   public static final boolean RIO_MODE = false;
   public static final boolean ROUND_SCREEN = !RIO_MODE;
   public static final int SCREEN_SIZE = RIO_MODE ? 280 : 320;

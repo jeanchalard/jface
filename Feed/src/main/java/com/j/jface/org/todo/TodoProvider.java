@@ -15,7 +15,7 @@ import com.j.jface.lifecycle.WrappedContentProvider;
 public class TodoProvider extends WrappedContentProvider
 {
   @NonNull private final static String DB_NAME = "TodoDb";
-  @NonNull private final static int DB_VERSION = 1;
+  private final static int DB_VERSION = 1;
   @NonNull private final static String TABLE_NAME = "todo";
 
   private class TodoOpenHelper extends SQLiteOpenHelper
@@ -29,6 +29,8 @@ public class TodoProvider extends WrappedContentProvider
     {
       sqLiteDatabase.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
        "id TEXT PRIMARY KEY NOT NULL," +
+       "creationDate INTEGER," +
+       "updateDate INTEGER," +
        "text TEXT NOT NULL," +
        "parent TEXT," +
        "lifeline INTEGER," +
@@ -55,15 +57,31 @@ public class TodoProvider extends WrappedContentProvider
 
   @Nullable public Cursor query(@NonNull final Uri uri, @Nullable final String[] projection, @Nullable final String selection, @Nullable final String[] selectionArgs, @Nullable final String sortOrder)
   {
+    final SQLiteDatabase db = mDb.getReadableDatabase();
+    switch (TodoProviderMatcher.Matcher.match(uri))
+    {
+      case TodoProviderMatcher.ALL_CONTENT:
+        return db.query(TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+      case TodoProviderMatcher.INDIVIDUAL_TODO:
+        final String todoId = uri.getLastPathSegment();
+        break;
+    }
   }
 
   @Nullable public String getType(@NonNull final Uri uri)
   {
+    switch (TodoProviderMatcher.Matcher.match(uri))
+    {
+      case TodoProviderMatcher.ALL_CONTENT: return TodoProviderContract.MIMETYPE_TODOLIST;
+      case TodoProviderMatcher.INDIVIDUAL_TODO: return TodoProviderContract.MIMETYPE_TODO;
+    }
+    return null;
   }
 
   @Nullable public Uri insert(@NonNull final Uri uri, @NonNull final ContentValues contentValues)
   {
     final SQLiteDatabase db = mDb.getWritableDatabase();
+    // TODO : sanitize
     db.insert(TABLE_NAME, null, contentValues);
   }
 
