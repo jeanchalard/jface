@@ -15,6 +15,7 @@ import java.util.List;
 public class Todo
 {
   @NonNull public final String mText;
+  @Nullable public final Todo mParent;
   @NonNull public final List<Todo> mRequirements;
   @NonNull public final List<Todo> mDependents;
   @NonNull public final List<Todo> mChildren;
@@ -22,6 +23,7 @@ public class Todo
   public final int mEstimatedTime;
 
   public Todo(@NonNull final String text,
+              @Nullable final Todo parent,
               @Nullable final Collection<? extends Todo> requirements,
               @Nullable final Collection<? extends Todo> dependents,
               @Nullable final Collection<? extends Todo> children,
@@ -29,6 +31,7 @@ public class Todo
               final int estimatedTime)
   {
     mText = text;
+    mParent = parent;
     mRequirements = null == requirements ? Collections.<Todo>emptyList() : Collections.unmodifiableList(new ArrayList<>(requirements));
     mDependents = null == dependents ? Collections.<Todo>emptyList() : Collections.unmodifiableList(new ArrayList<>(dependents));
     mChildren = null == children ? Collections.<Todo>emptyList() : Collections.unmodifiableList(new ArrayList<>(children));
@@ -38,23 +41,31 @@ public class Todo
 
   public Todo(@NonNull final String text)
   {
-    this(text, null, null, null, null, -1);
+    this(text, null, null, null, null, null, -1);
   }
 
-  // Copy constructor with overrides. Any non-null arg is used, while all null is taken from the old Todo.
-  public Todo(@NonNull final Todo todo,
-              @Nullable final String text,
-              @Nullable final Collection<? extends Todo> requirements,
-              @Nullable final Collection<? extends Todo> dependents,
-              @Nullable final Collection<? extends Todo> children,
-              @Nullable final Planning planning,
-              final int estimatedTime)
+  public class Builder
   {
-    this(null != text ? text : todo.mText,
-         null != requirements ? requirements : !todo.mRequirements.isEmpty() ? todo.mRequirements : null,
-         null != dependents ? dependents : !todo.mDependents.isEmpty() ? todo.mDependents : null,
-         null != children ? children : !todo.mChildren.isEmpty() ? todo.mChildren : null,
-         null != planning ? planning : todo.mPlanning,
-         0 != estimatedTime ? estimatedTime : todo.mEstimatedTime);
+    @NonNull private String mText;
+    @Nullable private Todo mParent;
+    @Nullable private List<Todo> mRequirements;
+    @Nullable private List<Todo> mDependents;
+    @Nullable private List<Todo> mChildren;
+    @Nullable private Planning mPlanning;
+    private int mEstimatedTime;
+
+    public Builder(@NonNull final String text) { mText = text; }
+    public Builder(@NonNull final Todo todo) { mText = todo.mText; mParent = todo.mParent; mRequirements = todo.mRequirements; mDependents = todo.mDependents; mChildren = todo.mChildren; mPlanning = todo.mPlanning; mEstimatedTime = todo.mEstimatedTime; }
+    public Builder setParent(@Nullable final Todo parent) { mParent = parent; return this; }
+    public Builder setRequirements(@Nullable final List<Todo> requirements) { mRequirements = requirements; return this; }
+    public Builder setDependents(@Nullable final List<Todo> dependents) { mDependents = dependents; return this; }
+    public Builder setChildren(@Nullable final List<Todo> children) { mChildren = children; return this; }
+    public Builder setPlanning(@Nullable final Planning planning) { mPlanning = planning; return this; }
+    public Builder setEstimatedTime(@Nullable final int estimatedTime) { mEstimatedTime = estimatedTime; return this; }
+
+    public Todo build()
+    {
+      return new Todo(mText, mParent, mRequirements, mDependents, mChildren, mPlanning, mEstimatedTime);
+    }
   }
 }
