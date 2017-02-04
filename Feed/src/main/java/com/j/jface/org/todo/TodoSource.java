@@ -11,7 +11,6 @@ import android.support.annotation.Nullable;
 import com.j.jface.feed.Fences;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 // Get Todo from the provider. This bridges the awful content provider interface
 // to an easy to use one.
@@ -64,7 +63,6 @@ public class TodoSource
     final ArrayList<Todo> todos = new ArrayList<>(c.getCount());
     while (!c.isAfterLast())
     {
-      final ArrayList<Todo> children = new ArrayList<>();
       final Todo t = new Todo(
        c.getString(TodoProviderContract.COLUMNINDEX_id),
        c.getLong(TodoProviderContract.COLUMNINDEX_creationTime),
@@ -72,7 +70,7 @@ public class TodoSource
        parent,
        null, // requirements
        null, // dependents
-       children,
+       null,
        new Planning(
         c.getInt(TodoProviderContract.COLUMNINDEX_lifeline),
         c.getInt(TodoProviderContract.COLUMNINDEX_deadline),
@@ -81,7 +79,7 @@ public class TodoSource
         Fences.paramsFromName(c.getString(TodoProviderContract.COLUMNINDEX_where))
        ),
        c.getInt(TodoProviderContract.COLUMNINDEX_estimatedTime));
-      children.addAll(fetchTodosWithParent(t));
+      t.mChildren.addAll(fetchTodosWithParent(t));
       c.moveToNext();
       todos.add(t);
     }
@@ -91,17 +89,8 @@ public class TodoSource
 
   @NonNull public Todo updateTodo(@NonNull final Todo todo)
   {
-    if (null == todo.mId)
-    {
-      final Todo todoWithId = new Todo.Builder(todo).setId(generateNewId()).build();
-      mResolver.insert(TodoProviderContract.BASE_URI, contentValuesFromTodo(todoWithId));
-      return todoWithId;
-    }
-    else
-    {
-      mResolver.update(TodoProviderContract.BASE_URI, contentValuesFromTodo(todo), TodoProviderContract.COLUMN_id + " = ?", new String[] { todo.mId });
-      return todo;
-    }
+    mResolver.insert(TodoProviderContract.BASE_URI, contentValuesFromTodo(todo));
+    return todo;
   }
 
   @NonNull private ContentValues contentValuesFromTodo(@NonNull final Todo todo)
@@ -119,11 +108,5 @@ public class TodoSource
     if (null != todo.mPlanning.mWhere) cv.put(TodoProviderContract.COLUMN_where, todo.mPlanning.mWhere.name);
     cv.put(TodoProviderContract.COLUMN_estimatedTime, todo.mEstimatedTime);
     return cv;
-  }
-
-  // Generate a new unique id.
-  @NonNull private String generateNewId()
-  {
-    return UUID.randomUUID().toString();
   }
 }

@@ -84,7 +84,7 @@ public class TodoProvider extends WrappedContentProvider
   {
     final SQLiteDatabase db = mDb.getWritableDatabase();
     // TODO : sanitize
-    db.insert(TABLE_NAME, null, values);
+    db.insertWithOnConflict(TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
     return Uri.withAppendedPath(TodoProviderContract.BASE_URI, values.getAsString(TodoProviderContract.COLUMN_id));
   }
 

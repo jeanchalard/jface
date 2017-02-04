@@ -2,6 +2,8 @@ package com.j.jface.org;
 
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,10 +41,14 @@ public class JOrg extends WrappedActivity
     mSoundSource = new SoundSource(mA, (ViewGroup)mA.findViewById(R.id.sound_source));
     mSoundRouter = new EditTextSoundRouter(mSoundSource);
     ArrayList<Todo> todoList = mTodoSource.fetchTodoList();
-    mAdapter = new TodoAdapter(mA, mSoundRouter, todoList);
+/*    Todo x = new Todo.Builder("subfoo").setParent(todoList.get(0)).build();
+    mTodoSource.updateTodo(x);
+    mTodoSource.updateTodo(new Todo.Builder("subsubfoo").setParent(x).build());*/
 
     final RecyclerView rv = (RecyclerView) mA.findViewById(R.id.todoList);
+    mAdapter = new TodoAdapter(mA, mSoundRouter, todoList, rv);
     rv.setAdapter(mAdapter);
+    rv.addItemDecoration(new DividerItemDecoration(mA, ((LinearLayoutManager)rv.getLayoutManager()).getOrientation()));
 
     final FloatingActionButton fab = (FloatingActionButton)mA.findViewById(R.id.addTodo);
     fab.setOnClickListener(new View.OnClickListener() {

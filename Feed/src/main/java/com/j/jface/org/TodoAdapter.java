@@ -3,6 +3,10 @@ package com.j.jface.org;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.transition.ChangeBounds;
+import android.transition.Fade;
+import android.transition.TransitionManager;
+import android.transition.TransitionSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +15,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.j.jface.R;
-import com.j.jface.org.todo.TodoViewModel;
 import com.j.jface.org.todo.Todo;
+import com.j.jface.org.todo.TodoViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,11 +26,20 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
 {
   public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
   {
-    final ImageView mExpander;
-    final LinearLayout.LayoutParams mExpanderLayoutParams;
-    final SelReportEditText mEditText;
-    final View mExpansion;
-    public ViewHolder(final View itemView, final EditTextSoundRouter router)
+    @NonNull final static TransitionSet expandCollapseTransition;
+    static
+    {
+      expandCollapseTransition = new TransitionSet();
+      expandCollapseTransition.addTransition(new ChangeBounds());
+      expandCollapseTransition.setOrdering(TransitionSet.ORDERING_TOGETHER);
+      expandCollapseTransition.addTransition(new Fade());
+    }
+    @NonNull final ImageView mExpander;
+    @NonNull final LinearLayout.LayoutParams mExpanderLayoutParams;
+    @NonNull final SelReportEditText mEditText;
+    @NonNull final View mExpansion;
+    @NonNull final RecyclerView mRecyclerView;
+    public ViewHolder(@NonNull final View itemView, @NonNull final EditTextSoundRouter router, @NonNull final RecyclerView recyclerView)
     {
       super(itemView);
       mExpander = (ImageView)itemView.findViewById(R.id.expander);
@@ -35,12 +48,14 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
       mEditText.setOnFocusChangeListener(router);
       mEditText.mListener = router;
       mExpansion = itemView.findViewById(R.id.todoExpanded);
+      mRecyclerView = recyclerView;
       final ImageButton b = (ImageButton)itemView.findViewById(R.id.todoExpandButton);
       b.setOnClickListener(this);
     }
 
-    @Override public void onClick(View view)
+    @Override public void onClick(@NonNull final View view)
     {
+      TransitionManager.beginDelayedTransition(mRecyclerView, expandCollapseTransition`);
       if (mExpansion.getVisibility() == View.VISIBLE)
         mExpansion.setVisibility(View.GONE);
       else
@@ -51,11 +66,13 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
   @NonNull final EditTextSoundRouter mRouter;
   @NonNull final LayoutInflater mInflater;
   @NonNull final ArrayList<TodoViewModel> mFlatTodoList;
-  public TodoAdapter(@NonNull final Context context, @NonNull final EditTextSoundRouter router, @NonNull final ArrayList<Todo> todoList)
+  @NonNull final RecyclerView mRecyclerView;
+  public TodoAdapter(@NonNull final Context context, @NonNull final EditTextSoundRouter router, @NonNull final ArrayList<Todo> todoList, @NonNull final RecyclerView recyclerView)
   {
     mRouter = router;
     mInflater = LayoutInflater.from(context);
     mFlatTodoList = flatten(todoList, 0, 0);
+    mRecyclerView = recyclerView;
   }
 
   private static ArrayList<TodoViewModel> flatten(@NonNull final List<Todo> list, final int start, final int depth)
@@ -71,7 +88,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
 
   @Override public ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType)
   {
-    return new ViewHolder(mInflater.inflate(R.layout.todo, parent, false), mRouter);
+    return new ViewHolder(mInflater.inflate(R.layout.todo, parent, false), mRouter, mRecyclerView);
   }
 
   @Override public void onBindViewHolder(@NonNull final ViewHolder holder, final int position)

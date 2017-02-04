@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * A class representing a single TODO.
@@ -13,7 +14,7 @@ import java.util.List;
 
 public class Todo
 {
-  @Nullable public final String mId;
+  @NonNull public final String mId;
   public final long mCreationTime;
   @NonNull public final String mText;
   @Nullable public final Todo mParent;
@@ -33,7 +34,7 @@ public class Todo
                @Nullable final Planning planning,
                final int estimatedTime)
   {
-    mId = id;
+    mId = null == id ? UUID.randomUUID().toString() : id;
     mCreationTime = creationTime;
     mText = text;
     mParent = parent;

@@ -1,5 +1,7 @@
 package com.j.jface;
 
+import android.support.annotation.NonNull;
+
 import java.util.concurrent.Semaphore;
 
 public class FutureValue<T>
@@ -12,7 +14,7 @@ public class FutureValue<T>
     return null == mValue;
   }
 
-  public T get()
+  @NonNull public T get()
   {
     while (null == mValue)
     {
