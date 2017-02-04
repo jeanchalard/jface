@@ -3,6 +3,7 @@ package com.j.jface.org;
 import android.animation.LayoutTransition;
 import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -31,6 +32,9 @@ public class JOrg extends WrappedActivity
   @NonNull private final TodoSource mTodoSource;
   @NonNull private final SoundSource mSoundSource;
   @NonNull private final EditTextSoundRouter mSoundRouter;
+  // This is final but nowhere near unmodifiable ; in fact it's modified all over
+  // the place whenever the UI changes anything.
+  @NonNull private final ArrayList<Todo> mTodoList;
 
   public JOrg(@NonNull Args args)
   {
@@ -45,12 +49,18 @@ public class JOrg extends WrappedActivity
     top.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
     top.getLayoutTransition().setDuration(LAYOUT_ANIMATION_DURATION);
 
-    final Todo test = new Todo("foobar");
-    mTodoSource.updateTodo(test);
+    mTodoList = mTodoSource.fetchTodoList();
+    addTodoViews(mTodoList, top, 0);
 
-    ArrayList<Todo> tt = mTodoSource.fetchTodoList();
-
-    addTodos(tt, top, 0);
+    final FloatingActionButton fab = (FloatingActionButton)mA.findViewById(R.id.addTodo);
+    fab.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View view)
+      {
+        final Todo newTodo = new Todo("");
+        mTodoList.add(newTodo);
+        addTodoView(newTodo, top, 0);
+      }
+    });
   }
 
   public void onPause()
@@ -63,19 +73,24 @@ public class JOrg extends WrappedActivity
     mSoundSource.onResume();
   }
 
-  private void addTodos(final List<Todo> l, final LinearLayout topView, final int shift)
+  private void addTodoViews(final List<Todo> l, final LinearLayout topView, final int shift)
   {
     for (final Todo todo : l)
     {
-      topView.addView(inflateTodo(todo, shift));
-      final View separator = new View(mA);
-      separator.setBackgroundColor(0xFFA0A0A0);
-      LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1);
-      lp.setMargins(20 + shift, 0, 20, 0);
-      separator.setLayoutParams(lp);
-      topView.addView(separator);
-      addTodos(todo.mChildren, topView, shift + 25);
+      addTodoView(todo, topView, shift);
+      addTodoViews(todo.mChildren, topView, shift + 25);
     }
+  }
+
+  private void addTodoView(final Todo todo, final LinearLayout topView, final int shift)
+  {
+    topView.addView(inflateTodo(todo, shift));
+    final View separator = new View(mA);
+    separator.setBackgroundColor(0xFFA0A0A0);
+    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1);
+    lp.setMargins(20 + shift, 0, 20, 0);
+    separator.setLayoutParams(lp);
+    topView.addView(separator);
   }
 
   private View inflateTodo(final Todo t, final int shift)
