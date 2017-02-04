@@ -3,8 +3,6 @@ package com.j.jface.org.todo;
 import android.content.UriMatcher;
 import android.support.annotation.NonNull;
 
-import com.j.jface.Const;
-
 // URI matcher for the Todo provider.
 public class TodoProviderMatcher extends UriMatcher
 {
@@ -16,7 +14,7 @@ public class TodoProviderMatcher extends UriMatcher
   public TodoProviderMatcher() { super(UriMatcher.NO_MATCH); }
   static
   {
-    Matcher.addURI(TodoProviderContract.BASE_URI, TodoProviderContract.TABLE, ALL_CONTENT);
-    Matcher.addURI(TodoProviderContract.BASE_URI, TodoProviderContract.TABLE + "/*", INDIVIDUAL_TODO);
+    Matcher.addURI(TodoProviderContract.BASE_URI_HOST, TodoProviderContract.TABLE, ALL_CONTENT);
+    Matcher.addURI(TodoProviderContract.BASE_URI_HOST, TodoProviderContract.TABLE + "/*", INDIVIDUAL_TODO);
   }
 }

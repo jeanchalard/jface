@@ -8,6 +8,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -19,6 +20,7 @@ import com.j.jface.feed.actions.Action;
 import com.j.jface.feed.actions.DeleteAllDataAction;
 import com.j.jface.feed.actions.DeleteDataAction;
 import com.j.jface.feed.actions.GetDataAction;
+import com.j.jface.feed.actions.GetNodeNameAction;
 import com.j.jface.feed.actions.PutDataAction;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -52,8 +54,10 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
     handlerThread.start();
     return handlerThread.getLooper();
   }
+
   @Override public void handleMessage(final Message msg)
   {
+    Log.e("HNDL", "" + Thread.currentThread() + " : " + msg.what);
     switch (msg.what)
     {
       case MSG_PROCESS_QUEUE:
@@ -121,6 +125,13 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
   public void putData(@NonNull final String path, @NonNull final DataMap map)
   {
     enqueue(new PutDataAction(path, map));
+  }
+
+  public FutureValue<String> getNodeId()
+  {
+    final GetNodeNameAction action = new GetNodeNameAction();
+    enqueue(action);
+    return action.mResult;
   }
 
   public void deleteData(@NonNull final Uri uri)

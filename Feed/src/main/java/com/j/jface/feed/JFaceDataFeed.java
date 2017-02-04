@@ -32,6 +32,7 @@ public class JFaceDataFeed extends WrappedActivity
 {
   @NonNull private final String LAST_OPEN_FRAGMENT_INDEX = "last_open_fragment_index";
   @NonNull private final ActionBarDrawerToggle mDrawerToggle;
+  @NonNull private final Client mClient;
 
   // State
   private int mCurrentlyDisplayedFragmentIndex = 0;
@@ -40,13 +41,13 @@ public class JFaceDataFeed extends WrappedActivity
   {
     super(args);
     mA.setContentView(R.layout.data_feed_drawer);
+    mClient = new Client(mA);
     final DrawerLayout drawer = (DrawerLayout)mA.findViewById(R.id.dataFeedDrawer);
 
     final ListView list = (ListView)mA.findViewById(R.id.dataFeedDrawerContents);
     list.setAdapter(new ArrayAdapter<>(mA, R.layout.data_feed_drawer_item, new String[] { "Messages", "Activity log", "Logs & data", "Debug tools" }));
     final AdapterView.OnItemClickListener listener = new AdapterView.OnItemClickListener()
     {
-      private final Client mClient = new Client(mA);
       @Override public void onItemClick(@Nullable final AdapterView<?> parent, @Nullable final View view, final int position, final long id)
       {
         final Fragment f = getFragmentForPosition(position, mClient);

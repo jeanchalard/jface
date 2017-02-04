@@ -28,17 +28,18 @@ public class TodoProvider extends WrappedContentProvider
     @Override public void onCreate(final SQLiteDatabase sqLiteDatabase)
     {
       sqLiteDatabase.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
-       "id TEXT PRIMARY KEY NOT NULL," +
-       "creationDate INTEGER," +
-       "updateDate INTEGER," +
-       "text TEXT NOT NULL," +
-       "parent TEXT," +
-       "lifeline INTEGER," +
-       "deadline INTEGER," +
-       "hardness TINYINT," +
-       "timeConstraint TINYINT," +
-       "where INTEGER," +
-       "estimatedTime INTEGER)");
+       /*  0 */              TodoProviderContract.COLUMN_id + " TEXT PRIMARY KEY NOT NULL," +
+       /*  1 */              TodoProviderContract.COLUMN_creationTime + " INTEGER," +
+       /*  2 */              TodoProviderContract.COLUMN_updateTime + " INTEGER," +
+       /*  3 */              TodoProviderContract.COLUMN_text + " TEXT NOT NULL," +
+       /*  4 */              TodoProviderContract.COLUMN_parent + " TEXT," +
+       /*  5 */              TodoProviderContract.COLUMN_lifeline + " INTEGER," +
+       /*  6 */              TodoProviderContract.COLUMN_deadline + " INTEGER," +
+       /*  7 */              TodoProviderContract.COLUMN_hardness + " TINYINT," +
+       /*  8 */              TodoProviderContract.COLUMN_timeConstraint + " TINYINT," +
+       /*  9 */              TodoProviderContract.COLUMN_where + " TEXT," +
+       /* 10 */              TodoProviderContract.COLUMN_estimatedTime + " INTEGER," +
+       /* 11 */              TodoProviderContract.COLUMN_status + " INTEGER)");
     }
 
     @Override public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1)
@@ -64,8 +65,9 @@ public class TodoProvider extends WrappedContentProvider
         return db.query(TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
       case TodoProviderMatcher.INDIVIDUAL_TODO:
         final String todoId = uri.getLastPathSegment();
-        break;
+        return db.query(TABLE_NAME, projection, "id = ?", new String[] { todoId }, null, null, sortOrder);
     }
+    return null;
   }
 
   @Nullable public String getType(@NonNull final Uri uri)
@@ -78,18 +80,24 @@ public class TodoProvider extends WrappedContentProvider
     return null;
   }
 
-  @Nullable public Uri insert(@NonNull final Uri uri, @NonNull final ContentValues contentValues)
+  @Nullable public Uri insert(@NonNull final Uri uri, @NonNull final ContentValues values)
   {
     final SQLiteDatabase db = mDb.getWritableDatabase();
     // TODO : sanitize
-    db.insert(TABLE_NAME, null, contentValues);
+    db.insert(TABLE_NAME, null, values);
+    return Uri.withAppendedPath(TodoProviderContract.BASE_URI, values.getAsString(TodoProviderContract.COLUMN_id));
   }
 
   public int delete(@NonNull final Uri uri, @Nullable final String selection, @Nullable final String[] selectionArgs)
   {
+    final SQLiteDatabase db = mDb.getWritableDatabase();
+    return db.delete(TABLE_NAME, selection, selectionArgs);
   }
 
   public int update(@NonNull final Uri uri, @NonNull final ContentValues values, @Nullable final String selection, @Nullable final String[] selectionArgs)
   {
+    final SQLiteDatabase db = mDb.getWritableDatabase();
+    // TODO : sanitize
+    return db.update(TABLE_NAME, values, selection, selectionArgs);
   }
 }

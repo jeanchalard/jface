@@ -12,11 +12,13 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 
 import com.j.jface.R;
+import com.j.jface.feed.Client;
 import com.j.jface.lifecycle.WrappedActivity;
 import com.j.jface.org.todo.Todo;
+import com.j.jface.org.todo.TodoSource;
 import com.j.jface.org.todo.TodoUtil;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,6 +27,8 @@ import java.util.List;
 public class JOrg extends WrappedActivity
 {
   private static final int LAYOUT_ANIMATION_DURATION = 100;
+  @NonNull private final Client mClient;
+  @NonNull private final TodoSource mTodoSource;
   @NonNull private final SoundSource mSoundSource;
   @NonNull private final EditTextSoundRouter mSoundRouter;
 
@@ -32,19 +36,21 @@ public class JOrg extends WrappedActivity
   {
     super(args);
     mA.setContentView(R.layout.org_top);
-    final LinearLayout top = (LinearLayout)mA.findViewById(R.id.todoList);
-    mSoundSource = new SoundSource(mA, (ViewGroup)mA.findViewById(R.id.sound_source));
+    mClient = new Client(mA);
+    mTodoSource = new TodoSource(mA);
+    mSoundSource = new SoundSource(mA, (ViewGroup) mA.findViewById(R.id.sound_source));
     mSoundRouter = new EditTextSoundRouter(mSoundSource);
 
-    Todo tt[] = {
-     new Todo("Inventer une machine à remonter le temps", null, null,
-      Arrays.asList(new Todo("Trouver du plutonium", null, null, Arrays.asList(new Todo("Acheter un gilet pare-balles"), new Todo("Demander aux lybiens")), null, 0), new Todo("Trouver une batterie de 2.21GW")),
-      null, 0), new Todo("Devenir maître du monde"), new Todo("")
-    };
-
+    final LinearLayout top = (LinearLayout)mA.findViewById(R.id.todoList);
     top.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
     top.getLayoutTransition().setDuration(LAYOUT_ANIMATION_DURATION);
-    addTodos(Arrays.asList(tt), top, 0);
+
+    final Todo test = new Todo("foobar");
+    mTodoSource.updateTodo(test);
+
+    ArrayList<Todo> tt = mTodoSource.fetchTodoList();
+
+    addTodos(tt, top, 0);
   }
 
   public void onPause()
