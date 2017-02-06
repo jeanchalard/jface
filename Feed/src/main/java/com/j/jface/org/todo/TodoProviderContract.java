@@ -19,8 +19,9 @@ public class TodoProviderContract
   @NonNull public static final String COLUMN_id = "id";
   @NonNull public static final String COLUMN_creationTime = "creationTime";
   @NonNull public static final String COLUMN_updateTime = "updateTime";
+  @NonNull public static final String COLUMN_completionTime = "completionTime";
   @NonNull public static final String COLUMN_text = "text";
-  @NonNull public static final String COLUMN_parent = "parent";
+  @NonNull public static final String COLUMN_depth = "depth";
   @NonNull public static final String COLUMN_lifeline = "lifeline";
   @NonNull public static final String COLUMN_deadline = "deadline";
   @NonNull public static final String COLUMN_hardness = "hardness";
@@ -29,16 +30,17 @@ public class TodoProviderContract
   @NonNull public static final String COLUMN_estimatedTime = "estimatedTime";
   @NonNull public static final String COLUMN_status = "status";
 
-  @NonNull public static final int COLUMNINDEX_id = 0;
-  @NonNull public static final int COLUMNINDEX_creationTime = 1;
-  @NonNull public static final int COLUMNINDEX_updateTime = 2;
-  @NonNull public static final int COLUMNINDEX_text = 3;
-  @NonNull public static final int COLUMNINDEX_parent = 4;
-  @NonNull public static final int COLUMNINDEX_lifeline = 5;
-  @NonNull public static final int COLUMNINDEX_deadline = 6;
-  @NonNull public static final int COLUMNINDEX_hardness = 7;
-  @NonNull public static final int COLUMNINDEX_timeConstraint = 8;
-  @NonNull public static final int COLUMNINDEX_where = 9;
-  @NonNull public static final int COLUMNINDEX_estimatedTime = 10;
-  @NonNull public static final int COLUMNINDEX_status = 11;
+  public static final int COLUMNINDEX_id = 0;
+  public static final int COLUMNINDEX_creationTime = 1;
+  public static final int COLUMNINDEX_updateTime = 2;
+  public static final int COLUMNINDEX_completionTime = 3;
+  public static final int COLUMNINDEX_text = 4;
+  public static final int COLUMNINDEX_depth = 5;
+  public static final int COLUMNINDEX_lifeline = 6;
+  public static final int COLUMNINDEX_deadline = 7;
+  public static final int COLUMNINDEX_hardness = 8;
+  public static final int COLUMNINDEX_timeConstraint = 9;
+  public static final int COLUMNINDEX_where = 10;
+  public static final int COLUMNINDEX_estimatedTime = 11;
+  public static final int COLUMNINDEX_status = 12;
 }

@@ -24,16 +24,18 @@
 
   <android.support.design.widget.CoordinatorLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:id="@+id/topLayout">
 
     <android.support.v7.widget.RecyclerView
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:orientation="vertical"
       android:id="@+id/todoList"
-      android:animateLayoutChanges="true"
       android:focusable="true"
       android:focusableInTouchMode="true"
+      android:clipToPadding="false"
+      android:clipChildren="false"
       android:descendantFocusability="beforeDescendants"
       app:layoutManager="android.support.v7.widget.LinearLayoutManager"/>
 

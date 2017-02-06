@@ -31,15 +31,16 @@ public class TodoProvider extends WrappedContentProvider
        /*  0 */              TodoProviderContract.COLUMN_id + " TEXT PRIMARY KEY NOT NULL," +
        /*  1 */              TodoProviderContract.COLUMN_creationTime + " INTEGER," +
        /*  2 */              TodoProviderContract.COLUMN_updateTime + " INTEGER," +
-       /*  3 */              TodoProviderContract.COLUMN_text + " TEXT NOT NULL," +
-       /*  4 */              TodoProviderContract.COLUMN_parent + " TEXT," +
-       /*  5 */              TodoProviderContract.COLUMN_lifeline + " INTEGER," +
-       /*  6 */              TodoProviderContract.COLUMN_deadline + " INTEGER," +
-       /*  7 */              TodoProviderContract.COLUMN_hardness + " TINYINT," +
-       /*  8 */              TodoProviderContract.COLUMN_timeConstraint + " TINYINT," +
-       /*  9 */              TodoProviderContract.COLUMN_where + " TEXT," +
-       /* 10 */              TodoProviderContract.COLUMN_estimatedTime + " INTEGER," +
-       /* 11 */              TodoProviderContract.COLUMN_status + " INTEGER)");
+       /*  3 */              TodoProviderContract.COLUMN_completionTime + " INTEGER," +
+       /*  4 */              TodoProviderContract.COLUMN_text + " TEXT NOT NULL," +
+       /*  5 */              TodoProviderContract.COLUMN_depth + " INTEGER," +
+       /*  6 */              TodoProviderContract.COLUMN_lifeline + " INTEGER," +
+       /*  7 */              TodoProviderContract.COLUMN_deadline + " INTEGER," +
+       /*  8 */              TodoProviderContract.COLUMN_hardness + " TINYINT," +
+       /*  9 */              TodoProviderContract.COLUMN_timeConstraint + " TINYINT," +
+       /* 10 */              TodoProviderContract.COLUMN_where + " TEXT," +
+       /* 11 */              TodoProviderContract.COLUMN_estimatedTime + " INTEGER," +
+       /* 12 */              TodoProviderContract.COLUMN_status + " INTEGER)");
     }
 
     @Override public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1)

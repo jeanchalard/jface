@@ -34,11 +34,9 @@ public class TodoSource
     return new Todo(
      c.getString(TodoProviderContract.COLUMNINDEX_id),
      c.getLong(TodoProviderContract.COLUMNINDEX_creationTime),
+     c.getLong(TodoProviderContract.COLUMNINDEX_completionTime),
      c.getString(TodoProviderContract.COLUMNINDEX_text),
-     null, // parent
-     null, // requirements
-     null, // dependents
-     null, // children
+     c.getInt(TodoProviderContract.COLUMNINDEX_depth),
      new Planning(
       c.getInt(TodoProviderContract.COLUMNINDEX_lifeline),
       c.getInt(TodoProviderContract.COLUMNINDEX_deadline),
@@ -49,28 +47,20 @@ public class TodoSource
      c.getInt(TodoProviderContract.COLUMNINDEX_estimatedTime));
   }
 
-  @NonNull public ArrayList<Todo> fetchTodoList()
+  @NonNull public TodoList fetchTodoList()
   {
-    return fetchTodosWithParent(null);
-  }
-
-  @NonNull private ArrayList<Todo> fetchTodosWithParent(final Todo parent)
-  {
-    final String condition = null == parent ? "parent is NULL" : "parent = ?";
-    final String arguments[] = null == parent ? null : new String[] { parent.mId };
-    final Cursor c = mResolver.query(TodoProviderContract.BASE_URI, null, condition, arguments, null);
-    if (null == c || !c.moveToFirst()) return new ArrayList<>();
+    final String condition = "completionTime = 0";
+    final Cursor c = mResolver.query(TodoProviderContract.BASE_URI, null, condition, null, "id");
+    if (null == c || !c.moveToFirst()) return new TodoList();
     final ArrayList<Todo> todos = new ArrayList<>(c.getCount());
     while (!c.isAfterLast())
     {
       final Todo t = new Todo(
        c.getString(TodoProviderContract.COLUMNINDEX_id),
        c.getLong(TodoProviderContract.COLUMNINDEX_creationTime),
+       c.getLong(TodoProviderContract.COLUMNINDEX_completionTime),
        c.getString(TodoProviderContract.COLUMNINDEX_text),
-       parent,
-       null, // requirements
-       null, // dependents
-       null,
+       c.getInt(TodoProviderContract.COLUMNINDEX_depth),
        new Planning(
         c.getInt(TodoProviderContract.COLUMNINDEX_lifeline),
         c.getInt(TodoProviderContract.COLUMNINDEX_deadline),
@@ -79,12 +69,11 @@ public class TodoSource
         Fences.paramsFromName(c.getString(TodoProviderContract.COLUMNINDEX_where))
        ),
        c.getInt(TodoProviderContract.COLUMNINDEX_estimatedTime));
-      t.mChildren.addAll(fetchTodosWithParent(t));
       c.moveToNext();
       todos.add(t);
     }
     c.close();
-    return todos;
+    return new TodoList(todos);
   }
 
   @NonNull public Todo updateTodo(@NonNull final Todo todo)
@@ -99,8 +88,9 @@ public class TodoSource
     cv.put(TodoProviderContract.COLUMN_id, todo.mId);
     cv.put(TodoProviderContract.COLUMN_creationTime, todo.mCreationTime);
     cv.put(TodoProviderContract.COLUMN_updateTime, System.currentTimeMillis());
+    cv.put(TodoProviderContract.COLUMN_completionTime, todo.mCompletionTime);
     cv.put(TodoProviderContract.COLUMN_text, todo.mText);
-    if (null != todo.mParent) cv.put(TodoProviderContract.COLUMN_parent, todo.mParent.mId);
+    cv.put(TodoProviderContract.COLUMN_depth, todo.mDepth);
     cv.put(TodoProviderContract.COLUMN_lifeline, todo.mPlanning.mLifeline);
     cv.put(TodoProviderContract.COLUMN_deadline, todo.mPlanning.mDeadline);
     cv.put(TodoProviderContract.COLUMN_hardness, todo.mPlanning.mHardness);
