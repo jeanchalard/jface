@@ -1,7 +1,6 @@
 package com.j.jface.org;
 
 import android.content.Context;
-import android.inputmethodservice.KeyboardView;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -38,4 +37,14 @@ public class SelReportEditText extends EditText
       imm.hideSoftInputFromWindow(getWindowToken(), 0);
     }
   }
+
+  /*
+  @Override public void onFocusChanged(final boolean gainFocus, final int direction, final Rect previouslyFocusedRect)
+  {
+    if (gainFocus)
+    {
+      final InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+      imm.showSoftInput(this, 0);
+    }
+  }*/
 }

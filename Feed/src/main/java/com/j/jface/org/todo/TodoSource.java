@@ -33,6 +33,7 @@ public class TodoSource
     if (null == c || c.getCount() != 1) return null;
     return new Todo(
      c.getString(TodoProviderContract.COLUMNINDEX_id),
+     c.getString(TodoProviderContract.COLUMNINDEX_ord),
      c.getLong(TodoProviderContract.COLUMNINDEX_creationTime),
      c.getLong(TodoProviderContract.COLUMNINDEX_completionTime),
      c.getString(TodoProviderContract.COLUMNINDEX_text),
@@ -50,13 +51,14 @@ public class TodoSource
   @NonNull public TodoList fetchTodoList()
   {
     final String condition = "completionTime = 0";
-    final Cursor c = mResolver.query(TodoProviderContract.BASE_URI, null, condition, null, "id");
+    final Cursor c = mResolver.query(TodoProviderContract.BASE_URI, null, condition, null, "ord");
     if (null == c || !c.moveToFirst()) return new TodoList();
     final ArrayList<Todo> todos = new ArrayList<>(c.getCount());
     while (!c.isAfterLast())
     {
       final Todo t = new Todo(
        c.getString(TodoProviderContract.COLUMNINDEX_id),
+       c.getString(TodoProviderContract.COLUMNINDEX_ord),
        c.getLong(TodoProviderContract.COLUMNINDEX_creationTime),
        c.getLong(TodoProviderContract.COLUMNINDEX_completionTime),
        c.getString(TodoProviderContract.COLUMNINDEX_text),
@@ -86,6 +88,7 @@ public class TodoSource
   {
     final ContentValues cv = new ContentValues();
     cv.put(TodoProviderContract.COLUMN_id, todo.mId);
+    cv.put(TodoProviderContract.COLUMN_ord, todo.mOrd);
     cv.put(TodoProviderContract.COLUMN_creationTime, todo.mCreationTime);
     cv.put(TodoProviderContract.COLUMN_updateTime, System.currentTimeMillis());
     cv.put(TodoProviderContract.COLUMN_completionTime, todo.mCompletionTime);

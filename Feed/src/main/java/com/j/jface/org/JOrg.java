@@ -21,8 +21,10 @@ import com.j.jface.org.todo.TodoAdapter;
 import com.j.jface.org.todo.TodoList;
 import com.j.jface.org.todo.TodoSource;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Main activity class for JOrg.
@@ -104,18 +106,26 @@ public class JOrg extends WrappedActivity implements Handler.Callback, TodoList.
   // Null parent means top level, as always
   @NonNull public Todo addNewSubTodo(@Nullable final Todo parent)
   {
-    return mTodoList.createAndInsertTodo("", parent);
+    final Todo todo = mTodoList.createAndInsertTodo("", parent);
+    mAdapter.passFocusTo(todo);
+    return todo;
   }
 
   public void clearTodo(@NonNull final Todo todo)
   {
-    final Todo newTodo = new Todo.Builder(todo).setCompletionTime(System.currentTimeMillis()).build();
-    mTodoList.updateTodo(newTodo);
+    final ArrayList<Todo> descendants = mTodoList.getDescendants(todo);
+    for (final ListIterator<Todo> it = descendants.listIterator(descendants.size()); it.hasPrevious(); )
+    {
+      final Todo t = it.previous();
+      final Todo newTodo = new Todo.Builder(t).setCompletionTime(System.currentTimeMillis()).build();
+      mTodoList.updateTodo(newTodo);
+    }
     final Snackbar undoChance = Snackbar.make(mTopLayout, "Marked done.", Snackbar.LENGTH_LONG);
+    undoChance.setDuration(8000); // 8 seconds, because LENGTH_LONG is punily short
     undoChance.setAction("Undo", new View.OnClickListener() {
       @Override public void onClick(View v)
       {
-        mTodoList.updateTodo(todo);
+        for (final Todo todo : descendants) mTodoList.updateTodo(todo);
       }
     });
     undoChance.show();
@@ -124,8 +134,7 @@ public class JOrg extends WrappedActivity implements Handler.Callback, TodoList.
   public Todo updateTodoContents(@NonNull final Todo todo, @NonNull final Editable editable)
   {
     final String text = editable.toString();
-    if (todo.mText.equals(text)) return todo;
-    final Todo newTodo = new Todo.Builder(todo).setText(editable.toString()).build();
+    final Todo newTodo = new Todo.Builder(todo).setText(text).build();
     mTodoList.updateTodo(newTodo);
     return newTodo;
   }
@@ -141,7 +150,7 @@ public class JOrg extends WrappedActivity implements Handler.Callback, TodoList.
     for (final Todo t : todosToPersist.values()) mTodoSource.updateTodo(t);
   }
 
-  @Override public void notifyItemChanged(int position, @NonNull Todo payload)
+  @Override public void notifyItemChanged(final int position, @NonNull final Todo payload)
   {
     synchronized(mTodosToPersist)
     {
@@ -151,12 +160,12 @@ public class JOrg extends WrappedActivity implements Handler.Callback, TodoList.
     mHandler.sendEmptyMessageDelayed(PERSIST_TODOS, 3000); // 3 sec before persistence
   }
 
-  @Override public void notifyItemInserted(int position, @NonNull Todo payload)
+  @Override public void notifyItemInserted(final int position, @NonNull final Todo payload)
   {
     mTodoSource.updateTodo(payload);
   }
 
-  @Override public void notifyItemsRemoved(int position, @NonNull List<Todo> payload)
+  @Override public void notifyItemsRemoved(final int position, @NonNull final List<Todo> payload)
   {
     for (final Todo t : payload)
       mTodoSource.updateTodo(t);

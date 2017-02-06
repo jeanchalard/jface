@@ -45,7 +45,7 @@ public class TodoList
   // Pass null for a top-level todo.
   @NonNull public Todo createAndInsertTodo(@NonNull final String text, @NonNull final Todo parent)
   {
-    final Todo result = new Todo.Builder(text, idForNewChild(parent)).setDepth(null == parent ? 0 : parent.mDepth + 1).build();
+    final Todo result = new Todo.Builder(text, ordForNewChild(parent)).setDepth(null == parent ? 0 : parent.mDepth + 1).build();
     updateTodo(result);
     return result;
   }
@@ -62,6 +62,8 @@ public class TodoList
         final List<Todo> subListToClear = mList.subList(index, lastChildIndex + 1); // inclusive, exclusive
         final ArrayList<Todo> removed = new ArrayList<>(subListToClear);
         subListToClear.clear();
+        for (int i = 0; i < removed.size(); ++i)
+          removed.set(i, new Todo.Builder(removed.get(i)).setCompletionTime(todo.mCompletionTime).build());
         for (final ChangeObserver obs : mObservers) obs.notifyItemsRemoved(index, removed);
       }
       else
@@ -79,6 +81,15 @@ public class TodoList
     }
   }
 
+  public ArrayList<Todo> getDescendants(@NonNull final Todo todo)
+  {
+    final int index = mList.indexOf(todo);
+    if (index < 0) return new ArrayList<>();
+    final int lastChildIndex = getLastChildIndex(index);
+    final List<Todo> subList = mList.subList(index, lastChildIndex + 1); // inclusive, exclusive
+    return new ArrayList<>(subList);
+  }
+
   // -1 if no such element
   private int getLastChildIndex(final int parentIndex)
   {
@@ -92,16 +103,16 @@ public class TodoList
   }
 
   // Pass null to get an ord for the end of the list.
-  private String idForNewChild(@Nullable Todo parent)
+  private String ordForNewChild(@Nullable Todo parent)
   {
     final int parentIndex = mList.indexOf(parent);
     if (parentIndex < 0) parent = null;
     final int lastChildIndex = getLastChildIndex(parentIndex);
     final Todo lastChild = lastChildIndex < 0 ? null : mList.get(lastChildIndex);
 
-    final String prevOrd = null == lastChild ? Todo.MIN_ID : (lastChild == parent ? parent.mId + Todo.SEP_ID : lastChild.mId);
-    final String nextOrd = null == parent ? Todo.MAX_ID : parent.mId + Todo.SEP_MAX_ID;
-    return Todo.idBetween(prevOrd, nextOrd);
+    final String prevOrd = null == lastChild ? Todo.MIN_ORD : (lastChild == parent ? parent.mOrd + Todo.SEP_ORD : lastChild.mOrd);
+    final String nextOrd = null == parent ? Todo.MAX_ORD : parent.mOrd + Todo.SEP_MAX_ORD;
+    return Todo.ordBetween(prevOrd, nextOrd);
   }
 
   public Todo get(final int index) { return mList.get(index); }

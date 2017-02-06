@@ -3,6 +3,7 @@ package com.j.jface.org.todo;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -39,7 +40,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
       expandCollapseTransition.addTransition(new Fade());
       expandCollapseTransition.setOrdering(TransitionSet.ORDERING_TOGETHER);
     }
-    @NonNull final private static Todo NULL_TODO = new Todo("", Todo.MIN_ID);
+    @NonNull final private static Todo NULL_TODO = new Todo("", Todo.MIN_ORD);
     @NonNull public Todo mCurrentTodo;
 
     @NonNull final private JOrg mJorg;
@@ -146,17 +147,23 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
     @Override public void afterTextChanged(@NonNull final Editable editable)
     {
       if (mCurrentTodo == NULL_TODO) return;
+      if (mCurrentTodo.mText.equals(editable.toString())) return;
       mCurrentTodo = mJorg.updateTodoContents(mCurrentTodo, editable);
     }
 
     public void bind(@NonNull final Todo todo)
     {
       if (todo.mId.equals(mCurrentTodo.mId)) return;
+      mCurrentTodo = todo;
       mExpanderLayoutParams.leftMargin = todo.mDepth * 40 + 10;
       mExpander.setLayoutParams(mExpanderLayoutParams);
       mExpansion.setVisibility(View.GONE);
       mEditText.setText(todo.mText);
-      mCurrentTodo = todo;
+    }
+
+    public void requestFocus()
+    {
+      mEditText.requestFocus();
     }
   }
 
@@ -183,6 +190,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
   @NonNull private final LayoutInflater mInflater;
   @NonNull private final TodoList mTodoList;
   @NonNull private final RecyclerView mRecyclerView;
+  @Nullable private Todo mExpectFocus;
   public TodoAdapter(@NonNull final JOrg jorg,
                      @NonNull final Context context,
                      @NonNull final EditTextSoundRouter router,
@@ -195,6 +203,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
     mTodoList = todoList;
     todoList.addObserver(new TodoChangeObserver());
     mRecyclerView = recyclerView;
+    mExpectFocus = null;
   }
 
   @Override public ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType)
@@ -206,10 +215,16 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
   {
     final Todo todo = mTodoList.get(position);
     holder.bind(todo);
+    if (todo == mExpectFocus) holder.requestFocus();
   }
 
   @Override public int getItemCount()
   {
     return mTodoList.size();
+  }
+
+  public void passFocusTo(@NonNull final Todo todo)
+  {
+    mExpectFocus = todo;
   }
 }
