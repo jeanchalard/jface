@@ -126,7 +126,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     }
 
     private final DataStore mDataStore = new DataStore();
-    private Sensors mSensors;
+//    private Sensors mSensors;
     private Draw mDraw = new Draw();
     private DrawTools mDrawTools = new DrawTools(null);
     @NonNull private final Time mTime = new Time();
@@ -154,7 +154,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
        .setAcceptsTapEvents(true)
        .build());
       mDrawTools = new DrawTools(DigitalWatchFaceService.this.getResources());
-      mSensors = new Sensors(DigitalWatchFaceService.this);
+//      mSensors = new Sensors(DigitalWatchFaceService.this);
       mTime.setToNow();
     }
 
@@ -206,10 +206,10 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     {
       super.onAmbientModeChanged(inAmbientMode);
       mDrawTools.onAmbientModeChanged(inAmbientMode, mLowBitAmbient);
-      if (inAmbientMode)
+/*      if (inAmbientMode)
         mSensors.stop();
       else
-        mSensors.start();
+        mSensors.start(); */
       invalidate();
 
       // Whether the timer should be running depends on whether we're in ambient mode (as well

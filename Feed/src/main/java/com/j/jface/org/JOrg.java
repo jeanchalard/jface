@@ -67,19 +67,6 @@ public class JOrg extends WrappedActivity implements Handler.Callback, TodoList.
         addNewSubTodo(null);
       }
     });
-
-    /*
-    String[] arr = { "0", "5",
-     "7", "8",
-     "7", "9",
-     "000000004", "5",
-     "000000004", "0000000041"
-    };
-    for (int i = 0; i < arr.length; i += 2)
-    {
-      final String ord1 = arr[i], ord2 = arr[i + 1];
-      Log.e("J", "<" + ord1 + "> : <" + ord2 + "> = <" + Todo.ordBetween(ord1, ord2) + ">");
-    }*/
   }
 
   public void onPause()
