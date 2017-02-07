@@ -37,7 +37,6 @@ public class SelReportEditText extends EditText
       imm.hideSoftInputFromWindow(getWindowToken(), 0);
     }
   }
-
   /*
   @Override public void onFocusChanged(final boolean gainFocus, final int direction, final Rect previouslyFocusedRect)
   {

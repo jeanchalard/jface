@@ -13,10 +13,7 @@
    android:theme="?attr/actionBarTheme"
    android:minHeight="?attr/actionBarSize"
    android:id="@+id/orgTopActionBar"
-   app:title="TODO"
-   android:focusable="true"
-   android:focusableInTouchMode="true"
-   android:descendantFocusability="beforeDescendants">
+   app:title="TODO">
 
     <include layout="@layout/sound_visualizer"/>
 
@@ -32,11 +29,8 @@
       android:layout_height="match_parent"
       android:orientation="vertical"
       android:id="@+id/todoList"
-      android:focusable="true"
-      android:focusableInTouchMode="true"
       android:clipToPadding="false"
       android:clipChildren="false"
-      android:descendantFocusability="beforeDescendants"
       app:layoutManager="android.support.v7.widget.LinearLayoutManager"/>
 
     <android.support.design.widget.FloatingActionButton

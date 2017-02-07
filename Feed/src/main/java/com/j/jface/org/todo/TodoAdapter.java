@@ -14,6 +14,7 @@ import android.transition.TransitionSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -164,6 +165,8 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
     public void requestFocus()
     {
       mEditText.requestFocus();
+      final InputMethodManager imm = (InputMethodManager)mEditText.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+      imm.showSoftInput(mEditText, 0);
     }
   }
 
@@ -215,7 +218,12 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
   {
     final Todo todo = mTodoList.get(position);
     holder.bind(todo);
-    if (todo == mExpectFocus) holder.requestFocus();
+  }
+
+  @Override public void onViewAttachedToWindow(final ViewHolder holder)
+  {
+    if (holder.mCurrentTodo == mExpectFocus)
+      holder.requestFocus();
   }
 
   @Override public int getItemCount()
