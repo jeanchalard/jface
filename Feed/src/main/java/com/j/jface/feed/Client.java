@@ -8,7 +8,6 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -57,7 +56,6 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
 
   @Override public void handleMessage(final Message msg)
   {
-    Log.e("HNDL", "" + Thread.currentThread() + " : " + msg.what);
     switch (msg.what)
     {
       case MSG_PROCESS_QUEUE:

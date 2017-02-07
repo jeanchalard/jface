@@ -1,22 +1,22 @@
 package com.j.jface.lifecycle;
 
-import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 // A base class for a wrapped activity with a sane lifecycle
 public class WrappedActivity
 {
-  @NonNull protected final Activity mA;
+  @NonNull protected final AppCompatActivity mA;
 
   public static class Args
   {
-    @NonNull public final Activity activity;
+    @NonNull public final AppCompatActivity activity;
     @Nullable public final Bundle icicle;
-    public Args(@NonNull final Activity a, @Nullable final Bundle b)
+    public Args(@NonNull final AppCompatActivity a, @Nullable final Bundle b)
     {
       activity = a; icicle = b;
     }

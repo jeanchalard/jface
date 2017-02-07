@@ -10,6 +10,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,6 +47,7 @@ public class JOrg extends WrappedActivity implements Handler.Callback, TodoList.
   {
     super(args);
     mA.setContentView(R.layout.org_top);
+    mA.setSupportActionBar((Toolbar)mA.findViewById(R.id.orgTopActionBar));
     mHandler = new Handler(this);
     mTodoSource = new TodoSource(mA);
     mSoundSource = new SoundSource(mA, (ViewGroup)mA.findViewById(R.id.sound_source));
