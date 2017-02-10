@@ -54,6 +54,11 @@
       </intent-filter>
     </activity>
 
+    <activity
+      android:name=".lifecycle.TodoEditorBoot"
+      android:label="Todo editor">
+    </activity>
+
     <provider
       android:authorities="com.j.jface.provider"
       android:exported="false"

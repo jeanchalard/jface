@@ -1,6 +1,5 @@
-package com.j.jface.org.todo;
+package com.j.jface.org;
 
-import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,7 +8,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.transition.ChangeBounds;
 import android.transition.Fade;
-import android.transition.TransitionManager;
 import android.transition.TransitionSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,9 +18,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.j.jface.R;
-import com.j.jface.org.EditTextSoundRouter;
-import com.j.jface.org.JOrg;
-import com.j.jface.org.SelReportEditText;
+import com.j.jface.org.todo.Todo;
+import com.j.jface.org.todo.TodoList;
 
 import java.util.List;
 
@@ -97,7 +94,9 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
     }
 
     private void toggleShowActions()
-    {/*
+    {
+      mJorg.startTodoEditor(mCurrentTodo);
+      /* Pour expand la ligne vers le bas et révéler les détails
         if (mShowActionsButton.getRotation() < 45f)
         {
           TransitionManager.beginDelayedTransition(mRecyclerView, expandCollapseTransition);
@@ -107,6 +106,8 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
             mExpansion.setVisibility(View.VISIBLE);
         }
         else*/
+
+      /* Pour afficher la palette de boutons
       TransitionManager.beginDelayedTransition(mTodoActionButtons, expandCollapseTransition);
       if (mAddSubTodoButton.getVisibility() == View.VISIBLE)
       {
@@ -140,6 +141,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
         ObjectAnimator.ofFloat(mClearTodoButton, "rotation", 0f).start();
         ObjectAnimator.ofFloat(mShowActionsButton, "rotation", 0f).start();
       }
+      */
     }
 
     private boolean mBinding;

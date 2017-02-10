@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+      android:orientation="vertical"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:layout_marginEnd="15dp"
+      android:layout_marginStart="10dp">
+
+      <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="top|center_horizontal"
+        android:layout_marginBottom="10dp"
+        android:id="@+id/calendarView_monthName"
+        android:textSize="@dimen/calendar_view_text_size"/>
+
+      <view class="com.j.jface.org.editor.CalendarView$CalendarGridView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/calendarView_gridView"/>
+
+    </LinearLayout>
+
+    <GridLayout
+      android:layout_width="0dp"
+      android:layout_height="match_parent"
+      android:layout_marginTop="40dp"
+      android:rowCount="2"
+      android:columnCount="2"
+      android:orientation="horizontal"
+      android:layout_weight="1">
+
+      <com.j.jface.org.editor.DatePicker
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:id="@+id/calendarView_date"/>
+
+      <TextView
+        android:text="今日"
+        android:background="@drawable/rounded_box"
+        android:padding="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:id="@+id/calendarView_resetDay"/>
+
+      <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+          android:text="00"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:gravity="center"
+          android:id="@+id/calendarView_hour"
+          android:textSize="@dimen/calendar_view_text_size"/>
+
+        <TextView
+          android:text=":"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="10dp"
+          android:layout_marginEnd="10dp"
+          android:gravity="center"
+          android:textSize="@dimen/calendar_view_text_size"/>
+
+        <TextView
+          android:text="00"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:id="@+id/calendarView_minute"
+          android:gravity="center"
+          android:textSize="@dimen/calendar_view_text_size"/>
+
+      </LinearLayout>
+
+      <TextView
+        android:text="00"
+        android:background="@drawable/rounded_box"
+        android:padding="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:id="@+id/calendarView_resetMinutes"/>
+
+    </GridLayout>
+
+</merge>

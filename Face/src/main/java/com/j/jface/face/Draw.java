@@ -33,7 +33,7 @@ public class Draw
   public boolean draw(@NonNull final DrawTools drawTools, final int modeFlags,
                       @NonNull final Canvas canvas, @NonNull final Rect bounds,
                       @Nullable final Departure departureLine1, @Nullable final Departure departureLine2,
-                      @NonNull final Status status, @NonNull final Time time, @NonNull final Sensors sensors,
+                      @NonNull final Status status, @NonNull final Time time, /*@NonNull final Sensors sensors,*/
                       @NonNull final String locationDescriptor,
                       @NonNull final String topic)
   {

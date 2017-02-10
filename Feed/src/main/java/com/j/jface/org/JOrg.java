@@ -1,5 +1,6 @@
 package com.j.jface.org;
 
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -16,9 +17,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.j.jface.R;
+import com.j.jface.lifecycle.TodoEditorBoot;
 import com.j.jface.lifecycle.WrappedActivity;
 import com.j.jface.org.todo.Todo;
-import com.j.jface.org.todo.TodoAdapter;
 import com.j.jface.org.todo.TodoList;
 import com.j.jface.org.todo.TodoSource;
 
@@ -43,7 +44,7 @@ public class JOrg extends WrappedActivity implements Handler.Callback, TodoList.
   @NonNull private final TodoList mTodoList;
   @NonNull private final HashMap<String, Todo> mTodosToPersist;
 
-  public JOrg(@NonNull Args args)
+  public JOrg(@NonNull final Args args)
   {
     super(args);
     mA.setContentView(R.layout.org_top);
@@ -158,5 +159,11 @@ public class JOrg extends WrappedActivity implements Handler.Callback, TodoList.
   {
     for (final Todo t : payload)
       mTodoSource.updateTodo(t);
+  }
+
+  public void startTodoEditor(@NonNull final Todo todo)
+  {
+    final Intent editorIntent = new Intent(mA, TodoEditorBoot.class);
+    mA.startActivity(editorIntent);
   }
 }
