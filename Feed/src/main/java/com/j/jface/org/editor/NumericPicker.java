@@ -1,6 +1,7 @@
 package com.j.jface.org.editor;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
@@ -18,6 +19,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.LinearLayout;
 import android.widget.Scroller;
 
+import com.j.jface.Const;
 import com.j.jface.R;
 
 import java.lang.annotation.Retention;
@@ -33,7 +35,7 @@ import java.util.Locale;
  * with a filter that only accepts digits, in spite of giving the option of
  * supplying a formatter.
  */
-public class DatePicker extends LinearLayout
+public class NumericPicker extends LinearLayout
 {
   /**
    * The number of items show in the selector wheel.
@@ -69,6 +71,22 @@ public class DatePicker extends LinearLayout
    * The strength of fading in the top and bottom while drawing the selector.
    */
   private static final float TOP_AND_BOTTOM_FADING_EDGE_STRENGTH = 1.0f;
+
+  /**
+   * Supported formats.
+   */
+  private static final int FORMAT_INTEGER = 0;
+  private static final int FORMAT_DATE = 1;
+
+  /**
+   * ...and which format we're in.
+   */
+  private final int mFormatStyle;
+
+  /**
+   * To avoid creating one for each formatting.
+   */
+  @NonNull private GregorianCalendar mTmpCal;
 
   /**
    * The distance between the two selection dividers.
@@ -232,7 +250,7 @@ public class DatePicker extends LinearLayout
      * @param oldVal The previous value.
      * @param newVal The new value.
      */
-    void onValueChange(DatePicker picker, int oldVal, int newVal);
+    void onValueChange(NumericPicker picker, int oldVal, int newVal);
   }
 
   /**
@@ -267,7 +285,7 @@ public class DatePicker extends LinearLayout
      *            {@link #SCROLL_STATE_TOUCH_SCROLL} or
      *            {@link #SCROLL_STATE_IDLE}.
      */
-    public void onScrollStateChange(DatePicker view, @ScrollState int scrollState);
+    public void onScrollStateChange(NumericPicker view, @ScrollState int scrollState);
   }
 
   /**
@@ -275,7 +293,7 @@ public class DatePicker extends LinearLayout
    *
    * @param context The application environment.
    */
-  public DatePicker(@NonNull final Context context)
+  public NumericPicker(@NonNull final Context context)
   {
     this(context, null);
   }
@@ -286,7 +304,7 @@ public class DatePicker extends LinearLayout
    * @param context The application environment.
    * @param attrs A collection of attributes.
    */
-  public DatePicker(@NonNull final Context context, @NonNull final AttributeSet attrs)
+  public NumericPicker(@NonNull final Context context, @NonNull final AttributeSet attrs)
   {
     super(context, attrs);
     mSolidColor = context.getColor(android.R.color.transparent);
@@ -330,6 +348,20 @@ public class DatePicker extends LinearLayout
     // create the fling and adjust scrollers
     mFlingScroller = new Scroller(getContext(), null, true);
     mAdjustScroller = new Scroller(getContext(), new DecelerateInterpolator(2.5f));
+
+    int formatStyle = FORMAT_INTEGER;
+    final TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.NumericPicker, 0, 0);
+    try
+    {
+      formatStyle = a.getInteger(R.styleable.NumericPicker_format, FORMAT_INTEGER);
+    }
+    finally
+    {
+      a.recycle();
+    }
+    mFormatStyle = formatStyle;
+    if (FORMAT_DATE == formatStyle)
+      mTmpCal = new GregorianCalendar();
   }
 
   @Override protected void onLayout(final boolean changed, final int left, final int top, final int right, final int bottom)
@@ -473,19 +505,7 @@ public class DatePicker extends LinearLayout
         }
         else
         {
-          int eventY = (int) event.getY();
-          int deltaMoveY = (int) Math.abs(eventY - mLastDownEventY);
-          long deltaTime = event.getEventTime() - mLastDownEventTime;
-          if (deltaMoveY <= mTouchSlop && deltaTime < ViewConfiguration.getTapTimeout())
-          {
-            int selectorIndexOffset = (eventY / mSelectorElementHeight) - SELECTOR_MIDDLE_ITEM_INDEX;
-            if (selectorIndexOffset > 0)
-              changeValueByOne(true);
-            else if (selectorIndexOffset < 0)
-              changeValueByOne(false);
-          }
-          else
-            ensureScrollWheelAdjusted();
+          ensureScrollWheelAdjusted();
           onScrollStateChange(OnScrollListener.SCROLL_STATE_IDLE);
         }
         mVelocityTracker.recycle();
@@ -576,20 +596,20 @@ public class DatePicker extends LinearLayout
   /**
    * Set the current value for the number picker.
    * <p>
-   * If the argument is less than the {@link DatePicker#getMinValue()} the
-   * current value is set to the {@link DatePicker#getMinValue()} value.
+   * If the argument is less than the {@link NumericPicker#getMinValue()} the
+   * current value is set to the {@link NumericPicker#getMinValue()} value.
    * </p>
    * <p>
-   * If the argument is less than the {@link DatePicker#getMinValue()} the
-   * current value is set to the {@link DatePicker#getMaxValue()} value.
+   * If the argument is less than the {@link NumericPicker#getMinValue()} the
+   * current value is set to the {@link NumericPicker#getMaxValue()} value.
    * </p>
    * <p>
-   * If the argument is less than the {@link DatePicker#getMaxValue()} the
-   * current value is set to the {@link DatePicker#getMaxValue()} value.
+   * If the argument is less than the {@link NumericPicker#getMaxValue()} the
+   * current value is set to the {@link NumericPicker#getMaxValue()} value.
    * </p>
    * <p>
-   * If the argument is less than the {@link DatePicker#getMaxValue()} the
-   * current value is set to the {@link DatePicker#getMinValue()} value.
+   * If the argument is less than the {@link NumericPicker#getMaxValue()} the
+   * current value is set to the {@link NumericPicker#getMinValue()} value.
    * </p>
    *
    * @param value The current value.
@@ -699,6 +719,10 @@ public class DatePicker extends LinearLayout
     {
       int selectorIndex = selectorIndices[i];
       String scrollSelectorValue = mSelectorIndexToStringCache.get(selectorIndex);
+      if (i == SELECTOR_MIDDLE_ITEM_INDEX)
+        mSelectorWheelPaint.setAlpha(255);
+      else
+        mSelectorWheelPaint.setAlpha(128);
       canvas.drawText(scrollSelectorValue, x, y, mSelectorWheelPaint);
       y += mSelectorElementHeight;
     }
@@ -718,18 +742,6 @@ public class DatePicker extends LinearLayout
       mSelectionDivider.setBounds(0, topOfBottomDivider, right, bottomOfBottomDivider);
       mSelectionDivider.draw(canvas);
     }
-  }
-
-  /**
-   * Makes a measure spec that tries greedily to use the max value.
-   *
-   * @param measureSpec The measure spec.
-   * @return A measure spec greedily imposing the max size.
-   */
-  private int makeMeasureSpec(final int measureSpec)
-  {
-    final int size = MeasureSpec.getSize(measureSpec);
-    return MeasureSpec.makeMeasureSpec(size, MeasureSpec.EXACTLY);
   }
 
   /**
@@ -765,25 +777,6 @@ public class DatePicker extends LinearLayout
     mValue = current;
     if (notifyChange) notifyChange(previous, current);
     initializeSelectorWheelIndices();
-    invalidate();
-  }
-
-  /**
-   * Changes the current value by one which is increment or
-   * decrement based on the passes argument.
-   * decrement the current value.
-   *
-   * @param increment True to increment, false to decrement.
-   */
-  private void changeValueByOne(final boolean increment)
-  {
-    if (!moveToFinalScrollerPosition(mFlingScroller))
-      moveToFinalScrollerPosition(mAdjustScroller);
-    mPreviousScrollerY = 0;
-    if (increment)
-      mFlingScroller.startScroll(0, 0, 0, -mSelectorElementHeight, SNAP_SCROLL_DURATION);
-    else
-      mFlingScroller.startScroll(0, 0, 0, mSelectorElementHeight, SNAP_SCROLL_DURATION);
     invalidate();
   }
 
@@ -883,10 +876,19 @@ public class DatePicker extends LinearLayout
     cache.put(selectorIndex, scrollSelectorValue);
   }
 
-  @NonNull private GregorianCalendar mTmpCal = new GregorianCalendar();
-  private String formatNumber(int value) {
-    mTmpCal.setTimeInMillis((long)value * 86400000);
-    return String.format(Locale.JAPANESE, "%04d-%02d-%02d", mTmpCal.get(Calendar.YEAR), mTmpCal.get(Calendar.MONTH) + 1, mTmpCal.get(Calendar.DAY_OF_MONTH));
+  /**
+   * Formats the value according to the format attribute.
+   * @param value the value.
+   * @return the string rep of the value.
+   */
+  private String formatNumber(final int value) {
+    if (FORMAT_DATE == mFormatStyle)
+    {
+      mTmpCal.setTimeInMillis(((long)value) * 86400000 - mTmpCal.get(Calendar.ZONE_OFFSET));
+      return String.format(Locale.JAPANESE, "%02d - %02d %s", mTmpCal.get(Calendar.MONTH) + 1, mTmpCal.get(Calendar.DAY_OF_MONTH), Const.WEEKDAYS[mTmpCal.get(Calendar.DAY_OF_WEEK) - 1]);
+    }
+    else // FORMAT_INTEGER
+      return String.format(Locale.JAPANESE, "%02d", value);
   }
 
   /**

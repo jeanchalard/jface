@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <declare-styleable name="NumericPicker">
+    <attr name="format" format="enum">
+      <enum name="integer" value="0"/>
+      <enum name="date" value="1"/>
+    </attr>
+  </declare-styleable>
+</resources>
