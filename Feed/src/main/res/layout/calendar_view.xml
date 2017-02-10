@@ -59,6 +59,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginEnd="15dp"
         j:format="date"
+        j:wrap="false"
         android:id="@+id/calendarView_date"/>
 
       <TextView
@@ -78,6 +79,7 @@
         android:layout_gravity="center"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="15dp"
+        android:layout_marginTop="15dp"
         android:orientation="horizontal">
 
         <com.j.jface.org.editor.NumericPicker
@@ -85,6 +87,7 @@
           android:layout_height="wrap_content"
           android:layout_gravity="center"
           j:format="integer"
+          j:wrap="true"
           android:id="@+id/calendarView_hour"/>
 
         <TextView
@@ -102,6 +105,7 @@
           android:layout_height="wrap_content"
           android:layout_gravity="center"
           j:format="integer"
+          j:wrap="true"
           android:id="@+id/calendarView_minute"/>
 
       </LinearLayout>

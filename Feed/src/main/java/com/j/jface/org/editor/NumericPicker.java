@@ -179,11 +179,6 @@ public class NumericPicker extends LinearLayout
   private float mLastDownEventY;
 
   /**
-   * The time of the last down event.
-   */
-  private long mLastDownEventTime;
-
-  /**
    * The Y position of the last down or move event.
    */
   private float mLastDownOrMoveEventY;
@@ -207,6 +202,11 @@ public class NumericPicker extends LinearLayout
    * @see ViewConfiguration#getScaledMaximumFlingVelocity()
    */
   private int mMaximumFlingVelocity;
+
+  /**
+   * Flag whether the selector should wrap around.
+   */
+  private boolean mWrapSelectorWheel;
 
   /**
    * The back ground color used to optimize scroller fading.
@@ -350,16 +350,19 @@ public class NumericPicker extends LinearLayout
     mAdjustScroller = new Scroller(getContext(), new DecelerateInterpolator(2.5f));
 
     int formatStyle = FORMAT_INTEGER;
+    boolean wrap = false;
     final TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.NumericPicker, 0, 0);
     try
     {
       formatStyle = a.getInteger(R.styleable.NumericPicker_format, FORMAT_INTEGER);
+      wrap = a.getBoolean(R.styleable.NumericPicker_wrap, false);
     }
     finally
     {
       a.recycle();
     }
     mFormatStyle = formatStyle;
+    mWrapSelectorWheel = wrap;
     if (FORMAT_DATE == formatStyle)
       mTmpCal = new GregorianCalendar();
   }
@@ -447,7 +450,6 @@ public class NumericPicker extends LinearLayout
     switch (action) {
       case MotionEvent.ACTION_DOWN: {
         mLastDownOrMoveEventY = mLastDownEventY = event.getY();
-        mLastDownEventTime = event.getEventTime();
         // Make sure we support flinging inside scrollables.
         getParent().requestDisallowInterceptTouchEvent(true);
         if (!mFlingScroller.isFinished()) {
@@ -539,12 +541,12 @@ public class NumericPicker extends LinearLayout
   @Override public void scrollBy(final int x, final int y)
   {
     int[] selectorIndices = mSelectorIndices;
-    if (y > 0 && selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX] <= mMinValue)
+    if (!mWrapSelectorWheel && y > 0 && selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX] <= mMinValue)
     {
       mCurrentScrollOffset = mInitialScrollOffset;
       return;
     }
-    if (y < 0 && selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX] >= mMaxValue)
+    if (!mWrapSelectorWheel && y < 0 && selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX] >= mMaxValue)
     {
       mCurrentScrollOffset = mInitialScrollOffset;
       return;
@@ -555,7 +557,7 @@ public class NumericPicker extends LinearLayout
       mCurrentScrollOffset -= mSelectorElementHeight;
       decrementSelectorIndices(selectorIndices);
       setValueInternal(selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX], true);
-      if (selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX] <= mMinValue)
+      if (!mWrapSelectorWheel && selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX] <= mMinValue)
         mCurrentScrollOffset = mInitialScrollOffset;
     }
     while (mCurrentScrollOffset - mInitialScrollOffset < -mSelectorTextGapHeight)
@@ -563,7 +565,7 @@ public class NumericPicker extends LinearLayout
       mCurrentScrollOffset += mSelectorElementHeight;
       incrementSelectorIndices(selectorIndices);
       setValueInternal(selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX], true);
-      if (selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX] >= mMaxValue)
+      if (!mWrapSelectorWheel && selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX] >= mMaxValue)
         mCurrentScrollOffset = mInitialScrollOffset;
     }
   }
@@ -756,6 +758,8 @@ public class NumericPicker extends LinearLayout
     for (int i = 0; i < mSelectorIndices.length; i++)
     {
       int selectorIndex = current + (i - SELECTOR_MIDDLE_ITEM_INDEX);
+      if (mWrapSelectorWheel)
+        selectorIndex = getWrappedSelectorIndex(selectorIndex);
       selectorIndices[i] = selectorIndex;
       ensureCachedScrollSelectorValue(selectorIndices[i]);
     }
@@ -771,8 +775,13 @@ public class NumericPicker extends LinearLayout
   {
     if (mValue == current) return;
     // Wrap around the values if we go past the start or end
-    current = Math.max(current, mMinValue);
-    current = Math.min(current, mMaxValue);
+    if (mWrapSelectorWheel)
+      current = getWrappedSelectorIndex(current);
+    else
+    {
+      current = Math.max(current, mMinValue);
+      current = Math.min(current, mMaxValue);
+    }
     int previous = mValue;
     mValue = current;
     if (notifyChange) notifyChange(previous, current);
@@ -835,6 +844,18 @@ public class NumericPicker extends LinearLayout
   }
 
   /**
+   * @return The wrapped index <code>selectorIndex</code> value.
+   */
+  private int getWrappedSelectorIndex(final int selectorIndex)
+  {
+    if (selectorIndex > mMaxValue)
+      return mMinValue + (selectorIndex - mMaxValue) % (mMaxValue - mMinValue) - 1;
+    else if (selectorIndex < mMinValue)
+      return mMaxValue - (mMinValue - selectorIndex) % (mMaxValue - mMinValue) + 1;
+    return selectorIndex;
+  }
+
+  /**
    * Increments the <code>selectorIndices</code> whose string representations
    * will be displayed in the selector.
    */
@@ -843,6 +864,8 @@ public class NumericPicker extends LinearLayout
     for (int i = 0; i < selectorIndices.length - 1; i++)
       selectorIndices[i] = selectorIndices[i + 1];
     int nextScrollSelectorIndex = selectorIndices[selectorIndices.length - 2] + 1;
+    if (mWrapSelectorWheel && nextScrollSelectorIndex > mMaxValue)
+      nextScrollSelectorIndex = mMaxValue;
     selectorIndices[selectorIndices.length - 1] = nextScrollSelectorIndex;
     ensureCachedScrollSelectorValue(nextScrollSelectorIndex);
   }
@@ -856,6 +879,8 @@ public class NumericPicker extends LinearLayout
     for (int i = selectorIndices.length - 1; i > 0; i--)
       selectorIndices[i] = selectorIndices[i - 1];
     int nextScrollSelectorIndex = selectorIndices[1] - 1;
+    if (mWrapSelectorWheel && nextScrollSelectorIndex < mMinValue)
+      nextScrollSelectorIndex = mMaxValue;
     selectorIndices[0] = nextScrollSelectorIndex;
     ensureCachedScrollSelectorValue(nextScrollSelectorIndex);
   }
