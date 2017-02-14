@@ -1,15 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="horizontal"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:layout_marginTop="20dp">
+<FrameLayout
+  xmlns:a="http://schemas.android.com/apk/res/android"
+  a:layout_width="match_parent"
+  a:layout_height="match_parent"
+  a:background="#9F000000">
 
-  <com.j.jface.org.editor.CalendarView
-    android:id="@+id/calendarView"
-    android:layout_marginEnd="15dp"
-    android:layout_marginStart="15dp"
-    android:layout_width="match_parent"
-    android:layout_height="180dp"/>
+  <LinearLayout
+    xmlns:a="http://schemas.android.com/apk/res/android"
+    a:id="@+id/todoEditor_details"
+    a:orientation="vertical"
+    a:layout_width="match_parent"
+    a:layout_height="wrap_content"
+    a:layout_gravity="center"
+    a:layout_marginStart="20dp"
+    a:layout_marginEnd="20dp"
+    a:paddingStart="10dp"
+    a:paddingEnd="10dp"
+    a:background="@color/active_todo_background"
+    a:elevation="5dp">
 
-</LinearLayout>
+    <TextView
+      a:layout_width="match_parent"
+      a:layout_height="wrap_content"
+      a:layout_gravity="center_vertical"
+      a:layout_marginTop="5dp"
+      a:layout_marginBottom="5dp"
+      a:id="@+id/todoEditor_title"
+      a:textSize="@dimen/todo_editor_title_size"
+      a:imeOptions="actionDone"
+      a:inputType="textCapSentences|textAutoCorrect|textAutoComplete"
+      />
+
+    <View
+      a:layout_height="1px"
+      a:layout_width="match_parent"
+      a:layout_marginStart="30dp"
+      a:layout_marginEnd="30dp"
+      a:layout_marginTop="5dp"
+      a:layout_marginBottom="5dp"
+      a:background="@color/separator_color"/>
+
+    <include layout="@layout/todo_details"/>
+
+  </LinearLayout>
+
+</FrameLayout>

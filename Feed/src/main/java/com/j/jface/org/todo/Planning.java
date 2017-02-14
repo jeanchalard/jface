@@ -25,13 +25,13 @@ public class Planning
   public static final int ON_DAYTIME = 4;
   public static final int ON_NIGHT = 8;
 
-  public final int mLifeline; // Timestamp : when this can be started
-  public final int mDeadline; // Timestamp : when this has to be done
+  public final long mLifeline; // Timestamp : when this can be started
+  public final long mDeadline; // Timestamp : when this has to be done
   public final int mHardness; // UNKNOWN or *_DEADLINE
   public final int mTimeConstraint; // UNKNOWN or ON_*
   @Nullable public final Fences.Params mWhere; // Typically null
 
-  public Planning(final int lifeline, final int deadline, final int hardness, final int timeConstraint, @Nullable final Fences.Params where)
+  public Planning(final long lifeline, final long deadline, final int hardness, final int timeConstraint, @Nullable final Fences.Params where)
   {
     mLifeline = lifeline;
     mDeadline = deadline;

@@ -31,6 +31,7 @@ public class TodoSource
     final Uri uri = Uri.withAppendedPath(TodoProviderContract.BASE_URI, id);
     final Cursor c = mResolver.query(uri, null, null, null, null);
     if (null == c || c.getCount() != 1) return null;
+    c.moveToFirst();
     return new Todo(
      c.getString(TodoProviderContract.COLUMNINDEX_id),
      c.getString(TodoProviderContract.COLUMNINDEX_ord),

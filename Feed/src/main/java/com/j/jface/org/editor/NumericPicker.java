@@ -299,7 +299,7 @@ public class NumericPicker extends LinearLayout
     super(context, attrs);
     mSolidColor = context.getColor(android.R.color.transparent);
 
-    final Drawable selectionDivider = context.getDrawable(R.drawable.number_picker_divider);
+    final Drawable selectionDivider = context.getDrawable(R.drawable.numeric_picker_divider);
     if (selectionDivider != null)
     {
       selectionDivider.setCallback(this);
@@ -331,7 +331,7 @@ public class NumericPicker extends LinearLayout
     paint.setTextAlign(Align.CENTER);
     paint.setTextSize(mTextSize);
     paint.setTypeface(Typeface.DEFAULT);
-    paint.setColor(context.getColor(android.R.color.primary_text_dark));
+    paint.setColor(0xFFFFFFFF);//context.getColor(android.R.color.primary_text_dark));
     paint.density = context.getResources().getDisplayMetrics().density;
     mSelectorWheelPaint = paint;
 

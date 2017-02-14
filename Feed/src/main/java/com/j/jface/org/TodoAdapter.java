@@ -8,6 +8,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.transition.ChangeBounds;
 import android.transition.Fade;
+import android.transition.TransitionManager;
 import android.transition.TransitionSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -95,9 +96,9 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
 
     private void toggleShowActions()
     {
-      mJorg.startTodoEditor(mCurrentTodo);
-      /* Pour expand la ligne vers le bas et révéler les détails
-        if (mShowActionsButton.getRotation() < 45f)
+//      mJorg.startTodoEditor(mCurrentTodo);
+      /* Pour expand la ligne vers le bas et révéler les détails */
+//        if (mShowActionsButton.getRotation() > 45f)
         {
           TransitionManager.beginDelayedTransition(mRecyclerView, expandCollapseTransition);
           if (mExpansion.getVisibility() == View.VISIBLE)
@@ -105,7 +106,6 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
           else
             mExpansion.setVisibility(View.VISIBLE);
         }
-        else*/
 
       /* Pour afficher la palette de boutons
       TransitionManager.beginDelayedTransition(mTodoActionButtons, expandCollapseTransition);

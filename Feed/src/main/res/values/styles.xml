@@ -6,7 +6,13 @@
     <item name="colorPrimary">@color/color_primary</item>
   </style>
 
-  <style name="AppTheme" parent="Theme.Base" />
-  <!-- Widget styling -->
+  <style name="JOrgStyle" parent="Theme.Base">
+    <item name="android:windowSoftInputMode">stateHidden</item>
+  </style>
+
+  <style name="Dialog" parent="@android:style/Theme.Material">
+    <item name="android:windowIsTranslucent">true</item>
+    <item name="android:windowBackground">@android:color/transparent</item>
+  </style>
 
 </resources>

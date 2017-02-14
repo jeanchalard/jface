@@ -1,26 +1,26 @@
 package com.j.jface.lifecycle;
 
-import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 /**
  * A wrapper for activities.
  */
-public abstract class ActivityWrapper<T extends WrappedActivity> extends Activity
+public abstract class AppCompatActivityWrapper<T extends WrappedActivity> extends AppCompatActivity
 {
   @Nullable private T mW;
 
   // Activity callbacks
   @Override protected void onCreate(@Nullable final Bundle icicle)
   {
+    super.onCreate(null);
     mW = (T)WrapUtils.build(getClass(),
      new Class[]{WrappedActivity.Args.class},
      new Object[]{new WrappedActivity.Args(this, icicle)});
-    super.onCreate(null);
   }
 
   @Override public void onSaveInstanceState(@NonNull final Bundle savedInstanceState)

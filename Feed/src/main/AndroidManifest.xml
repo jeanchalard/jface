@@ -56,7 +56,8 @@
 
     <activity
       android:name=".lifecycle.TodoEditorBoot"
-      android:label="Todo editor">
+      android:label="Todo editor"
+      android:theme="@style/Dialog">
     </activity>
 
     <provider

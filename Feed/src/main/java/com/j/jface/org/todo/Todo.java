@@ -11,6 +11,8 @@ import java.util.UUID;
 
 public class Todo implements Comparable<Todo>
 {
+  @NonNull public static final Todo NULL_TODO = new Todo("", "");
+
   @NonNull public final String mId;
   @NonNull public final String mOrd;
   public final long mCreationTime;

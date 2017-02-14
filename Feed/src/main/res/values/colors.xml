@@ -5,4 +5,5 @@
   <color name="drawer_separator">#C0C0C0</color>
   <color name="separator_color">#A0A0A0</color>
   <color name="color_primary">#607360</color>
+  <color name="active_todo_background">#FF3F3F3F</color>
 </resources>

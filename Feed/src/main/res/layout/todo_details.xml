@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:a="http://schemas.android.com/apk/res/android">
+
+  <LinearLayout
+    a:layout_width="match_parent"
+    a:layout_height="wrap_content"
+    a:orientation="horizontal">
+
+    <TextView
+      a:layout_width="wrap_content"
+      a:layout_height="wrap_content"
+      a:textSize="@dimen/calendar_view_text_size"
+      a:id="@+id/todoDetails_lifeline_text"/>
+
+    <TextView
+      a:text=" 〜 "
+      a:layout_width="wrap_content"
+      a:layout_height="wrap_content" />
+
+    <TextView
+      a:layout_width="wrap_content"
+      a:layout_height="wrap_content"
+      a:textSize="@dimen/calendar_view_text_size"
+      a:id="@+id/todoDetails_deadline_text"/>
+
+  </LinearLayout>
+
+  <com.j.jface.org.editor.CalendarView
+    a:id="@+id/todoDetails_calendarView"
+    a:layout_width="match_parent"
+    a:layout_marginStart="5dp"
+    a:layout_marginEnd="5dp"
+    a:layout_height="180dp"
+    a:visibility="gone" />
+
+
+</merge>

@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +17,7 @@ import android.text.Editable;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.j.jface.Const;
 import com.j.jface.R;
 import com.j.jface.lifecycle.TodoEditorBoot;
 import com.j.jface.lifecycle.WrappedActivity;
@@ -48,7 +50,7 @@ public class JOrg extends WrappedActivity implements Handler.Callback, TodoList.
   {
     super(args);
     mA.setContentView(R.layout.org_top);
-    mA.setSupportActionBar((Toolbar)mA.findViewById(R.id.orgTopActionBar));
+    ((AppCompatActivity)mA).setSupportActionBar((Toolbar)mA.findViewById(R.id.orgTopActionBar));
     mHandler = new Handler(this);
     mTodoSource = new TodoSource(mA);
     mSoundSource = new SoundSource(mA, (ViewGroup)mA.findViewById(R.id.sound_source));
@@ -164,6 +166,7 @@ public class JOrg extends WrappedActivity implements Handler.Callback, TodoList.
   public void startTodoEditor(@NonNull final Todo todo)
   {
     final Intent editorIntent = new Intent(mA, TodoEditorBoot.class);
+    editorIntent.putExtra(Const.EXTRA_TODO_ID, todo.mId);
     mA.startActivity(editorIntent);
   }
 }
