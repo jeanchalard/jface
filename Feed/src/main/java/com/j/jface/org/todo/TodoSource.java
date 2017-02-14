@@ -39,14 +39,12 @@ public class TodoSource
      c.getLong(TodoProviderContract.COLUMNINDEX_completionTime),
      c.getString(TodoProviderContract.COLUMNINDEX_text),
      c.getInt(TodoProviderContract.COLUMNINDEX_depth),
-     new Planning(
-      c.getInt(TodoProviderContract.COLUMNINDEX_lifeline),
-      c.getInt(TodoProviderContract.COLUMNINDEX_deadline),
-      c.getInt(TodoProviderContract.COLUMNINDEX_hardness),
-      c.getInt(TodoProviderContract.COLUMNINDEX_timeConstraint),
-      Fences.paramsFromName(c.getString(TodoProviderContract.COLUMNINDEX_where))
-     ),
-     c.getInt(TodoProviderContract.COLUMNINDEX_estimatedTime));
+     c.getInt(TodoProviderContract.COLUMNINDEX_lifeline),
+     c.getInt(TodoProviderContract.COLUMNINDEX_deadline),
+     c.getInt(TodoProviderContract.COLUMNINDEX_hardness),
+     c.getInt(TodoProviderContract.COLUMNINDEX_timeConstraint),
+     c.getInt(TodoProviderContract.COLUMNINDEX_estimatedTime),
+     Fences.paramsFromName(c.getString(TodoProviderContract.COLUMNINDEX_where)));
   }
 
   @NonNull public TodoList fetchTodoList()
@@ -64,14 +62,12 @@ public class TodoSource
        c.getLong(TodoProviderContract.COLUMNINDEX_completionTime),
        c.getString(TodoProviderContract.COLUMNINDEX_text),
        c.getInt(TodoProviderContract.COLUMNINDEX_depth),
-       new Planning(
-        c.getInt(TodoProviderContract.COLUMNINDEX_lifeline),
-        c.getInt(TodoProviderContract.COLUMNINDEX_deadline),
-        c.getInt(TodoProviderContract.COLUMNINDEX_hardness),
-        c.getInt(TodoProviderContract.COLUMNINDEX_timeConstraint),
-        Fences.paramsFromName(c.getString(TodoProviderContract.COLUMNINDEX_where))
-       ),
-       c.getInt(TodoProviderContract.COLUMNINDEX_estimatedTime));
+       c.getInt(TodoProviderContract.COLUMNINDEX_lifeline),
+       c.getInt(TodoProviderContract.COLUMNINDEX_deadline),
+       c.getInt(TodoProviderContract.COLUMNINDEX_hardness),
+       c.getInt(TodoProviderContract.COLUMNINDEX_timeConstraint),
+       c.getInt(TodoProviderContract.COLUMNINDEX_estimatedTime),
+       Fences.paramsFromName(c.getString(TodoProviderContract.COLUMNINDEX_where)));
       c.moveToNext();
       todos.add(t);
     }
@@ -88,19 +84,19 @@ public class TodoSource
   @NonNull private ContentValues contentValuesFromTodo(@NonNull final Todo todo)
   {
     final ContentValues cv = new ContentValues();
-    cv.put(TodoProviderContract.COLUMN_id, todo.mId);
-    cv.put(TodoProviderContract.COLUMN_ord, todo.mOrd);
-    cv.put(TodoProviderContract.COLUMN_creationTime, todo.mCreationTime);
+    cv.put(TodoProviderContract.COLUMN_id, todo.id);
+    cv.put(TodoProviderContract.COLUMN_ord, todo.ord);
+    cv.put(TodoProviderContract.COLUMN_creationTime, todo.creationTime);
     cv.put(TodoProviderContract.COLUMN_updateTime, System.currentTimeMillis());
-    cv.put(TodoProviderContract.COLUMN_completionTime, todo.mCompletionTime);
-    cv.put(TodoProviderContract.COLUMN_text, todo.mText);
-    cv.put(TodoProviderContract.COLUMN_depth, todo.mDepth);
-    cv.put(TodoProviderContract.COLUMN_lifeline, todo.mPlanning.mLifeline);
-    cv.put(TodoProviderContract.COLUMN_deadline, todo.mPlanning.mDeadline);
-    cv.put(TodoProviderContract.COLUMN_hardness, todo.mPlanning.mHardness);
-    cv.put(TodoProviderContract.COLUMN_timeConstraint, todo.mPlanning.mTimeConstraint);
-    if (null != todo.mPlanning.mWhere) cv.put(TodoProviderContract.COLUMN_where, todo.mPlanning.mWhere.name);
-    cv.put(TodoProviderContract.COLUMN_estimatedTime, todo.mEstimatedTime);
+    cv.put(TodoProviderContract.COLUMN_completionTime, todo.completionTime);
+    cv.put(TodoProviderContract.COLUMN_text, todo.text);
+    cv.put(TodoProviderContract.COLUMN_depth, todo.depth);
+    cv.put(TodoProviderContract.COLUMN_lifeline, todo.lifeline);
+    cv.put(TodoProviderContract.COLUMN_deadline, todo.deadline);
+    cv.put(TodoProviderContract.COLUMN_hardness, todo.hardness);
+    cv.put(TodoProviderContract.COLUMN_timeConstraint, todo.timeConstraint);
+    cv.put(TodoProviderContract.COLUMN_estimatedTime, todo.estimatedTime);
+    if (null != todo.where) cv.put(TodoProviderContract.COLUMN_where, todo.where.name);
     return cv;
   }
 }

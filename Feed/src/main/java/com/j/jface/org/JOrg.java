@@ -146,7 +146,7 @@ public class JOrg extends WrappedActivity implements Handler.Callback, TodoList.
   {
     synchronized(mTodosToPersist)
     {
-      mTodosToPersist.put(payload.mId, payload);
+      mTodosToPersist.put(payload.id, payload);
     }
     mHandler.removeMessages(PERSIST_TODOS);
     mHandler.sendEmptyMessageDelayed(PERSIST_TODOS, 3000); // 3 sec before persistence
@@ -166,7 +166,7 @@ public class JOrg extends WrappedActivity implements Handler.Callback, TodoList.
   public void startTodoEditor(@NonNull final Todo todo)
   {
     final Intent editorIntent = new Intent(mA, TodoEditorBoot.class);
-    editorIntent.putExtra(Const.EXTRA_TODO_ID, todo.mId);
+    editorIntent.putExtra(Const.EXTRA_TODO_ID, todo.id);
     mA.startActivity(editorIntent);
   }
 }

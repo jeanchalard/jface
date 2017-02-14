@@ -9,7 +9,6 @@ import android.widget.TextView;
 import com.j.jface.Const;
 import com.j.jface.R;
 import com.j.jface.lifecycle.WrappedActivity;
-import com.j.jface.org.todo.Planning;
 import com.j.jface.org.todo.Todo;
 import com.j.jface.org.todo.TodoSource;
 
@@ -40,7 +39,7 @@ public class TodoEditor extends WrappedActivity
     todo = null == todoId ? null : mSource.getTodoFromIdWithoutHierarchy(todoId);
     mTodo = null == todo ? NULL_TODO : todo;
 
-    mTitle.setText(mTodo.mText);
+    mTitle.setText(mTodo.text);
     mDetails = new TodoDetails(mSource, mTodo, mA.findViewById(R.id.todoEditor_details));
   }
 
@@ -58,12 +57,11 @@ public class TodoEditor extends WrappedActivity
       mDeadline = (TextView)rootView.findViewById(R.id.todoDetails_deadline_text);
       mCalendarView = (CalendarView)rootView.findViewById(R.id.todoDetails_calendarView);
 
-      final Planning p = todo.mPlanning;
-      if (p.mLifeline > 0)
-        mLifeline.setText(renderDate(todo.mPlanning.mLifeline));
+      if (todo.lifeline > 0)
+        mLifeline.setText(renderDate(todo.lifeline));
       else mLifeline.setText("–");
-      if (p.mDeadline > 0)
-        mDeadline.setText(renderDate(todo.mPlanning.mDeadline));
+      if (todo.deadline > 0)
+        mDeadline.setText(renderDate(todo.deadline));
       else mDeadline.setText("–");
     }
 

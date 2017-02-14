@@ -150,18 +150,18 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
     @Override public void afterTextChanged(@NonNull final Editable editable)
     {
       if (mCurrentTodo == NULL_TODO) return;
-      if (mCurrentTodo.mText.equals(editable.toString())) return;
+      if (mCurrentTodo.text.equals(editable.toString())) return;
       mCurrentTodo = mJorg.updateTodoContents(mCurrentTodo, editable);
     }
 
     public void bind(@NonNull final Todo todo)
     {
-      if (todo.mId.equals(mCurrentTodo.mId)) return;
+      if (todo.id.equals(mCurrentTodo.id)) return;
       mCurrentTodo = todo;
-      mExpanderLayoutParams.leftMargin = todo.mDepth * 40 + 10;
+      mExpanderLayoutParams.leftMargin = todo.depth * 40 + 10;
       mExpander.setLayoutParams(mExpanderLayoutParams);
       mExpansion.setVisibility(View.GONE);
-      mEditText.setText(todo.mText);
+      mEditText.setText(todo.text);
     }
 
     public void requestFocus()

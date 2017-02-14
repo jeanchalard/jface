@@ -3,6 +3,8 @@ package com.j.jface.org.todo;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.j.jface.feed.Fences;
+
 import java.util.UUID;
 
 /**
@@ -13,14 +15,31 @@ public class Todo implements Comparable<Todo>
 {
   @NonNull public static final Todo NULL_TODO = new Todo("", "");
 
-  @NonNull public final String mId;
-  @NonNull public final String mOrd;
-  public final long mCreationTime;
-  public final long mCompletionTime;
-  @NonNull public final String mText;
-  public final int mDepth;
-  @NonNull public final Planning mPlanning;
-  public final int mEstimatedTime;
+  public static final int UNKNOWN = 0;
+
+  // Deadline hardnesses
+  public static final int SOFT_DEADLINE = 1; // Decided myself
+  public static final int SEMIHARD_DEADLINE = 2; // Important, but not the end of the world if missed
+  public static final int HARD_DEADLINE = 3; // Really needs to be done
+
+  // Add other patterns here if ever necessary
+  public static final int ON_WEEKDAY = 1;
+  public static final int ON_WEEKEND = 2;
+  public static final int ON_DAYTIME = 4;
+  public static final int ON_NIGHT = 8;
+
+  @NonNull public final String id;
+  @NonNull public final String ord;
+  public final long creationTime;
+  public final long completionTime;
+  @NonNull public final String text;
+  public final int depth;
+  public final long lifeline; // Timestamp : when this can be started
+  public final long deadline; // Timestamp : when this has to be done
+  public final int hardness; // UNKNOWN or *_DEADLINE
+  public final int timeConstraint; // UNKNOWN or ON_*
+  public final int estimatedTime;
+  @Nullable public final Fences.Params where; // Typically null
 
   public Todo(@Nullable final String id,
               @NonNull final String ord,
@@ -28,53 +47,83 @@ public class Todo implements Comparable<Todo>
               final long completionTime,
               @NonNull final String text,
               final int depth,
-              @Nullable final Planning planning,
-              final int estimatedTime)
+              final long lifeline,
+              final long deadline,
+              final int hardness,
+              final int timeConstraint,
+              final int estimatedTime,
+              @Nullable final Fences.Params where)
   {
-    mId = null == id ? UUID.randomUUID().toString() : id;
-    mOrd = ord;
-    mCreationTime = creationTime;
-    mCompletionTime = completionTime;
-    mText = text;
-    mDepth = depth;
-    mPlanning = null == planning ? new Planning() : planning;
-    mEstimatedTime = estimatedTime;
+    this.id = null == id ? UUID.randomUUID().toString() : id;
+    this.ord = ord;
+    this.creationTime = creationTime;
+    this.completionTime = completionTime;
+    this.text = text;
+    this.depth = depth;
+    this.lifeline = lifeline;
+    this.deadline = deadline;
+    this.hardness = hardness;
+    this.timeConstraint = timeConstraint;
+    this.estimatedTime = estimatedTime;
+    this.where = where;
   }
 
   public Todo(@NonNull final String text, @NonNull final String ord)
   {
-    this(null, ord, System.currentTimeMillis(), 0, text, 0, null, -1);
+    this(null, ord, System.currentTimeMillis(), 0, text, 0, 0, 0, UNKNOWN, UNKNOWN, 0, null);
   }
 
   public int compareTo(final Todo other)
   {
-    return mOrd.compareTo(other.mOrd);
+    return ord.compareTo(other.ord);
   }
 
   public static class Builder
   {
-    @Nullable private String mId;
-    @NonNull private String mOrd;
-    private long mCreationTime;
-    private long mCompletionTime;
-    @NonNull private String mText;
-    private int mDepth;
-    @Nullable private Planning mPlanning;
-    private int mEstimatedTime;
+    @Nullable private String id;
+    @NonNull private String ord;
+    private long creationTime;
+    private long completionTime;
+    @NonNull private String text;
+    private int depth;
+    private long lifeline;
+    private long deadline;
+    private int hardness;
+    private int timeConstraint;
+    private int estimatedTime;
+    @Nullable private Fences.Params where;
 
-    public Builder(@NonNull final String text, @NonNull final String ord) { mCreationTime = System.currentTimeMillis(); mText = text; mOrd = ord; }
-    public Builder(@NonNull final Todo todo) { mId = todo.mId; mOrd = todo.mOrd; mCreationTime = todo.mCreationTime; mCompletionTime = todo.mCompletionTime; mText = todo.mText; mDepth = todo.mDepth; mPlanning = todo.mPlanning; mEstimatedTime = todo.mEstimatedTime; }
-    public Builder setId(@Nullable final String id) { mId = id; return this; }
-    public Builder setOrd(@NonNull final String ord) { mOrd = ord; return this; }
-    public Builder setCompletionTime(final long completionTime) { mCompletionTime = completionTime; return this; }
-    public Builder setText(@NonNull final String text) { mText = text; return this; }
-    public Builder setDepth(final int depth) { mDepth = depth; return this; }
-    public Builder setPlanning(@Nullable final Planning planning) { mPlanning = planning; return this; }
-    public Builder setEstimatedTime(@Nullable final int estimatedTime) { mEstimatedTime = estimatedTime; return this; }
+    public Builder(@NonNull final String text, @NonNull final String ord) { creationTime = System.currentTimeMillis(); this.text = text; this.ord = ord; this.where = null; }
+    public Builder(@NonNull final Todo todo)
+    {
+      id = todo.id;
+      ord = todo.ord;
+      creationTime = todo.creationTime;
+      completionTime = todo.completionTime;
+      text = todo.text;
+      depth = todo.depth;
+      lifeline = todo.lifeline;
+      deadline = todo.deadline;
+      hardness = todo.hardness;
+      timeConstraint = todo.timeConstraint;
+      estimatedTime = todo.estimatedTime;
+      where = todo.where;
+    }
+    public Builder setId(@Nullable final String id) { this.id = id; return this; }
+    public Builder setOrd(@NonNull final String ord) { this.ord = ord; return this; }
+    public Builder setCompletionTime(final long completionTime) { this.completionTime = completionTime; return this; }
+    public Builder setText(@NonNull final String text) { this.text = text; return this; }
+    public Builder setDepth(final int depth) { this.depth = depth; return this; }
+    public Builder setLifeline(final long lifeline) { this.lifeline = lifeline; return this; }
+    public Builder setDeadline(final long deadline) { this.deadline = deadline; return this; }
+    public Builder setHardness(final int hardness) { this.hardness = hardness; return this; }
+    public Builder setTimeConstraint(final int timeConstraint) { this.timeConstraint = timeConstraint; return this; }
+    public Builder setEstimatedTime(final int estimatedTime) { this.estimatedTime = estimatedTime; return this; }
+    public Builder setWhere(@Nullable final Fences.Params where) { this.where = where; return this; }
 
     public Todo build()
     {
-      return new Todo(mId, mOrd, mCreationTime, mCompletionTime, mText, mDepth, mPlanning, mEstimatedTime);
+      return new Todo(id, ord, creationTime, completionTime, text, depth, lifeline, deadline, hardness, timeConstraint, estimatedTime, where);
     }
   }
 

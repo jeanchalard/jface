@@ -11,14 +11,14 @@ public class TodoUtil
   {
     switch (timeConstraint)
     {
-      case Planning.ON_WEEKDAY : return "Weekday";
-      case Planning.ON_WEEKEND : return "Weekend";
-      case Planning.ON_DAYTIME : return "Daytime";
-      case Planning.ON_NIGHT :   return "Night";
-      case Planning.ON_WEEKDAY | Planning.ON_DAYTIME : return "Business hours";
-      case Planning.ON_WEEKDAY | Planning.ON_NIGHT : return "Week night";
-      case Planning.ON_WEEKEND | Planning.ON_DAYTIME : return "Weekend day";
-      case Planning.ON_WEEKEND | Planning.ON_NIGHT : return "Weekend night";
+      case Todo.ON_WEEKDAY : return "Weekday";
+      case Todo.ON_WEEKEND : return "Weekend";
+      case Todo.ON_DAYTIME : return "Daytime";
+      case Todo.ON_NIGHT :   return "Night";
+      case Todo.ON_WEEKDAY | Todo.ON_DAYTIME : return "Business hours";
+      case Todo.ON_WEEKDAY | Todo.ON_NIGHT : return "Week night";
+      case Todo.ON_WEEKEND | Todo.ON_DAYTIME : return "Weekend day";
+      case Todo.ON_WEEKEND | Todo.ON_NIGHT : return "Weekend night";
       default : return "Anytime";
     }
   }
