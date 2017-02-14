@@ -43,11 +43,6 @@ public class NumericPicker extends LinearLayout
   private static final int SELECTOR_WHEEL_ITEM_COUNT = 3;
 
   /**
-   * The default update interval during long press.
-   */
-  private static final long DEFAULT_LONG_PRESS_UPDATE_INTERVAL = 300;
-
-  /**
    * The index of the middle selector item.
    */
   private static final int SELECTOR_MIDDLE_ITEM_INDEX = SELECTOR_WHEEL_ITEM_COUNT / 2;
@@ -61,11 +56,6 @@ public class NumericPicker extends LinearLayout
    * The the duration for adjusting the selector wheel.
    */
   private static final int SELECTOR_ADJUSTMENT_DURATION_MILLIS = 800;
-
-  /**
-   * The duration of scrolling while snapping to a given position.
-   */
-  private static final int SNAP_SCROLL_DURATION = 300;
 
   /**
    * The strength of fading in the top and bottom while drawing the selector.
@@ -381,9 +371,9 @@ public class NumericPicker extends LinearLayout
 
   @Override protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec)
   {
-    final int hPadding = 30; final int vPaddingPerElement = 15;
+    final int hPadding = 30; final int vPaddingPerElement = 5;
     final int maxWidth = (int)(mSelectorWheelPaint.measureText(formatNumber(mValue)) + 0.5) + hPadding;
-    final int height = (mTextSize + vPaddingPerElement) * mSelectorIndices.length;
+    final int height = (mTextSize + vPaddingPerElement) * (mSelectorIndices.length - 1);
     // Try greedily to fit the max width and height.
     final int newWidthMeasureSpec = makeMeasureSpec(widthMeasureSpec, maxWidth);
     final int newHeightMeasureSpec = makeMeasureSpec(heightMeasureSpec, -1);
@@ -480,15 +470,13 @@ public class NumericPicker extends LinearLayout
         float currentMoveY = event.getY();
         if (mScrollState != OnScrollListener.SCROLL_STATE_TOUCH_SCROLL)
         {
-          int deltaDownY = (int) Math.abs(currentMoveY - mLastDownEventY);
+          int deltaDownY = (int)Math.abs(currentMoveY - mLastDownEventY);
           if (deltaDownY > mTouchSlop)
-          {
             onScrollStateChange(OnScrollListener.SCROLL_STATE_TOUCH_SCROLL);
-          }
         }
         else
         {
-          int deltaMoveY = (int) ((currentMoveY - mLastDownOrMoveEventY));
+          int deltaMoveY = (int)(currentMoveY - mLastDownOrMoveEventY);
           scrollBy(0, deltaMoveY);
           invalidate();
         }
@@ -793,20 +781,16 @@ public class NumericPicker extends LinearLayout
   {
     initializeSelectorWheelIndices();
     int[] selectorIndices = mSelectorIndices;
-    mSelectorElementHeight = getHeight() / mSelectorIndices.length;
-
-    int totalTextHeight = selectorIndices.length * mTextSize;
-    float totalTextGapHeight = getHeight() - totalTextHeight;
-    mSelectorTextGapHeight = (int)totalTextGapHeight / selectorIndices.length;
-    mSelectorElementHeight = mTextSize + mSelectorTextGapHeight;
-    mInitialScrollOffset = -mSelectorWheelPaint.getFontMetricsInt().top;
+    mSelectorElementHeight = getHeight() / (selectorIndices.length - 1);
+    mSelectorTextGapHeight = mSelectorElementHeight / 2;
+    mInitialScrollOffset = -(mSelectorWheelPaint.getFontMetricsInt().top + mSelectorWheelPaint.getFontMetricsInt().bottom) / 2;
     mCurrentScrollOffset = mInitialScrollOffset;
   }
 
   private void initializeFadingEdges()
   {
     setVerticalFadingEdgeEnabled(true);
-    setFadingEdgeLength((getHeight() - mTextSize) / 2);
+    setFadingEdgeLength(mTextSize);
   }
 
   /**

@@ -4,7 +4,7 @@
 
   <LinearLayout
     android:layout_width="0dp"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:layout_weight="1"
     android:orientation="vertical">
 
@@ -20,7 +20,7 @@
     <view
       class="com.j.jface.org.editor.CalendarView$CalendarGridView"
       android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
+      android:layout_height="0dp"
       android:layout_gravity="center"
       android:layout_weight="1"
       android:id="@+id/calendarView_gridView"/>
@@ -29,7 +29,7 @@
 
   <LinearLayout
     android:layout_width="0dp"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:layout_weight="1"
     android:orientation="vertical">
 
@@ -44,8 +44,9 @@
 
     <GridLayout
       android:layout_width="match_parent"
-      android:layout_height="match_parent"
+      android:layout_height="0dp"
       android:layout_gravity="center"
+      android:gravity="center"
       android:layout_weight="1"
       android:rowCount="2"
       android:columnCount="2"
@@ -53,9 +54,9 @@
 
       <com.j.jface.org.editor.NumericPicker
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
+        android:layout_rowWeight="1"
         android:layout_gravity="center"
-        android:layout_weight="4"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="15dp"
         j:format="date"
@@ -68,23 +69,22 @@
         android:padding="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_rowWeight="1"
         android:layout_gravity="center"
         android:id="@+id/calendarView_resetDay"/>
 
       <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="4"
+        android:layout_height="50dp"
         android:layout_gravity="center"
+        android:layout_rowWeight="1"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="15dp"
-        android:layout_marginTop="15dp"
         android:orientation="horizontal">
 
         <com.j.jface.org.editor.NumericPicker
           android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
+          android:layout_height="match_parent"
           android:layout_gravity="center"
           j:format="integer"
           j:wrap="true"
@@ -93,16 +93,16 @@
         <TextView
           android:text=":"
           android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
+          android:layout_height="match_parent"
           android:layout_marginStart="10dp"
           android:layout_marginEnd="10dp"
-          android:layout_gravity="center_vertical"
+          android:layout_gravity="center"
           android:gravity="center"
           android:textSize="@dimen/calendar_view_text_size"/>
 
         <com.j.jface.org.editor.NumericPicker
           android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
+          android:layout_height="match_parent"
           android:layout_gravity="center"
           j:format="integer"
           j:wrap="true"
@@ -114,9 +114,9 @@
         android:text="00"
         android:background="@drawable/rounded_box"
         android:padding="10dp"
+        android:layout_rowWeight="1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:layout_gravity="center"
         android:id="@+id/calendarView_resetMinutes"/>
 

@@ -6,8 +6,10 @@ import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
@@ -30,7 +32,7 @@ import static java.util.Calendar.YEAR;
 
 public class CalendarView extends LinearLayout implements NumericPicker.OnValueChangeListener, View.OnClickListener
 {
-  @NonNull private GregorianCalendar mCalendar;
+  @NonNull private final GregorianCalendar mCalendar;
   @NonNull private final TextView mMonthView;
   @NonNull private final TextView mDayTimeView;
   @NonNull private final TextView mResetDayButton;
@@ -48,12 +50,13 @@ public class CalendarView extends LinearLayout implements NumericPicker.OnValueC
     mMonthView = (TextView)findViewById(R.id.calendarView_monthName);
     mDayTimeView = (TextView)findViewById(R.id.calendarView_dayTime);
     mCalendarView = (CalendarGridView)findViewById(R.id.calendarView_gridView);
+    mCalendarView.mParent = this;
     mDateView = (NumericPicker)findViewById(R.id.calendarView_date);
     mHourView = (NumericPicker)findViewById(R.id.calendarView_hour);
     mMinuteView = (NumericPicker)findViewById(R.id.calendarView_minute);
     mResetDayButton = (TextView)findViewById(R.id.calendarView_resetDay);
     mResetMinutesButton = (TextView)findViewById(R.id.calendarView_resetMinutes);
-    mCalendar = mCalendarView.mCalendar;
+    mCalendar = new GregorianCalendar();
     mDateView.setMinValue(16000); mDateView.setMaxValue(Integer.MAX_VALUE);
     mHourView.setMinValue(0); mHourView.setMaxValue(23);
     mMinuteView.setMinValue(0); mMinuteView.setMaxValue(59);
@@ -122,7 +125,7 @@ public class CalendarView extends LinearLayout implements NumericPicker.OnValueC
 
   public static class CalendarGridView extends View
   {
-    @NonNull public final GregorianCalendar mCalendar = new GregorianCalendar();
+    @Nullable private CalendarView mParent;
     @NonNull private final Paint mPaint = new Paint();
     @NonNull private final Path mPath = new Path();
     private int mTileWidth = 20;
@@ -153,12 +156,15 @@ public class CalendarView extends LinearLayout implements NumericPicker.OnValueC
     @NonNull final GregorianCalendar mTmpCal = new GregorianCalendar();
     @Override public void onDraw(@NonNull final Canvas canvas)
     {
+      final CalendarView parent = mParent;
+      if (null == parent) return;
+      final GregorianCalendar calendar = parent.mCalendar;
       mPaint.setStyle(Paint.Style.FILL);
 
-      final int firstDayOfMonth = mCalendar.getActualMinimum(DAY_OF_MONTH);
-      final int lastDayOfMonth = mCalendar.getActualMaximum(DAY_OF_MONTH);
-      final int day = mCalendar.get(DAY_OF_MONTH);
-      final int dayOfWeek = (mCalendar.get(DAY_OF_WEEK) - MONDAY) % 7;
+      final int firstDayOfMonth = calendar.getActualMinimum(DAY_OF_MONTH);
+      final int lastDayOfMonth = calendar.getActualMaximum(DAY_OF_MONTH);
+      final int day = calendar.get(DAY_OF_MONTH);
+      final int dayOfWeek = (calendar.get(DAY_OF_WEEK) - MONDAY) % 7;
       final int dayOfWeekOfFirstDay = (dayOfWeek + firstDayOfMonth - day + 35) % 7;
       mPaint.setColor(0x1FFFFFFF);
       for (int d = dayOfWeekOfFirstDay - 1; d >= 0; --d) paintDay(d, canvas);
@@ -194,11 +200,11 @@ public class CalendarView extends LinearLayout implements NumericPicker.OnValueC
       for (int d = dayOfWeekOfFirstDay == 0 ? 0 : 7; d < dayOfWeekOfFirstDay + lastDayOfMonth; d += 7) writeDay(d, d - dayOfWeekOfFirstDay + 1, canvas, mPaint);
 
       mPaint.setAlpha(64);
-      mTmpCal.setTimeInMillis(mCalendar.getTimeInMillis());
+      mTmpCal.setTimeInMillis(calendar.getTimeInMillis());
       mTmpCal.add(DAY_OF_MONTH, -day + firstDayOfMonth - 1); // Just case some month does not start on day 1. What planet do I live on.
       int dayOfLastMonth = mTmpCal.get(DAY_OF_MONTH);
       for (int d = dayOfWeekOfFirstDay - 1; d >= 0; --d, --dayOfLastMonth) writeDay(d, dayOfLastMonth, canvas, mPaint);
-      mTmpCal.setTimeInMillis(mCalendar.getTimeInMillis());
+      mTmpCal.setTimeInMillis(calendar.getTimeInMillis());
       mTmpCal.add(DAY_OF_MONTH, lastDayOfMonth - day + 1);
       int dayOfNextMonth = mTmpCal.get(DAY_OF_MONTH);
       for (int d = dayOfWeekOfFirstDay + lastDayOfMonth; d < 6 * 7; ++d, ++dayOfNextMonth) writeDay(d, dayOfNextMonth, canvas, mPaint);
@@ -217,6 +223,27 @@ public class CalendarView extends LinearLayout implements NumericPicker.OnValueC
       final int w = MeasureSpec.getSize(widthMeasureSpec);
       final int h = MeasureSpec.getSize(heightMeasureSpec);
       setMeasuredDimension(7 * ((w - 1) / 7) + 1, 6 * ((h - 1) / 6) + 1);
+    }
+
+    public boolean onTouchEvent(@NonNull final MotionEvent event)
+    {
+      if (MotionEvent.ACTION_UP != event.getAction()) return MotionEvent.ACTION_DOWN == event.getAction();
+      final CalendarView parent = mParent;
+      if (null == parent) return false;
+      final GregorianCalendar calendar = parent.mCalendar;
+      final float x = event.getX();
+      final float y = event.getY();
+      final int row = (int)(y / mTileHeight);
+      final int column = (int)(x / mTileWidth);
+      final int tile = row * 7 + column;
+      final int firstDayOfMonth = calendar.getActualMinimum(DAY_OF_MONTH);
+      final int day = calendar.get(DAY_OF_MONTH);
+      final int dayOfWeek = (calendar.get(DAY_OF_WEEK) - MONDAY) % 7;
+      final int dayOfWeekOfFirstDay = (dayOfWeek + firstDayOfMonth - day + 35) % 7;
+      final int tappedDate = tile - dayOfWeekOfFirstDay + 1;
+      calendar.add(DAY_OF_MONTH, tappedDate - day);
+      parent.refreshDateFromCalendar();
+      return true;
     }
   }
 }
