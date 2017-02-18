@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.j.jface.Const;
 import com.j.jface.R;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
@@ -32,6 +33,10 @@ import static java.util.Calendar.YEAR;
 
 public class CalendarView extends LinearLayout implements NumericPicker.OnValueChangeListener, View.OnClickListener
 {
+  public interface DateChangeListener
+  {
+    public void onDateChanged(final long newDate);
+  }
   @NonNull private final GregorianCalendar mCalendar;
   @NonNull private final TextView mMonthView;
   @NonNull private final TextView mDayTimeView;
@@ -41,6 +46,7 @@ public class CalendarView extends LinearLayout implements NumericPicker.OnValueC
   @NonNull private final NumericPicker mHourView;
   @NonNull private final NumericPicker mMinuteView;
   @NonNull private final CalendarGridView mCalendarView;
+  @NonNull private final ArrayList<DateChangeListener> mListeners;
   public CalendarView(Context context, AttributeSet attrs)
   {
     super(context, attrs);
@@ -61,17 +67,32 @@ public class CalendarView extends LinearLayout implements NumericPicker.OnValueC
     mHourView.setMinValue(0); mHourView.setMaxValue(23);
     mMinuteView.setMinValue(0); mMinuteView.setMaxValue(59);
     mCalendar.setTimeInMillis(System.currentTimeMillis());
+    mListeners = new ArrayList<>(); // Listeners to this Calendar view
     refreshDateFromCalendar();
-    setupListeners();
+    setupInternalListeners();
   }
 
-  public void refreshDateFromCalendar()
+  public void addDateChangeListener(@NonNull final DateChangeListener listener)
   {
+    mListeners.add(listener);
+  }
+
+  public void setDate(final long date)
+  {
+    mCalendar.setTimeInMillis(date);
+    refreshDateFromCalendar();
+  }
+
+  private void refreshDateFromCalendar()
+  {
+    final long newDate = mCalendar.getTimeInMillis();
     updateTops();
-    mDateView.setValue((int)((mCalendar.getTimeInMillis() + mCalendar.get(Calendar.ZONE_OFFSET)) / 86400000));
+    mDateView.setValue((int)((newDate + mCalendar.get(Calendar.ZONE_OFFSET)) / 86400000));
     mHourView.setValue(mCalendar.get(HOUR_OF_DAY));
     mMinuteView.setValue(mCalendar.get(MINUTE));
     mCalendarView.invalidate();
+    for (final DateChangeListener listener : mListeners)
+      listener.onDateChanged(newDate);
   }
 
   private void updateTops()
@@ -81,7 +102,7 @@ public class CalendarView extends LinearLayout implements NumericPicker.OnValueC
      mCalendar.get(DAY_OF_MONTH), Const.WEEKDAYS[mCalendar.get(DAY_OF_WEEK) - 1], mCalendar.get(HOUR_OF_DAY), mCalendar.get(MINUTE)));
   }
 
-  private void setupListeners()
+  private void setupInternalListeners()
   {
     mDateView.setOnValueChangedListener(this);
     mHourView.setOnValueChangedListener(this);

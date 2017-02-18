@@ -2,6 +2,7 @@ package com.j.jface.org.editor;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
@@ -43,19 +44,25 @@ public class TodoEditor extends WrappedActivity
     mDetails = new TodoDetails(mSource, mTodo, mA.findViewById(R.id.todoEditor_details));
   }
 
-  public static class TodoDetails
+  public static class TodoDetails implements CalendarView.DateChangeListener, View.OnClickListener
   {
     @NonNull private final TodoSource mSource;
+    @NonNull private Todo mTodo;
     @NonNull private final TextView mLifeline;
     @NonNull private final TextView mDeadline;
     @NonNull private final CalendarView mCalendarView;
+    @Nullable private TextView mEditing;
 
     public TodoDetails(@NonNull final TodoSource source, @NonNull final Todo todo, @NonNull final View rootView)
     {
       mSource = source;
+      mTodo = todo;
       mLifeline = (TextView)rootView.findViewById(R.id.todoDetails_lifeline_text);
       mDeadline = (TextView)rootView.findViewById(R.id.todoDetails_deadline_text);
+      mLifeline.setOnClickListener(this);
+      mDeadline.setOnClickListener(this);
       mCalendarView = (CalendarView)rootView.findViewById(R.id.todoDetails_calendarView);
+      mCalendarView.addDateChangeListener(this);
 
       if (todo.lifeline > 0)
         mLifeline.setText(renderDate(todo.lifeline));
@@ -75,6 +82,19 @@ public class TodoEditor extends WrappedActivity
          sRenderCalendar.get(Calendar.YEAR), sRenderCalendar.get(Calendar.MONTH) + 1, sRenderCalendar.get(Calendar.DAY_OF_MONTH),
          Const.WEEKDAYS[sRenderCalendar.get(Calendar.DAY_OF_WEEK) - 1], sRenderCalendar.get(Calendar.HOUR_OF_DAY), sRenderCalendar.get(Calendar.MINUTE));
       }
+    }
+
+    @Override public void onDateChanged(long newDate)
+    {
+
+    }
+
+    @Override public void onClick(@NonNull final View v)
+    {
+      // Either Lifeline or Deadline
+      final long date = v == mDeadline ? mTodo.deadline : mTodo.lifeline;
+      mEditing = (TextView)v;
+      mCalendarView.setDate(date > 0 ? date : System.currentTimeMillis());
     }
   }
 }

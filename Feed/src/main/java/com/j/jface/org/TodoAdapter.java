@@ -1,5 +1,6 @@
 package com.j.jface.org;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -72,8 +73,10 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
       mTodoActionButtons = (LinearLayout)itemView.findViewById(R.id.todoActionButtons);
       mAddSubTodoButton = (ImageButton)itemView.findViewById(R.id.todoAddButton);
       mAddSubTodoButton.setOnClickListener(this);
+      mAddSubTodoButton.setVisibility(View.GONE);
       mClearTodoButton = (ImageButton)itemView.findViewById(R.id.todoClearButton);
       mClearTodoButton.setOnClickListener(this);
+      mClearTodoButton.setVisibility(View.GONE);
       mShowActionsButton = (ImageButton)itemView.findViewById(R.id.todoShowActionsButton);
       mShowActionsButton.setOnClickListener(this);
     }
@@ -98,14 +101,22 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
     {
 //      mJorg.startTodoEditor(mCurrentTodo);
       /* Pour expand la ligne vers le bas et révéler les détails */
-//        if (mShowActionsButton.getRotation() > 45f)
-        {
-          TransitionManager.beginDelayedTransition(mRecyclerView, expandCollapseTransition);
-          if (mExpansion.getVisibility() == View.VISIBLE)
-            mExpansion.setVisibility(View.GONE);
-          else
-            mExpansion.setVisibility(View.VISIBLE);
-        }
+      TransitionManager.beginDelayedTransition(mRecyclerView, expandCollapseTransition);
+      if (mExpansion.getVisibility() == View.VISIBLE)
+      {
+        mExpansion.setVisibility(View.GONE);
+        mClearTodoButton.setVisibility(View.GONE);
+        mAddSubTodoButton.setVisibility(View.GONE);
+        ObjectAnimator.ofFloat(mShowActionsButton, "rotation", 0f).start();
+      }
+      else
+      {
+        mExpansion.setVisibility(View.VISIBLE);
+        mClearTodoButton.setVisibility(View.VISIBLE);
+        mAddSubTodoButton.setVisibility(View.VISIBLE);
+        ObjectAnimator.ofFloat(mShowActionsButton, "rotation", 180f).start();
+      }
+
 
       /* Pour afficher la palette de boutons
       TransitionManager.beginDelayedTransition(mTodoActionButtons, expandCollapseTransition);
@@ -144,7 +155,6 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
       */
     }
 
-    private boolean mBinding;
     @Override public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
     @Override public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
     @Override public void afterTextChanged(@NonNull final Editable editable)
