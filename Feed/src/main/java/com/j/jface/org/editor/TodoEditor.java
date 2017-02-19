@@ -35,7 +35,7 @@ public class TodoEditor extends WrappedActivity
     mA.setContentView(R.layout.todo_editor);
     mTitle = (TextView)mA.findViewById(R.id.todoEditor_title);
 
-    mSource = new TodoSource(mA);
+    mSource = TodoSource.getInstance(mA.getApplicationContext());
     final Intent intent = mA.getIntent();
     Todo todo;
     final String todoId = null == intent ? null : intent.getStringExtra(Const.EXTRA_TODO_ID);

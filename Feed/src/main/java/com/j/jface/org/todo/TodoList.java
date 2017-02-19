@@ -43,7 +43,7 @@ public class TodoList
   }
 
   // Pass null for a top-level todo.
-  @NonNull public Todo createAndInsertTodo(@NonNull final String text, @NonNull final Todo parent)
+  @NonNull public Todo createAndInsertTodo(@NonNull final String text, @Nullable final Todo parent)
   {
     final Todo result = new Todo.Builder(text, ordForNewChild(parent)).setDepth(null == parent ? 0 : parent.depth + 1).build();
     updateTodo(result);

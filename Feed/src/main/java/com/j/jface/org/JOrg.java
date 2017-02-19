@@ -33,7 +33,7 @@ import java.util.ListIterator;
 /**
  * Main activity class for JOrg.
  */
-public class JOrg extends WrappedActivity implements Handler.Callback, TodoList.ChangeObserver
+public class JOrg extends WrappedActivity implements TodoList.ChangeObserver
 {
   @NonNull public final TodoSource mTodoSource;
   @NonNull private final SoundSource mSoundSource;
@@ -41,21 +41,16 @@ public class JOrg extends WrappedActivity implements Handler.Callback, TodoList.
   @NonNull private final TodoAdapter mAdapter;
   @NonNull private final CoordinatorLayout mTopLayout;
 
-  private static final int PERSIST_TODOS = 1;
-  @NonNull private final Handler mHandler;
   @NonNull private final TodoList mTodoList;
-  @NonNull private final HashMap<String, Todo> mTodosToPersist;
 
   public JOrg(@NonNull final Args args)
   {
     super(args);
     mA.setContentView(R.layout.org_top);
     ((AppCompatActivity)mA).setSupportActionBar((Toolbar)mA.findViewById(R.id.orgTopActionBar));
-    mHandler = new Handler(this);
-    mTodoSource = new TodoSource(mA);
+    mTodoSource = TodoSource.getInstance(mA.getApplicationContext());
     mSoundSource = new SoundSource(mA, (ViewGroup)mA.findViewById(R.id.sound_source));
     mSoundRouter = new EditTextSoundRouter(mSoundSource);
-    mTodosToPersist = new HashMap<>();
     mTodoList = mTodoSource.fetchTodoList();
     mTodoList.addObserver(this);
 
@@ -77,22 +72,11 @@ public class JOrg extends WrappedActivity implements Handler.Callback, TodoList.
   public void onPause()
   {
     mSoundSource.onPause();
-    persistAllTodos();
+    mTodoSource.onPauseApplication();
   }
   public void onResume()
   {
     mSoundSource.onResume();
-  }
-
-  public boolean handleMessage(@NonNull final Message msg)
-  {
-    switch (msg.what)
-    {
-      case PERSIST_TODOS:
-        persistAllTodos();
-        break;
-    }
-    return true;
   }
 
   // Null parent means top level, as always
@@ -131,25 +115,9 @@ public class JOrg extends WrappedActivity implements Handler.Callback, TodoList.
     return newTodo;
   }
 
-  public void persistAllTodos()
-  {
-    HashMap<String, Todo> todosToPersist = new HashMap<>();
-    synchronized (mTodosToPersist)
-    {
-      todosToPersist.putAll(mTodosToPersist);
-      mTodosToPersist.clear();
-    }
-    for (final Todo t : todosToPersist.values()) mTodoSource.updateTodo(t);
-  }
-
   @Override public void notifyItemChanged(final int position, @NonNull final Todo payload)
   {
-    synchronized(mTodosToPersist)
-    {
-      mTodosToPersist.put(payload.id, payload);
-    }
-    mHandler.removeMessages(PERSIST_TODOS);
-    mHandler.sendEmptyMessageDelayed(PERSIST_TODOS, 3000); // 3 sec before persistence
+    mTodoSource.scheduleUpdateTodo(payload);
   }
 
   @Override public void notifyItemInserted(final int position, @NonNull final Todo payload)
