@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.j.jface.R;
+import com.j.jface.org.editor.TodoEditor;
 import com.j.jface.org.todo.Todo;
 import com.j.jface.org.todo.TodoList;
 
@@ -79,6 +80,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
       mClearTodoButton.setVisibility(View.GONE);
       mShowActionsButton = (ImageButton)itemView.findViewById(R.id.todoShowActionsButton);
       mShowActionsButton.setOnClickListener(this);
+      new TodoEditor.TodoDetails(mJorg.mTodoSource, mCurrentTodo, mExpansion);
     }
 
     @Override public void onClick(@NonNull final View view)

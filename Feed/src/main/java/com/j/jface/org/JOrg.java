@@ -35,7 +35,7 @@ import java.util.ListIterator;
  */
 public class JOrg extends WrappedActivity implements Handler.Callback, TodoList.ChangeObserver
 {
-  @NonNull private final TodoSource mTodoSource;
+  @NonNull public final TodoSource mTodoSource;
   @NonNull private final SoundSource mSoundSource;
   @NonNull private final EditTextSoundRouter mSoundRouter;
   @NonNull private final TodoAdapter mAdapter;

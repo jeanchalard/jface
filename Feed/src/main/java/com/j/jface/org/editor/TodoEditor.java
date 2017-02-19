@@ -84,9 +84,9 @@ public class TodoEditor extends WrappedActivity
       }
     }
 
-    @Override public void onDateChanged(long newDate)
+    @Override public void onDateChanged(final long newDate)
     {
-
+      mEditing.setText(renderDate(newDate));
     }
 
     @Override public void onClick(@NonNull final View v)
@@ -95,6 +95,7 @@ public class TodoEditor extends WrappedActivity
       final long date = v == mDeadline ? mTodo.deadline : mTodo.lifeline;
       mEditing = (TextView)v;
       mCalendarView.setDate(date > 0 ? date : System.currentTimeMillis());
+      mCalendarView.setVisibility(View.VISIBLE);
     }
   }
 }
