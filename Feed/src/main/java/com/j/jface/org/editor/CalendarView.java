@@ -1,6 +1,7 @@
 package com.j.jface.org.editor;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
@@ -11,6 +12,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -47,7 +49,8 @@ public class CalendarView extends LinearLayout implements NumericPicker.OnValueC
   @NonNull private final NumericPicker mMinuteView;
   @NonNull private final CalendarGridView mCalendarView;
   @NonNull private final ArrayList<DateChangeListener> mListeners;
-  public CalendarView(Context context, AttributeSet attrs)
+  @NonNull private final Button mClearButton;
+  public CalendarView(@NonNull final Context context, @Nullable final AttributeSet attrs)
   {
     super(context, attrs);
     setOrientation(GridLayout.HORIZONTAL);
@@ -62,6 +65,7 @@ public class CalendarView extends LinearLayout implements NumericPicker.OnValueC
     mMinuteView = (NumericPicker)findViewById(R.id.calendarView_minute);
     mResetDayButton = (TextView)findViewById(R.id.calendarView_resetDay);
     mResetMinutesButton = (TextView)findViewById(R.id.calendarView_resetMinutes);
+    mClearButton = (Button)findViewById(R.id.calendarView_clear);
     mCalendar = new GregorianCalendar();
     mDateView.setMinValue(16000); mDateView.setMaxValue(Integer.MAX_VALUE);
     mHourView.setMinValue(0); mHourView.setMaxValue(23);
@@ -70,6 +74,23 @@ public class CalendarView extends LinearLayout implements NumericPicker.OnValueC
     mListeners = new ArrayList<>(); // Listeners to this Calendar view
     refreshDateFromCalendar();
     setupInternalListeners();
+
+    if (null == attrs) return;
+    boolean headerDateVisible = true;
+    boolean clearButtonVisible = true;
+    final TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.CalendarView, 0, 0);
+    try
+    {
+      headerDateVisible = a.getBoolean(R.styleable.CalendarView_headerDateVisible, true);
+      clearButtonVisible = a.getBoolean(R.styleable.CalendarView_clearButtonVisible, true);
+    }
+    finally
+    {
+      a.recycle();
+    }
+    mMonthView.setVisibility(headerDateVisible ? View.VISIBLE : View.GONE);
+    mDayTimeView.setVisibility(headerDateVisible ? View.VISIBLE : View.GONE);
+    mClearButton.setVisibility(clearButtonVisible ? View.VISIBLE : View.GONE);
   }
 
   public void addDateChangeListener(@NonNull final DateChangeListener listener)
@@ -109,6 +130,7 @@ public class CalendarView extends LinearLayout implements NumericPicker.OnValueC
     mMinuteView.setOnValueChangedListener(this);
     mResetDayButton.setOnClickListener(this);
     mResetMinutesButton.setOnClickListener(this);
+    mClearButton.setOnClickListener(this);
   }
 
   @Override public void onValueChange(@NonNull final NumericPicker picker, final int oldVal, final int newVal)
@@ -140,6 +162,12 @@ public class CalendarView extends LinearLayout implements NumericPicker.OnValueC
       if (m > 50) add = 60 - m;
       else add = -m;
       mCalendar.add(MINUTE, add);
+    }
+    else if (v == mClearButton)
+    {
+      for (final DateChangeListener listener : mListeners)
+        listener.onDateChanged(0);
+      return;
     }
     refreshDateFromCalendar();
   }

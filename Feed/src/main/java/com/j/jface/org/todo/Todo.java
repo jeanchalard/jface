@@ -73,7 +73,7 @@ public class Todo implements Comparable<Todo>
     this(null, ord, System.currentTimeMillis(), 0, text, 0, 0, 0, UNKNOWN, UNKNOWN, 0, null);
   }
 
-  public int compareTo(final Todo other)
+  public int compareTo(@NonNull final Todo other)
   {
     return ord.compareTo(other.ord);
   }

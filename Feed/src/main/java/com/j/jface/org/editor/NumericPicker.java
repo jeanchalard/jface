@@ -832,6 +832,7 @@ public class NumericPicker extends LinearLayout
    */
   private int getWrappedSelectorIndex(final int selectorIndex)
   {
+    if (mMaxValue == mMinValue) return selectorIndex;
     if (selectorIndex > mMaxValue)
       return mMinValue + (selectorIndex - mMaxValue) % (mMaxValue - mMinValue) - 1;
     else if (selectorIndex < mMinValue)
