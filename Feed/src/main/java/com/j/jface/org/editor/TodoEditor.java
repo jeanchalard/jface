@@ -41,7 +41,7 @@ public class TodoEditor extends WrappedActivity
     final Intent intent = mA.getIntent();
     Todo todo;
     final String todoId = null == intent ? null : intent.getStringExtra(Const.EXTRA_TODO_ID);
-    todo = null == todoId ? null : mList.get(todoId);
+    todo = null == todoId ? null : mList.getFromId(todoId);
     mTodo = null == todo ? NULL_TODO : todo;
 
     mTitle.setText(mTodo.text);
@@ -63,15 +63,21 @@ public class TodoEditor extends WrappedActivity
       mList = TodoList.getInstance(context);
       mTodo = todo;
       mRootView = rootView;
-      mLifeline = (TextView)rootView.findViewById(R.id.todoDetails_lifeline_text);
-      mDeadline = (TextView)rootView.findViewById(R.id.todoDetails_deadline_text);
+      mLifeline = (TextView) rootView.findViewById(R.id.todoDetails_lifeline_text);
+      mDeadline = (TextView) rootView.findViewById(R.id.todoDetails_deadline_text);
       mLifeline.setOnClickListener(this);
       mDeadline.setOnClickListener(this);
       mCalendarView = (CalendarView)rootView.findViewById(R.id.todoDetails_calendarView);
       mCalendarView.addDateChangeListener(this);
+      bind(todo);
+    }
 
+    public void bind(@NonNull final Todo todo)
+    {
+      mTodo = todo;
       setTextDate(mLifeline, todo.lifeline);
       setTextDate(mDeadline, todo.deadline);
+      mCalendarView.setVisibility(View.GONE);
     }
 
     @NonNull private static GregorianCalendar sRenderCalendar = new GregorianCalendar();

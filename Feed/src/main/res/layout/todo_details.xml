@@ -35,7 +35,7 @@
     a:layout_width="match_parent"
     a:layout_margin="5dp"
     a:layout_height="180dp"
-    a:visibility="visible"
+    a:visibility="gone"
     j:headerDateVisible="false"
     j:clearButtonVisible="true"/>
 

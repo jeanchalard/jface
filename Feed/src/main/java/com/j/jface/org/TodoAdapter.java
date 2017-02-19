@@ -20,7 +20,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.j.jface.R;
-import com.j.jface.org.editor.TodoEditor;
+import com.j.jface.org.editor.TodoEditor.TodoDetails;
 import com.j.jface.org.todo.Todo;
 import com.j.jface.org.todo.TodoList;
 
@@ -42,7 +42,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
       expandCollapseTransition.setOrdering(TransitionSet.ORDERING_TOGETHER);
     }
     @NonNull final private static Todo NULL_TODO = new Todo("", Todo.MIN_ORD);
-    @NonNull public Todo mCurrentTodo;
+    @NonNull private Todo mCurrentTodo;
 
     @NonNull final private JOrg mJorg;
     @NonNull final private RecyclerView mRecyclerView;
@@ -52,6 +52,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
     @NonNull final private SelReportEditText mEditText;
     @NonNull final private View mExpansion;
     @NonNull final private TodoList mList;
+    @NonNull final private TodoDetails mDetails;
     @NonNull final private ImageButton mAddSubTodoButton, mClearTodoButton, mShowActionsButton;
     public ViewHolder(@NonNull final View itemView,
                       @NonNull final JOrg jorg,
@@ -80,7 +81,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
       mClearTodoButton.setVisibility(View.GONE);
       mShowActionsButton = (ImageButton)itemView.findViewById(R.id.todoShowActionsButton);
       mShowActionsButton.setOnClickListener(this);
-      new TodoEditor.TodoDetails(mJorg.getApplicationContext(), mCurrentTodo, (ViewGroup)mExpansion);
+      mDetails = new TodoDetails(mJorg.getApplicationContext(), mCurrentTodo, (ViewGroup)mExpansion);
     }
 
     @Override public void onClick(@NonNull final View view)
@@ -170,6 +171,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
     {
       if (todo.id.equals(mCurrentTodo.id)) return;
       mCurrentTodo = todo;
+      mDetails.bind(todo);
       mExpanderLayoutParams.leftMargin = todo.depth * 40 + 10;
       mExpander.setLayoutParams(mExpanderLayoutParams);
       mExpansion.setVisibility(View.GONE);

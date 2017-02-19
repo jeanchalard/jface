@@ -11,7 +11,7 @@ import java.util.UUID;
  * A class representing a single TODO.
  */
 
-public class Todo implements Comparable<Todo>
+public class Todo implements Comparable<String>
 {
   @NonNull public static final Todo NULL_TODO = new Todo("", "");
 
@@ -73,9 +73,9 @@ public class Todo implements Comparable<Todo>
     this(null, ord, System.currentTimeMillis(), 0, text, 0, 0, 0, UNKNOWN, UNKNOWN, 0, null);
   }
 
-  public int compareTo(@NonNull final Todo other)
+  public int compareTo(@NonNull final String otherOrd)
   {
-    return ord.compareTo(other.ord);
+    return ord.compareTo(otherOrd);
   }
 
   public static class Builder

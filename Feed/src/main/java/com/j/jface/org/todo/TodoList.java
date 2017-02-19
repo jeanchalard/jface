@@ -11,6 +11,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.j.jface.org.todo.Todo.NULL_TODO;
+
 // A todo list backed by a sorted ArrayList. It guarantees ordering according to the ID,
 // but provides indexation.
 public class TodoList implements Handler.Callback
@@ -55,8 +57,9 @@ public class TodoList implements Handler.Callback
 
   public void updateTodo(@NonNull final Todo todo)
   {
+    if ("!".equals(todo.ord)) throw new RuntimeException("Trying to update a null Todo");
     mSource.updateTodo(todo);
-    final int index = Collections.binarySearch(mList, todo);
+    final int index = Collections.binarySearch(mList, todo.ord);
     if (index >= 0)
     {
       if (todo.completionTime > 0)
@@ -120,7 +123,13 @@ public class TodoList implements Handler.Callback
   }
 
   @NonNull public Todo get(final int index) { return mList.get(index); }
-  @Nullable public Todo get(@NonNull final String todoId)
+  @Nullable public Todo getFromOrd(@NonNull final String todoOrd)
+  {
+    final int index = Collections.binarySearch(mList, todoOrd);
+    if (index >= 0) return mList.get(index);
+    return null;
+  }
+  @Nullable public Todo getFromId(@NonNull final String todoId)
   {
     for (final Todo t : mList) if (t.id.equals(todoId)) return t;
     return null;
@@ -146,6 +155,7 @@ public class TodoList implements Handler.Callback
 
   @NonNull public Todo scheduleUpdateTodo(@NonNull final Todo todo)
   {
+    if ("!".equals(todo.ord)) throw new RuntimeException("Trying to update a null Todo");
     synchronized(mTodosToPersist)
     {
       mTodosToPersist.put(todo.id, todo);
