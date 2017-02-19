@@ -31,7 +31,7 @@ import static com.j.jface.R.layout.todo;
 // Adapter for Todo Recycler view.
 public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
 {
-  public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, TextWatcher
+  public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, TextWatcher, TodoList.ChangeObserver
   {
     @NonNull final static TransitionSet expandCollapseTransition;
     static
@@ -47,22 +47,23 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
     @NonNull final private JOrg mJorg;
     @NonNull final private RecyclerView mRecyclerView;
 
-    @NonNull final private View mView;
     @NonNull final private ImageView mExpander;
     @NonNull final private LinearLayout.LayoutParams mExpanderLayoutParams;
     @NonNull final private SelReportEditText mEditText;
     @NonNull final private View mExpansion;
-    @NonNull final private LinearLayout mTodoActionButtons;
+    @NonNull final private TodoList mList;
     @NonNull final private ImageButton mAddSubTodoButton, mClearTodoButton, mShowActionsButton;
     public ViewHolder(@NonNull final View itemView,
                       @NonNull final JOrg jorg,
                       @NonNull final EditTextSoundRouter router,
-                      @NonNull final RecyclerView recyclerView)
+                      @NonNull final RecyclerView recyclerView,
+                      @NonNull final TodoList list)
     {
       super(itemView);
       mJorg = jorg;
+      mList = list;
+      mList.addObserver(this);
       mRecyclerView = recyclerView;
-      mView = itemView;
       mExpander = (ImageView)itemView.findViewById(R.id.expander);
       mExpanderLayoutParams = (LinearLayout.LayoutParams)mExpander.getLayoutParams();
       mEditText = (SelReportEditText)itemView.findViewById(R.id.todoText);
@@ -71,7 +72,6 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
       mEditText.addTextChangedListener(this);
       mExpansion = itemView.findViewById(R.id.todoExpanded);
       mCurrentTodo = NULL_TODO;
-      mTodoActionButtons = (LinearLayout)itemView.findViewById(R.id.todoActionButtons);
       mAddSubTodoButton = (ImageButton)itemView.findViewById(R.id.todoAddButton);
       mAddSubTodoButton.setOnClickListener(this);
       mAddSubTodoButton.setVisibility(View.GONE);
@@ -80,7 +80,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
       mClearTodoButton.setVisibility(View.GONE);
       mShowActionsButton = (ImageButton)itemView.findViewById(R.id.todoShowActionsButton);
       mShowActionsButton.setOnClickListener(this);
-      new TodoEditor.TodoDetails(mJorg.mTodoSource, mCurrentTodo, (ViewGroup)mExpansion);
+      new TodoEditor.TodoDetails(mJorg.getApplicationContext(), mCurrentTodo, (ViewGroup)mExpansion);
     }
 
     @Override public void onClick(@NonNull final View view)
@@ -182,6 +182,15 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
       final InputMethodManager imm = (InputMethodManager)mEditText.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
       imm.showSoftInput(mEditText, 0);
     }
+
+    @Override
+    public void notifyItemChanged(int position, @NonNull Todo payload)
+    {
+      if (payload.ord == mCurrentTodo.ord) mCurrentTodo = payload;
+    }
+
+    @Override public void notifyItemInserted(int position, @NonNull Todo payload) {}
+    @Override public void notifyItemsRemoved(int position, @NonNull List<Todo> payload) {}
   }
 
   private class TodoChangeObserver implements TodoList.ChangeObserver
@@ -225,7 +234,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
 
   @Override public ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType)
   {
-    return new ViewHolder(mInflater.inflate(todo, parent, false), mJorg, mRouter, mRecyclerView);
+    return new ViewHolder(mInflater.inflate(todo, parent, false), mJorg, mRouter, mRecyclerView, mTodoList);
   }
 
   @Override public void onBindViewHolder(@NonNull final ViewHolder holder, final int position)

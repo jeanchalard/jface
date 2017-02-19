@@ -16,17 +16,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 // Get Todo from the provider. This bridges the awful content provider interface
-// to an easy to use one. This is also a singleton.
-public class TodoSource implements Handler.Callback
+// to an easy to use one.
+public class TodoSource
 {
   @NonNull final ContentResolver mResolver;
-  @NonNull final Handler mHandler;
 
-  private TodoSource(@NonNull final Context context)
+  public TodoSource(@NonNull final Context context)
   {
     mResolver = context.getContentResolver();
-    mHandler = new Handler(this);
-    mTodosToPersist = new HashMap<>();
   }
 
   // Returns null if no such Todo, or if multiple Todos with this ID (which is supposed to be impossible)
@@ -53,11 +50,11 @@ public class TodoSource implements Handler.Callback
      Fences.paramsFromName(c.getString(TodoProviderContract.COLUMNINDEX_where)));
   }
 
-  @NonNull public TodoList fetchTodoList()
+  @NonNull public ArrayList<Todo> fetchTodoList()
   {
     final String condition = "completionTime = 0";
     final Cursor c = mResolver.query(TodoProviderContract.BASE_URI, null, condition, null, "ord");
-    if (null == c || !c.moveToFirst()) return new TodoList();
+    if (null == c || !c.moveToFirst()) return new ArrayList<>();
     final ArrayList<Todo> todos = new ArrayList<>(c.getCount());
     while (!c.isAfterLast())
     {
@@ -78,7 +75,7 @@ public class TodoSource implements Handler.Callback
       todos.add(t);
     }
     c.close();
-    return new TodoList(todos);
+    return todos;
   }
 
   @NonNull public Todo updateTodo(@NonNull final Todo todo)
@@ -104,58 +101,5 @@ public class TodoSource implements Handler.Callback
     cv.put(TodoProviderContract.COLUMN_estimatedTime, todo.estimatedTime);
     if (null != todo.where) cv.put(TodoProviderContract.COLUMN_where, todo.where.name);
     return cv;
-  }
-
-  ///////////////////////////////////////////////////////////////////////////
-  // Handler for delayed persistence
-  ///////////////////////////////////////////////////////////////////////////
-  private static final int PERSIST_TODOS = 1;
-  @NonNull private final HashMap<String, Todo> mTodosToPersist;
-  public boolean handleMessage(@NonNull final Message msg)
-  {
-    switch (msg.what)
-    {
-      case PERSIST_TODOS:
-        persistAllTodos();
-        break;
-    }
-    return true;
-  }
-
-  @NonNull public Todo scheduleUpdateTodo(@NonNull final Todo todo)
-  {
-    synchronized(mTodosToPersist)
-    {
-      mTodosToPersist.put(todo.id, todo);
-    }
-    mHandler.removeMessages(PERSIST_TODOS);
-    mHandler.sendEmptyMessageDelayed(PERSIST_TODOS, 3000); // 3 sec before persistence
-    return todo;
-  }
-
-  public void persistAllTodos()
-  {
-    HashMap<String, Todo> todosToPersist = new HashMap<>();
-    synchronized (mTodosToPersist)
-    {
-      todosToPersist.putAll(mTodosToPersist);
-      mTodosToPersist.clear();
-    }
-    for (final Todo t : todosToPersist.values()) updateTodo(t);
-  }
-
-  public void onPauseApplication()
-  {
-    persistAllTodos();
-  }
-
-  ///////////////////////////////////////////////////////////////////////////
-  // Singleton behavior
-  ///////////////////////////////////////////////////////////////////////////
-  @Nullable static TodoSource sSource;
-  synchronized static public TodoSource getInstance(@NonNull final Context context)
-  {
-    if (null == sSource) sSource = new TodoSource(context);
-    return sSource;
   }
 }

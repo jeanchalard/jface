@@ -1,5 +1,6 @@
 package com.j.jface.org;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
@@ -33,9 +34,8 @@ import java.util.ListIterator;
 /**
  * Main activity class for JOrg.
  */
-public class JOrg extends WrappedActivity implements TodoList.ChangeObserver
+public class JOrg extends WrappedActivity
 {
-  @NonNull public final TodoSource mTodoSource;
   @NonNull private final SoundSource mSoundSource;
   @NonNull private final EditTextSoundRouter mSoundRouter;
   @NonNull private final TodoAdapter mAdapter;
@@ -48,11 +48,9 @@ public class JOrg extends WrappedActivity implements TodoList.ChangeObserver
     super(args);
     mA.setContentView(R.layout.org_top);
     ((AppCompatActivity)mA).setSupportActionBar((Toolbar)mA.findViewById(R.id.orgTopActionBar));
-    mTodoSource = TodoSource.getInstance(mA.getApplicationContext());
     mSoundSource = new SoundSource(mA, (ViewGroup)mA.findViewById(R.id.sound_source));
     mSoundRouter = new EditTextSoundRouter(mSoundSource);
-    mTodoList = mTodoSource.fetchTodoList();
-    mTodoList.addObserver(this);
+    mTodoList = TodoList.getInstance(mA.getApplicationContext());
 
     mTopLayout = (CoordinatorLayout)mA.findViewById(R.id.topLayout);
     final RecyclerView rv = (RecyclerView)mA.findViewById(R.id.todoList);
@@ -69,10 +67,15 @@ public class JOrg extends WrappedActivity implements TodoList.ChangeObserver
     });
   }
 
+  public Context getApplicationContext()
+  {
+    return mA.getApplicationContext();
+  }
+
   public void onPause()
   {
     mSoundSource.onPause();
-    mTodoSource.onPauseApplication();
+    mTodoList.onPauseApplication();
   }
   public void onResume()
   {
@@ -111,24 +114,8 @@ public class JOrg extends WrappedActivity implements TodoList.ChangeObserver
   {
     final String text = editable.toString();
     final Todo newTodo = new Todo.Builder(todo).setText(text).build();
-    mTodoList.updateTodo(newTodo);
+    mTodoList.scheduleUpdateTodo(newTodo);
     return newTodo;
-  }
-
-  @Override public void notifyItemChanged(final int position, @NonNull final Todo payload)
-  {
-    mTodoSource.scheduleUpdateTodo(payload);
-  }
-
-  @Override public void notifyItemInserted(final int position, @NonNull final Todo payload)
-  {
-    mTodoSource.updateTodo(payload);
-  }
-
-  @Override public void notifyItemsRemoved(final int position, @NonNull final List<Todo> payload)
-  {
-    for (final Todo t : payload)
-      mTodoSource.updateTodo(t);
   }
 
   public void startTodoEditor(@NonNull final Todo todo)

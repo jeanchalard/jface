@@ -1,15 +1,19 @@
 package com.j.jface.org.todo;
 
+import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 // A todo list backed by a sorted ArrayList. It guarantees ordering according to the ID,
 // but provides indexation.
-public class TodoList
+public class TodoList implements Handler.Callback
 {
   public interface ChangeObserver
   {
@@ -18,18 +22,17 @@ public class TodoList
     void notifyItemsRemoved(int position, @NonNull final List<Todo> payload);
   }
 
-  @NonNull private ArrayList<Todo> mList;
-  @Nullable private ArrayList<ChangeObserver> mObservers;
-  public TodoList() { this(0); }
-  public TodoList(final int capacity) { this(new ArrayList<Todo>(capacity)); }
-  // Careful : dangerous constructor. Assumes the todoList is already sorted like this
-  // class likes it. Provided for performance when reading from the database, where
-  // we know it's already ordered and we don't need to sort them again one by one
-  // with each insertion.
-  public TodoList(final ArrayList<Todo> todoList)
+  @NonNull private final ArrayList<Todo> mList;
+  @NonNull private final ArrayList<ChangeObserver> mObservers;
+  @NonNull private final TodoSource mSource;
+  @NonNull private final Handler mHandler;
+  private TodoList(@NonNull final Context context)
   {
-    mList = todoList;
+    mSource = new TodoSource(context);
+    mList = mSource.fetchTodoList();
     mObservers = new ArrayList<>();
+    mHandler = new Handler(this);
+    mTodosToPersist = new HashMap<>();
   }
 
   public void addObserver(@NonNull final ChangeObserver obs)
@@ -52,6 +55,7 @@ public class TodoList
 
   public void updateTodo(@NonNull final Todo todo)
   {
+    mSource.updateTodo(todo);
     final int index = Collections.binarySearch(mList, todo);
     if (index >= 0)
     {
@@ -115,6 +119,65 @@ public class TodoList
     return Todo.ordBetween(prevOrd, nextOrd);
   }
 
-  public Todo get(final int index) { return mList.get(index); }
+  @NonNull public Todo get(final int index) { return mList.get(index); }
+  @Nullable public Todo get(@NonNull final String todoId)
+  {
+    for (final Todo t : mList) if (t.id.equals(todoId)) return t;
+    return null;
+  }
   public int size() { return mList.size(); }
+
+
+  ///////////////////////////////////////////////////////////////////////////
+  // Handler for delayed persistence
+  ///////////////////////////////////////////////////////////////////////////
+  private static final int PERSIST_TODOS = 1;
+  @NonNull private final HashMap<String, Todo> mTodosToPersist;
+  public boolean handleMessage(@NonNull final Message msg)
+  {
+    switch (msg.what)
+    {
+      case PERSIST_TODOS:
+        persistAllTodos();
+        break;
+    }
+    return true;
+  }
+
+  @NonNull public Todo scheduleUpdateTodo(@NonNull final Todo todo)
+  {
+    synchronized(mTodosToPersist)
+    {
+      mTodosToPersist.put(todo.id, todo);
+    }
+    mHandler.removeMessages(PERSIST_TODOS);
+    mHandler.sendEmptyMessageDelayed(PERSIST_TODOS, 3000); // 3 sec before persistence
+    return todo;
+  }
+
+  public void persistAllTodos()
+  {
+    HashMap<String, Todo> todosToPersist = new HashMap<>();
+    synchronized (mTodosToPersist)
+    {
+      todosToPersist.putAll(mTodosToPersist);
+      mTodosToPersist.clear();
+    }
+    for (final Todo t : todosToPersist.values()) updateTodo(t);
+  }
+
+  public void onPauseApplication()
+  {
+    persistAllTodos();
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // Singleton behavior
+  ///////////////////////////////////////////////////////////////////////////
+  @Nullable static TodoList sList;
+  synchronized static public TodoList getInstance(@NonNull final Context context)
+  {
+    if (null == sList) sList = new TodoList(context);
+    return sList;
+  }
 }
