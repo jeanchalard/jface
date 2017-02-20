@@ -13,7 +13,18 @@
    android:theme="?attr/actionBarTheme"
    android:minHeight="?attr/actionBarSize"
    android:id="@+id/orgTopActionBar"
-   app:title="TODO">
+   app:title="J"
+   app:titleTextAppearance="@style/JOrgTitleStyle">
+
+    <TextView
+     android:id="@+id/title_today"
+     android:textSize="18dp"
+     android:textStyle="bold"
+     android:textColor="@color/white"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_gravity="center"
+     android:gravity="center" />
 
     <include layout="@layout/sound_visualizer"/>
 

@@ -15,4 +15,13 @@
     <item name="android:windowBackground">@android:color/transparent</item>
   </style>
 
+  <style name="JOrgTitleStyle" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+    <item name="android:textScaleX">0.75</item>
+    <item name="android:textSize">24sp</item>
+    <item name="android:shadowColor">#7F000000</item>
+    <item name="android:shadowDx">4</item>
+    <item name="android:shadowDy">4</item>
+    <item name="android:shadowRadius">4</item>
+  </style>
+
 </resources>

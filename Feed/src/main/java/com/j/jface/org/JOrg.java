@@ -2,8 +2,6 @@ package com.j.jface.org;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
@@ -17,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.j.jface.Const;
 import com.j.jface.R;
@@ -24,12 +23,12 @@ import com.j.jface.lifecycle.TodoEditorBoot;
 import com.j.jface.lifecycle.WrappedActivity;
 import com.j.jface.org.todo.Todo;
 import com.j.jface.org.todo.TodoList;
-import com.j.jface.org.todo.TodoSource;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.ListIterator;
+import java.util.Locale;
 
 /**
  * Main activity class for JOrg.
@@ -80,6 +79,10 @@ public class JOrg extends WrappedActivity
   public void onResume()
   {
     mSoundSource.onResume();
+    final GregorianCalendar c = new GregorianCalendar();
+    final String title = String.format(Locale.JAPAN, "%02d-%02d %s",
+     c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH), Const.WEEKDAYS[c.get(Calendar.DAY_OF_WEEK) - 1]);
+    ((TextView)mA.findViewById(R.id.title_today)).setText(title);
   }
 
   // Null parent means top level, as always

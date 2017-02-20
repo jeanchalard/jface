@@ -46,6 +46,7 @@
     <activity
       android:name=".lifecycle.JOrgBoot"
       android:label="@string/orgtool_name"
+      android:icon="@drawable/jormungand"
       android:windowSoftInputMode="stateHidden">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
