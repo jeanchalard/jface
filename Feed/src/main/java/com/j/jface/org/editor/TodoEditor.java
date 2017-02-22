@@ -8,6 +8,7 @@ import android.support.transition.TransitionManager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.j.jface.Const;
@@ -15,7 +16,6 @@ import com.j.jface.R;
 import com.j.jface.lifecycle.WrappedActivity;
 import com.j.jface.org.todo.Todo;
 import com.j.jface.org.todo.TodoList;
-import com.j.jface.org.todo.TodoSource;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -56,6 +56,7 @@ public class TodoEditor extends WrappedActivity
     @NonNull private final TextView mLifeline;
     @NonNull private final TextView mDeadline;
     @NonNull private final CalendarView mCalendarView;
+    @NonNull private final Spinner mHardness;
     @Nullable private TextView mEditing;
 
     public TodoDetails(@NonNull final Context context, @NonNull final Todo todo, @NonNull final ViewGroup rootView)
@@ -63,12 +64,15 @@ public class TodoEditor extends WrappedActivity
       mList = TodoList.getInstance(context);
       mTodo = todo;
       mRootView = rootView;
-      mLifeline = (TextView) rootView.findViewById(R.id.todoDetails_lifeline_text);
-      mDeadline = (TextView) rootView.findViewById(R.id.todoDetails_deadline_text);
+      mLifeline = (TextView)rootView.findViewById(R.id.todoDetails_lifeline_text);
+      mDeadline = (TextView)rootView.findViewById(R.id.todoDetails_deadline_text);
+      mHardness = (Spinner)rootView.findViewById(R.id.todoDetails_hardness);
+
       mLifeline.setOnClickListener(this);
       mDeadline.setOnClickListener(this);
       mCalendarView = (CalendarView)rootView.findViewById(R.id.todoDetails_calendarView);
       mCalendarView.addDateChangeListener(this);
+
       bind(todo);
     }
 
@@ -77,12 +81,15 @@ public class TodoEditor extends WrappedActivity
       mTodo = todo;
       setTextDate(mLifeline, todo.lifeline);
       setTextDate(mDeadline, todo.deadline);
+      mHardness.setSelection(todo.hardness);
       mCalendarView.setVisibility(View.GONE);
     }
 
     @NonNull private static GregorianCalendar sRenderCalendar = new GregorianCalendar();
     public static String renderDate(final long date)
     {
+      if (0 == date) return "—";
+      if (-1 == date) return "?";
       synchronized (sRenderCalendar)
       {
         sRenderCalendar.setTimeInMillis(date);
@@ -94,16 +101,11 @@ public class TodoEditor extends WrappedActivity
 
     private void setTextDate(@NonNull final TextView textView, final long date)
     {
+      textView.setText(renderDate(date));
       if (date > 0)
-      {
-        textView.setText(renderDate(date));
         textView.setBackground(null);
-      }
       else
-      {
-        textView.setText("–");
         textView.setBackgroundResource(R.drawable.rectangle);
-      }
       if (textView == mEditing)
         textView.setBackgroundResource(R.drawable.red_rectangle);
     }

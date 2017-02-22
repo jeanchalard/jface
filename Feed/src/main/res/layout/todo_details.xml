@@ -5,28 +5,41 @@
   <LinearLayout
     a:layout_width="match_parent"
     a:layout_height="wrap_content"
+    a:layout_marginBottom="4dp"
     a:orientation="horizontal">
 
     <TextView
-      a:layout_width="0dp"
+      a:layout_width="wrap_content"
       a:layout_height="wrap_content"
-      a:layout_weight="1"
+      a:layout_marginBottom="2dp"
       a:gravity="center"
       a:textSize="@dimen/todo_details_text_size"
       a:id="@+id/todoDetails_lifeline_text"/>
 
     <TextView
-      a:text=" 〜 "
+      a:text="〜"
+      a:layout_marginStart="2dp"
+      a:layout_marginEnd="2dp"
+      a:layout_marginBottom="2dp"
       a:layout_width="wrap_content"
       a:layout_height="wrap_content" />
 
     <TextView
       a:layout_width="0dp"
       a:layout_height="wrap_content"
+      a:layout_marginBottom="2dp"
       a:layout_weight="1"
       a:gravity="center"
       a:textSize="@dimen/todo_details_text_size"
       a:id="@+id/todoDetails_deadline_text"/>
+
+    <Spinner
+     a:id="@+id/todoDetails_hardness"
+     a:entries="@array/hardnesses"
+     a:layout_width="wrap_content"
+     a:layout_height="match_parent">
+
+    </Spinner>
 
   </LinearLayout>
 

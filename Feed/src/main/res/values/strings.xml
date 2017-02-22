@@ -44,10 +44,12 @@
         <item>@string/color_white</item>
   </string-array>
 
+  <string name="unknown">\?</string>
   <string name="soft">Soft</string>
   <string name="semihard">Semihard</string>
   <string name="hard">Hard</string>
-  <string-array name="deadline_type">
+  <string-array name="hardnesses">
+    <item>@string/unknown</item>
     <item>@string/soft</item>
     <item>@string/semihard</item>
     <item>@string/hard</item>
