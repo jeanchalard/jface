@@ -8,6 +8,7 @@ import android.support.transition.TransitionManager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -48,7 +49,7 @@ public class TodoEditor extends WrappedActivity
     mDetails = new TodoDetails(mA.getApplicationContext(), mTodo, (ViewGroup)mA.findViewById(R.id.todoEditor_details));
   }
 
-  public static class TodoDetails implements CalendarView.DateChangeListener, View.OnClickListener
+  public static class TodoDetails implements CalendarView.DateChangeListener, View.OnClickListener, AdapterView.OnItemSelectedListener
   {
     @NonNull private final TodoList mList;
     @NonNull private Todo mTodo;
@@ -67,6 +68,11 @@ public class TodoEditor extends WrappedActivity
       mLifeline = (TextView)rootView.findViewById(R.id.todoDetails_lifeline_text);
       mDeadline = (TextView)rootView.findViewById(R.id.todoDetails_deadline_text);
       mHardness = (Spinner)rootView.findViewById(R.id.todoDetails_hardness);
+
+      // Remove the huge and useless arrow from the spinner
+      mHardness.setBackground(null);
+      mHardness.setPadding(0, 0, 0, 0);
+      mHardness.setOnItemSelectedListener(this);
 
       mLifeline.setOnClickListener(this);
       mDeadline.setOnClickListener(this);
@@ -143,6 +149,21 @@ public class TodoEditor extends WrappedActivity
         mCalendarView.setDate(date > 0 ? date : System.currentTimeMillis());
         mCalendarView.setVisibility(View.VISIBLE);
       }
+    }
+
+    @Override
+    public void onItemSelected(@NonNull final AdapterView<?> parent, @Nullable final View view, final int position, final long id)
+    {
+      final Todo.Builder b = new Todo.Builder(mTodo);
+      b.setHardness(position);
+      mTodo = b.build();
+      mList.scheduleUpdateTodo(mTodo);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent)
+    {
+      onItemSelected(parent, null, 0, 0);
     }
   }
 }
