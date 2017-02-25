@@ -9,11 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.j.jface.Const;
 import com.j.jface.R;
+import com.j.jface.Util;
 import com.j.jface.lifecycle.WrappedActivity;
 import com.j.jface.org.todo.Todo;
 import com.j.jface.org.todo.TodoList;
@@ -58,6 +60,7 @@ public class TodoEditor extends WrappedActivity
     @NonNull private final TextView mDeadline;
     @NonNull private final CalendarView mCalendarView;
     @NonNull private final Spinner mHardness;
+    @NonNull private final Spinner mConstraint;
     @Nullable private TextView mEditing;
 
     public TodoDetails(@NonNull final Context context, @NonNull final Todo todo, @NonNull final ViewGroup rootView)
@@ -68,18 +71,31 @@ public class TodoEditor extends WrappedActivity
       mLifeline = (TextView)rootView.findViewById(R.id.todoDetails_lifeline_text);
       mDeadline = (TextView)rootView.findViewById(R.id.todoDetails_deadline_text);
       mHardness = (Spinner)rootView.findViewById(R.id.todoDetails_hardness);
+      mConstraint = (Spinner)rootView.findViewById(R.id.todoDetails_constraint);
 
-      // Remove the huge and useless arrow from the spinner
-      mHardness.setBackground(null);
-      mHardness.setPadding(0, 0, 0, 0);
-      mHardness.setOnItemSelectedListener(this);
+      cleanupSpinner(mHardness); cleanupSpinner(mConstraint);
 
       mLifeline.setOnClickListener(this);
       mDeadline.setOnClickListener(this);
       mCalendarView = (CalendarView)rootView.findViewById(R.id.todoDetails_calendarView);
       mCalendarView.addDateChangeListener(this);
 
+      mHardness.setOnItemSelectedListener(this);
+      final ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(context, android.R.layout.simple_spinner_item, Todo.CONSTRAINT_NAMES);
+      adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+      mConstraint.setAdapter(adapter);
+      mConstraint.setOnItemSelectedListener(this);
+      mConstraint.setBackgroundResource(R.drawable.rectangle);
+
       bind(todo);
+    }
+
+    private void cleanupSpinner(final Spinner s)
+    {
+      // Remove the huge and useless arrow from the spinner
+      s.setBackground(null);
+      s.setPadding(0, 0, 0, 0);
+      s.setOnItemSelectedListener(this);
     }
 
     public void bind(@NonNull final Todo todo)
@@ -88,6 +104,7 @@ public class TodoEditor extends WrappedActivity
       setTextDate(mLifeline, todo.lifeline);
       setTextDate(mDeadline, todo.deadline);
       mHardness.setSelection(todo.hardness);
+      mConstraint.setSelection(todo.constraint);
       mCalendarView.setVisibility(View.GONE);
     }
 
@@ -151,17 +168,25 @@ public class TodoEditor extends WrappedActivity
       }
     }
 
-    @Override
-    public void onItemSelected(@NonNull final AdapterView<?> parent, @Nullable final View view, final int position, final long id)
+    @Override public void onItemSelected(@NonNull final AdapterView<?> parent, @Nullable final View view, final int position, final long id)
     {
+      if (null == view) return;
       final Todo.Builder b = new Todo.Builder(mTodo);
-      b.setHardness(position);
+      if (view.getParent() == mHardness)
+      {
+        if (position == mTodo.hardness) return;
+        b.setHardness(position);
+      }
+      else if (view.getParent() == mConstraint)
+      {
+        if (position == mTodo.constraint) return;
+        b.setConstraint(position);
+      }
       mTodo = b.build();
       mList.scheduleUpdateTodo(mTodo);
     }
 
-    @Override
-    public void onNothingSelected(AdapterView<?> parent)
+    @Override public void onNothingSelected(AdapterView<?> parent)
     {
       onItemSelected(parent, null, 0, 0);
     }

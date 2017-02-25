@@ -46,7 +46,7 @@
 
   <string name="unknown">\?</string>
   <string name="soft">Soft</string>
-  <string name="semihard">SHard</string>
+  <string name="semihard">Semihard</string>
   <string name="hard">Hard</string>
   <string-array name="hardnesses">
     <item>@string/unknown</item>
@@ -54,4 +54,5 @@
     <item>@string/semihard</item>
     <item>@string/hard</item>
   </string-array>
+
 </resources>

@@ -26,8 +26,7 @@ public class TodoProviderContract
   @NonNull public static final String COLUMN_lifeline = "lifeline";
   @NonNull public static final String COLUMN_deadline = "deadline";
   @NonNull public static final String COLUMN_hardness = "hardness";
-  @NonNull public static final String COLUMN_timeConstraint = "timeConstraint";
-  @NonNull public static final String COLUMN_where = "fenceName";
+  @NonNull public static final String COLUMN_constraint = "constraintSpec"; // "constraint" is a reserved SQL word :/
   @NonNull public static final String COLUMN_estimatedTime = "estimatedTime";
   @NonNull public static final String COLUMN_status = "status";
 
@@ -41,8 +40,7 @@ public class TodoProviderContract
   public static final int COLUMNINDEX_lifeline = 7;
   public static final int COLUMNINDEX_deadline = 8;
   public static final int COLUMNINDEX_hardness = 9;
-  public static final int COLUMNINDEX_timeConstraint = 10;
-  public static final int COLUMNINDEX_where = 11;
-  public static final int COLUMNINDEX_estimatedTime = 12;
-  public static final int COLUMNINDEX_status = 13;
+  public static final int COLUMNINDEX_constraint = 10;
+  public static final int COLUMNINDEX_estimatedTime = 11;
+  public static final int COLUMNINDEX_status = 12;
 }

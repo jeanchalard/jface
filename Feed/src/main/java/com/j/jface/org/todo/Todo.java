@@ -23,10 +23,13 @@ public class Todo implements Comparable<String>
   public static final int HARD_DEADLINE = 3; // Really needs to be done
 
   // Add other patterns here if ever necessary
-  public static final int ON_WEEKDAY = 1;
-  public static final int ON_WEEKEND = 2;
-  public static final int ON_DAYTIME = 4;
-  public static final int ON_NIGHT = 8;
+  public static final int ANY = 0;
+  public static final int ON_HOME = 1;
+  public static final int ON_WORK = 2;
+  public static final int ON_WEEKNIGHT = 3;
+  public static final int ON_WEEKEND = 4;
+  public static final int ON_NIGHT = 5;
+  public static final String[] CONSTRAINT_NAMES = new String[] { "Any", "Home", "Work", "Weeknight", "Weekend", "Night" };
 
   @NonNull public final String id;
   @NonNull public final String ord;
@@ -37,9 +40,8 @@ public class Todo implements Comparable<String>
   public final long lifeline; // Timestamp : when this can be started
   public final long deadline; // Timestamp : when this has to be done
   public final int hardness; // UNKNOWN or *_DEADLINE
-  public final int timeConstraint; // UNKNOWN or ON_*
+  public final int constraint; // ANY or ON_*
   public final int estimatedTime;
-  @Nullable public final Fences.Params where; // Typically null
 
   public Todo(@Nullable final String id,
               @NonNull final String ord,
@@ -50,9 +52,8 @@ public class Todo implements Comparable<String>
               final long lifeline,
               final long deadline,
               final int hardness,
-              final int timeConstraint,
-              final int estimatedTime,
-              @Nullable final Fences.Params where)
+              final int constraint,
+              final int estimatedTime)
   {
     this.id = null == id ? UUID.randomUUID().toString() : id;
     this.ord = ord;
@@ -63,14 +64,13 @@ public class Todo implements Comparable<String>
     this.lifeline = lifeline;
     this.deadline = deadline;
     this.hardness = hardness;
-    this.timeConstraint = timeConstraint;
+    this.constraint = constraint;
     this.estimatedTime = estimatedTime;
-    this.where = where;
   }
 
   public Todo(@NonNull final String text, @NonNull final String ord)
   {
-    this(null, ord, System.currentTimeMillis(), 0, text, 0, 0, 0, UNKNOWN, UNKNOWN, 0, null);
+    this(null, ord, System.currentTimeMillis(), 0, text, 0, 0, 0, UNKNOWN, UNKNOWN, 0);
   }
 
   public int compareTo(@NonNull final String otherOrd)
@@ -89,11 +89,10 @@ public class Todo implements Comparable<String>
     private long lifeline;
     private long deadline;
     private int hardness;
-    private int timeConstraint;
+    private int constraint;
     private int estimatedTime;
-    @Nullable private Fences.Params where;
 
-    public Builder(@NonNull final String text, @NonNull final String ord) { creationTime = System.currentTimeMillis(); this.text = text; this.ord = ord; this.where = null; }
+    public Builder(@NonNull final String text, @NonNull final String ord) { creationTime = System.currentTimeMillis(); this.text = text; this.ord = ord; }
     public Builder(@NonNull final Todo todo)
     {
       id = todo.id;
@@ -105,9 +104,8 @@ public class Todo implements Comparable<String>
       lifeline = todo.lifeline;
       deadline = todo.deadline;
       hardness = todo.hardness;
-      timeConstraint = todo.timeConstraint;
+      constraint = todo.constraint;
       estimatedTime = todo.estimatedTime;
-      where = todo.where;
     }
     public Builder setId(@Nullable final String id) { this.id = id; return this; }
     public Builder setOrd(@NonNull final String ord) { this.ord = ord; return this; }
@@ -117,13 +115,12 @@ public class Todo implements Comparable<String>
     public Builder setLifeline(final long lifeline) { this.lifeline = lifeline; return this; }
     public Builder setDeadline(final long deadline) { this.deadline = deadline; return this; }
     public Builder setHardness(final int hardness) { this.hardness = hardness; return this; }
-    public Builder setTimeConstraint(final int timeConstraint) { this.timeConstraint = timeConstraint; return this; }
+    public Builder setConstraint(final int constraint) { this.constraint = constraint; return this; }
     public Builder setEstimatedTime(final int estimatedTime) { this.estimatedTime = estimatedTime; return this; }
-    public Builder setWhere(@Nullable final Fences.Params where) { this.where = where; return this; }
 
     public Todo build()
     {
-      return new Todo(id, ord, creationTime, completionTime, text, depth, lifeline, deadline, hardness, timeConstraint, estimatedTime, where);
+      return new Todo(id, ord, creationTime, completionTime, text, depth, lifeline, deadline, hardness, constraint, estimatedTime);
     }
   }
 

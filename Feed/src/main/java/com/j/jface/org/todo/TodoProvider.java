@@ -38,10 +38,9 @@ public class TodoProvider extends WrappedContentProvider
        /*  7 */              TodoProviderContract.COLUMN_lifeline + " INTEGER," +
        /*  8 */              TodoProviderContract.COLUMN_deadline + " INTEGER," +
        /*  9 */              TodoProviderContract.COLUMN_hardness + " TINYINT," +
-       /* 10 */              TodoProviderContract.COLUMN_timeConstraint + " TINYINT," +
-       /* 11 */              TodoProviderContract.COLUMN_where + " TEXT," +
-       /* 12 */              TodoProviderContract.COLUMN_estimatedTime + " INTEGER," +
-       /* 13 */              TodoProviderContract.COLUMN_status + " INTEGER)");
+       /* 10 */              TodoProviderContract.COLUMN_constraint + " TINYINT," +
+       /* 11 */              TodoProviderContract.COLUMN_estimatedTime + " INTEGER," +
+       /* 12 */              TodoProviderContract.COLUMN_status + " INTEGER)");
     }
 
     @Override public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1)

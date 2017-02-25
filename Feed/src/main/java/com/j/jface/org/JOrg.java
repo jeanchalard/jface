@@ -66,9 +66,9 @@ public class JOrg extends WrappedActivity
     });
   }
 
-  public Context getApplicationContext()
+  public Context getContext()
   {
-    return mA.getApplicationContext();
+    return mA;
   }
 
   public void onPause()

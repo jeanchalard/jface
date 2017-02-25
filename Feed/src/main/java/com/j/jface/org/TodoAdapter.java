@@ -81,7 +81,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
       mClearTodoButton.setVisibility(View.GONE);
       mShowActionsButton = (ImageButton)itemView.findViewById(R.id.todoShowActionsButton);
       mShowActionsButton.setOnClickListener(this);
-      mDetails = new TodoDetails(mJorg.getApplicationContext(), mCurrentTodo, (ViewGroup)mExpansion);
+      mDetails = new TodoDetails(mJorg.getContext(), mCurrentTodo, (ViewGroup)mExpansion);
     }
 
     @Override public void onClick(@NonNull final View view)

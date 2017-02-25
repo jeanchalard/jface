@@ -5,15 +5,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.j.jface.feed.Fences;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 // Get Todo from the provider. This bridges the awful content provider interface
 // to an easy to use one.
@@ -45,9 +42,8 @@ public class TodoSource
      c.getInt(TodoProviderContract.COLUMNINDEX_lifeline),
      c.getInt(TodoProviderContract.COLUMNINDEX_deadline),
      c.getInt(TodoProviderContract.COLUMNINDEX_hardness),
-     c.getInt(TodoProviderContract.COLUMNINDEX_timeConstraint),
-     c.getInt(TodoProviderContract.COLUMNINDEX_estimatedTime),
-     Fences.paramsFromName(c.getString(TodoProviderContract.COLUMNINDEX_where)));
+     c.getInt(TodoProviderContract.COLUMNINDEX_constraint),
+     c.getInt(TodoProviderContract.COLUMNINDEX_estimatedTime));
   }
 
   @NonNull public ArrayList<Todo> fetchTodoList()
@@ -68,9 +64,8 @@ public class TodoSource
        c.getInt(TodoProviderContract.COLUMNINDEX_lifeline),
        c.getInt(TodoProviderContract.COLUMNINDEX_deadline),
        c.getInt(TodoProviderContract.COLUMNINDEX_hardness),
-       c.getInt(TodoProviderContract.COLUMNINDEX_timeConstraint),
-       c.getInt(TodoProviderContract.COLUMNINDEX_estimatedTime),
-       Fences.paramsFromName(c.getString(TodoProviderContract.COLUMNINDEX_where)));
+       c.getInt(TodoProviderContract.COLUMNINDEX_constraint),
+       c.getInt(TodoProviderContract.COLUMNINDEX_estimatedTime));
       c.moveToNext();
       todos.add(t);
     }
@@ -97,9 +92,8 @@ public class TodoSource
     cv.put(TodoProviderContract.COLUMN_lifeline, todo.lifeline);
     cv.put(TodoProviderContract.COLUMN_deadline, todo.deadline);
     cv.put(TodoProviderContract.COLUMN_hardness, todo.hardness);
-    cv.put(TodoProviderContract.COLUMN_timeConstraint, todo.timeConstraint);
+    cv.put(TodoProviderContract.COLUMN_constraint, todo.constraint);
     cv.put(TodoProviderContract.COLUMN_estimatedTime, todo.estimatedTime);
-    if (null != todo.where) cv.put(TodoProviderContract.COLUMN_where, todo.where.name);
     return cv;
   }
 }
