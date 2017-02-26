@@ -61,6 +61,7 @@ public class TodoEditor extends WrappedActivity
     @NonNull private final CalendarView mCalendarView;
     @NonNull private final Spinner mHardness;
     @NonNull private final Spinner mConstraint;
+    @NonNull private final NumericPicker mEstimatedTime;
     @Nullable private TextView mEditing;
 
     public TodoDetails(@NonNull final Context context, @NonNull final Todo todo, @NonNull final ViewGroup rootView)
@@ -72,6 +73,7 @@ public class TodoEditor extends WrappedActivity
       mDeadline = (TextView)rootView.findViewById(R.id.todoDetails_deadline_text);
       mHardness = (Spinner)rootView.findViewById(R.id.todoDetails_hardness);
       mConstraint = (Spinner)rootView.findViewById(R.id.todoDetails_constraint);
+      mEstimatedTime = (NumericPicker)rootView.findViewById(R.id.todoDetails_estimatedTime);
 
       cleanupSpinner(mHardness); cleanupSpinner(mConstraint);
 
@@ -86,6 +88,8 @@ public class TodoEditor extends WrappedActivity
       mConstraint.setAdapter(adapter);
       mConstraint.setOnItemSelectedListener(this);
       mConstraint.setBackgroundResource(R.drawable.rectangle);
+
+      mEstimatedTime.setMinValue(0); mEstimatedTime.setMaxValue(240);
 
       bind(todo);
     }

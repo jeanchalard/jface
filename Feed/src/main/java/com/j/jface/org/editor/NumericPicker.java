@@ -67,6 +67,7 @@ public class NumericPicker extends LinearLayout
    */
   private static final int FORMAT_INTEGER = 0;
   private static final int FORMAT_DATE = 1;
+  private static final int FORMAT_FIVEMIN = 2;
 
   /**
    * ...and which format we're in.
@@ -76,22 +77,28 @@ public class NumericPicker extends LinearLayout
   /**
    * To avoid creating one for each formatting.
    */
+  @NonNull private GregorianCalendar sNullCal = new GregorianCalendar();
   @NonNull private GregorianCalendar mTmpCal;
+
+  /**
+   * Direction : false for vertical, true for horizontal.
+   */
+  private final boolean mDirection;
 
   /**
    * The distance between the two selection dividers.
    */
-  private final int mSelectionDividersDistance;
+  private int mSelectionDividersDistance;
 
   /**
    * The height of the text.
    */
-  private final int mTextSize;
+  private final int mTextHeight;
 
   /**
    * The height of the gap between text elements if the selector wheel.
    */
-  private int mSelectorTextGapHeight;
+  private int mSelectorTextGapSize;
 
   /**
    * Lower value of the range of numbers allowed for the DatePicker
@@ -136,7 +143,7 @@ public class NumericPicker extends LinearLayout
   /**
    * The height of a selector element (text + gap).
    */
-  private int mSelectorElementHeight;
+  private int mSelectorElementSize;
 
   /**
    * The initial offset of the scroll selector.
@@ -161,17 +168,17 @@ public class NumericPicker extends LinearLayout
   /**
    * The previous Y coordinate while scrolling the selector.
    */
-  private int mPreviousScrollerY;
+  private int mPreviousScrollerCoord;
 
   /**
    * The Y position of the last down event.
    */
-  private float mLastDownEventY;
+  private float mLastDownEventCoord;
 
   /**
    * The Y position of the last down or move event.
    */
-  private float mLastDownOrMoveEventY;
+  private float mLastDownOrMoveEventCoord;
 
   /**
    * Determines speed during touch scrolling.
@@ -211,7 +218,7 @@ public class NumericPicker extends LinearLayout
   /**
    * The height of the selection divider.
    */
-  private final int mSelectionDividerHeight;
+  private final int mSelectionDividerSize;
 
   /**
    * The current scroll state of the number picker.
@@ -221,12 +228,12 @@ public class NumericPicker extends LinearLayout
   /**
    * The top of the top selection divider.
    */
-  private int mTopSelectionDividerTop;
+  private int mFirstDividerCoord;
 
   /**
    * The bottom of the bottom selection divider.
    */
-  private int mBottomSelectionDividerBottom;
+  private int mSecondDividerCoord;
 
   /**
    * Interface to listen for changes of the current value.
@@ -308,7 +315,7 @@ public class NumericPicker extends LinearLayout
     }
     mSelectionDivider = selectionDivider;
 
-    mSelectionDividerHeight = (int)context.getResources().getDimension(R.dimen.selection_divider_height);
+    mSelectionDividerSize = (int)context.getResources().getDimension(R.dimen.selection_divider_size);
     mSelectionDividersDistance = (int)context.getResources().getDimension(R.dimen.selection_dividers_distance);
 
     // By default Linearlayout that we extend is not drawn. This is
@@ -323,13 +330,13 @@ public class NumericPicker extends LinearLayout
     mTouchSlop = configuration.getScaledTouchSlop();
     mMinimumFlingVelocity = configuration.getScaledMinimumFlingVelocity();
     mMaximumFlingVelocity = configuration.getScaledMaximumFlingVelocity() / SELECTOR_MAX_FLING_VELOCITY_ADJUSTMENT;
-    mTextSize = (int)context.getResources().getDimension(R.dimen.calendar_view_text_size);
+    mTextHeight = (int)context.getResources().getDimension(R.dimen.calendar_view_text_size);
 
     // create the selector wheel paint
     TextPaint paint = new TextPaint();
     paint.setAntiAlias(true);
     paint.setTextAlign(Align.CENTER);
-    paint.setTextSize(mTextSize);
+    paint.setTextSize(mTextHeight);
     paint.setTypeface(Typeface.DEFAULT);
     paint.setColor(0xFFFFFFFF);//context.getColor(android.R.color.primary_text_dark));
     paint.density = context.getResources().getDisplayMetrics().density;
@@ -341,11 +348,13 @@ public class NumericPicker extends LinearLayout
 
     int formatStyle = FORMAT_INTEGER;
     boolean wrap = false;
+    boolean direction = false;
     final TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.NumericPicker, 0, 0);
     try
     {
       formatStyle = a.getInteger(R.styleable.NumericPicker_format, FORMAT_INTEGER);
       wrap = a.getBoolean(R.styleable.NumericPicker_wrap, false);
+      direction = 1 == a.getInteger(R.styleable.NumericPicker_direction, 0);
     }
     finally
     {
@@ -353,8 +362,8 @@ public class NumericPicker extends LinearLayout
     }
     mFormatStyle = formatStyle;
     mWrapSelectorWheel = wrap;
-    if (FORMAT_DATE == formatStyle)
-      mTmpCal = new GregorianCalendar();
+    mDirection = direction;
+    mTmpCal = (FORMAT_DATE == formatStyle) ? new GregorianCalendar() : sNullCal;
   }
 
   @Override protected void onLayout(final boolean changed, final int left, final int top, final int right, final int bottom)
@@ -364,25 +373,42 @@ public class NumericPicker extends LinearLayout
       // need to do all this when we know our size
       initializeSelectorWheel();
       initializeFadingEdges();
-      mTopSelectionDividerTop = (getHeight() - mSelectionDividersDistance) / 2 - mSelectionDividerHeight;
-      mBottomSelectionDividerBottom = mTopSelectionDividerTop + 2 * mSelectionDividerHeight + mSelectionDividersDistance;
+      mFirstDividerCoord = mDirection
+       ? (getWidth() - mSelectionDividersDistance) / 2 - mSelectionDividerSize
+       : (getHeight() - mSelectionDividersDistance) / 2 - mSelectionDividerSize;
+      mSecondDividerCoord = mFirstDividerCoord + 2 * mSelectionDividerSize + mSelectionDividersDistance;
     }
   }
 
   @Override protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec)
   {
     final int hPadding = 30; final int vPaddingPerElement = 5;
-    final int maxWidth = (int)(mSelectorWheelPaint.measureText(formatNumber(mValue)) + 0.5) + hPadding;
-    final int height = (mTextSize + vPaddingPerElement) * (mSelectorIndices.length - 1);
-    // Try greedily to fit the max width and height.
-    final int newWidthMeasureSpec = makeMeasureSpec(widthMeasureSpec, maxWidth);
-    final int newHeightMeasureSpec = makeMeasureSpec(heightMeasureSpec, -1);
-    super.onMeasure(newWidthMeasureSpec, newHeightMeasureSpec);
-    // Flag if we are measured with width or height less than the respective min.
-    final int widthSize = resolveSizeAndState(getMeasuredWidth(), widthMeasureSpec, 0);
-    final int desiredHeight = Math.max(height, getMeasuredHeight());
-    final int heightSize = resolveSizeAndState(desiredHeight, heightMeasureSpec, 0);
-    setMeasuredDimension(widthSize, heightSize);
+    final int vPadding = 0;
+    if (mDirection)
+    {
+      final String longestText = formatNumber(mMaxValue);
+      final int desiredWidth = (int)(mSelectorWheelPaint.measureText(longestText) * (mSelectorIndices.length - 1) + 0.5);
+      final int desiredHeight = mTextHeight + vPadding;
+      final int newWidthMeasureSpec = makeMeasureSpec(widthMeasureSpec, desiredWidth);
+      final int newHeightMeasureSpec = makeMeasureSpec(heightMeasureSpec, desiredHeight);
+      super.onMeasure(newWidthMeasureSpec, newHeightMeasureSpec);
+      final int widthSize = resolveSizeAndState(getMeasuredWidth(), widthMeasureSpec, 0);
+      final int heightSize = resolveSizeAndState(desiredHeight, heightMeasureSpec, 0);
+      setMeasuredDimension(widthSize, heightSize);
+    }
+    else
+    {
+      final int maxHeight = (mTextHeight + vPaddingPerElement) * (mSelectorIndices.length - 1);
+      final int maxWidth = (int)(mSelectorWheelPaint.measureText(formatNumber(mValue)) + 0.5) + hPadding;
+      final int newWidthMeasureSpec = makeMeasureSpec(widthMeasureSpec, maxWidth);
+      final int newHeightMeasureSpec = makeMeasureSpec(heightMeasureSpec, -1);
+      super.onMeasure(newWidthMeasureSpec, newHeightMeasureSpec);
+      // Flag if we are measured with width or maxSize less than the respective min.
+      final int widthSize = resolveSizeAndState(getMeasuredWidth(), widthMeasureSpec, 0);
+      final int desiredHeight = Math.max(maxHeight, getMeasuredHeight());
+      final int heightSize = resolveSizeAndState(desiredHeight, heightMeasureSpec, 0);
+      setMeasuredDimension(widthSize, heightSize);
+    }
   }
 
   /**
@@ -418,15 +444,16 @@ public class NumericPicker extends LinearLayout
    */
   private boolean moveToFinalScrollerPosition(@NonNull final Scroller scroller) {
     scroller.forceFinished(true);
-    int amountToScroll = scroller.getFinalY() - scroller.getCurrY();
-    int futureScrollOffset = (mCurrentScrollOffset + amountToScroll) % mSelectorElementHeight;
+    int amountToScroll;
+    amountToScroll = mDirection ? scroller.getFinalX() - scroller.getCurrX() : scroller.getFinalY() - scroller.getCurrY();
+    int futureScrollOffset = (mCurrentScrollOffset + amountToScroll) % mSelectorElementSize;
     int overshootAdjustment = mInitialScrollOffset - futureScrollOffset;
     if (overshootAdjustment == 0) return false;
-    if (Math.abs(overshootAdjustment) > mSelectorElementHeight / 2) {
+    if (Math.abs(overshootAdjustment) > mSelectorElementSize / 2) {
       if (overshootAdjustment > 0)
-        overshootAdjustment -= mSelectorElementHeight;
+        overshootAdjustment -= mSelectorElementSize;
       else
-        overshootAdjustment += mSelectorElementHeight;
+        overshootAdjustment += mSelectorElementSize;
     }
     amountToScroll += overshootAdjustment;
     scrollBy(0, amountToScroll);
@@ -439,7 +466,7 @@ public class NumericPicker extends LinearLayout
     final int action = event.getActionMasked();
     switch (action) {
       case MotionEvent.ACTION_DOWN: {
-        mLastDownOrMoveEventY = mLastDownEventY = event.getY();
+        mLastDownOrMoveEventCoord = mLastDownEventCoord = mDirection ? event.getX() : event.getY();
         // Make sure we support flinging inside scrollables.
         getParent().requestDisallowInterceptTouchEvent(true);
         if (!mFlingScroller.isFinished()) {
@@ -467,27 +494,27 @@ public class NumericPicker extends LinearLayout
     switch (action) {
       case MotionEvent.ACTION_MOVE:
       {
-        float currentMoveY = event.getY();
+        float currentMoveCoord = mDirection ? event.getX() : event.getY();
         if (mScrollState != OnScrollListener.SCROLL_STATE_TOUCH_SCROLL)
         {
-          int deltaDownY = (int)Math.abs(currentMoveY - mLastDownEventY);
-          if (deltaDownY > mTouchSlop)
+          final int deltaDownCoord = (int)Math.abs(currentMoveCoord - mLastDownEventCoord);
+          if (deltaDownCoord > mTouchSlop)
             onScrollStateChange(OnScrollListener.SCROLL_STATE_TOUCH_SCROLL);
         }
         else
         {
-          int deltaMoveY = (int)(currentMoveY - mLastDownOrMoveEventY);
-          scrollBy(0, deltaMoveY);
+          final int deltaMoveCoord = (int)(currentMoveCoord - mLastDownOrMoveEventCoord);
+          if (mDirection) scrollBy(deltaMoveCoord, 0); else scrollBy(0, deltaMoveCoord);
           invalidate();
         }
-        mLastDownOrMoveEventY = currentMoveY;
+        mLastDownOrMoveEventCoord = currentMoveCoord;
       }
       break;
       case MotionEvent.ACTION_UP:
       {
         VelocityTracker velocityTracker = mVelocityTracker;
         velocityTracker.computeCurrentVelocity(1000, mMaximumFlingVelocity);
-        int initialVelocity = (int) velocityTracker.getYVelocity();
+        int initialVelocity = mDirection ? (int)velocityTracker.getXVelocity() : (int)velocityTracker.getYVelocity();
         if (Math.abs(initialVelocity) > mMinimumFlingVelocity)
         {
           fling(initialVelocity);
@@ -515,11 +542,20 @@ public class NumericPicker extends LinearLayout
       if (scroller.isFinished()) return;
     }
     scroller.computeScrollOffset();
-    int currentScrollerY = scroller.getCurrY();
-    if (mPreviousScrollerY == 0)
-      mPreviousScrollerY = scroller.getStartY();
-    scrollBy(0, currentScrollerY - mPreviousScrollerY);
-    mPreviousScrollerY = currentScrollerY;
+    if (mDirection)
+    {
+      final int currentScrollerX = scroller.getCurrX();
+      if (0 == mPreviousScrollerCoord) mPreviousScrollerCoord = scroller.getStartX();
+      scrollBy(currentScrollerX - mPreviousScrollerCoord, 0);
+      mPreviousScrollerCoord = currentScrollerX;
+    }
+    else
+    {
+      final int currentScrollerY = scroller.getCurrY();
+      if (0 == mPreviousScrollerCoord) mPreviousScrollerCoord = scroller.getStartY();
+      scrollBy(0, currentScrollerY - mPreviousScrollerCoord);
+      mPreviousScrollerCoord = currentScrollerY;
+    }
     if (scroller.isFinished())
       onScrollerFinished(scroller);
     else
@@ -528,29 +564,30 @@ public class NumericPicker extends LinearLayout
 
   @Override public void scrollBy(final int x, final int y)
   {
+    final int coord = mDirection ? x : y;
     int[] selectorIndices = mSelectorIndices;
-    if (!mWrapSelectorWheel && y > 0 && selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX] <= mMinValue)
+    if (!mWrapSelectorWheel && coord > 0 && selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX] <= mMinValue)
     {
       mCurrentScrollOffset = mInitialScrollOffset;
       return;
     }
-    if (!mWrapSelectorWheel && y < 0 && selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX] >= mMaxValue)
+    if (!mWrapSelectorWheel && coord < 0 && selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX] >= mMaxValue)
     {
       mCurrentScrollOffset = mInitialScrollOffset;
       return;
     }
-    mCurrentScrollOffset += y;
-    while (mCurrentScrollOffset - mInitialScrollOffset > mSelectorTextGapHeight)
+    mCurrentScrollOffset += coord;
+    while (mCurrentScrollOffset - mInitialScrollOffset > mSelectorTextGapSize)
     {
-      mCurrentScrollOffset -= mSelectorElementHeight;
+      mCurrentScrollOffset -= mSelectorElementSize;
       decrementSelectorIndices(selectorIndices);
       setValueInternal(selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX], true);
       if (!mWrapSelectorWheel && selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX] <= mMinValue)
         mCurrentScrollOffset = mInitialScrollOffset;
     }
-    while (mCurrentScrollOffset - mInitialScrollOffset < -mSelectorTextGapHeight)
+    while (mCurrentScrollOffset - mInitialScrollOffset < -mSelectorTextGapSize)
     {
-      mCurrentScrollOffset += mSelectorElementHeight;
+      mCurrentScrollOffset += mSelectorElementSize;
       incrementSelectorIndices(selectorIndices);
       setValueInternal(selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX], true);
       if (!mWrapSelectorWheel && selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX] >= mMaxValue)
@@ -558,9 +595,12 @@ public class NumericPicker extends LinearLayout
     }
   }
 
-  @Override protected int computeVerticalScrollOffset() { return mCurrentScrollOffset; }
-  @Override protected int computeVerticalScrollRange() { return (mMaxValue - mMinValue + 1) * mSelectorElementHeight; }
-  @Override protected int computeVerticalScrollExtent() { return getHeight(); }
+  @Override protected int computeVerticalScrollOffset() { return mDirection ? 0 : mCurrentScrollOffset; }
+  @Override protected int computeVerticalScrollRange() { return mDirection ? 0 : (mMaxValue - mMinValue + 1) * mSelectorElementSize; }
+  @Override protected int computeVerticalScrollExtent() { return mDirection ? 0 : getHeight(); }
+  @Override protected int computeHorizontalScrollOffset() { return mDirection ? mCurrentScrollOffset : 0; }
+  @Override protected int computeHorizontalScrollRange() { return mDirection ? (mMaxValue - mMinValue + 1) * mSelectorElementSize : 0; }
+  @Override protected int computeHorizontalScrollExtent() { return mDirection ? getWidth() : 0; }
   @Override public int getSolidColor() { return mSolidColor; }
 
   /**
@@ -698,10 +738,8 @@ public class NumericPicker extends LinearLayout
 
   @Override protected void onDraw(@NonNull final Canvas canvas)
   {
-    final int left = getLeft();
-    final int right = getRight();
-    float x = (right - left) / 2;
-    float y = mCurrentScrollOffset;
+    float x = mDirection ? mCurrentScrollOffset : (getRight() - getLeft()) / 2;
+    float y = mDirection ? -mSelectorWheelPaint.getFontMetricsInt().ascent : mCurrentScrollOffset;
 
     // draw the selector wheel
     int[] selectorIndices = mSelectorIndices;
@@ -714,22 +752,31 @@ public class NumericPicker extends LinearLayout
       else
         mSelectorWheelPaint.setAlpha(128);
       canvas.drawText(scrollSelectorValue, x, y, mSelectorWheelPaint);
-      y += mSelectorElementHeight;
+      if (mDirection)
+        x += mSelectorElementSize;
+      else
+        y += mSelectorElementSize;
     }
 
     // draw the selection dividers
     if (mSelectionDivider != null)
     {
       // draw the top divider
-      int topOfTopDivider = mTopSelectionDividerTop;
-      int bottomOfTopDivider = topOfTopDivider + mSelectionDividerHeight;
-      mSelectionDivider.setBounds(0, topOfTopDivider, right, bottomOfTopDivider);
+      final int startOfFirstDivider = mFirstDividerCoord;
+      final int endOfTopDivider = startOfFirstDivider + mSelectionDividerSize;
+      if (mDirection)
+        mSelectionDivider.setBounds(startOfFirstDivider, 0, endOfTopDivider, getBottom());
+      else
+        mSelectionDivider.setBounds(0, startOfFirstDivider, getRight(), endOfTopDivider);
       mSelectionDivider.draw(canvas);
 
       // draw the bottom divider
-      int bottomOfBottomDivider = mBottomSelectionDividerBottom;
-      int topOfBottomDivider = bottomOfBottomDivider - mSelectionDividerHeight;
-      mSelectionDivider.setBounds(0, topOfBottomDivider, right, bottomOfBottomDivider);
+      int endOfSecondDivider = mSecondDividerCoord;
+      int startOfSecondDivider = endOfSecondDivider - mSelectionDividerSize;
+      if (mDirection)
+        mSelectionDivider.setBounds(startOfSecondDivider, 0, endOfSecondDivider, getBottom());
+      else
+        mSelectionDivider.setBounds(0, startOfSecondDivider, getRight(), endOfSecondDivider);
       mSelectionDivider.draw(canvas);
     }
   }
@@ -781,16 +828,23 @@ public class NumericPicker extends LinearLayout
   {
     initializeSelectorWheelIndices();
     int[] selectorIndices = mSelectorIndices;
-    mSelectorElementHeight = getHeight() / (selectorIndices.length - 1);
-    mSelectorTextGapHeight = mSelectorElementHeight / 2;
-    mInitialScrollOffset = -(mSelectorWheelPaint.getFontMetricsInt().top + mSelectorWheelPaint.getFontMetricsInt().bottom) / 2;
+    mSelectorElementSize = mDirection ? getWidth() / selectorIndices.length : getHeight() / (selectorIndices.length - 1);
+    mSelectorTextGapSize = mSelectorElementSize / 2;
+    mInitialScrollOffset = mDirection
+     ? mSelectorElementSize / 2
+     : -(mSelectorWheelPaint.getFontMetricsInt().top + mSelectorWheelPaint.getFontMetricsInt().bottom) / 2;
     mCurrentScrollOffset = mInitialScrollOffset;
+    if (mDirection)
+      mSelectionDividersDistance = mSelectorElementSize;
   }
 
   private void initializeFadingEdges()
   {
-    setVerticalFadingEdgeEnabled(true);
-    setFadingEdgeLength(mTextSize);
+    if (mDirection)
+      setHorizontalFadingEdgeEnabled(true);
+    else
+      setVerticalFadingEdgeEnabled(true);
+    setFadingEdgeLength(mTextHeight);
   }
 
   /**
@@ -817,13 +871,17 @@ public class NumericPicker extends LinearLayout
   /**
    * Flings the selector with the given <code>velocityY</code>.
    */
-  private void fling(final int velocityY)
+  private void fling(final int velocity)
   {
-    mPreviousScrollerY = 0;
-    if (velocityY > 0)
-      mFlingScroller.fling(0, 0, 0, velocityY, 0, 0, 0, Integer.MAX_VALUE);
+    final int velocityX = mDirection ? velocity : 0;
+    final int velocityY = mDirection ? 0 : velocity;
+    final int maxX = mDirection ? Integer.MAX_VALUE : 0;
+    final int maxY = mDirection ? 0 : Integer.MAX_VALUE;
+    mPreviousScrollerCoord = 0;
+    if (velocity > 0)
+      mFlingScroller.fling(0, 0, velocityX, velocityY, 0, maxX, 0, maxY);
     else
-      mFlingScroller.fling(0, Integer.MAX_VALUE, 0, velocityY, 0, 0, 0, Integer.MAX_VALUE);
+      mFlingScroller.fling(maxX, maxY, velocityX, velocityY, 0, maxX, 0, maxY);
     invalidate();
   }
 
@@ -897,6 +955,10 @@ public class NumericPicker extends LinearLayout
       mTmpCal.setTimeInMillis(((long)value) * 86400000 - mTmpCal.get(Calendar.ZONE_OFFSET));
       return String.format(Locale.JAPANESE, "%02d - %02d %s", mTmpCal.get(Calendar.MONTH) + 1, mTmpCal.get(Calendar.DAY_OF_MONTH), Const.WEEKDAYS[mTmpCal.get(Calendar.DAY_OF_WEEK) - 1]);
     }
+    else if (FORMAT_FIVEMIN == mFormatStyle)
+    {
+      return String.format(Locale.JAPANESE, "%d'", value * 5);
+    }
     else // FORMAT_INTEGER
       return String.format(Locale.JAPANESE, "%02d", value);
   }
@@ -920,13 +982,13 @@ public class NumericPicker extends LinearLayout
   private boolean ensureScrollWheelAdjusted()
   {
     // adjust to the closest value
-    int deltaY = mInitialScrollOffset - mCurrentScrollOffset;
-    if (deltaY != 0)
+    int delta = mInitialScrollOffset - mCurrentScrollOffset;
+    if (delta != 0)
     {
-      mPreviousScrollerY = 0;
-      if (Math.abs(deltaY) > mSelectorElementHeight / 2)
-        deltaY += (deltaY > 0) ? -mSelectorElementHeight : mSelectorElementHeight;
-      mAdjustScroller.startScroll(0, 0, 0, deltaY, SELECTOR_ADJUSTMENT_DURATION_MILLIS);
+      mPreviousScrollerCoord = 0;
+      if (Math.abs(delta) > mSelectorElementSize / 2)
+        delta += (delta > 0) ? -mSelectorElementSize : mSelectorElementSize;
+      mAdjustScroller.startScroll(0, 0, mDirection ? delta : 0, mDirection ? 0 : delta, SELECTOR_ADJUSTMENT_DURATION_MILLIS);
       invalidate();
       return true;
     }

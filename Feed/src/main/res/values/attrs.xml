@@ -4,8 +4,13 @@
     <attr name="format" format="enum">
       <enum name="integer" value="0"/>
       <enum name="date" value="1"/>
+      <enum name="fivemin" value="2"/>
     </attr>
     <attr name="wrap" format="boolean" />
+    <attr name="direction" format="enum">
+      <enum name="vertical" value="0"/>
+      <enum name="horizontal" value="1"/>
+    </attr>
   </declare-styleable>
   <declare-styleable name="CalendarView">
     <attr name="headerDateVisible" format="boolean"/>

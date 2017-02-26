@@ -7,6 +7,6 @@
   <dimen name="calendar_view_text_size">18sp</dimen>
   <dimen name="todo_editor_title_size">20sp</dimen>
 
-  <dimen name="selection_divider_height">1px</dimen>
+  <dimen name="selection_divider_size">1px</dimen>
   <dimen name="selection_dividers_distance">24dp</dimen>
 </resources>

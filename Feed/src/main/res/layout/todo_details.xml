@@ -60,8 +60,19 @@
     <Spinner
      a:id="@+id/todoDetails_constraint"
      a:gravity="right"
+     a:layout_weight="1"
      a:layout_width="wrap_content"
      a:layout_height="match_parent"/>
+
+    <com.j.jface.org.editor.NumericPicker
+     a:layout_width="wrap_content"
+     a:layout_height="match_parent"
+     a:layout_gravity="center"
+     a:layout_weight="2"
+     j:direction="horizontal"
+     j:format="fivemin"
+     j:wrap="false"
+     a:id="@+id/todoDetails_estimatedTime"/>
 
    </LinearLayout>
 
