@@ -1,4 +1,4 @@
-package com.j.jface.feed.actions;
+package com.j.jface.client.action.geofence;
 
 import android.Manifest;
 import android.app.PendingIntent;
@@ -13,6 +13,7 @@ import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
 import com.j.jface.Const;
+import com.j.jface.client.action.Action;
 import com.j.jface.feed.Fences;
 
 public class SetupGeofenceAction implements Action, ResultCallback<Status>

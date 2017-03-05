@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
+import com.j.jface.client.Client;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package com.j.jface.feed;
+package com.j.jface.client;
 
 import android.content.Context;
 import android.net.Uri;
@@ -15,12 +15,12 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.Wearable;
 import com.j.jface.FutureValue;
-import com.j.jface.feed.actions.Action;
-import com.j.jface.feed.actions.DeleteAllDataAction;
-import com.j.jface.feed.actions.DeleteDataAction;
-import com.j.jface.feed.actions.GetDataAction;
-import com.j.jface.feed.actions.GetNodeNameAction;
-import com.j.jface.feed.actions.PutDataAction;
+import com.j.jface.client.action.Action;
+import com.j.jface.client.action.wear.DeleteAllDataAction;
+import com.j.jface.client.action.wear.DeleteDataAction;
+import com.j.jface.client.action.wear.GetDataAction;
+import com.j.jface.client.action.node.GetNodeNameAction;
+import com.j.jface.client.action.wear.PutDataAction;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 

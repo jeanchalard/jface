@@ -1,4 +1,4 @@
-package com.j.jface.feed.actions;
+package com.j.jface.client.action.wear;
 
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -11,7 +11,8 @@ import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
 import com.j.jface.FutureValue;
-import com.j.jface.feed.Client;
+import com.j.jface.client.action.Action;
+import com.j.jface.client.Client;
 
 public class GetDataAction implements Action, ResultCallback<DataItemBuffer>
 {

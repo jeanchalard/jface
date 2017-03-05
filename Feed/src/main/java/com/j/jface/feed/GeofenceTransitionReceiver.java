@@ -4,18 +4,13 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.text.format.Time;
-import android.util.Log;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 import com.j.jface.Const;
-import com.j.jface.feed.actions.SetupGeofenceAction;
+import com.j.jface.client.Client;
+import com.j.jface.client.action.geofence.SetupGeofenceAction;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.List;
 
 public class GeofenceTransitionReceiver

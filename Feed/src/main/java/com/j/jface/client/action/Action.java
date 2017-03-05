@@ -1,4 +1,4 @@
-package com.j.jface.feed.actions;
+package com.j.jface.client.action;
 
 import android.support.annotation.NonNull;
 

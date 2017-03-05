@@ -1,4 +1,4 @@
-package com.j.jface.feed.actions;
+package com.j.jface.client.action.wear;
 
 import android.support.annotation.NonNull;
 
@@ -10,6 +10,7 @@ import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
+import com.j.jface.client.action.Action;
 
 public class PutDataAction implements Action, ResultCallback<DataApi.DataItemResult>
 {

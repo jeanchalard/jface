@@ -8,7 +8,7 @@ import android.widget.EditText;
 import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
 import com.j.jface.R;
-import com.j.jface.feed.Client;
+import com.j.jface.client.Client;
 import com.j.jface.lifecycle.WrappedFragment;
 
 /**

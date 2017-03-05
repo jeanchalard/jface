@@ -1,4 +1,4 @@
-package com.j.jface.feed.actions;
+package com.j.jface.client.action.wear;
 
 import android.support.annotation.NonNull;
 
@@ -6,7 +6,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.DataItemBuffer;
 import com.google.android.gms.wearable.Wearable;
-import com.j.jface.feed.Client;
+import com.j.jface.client.action.Action;
+import com.j.jface.client.Client;
 
 public class DeleteAllDataAction implements Action, ResultCallback<DataItemBuffer>
 {
