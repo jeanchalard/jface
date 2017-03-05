@@ -679,7 +679,6 @@ public class NumericPicker extends LinearLayout
   public void setMinValue(final int minValue)
   {
     if (mMinValue == minValue) return;
-    if (minValue < 0) throw new IllegalArgumentException("minValue must be >= 0");
     mMinValue = minValue;
     if (mMinValue > mValue) mValue = mMinValue;
     initializeSelectorWheelIndices();
@@ -957,7 +956,9 @@ public class NumericPicker extends LinearLayout
     }
     else if (FORMAT_FIVEMIN == mFormatStyle)
     {
-      return String.format(Locale.JAPANESE, "%d'", value * 5);
+      if (value < 0) return "?";
+      if (value < 60 / 5) return String.format(Locale.JAPANESE, "%d'", value * 5);
+      return String.format(Locale.JAPANESE, "%dh%02d", value / 12, 5 * (value % 12));
     }
     else // FORMAT_INTEGER
       return String.format(Locale.JAPANESE, "%02d", value);

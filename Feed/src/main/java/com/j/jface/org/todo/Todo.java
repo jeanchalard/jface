@@ -70,7 +70,7 @@ public class Todo implements Comparable<String>
 
   public Todo(@NonNull final String text, @NonNull final String ord)
   {
-    this(null, ord, System.currentTimeMillis(), 0, text, 0, 0, 0, UNKNOWN, UNKNOWN, 0);
+    this(null, ord, System.currentTimeMillis(), 0, text, 0, 0, 0, UNKNOWN, UNKNOWN, -1);
   }
 
   public int compareTo(@NonNull final String otherOrd)
@@ -92,7 +92,7 @@ public class Todo implements Comparable<String>
     private int constraint;
     private int estimatedTime;
 
-    public Builder(@NonNull final String text, @NonNull final String ord) { creationTime = System.currentTimeMillis(); this.text = text; this.ord = ord; }
+    public Builder(@NonNull final String text, @NonNull final String ord) { creationTime = System.currentTimeMillis(); this.text = text; this.ord = ord; this.estimatedTime = -1; }
     public Builder(@NonNull final Todo todo)
     {
       id = todo.id;

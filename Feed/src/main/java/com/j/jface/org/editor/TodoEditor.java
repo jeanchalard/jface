@@ -51,7 +51,7 @@ public class TodoEditor extends WrappedActivity
     mDetails = new TodoDetails(mA.getApplicationContext(), mTodo, (ViewGroup)mA.findViewById(R.id.todoEditor_details));
   }
 
-  public static class TodoDetails implements CalendarView.DateChangeListener, View.OnClickListener, AdapterView.OnItemSelectedListener
+  public static class TodoDetails implements CalendarView.DateChangeListener, View.OnClickListener, AdapterView.OnItemSelectedListener, NumericPicker.OnValueChangeListener
   {
     @NonNull private final TodoList mList;
     @NonNull private Todo mTodo;
@@ -89,7 +89,8 @@ public class TodoEditor extends WrappedActivity
       mConstraint.setOnItemSelectedListener(this);
       mConstraint.setBackgroundResource(R.drawable.rectangle);
 
-      mEstimatedTime.setMinValue(0); mEstimatedTime.setMaxValue(240);
+      mEstimatedTime.setMinValue(-1); mEstimatedTime.setMaxValue(96);
+      mEstimatedTime.setOnValueChangedListener(this);
 
       bind(todo);
     }
@@ -109,6 +110,7 @@ public class TodoEditor extends WrappedActivity
       setTextDate(mDeadline, todo.deadline);
       mHardness.setSelection(todo.hardness);
       mConstraint.setSelection(todo.constraint);
+      mEstimatedTime.setValue(mTodo.estimatedTime < 0 ? mTodo.estimatedTime : mTodo.estimatedTime / 5);
       mCalendarView.setVisibility(View.GONE);
     }
 
@@ -193,6 +195,12 @@ public class TodoEditor extends WrappedActivity
     @Override public void onNothingSelected(AdapterView<?> parent)
     {
       onItemSelected(parent, null, 0, 0);
+    }
+
+    @Override public void onValueChange(@NonNull final NumericPicker picker, final int oldVal, final int newVal)
+    {
+      mTodo = new Todo.Builder(mTodo).setEstimatedTime(newVal < 0 ? newVal : newVal * 5).build();
+      mList.scheduleUpdateTodo(mTodo);
     }
   }
 }
