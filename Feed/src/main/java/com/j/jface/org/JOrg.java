@@ -100,7 +100,7 @@ public class JOrg extends WrappedActivity implements TodoList.ChangeObserver
 
   public void clearTodo(@NonNull final Todo todo)
   {
-    final ArrayList<Todo> descendants = mTodoList.getDescendants(todo);
+    final ArrayList<Todo> descendants = mTodoList.getTreeRootedAt(todo);
     for (final ListIterator<Todo> it = descendants.listIterator(descendants.size()); it.hasPrevious(); )
     {
       final Todo t = it.previous();

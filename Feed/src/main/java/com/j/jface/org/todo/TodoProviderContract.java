@@ -10,8 +10,10 @@ public class TodoProviderContract
 {
   @NonNull public static final String BASE_URI_SCHEME = "content";
   @NonNull public static final String BASE_URI_HOST = Const.APP_PACKAGE + ".provider";
-  @NonNull public static final String TABLE = "todo";
-  @NonNull public static final Uri BASE_URI = Uri.parse(BASE_URI_SCHEME + "://" + BASE_URI_HOST + "/" + TABLE);
+  @NonNull public static final String TABLE_NAME = "todo";
+  @NonNull public static final String UI_METADATA_TABLE_NAME = "uiMetadata";
+  @NonNull public static final Uri BASE_URI_TODO = Uri.parse(BASE_URI_SCHEME + "://" + BASE_URI_HOST + "/" + TABLE_NAME);
+  @NonNull public static final Uri BASE_URI_METADATA = Uri.parse(BASE_URI_SCHEME + "://" + BASE_URI_HOST + "/" + UI_METADATA_TABLE_NAME);
 
   @NonNull public static final String MIMETYPE_TODOLIST = "vnd.android.cursor.dir/vnd.com.j.jface.todolist";
   @NonNull public static final String MIMETYPE_TODO = "vnd.android.cursor.dir/vnd.com.j.jface.todo";
@@ -43,4 +45,9 @@ public class TodoProviderContract
   public static final int COLUMNINDEX_constraint = 10;
   public static final int COLUMNINDEX_estimatedTime = 11;
   public static final int COLUMNINDEX_status = 12;
+
+  // UI save table
+  @NonNull public static final String COLUMN_open = "open";
+
+  public static final int COLUMNINDEX_open = 1;
 }

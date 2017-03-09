@@ -8,8 +8,6 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.j.jface.feed.Fences;
-
 import java.util.ArrayList;
 
 // Get Todo from the provider. This bridges the awful content provider interface
@@ -28,11 +26,11 @@ public class TodoSource
   // just look up the entire tree.
   @Nullable public Todo getTodoFromIdWithoutHierarchy(@NonNull final String id)
   {
-    final Uri uri = Uri.withAppendedPath(TodoProviderContract.BASE_URI, id);
+    final Uri uri = Uri.withAppendedPath(TodoProviderContract.BASE_URI_TODO, id);
     final Cursor c = mResolver.query(uri, null, null, null, null);
     if (null == c || c.getCount() != 1) return null;
     c.moveToFirst();
-    return new Todo(
+    final Todo t = new Todo(
      c.getString(TodoProviderContract.COLUMNINDEX_id),
      c.getString(TodoProviderContract.COLUMNINDEX_ord),
      c.getLong(TodoProviderContract.COLUMNINDEX_creationTime),
@@ -44,12 +42,14 @@ public class TodoSource
      c.getInt(TodoProviderContract.COLUMNINDEX_hardness),
      c.getInt(TodoProviderContract.COLUMNINDEX_constraint),
      c.getInt(TodoProviderContract.COLUMNINDEX_estimatedTime));
+    c.close();
+    return t;
   }
 
   @NonNull public ArrayList<Todo> fetchTodoList()
   {
     final String condition = "completionTime = 0";
-    final Cursor c = mResolver.query(TodoProviderContract.BASE_URI, null, condition, null, "ord");
+    final Cursor c = mResolver.query(TodoProviderContract.BASE_URI_TODO, null, condition, null, "ord");
     if (null == c || !c.moveToFirst()) return new ArrayList<>();
     final ArrayList<Todo> todos = new ArrayList<>(c.getCount());
     while (!c.isAfterLast())
@@ -75,7 +75,7 @@ public class TodoSource
 
   @NonNull public Todo updateTodo(@NonNull final Todo todo)
   {
-    mResolver.insert(TodoProviderContract.BASE_URI, contentValuesFromTodo(todo));
+    mResolver.insert(TodoProviderContract.BASE_URI_TODO, contentValuesFromTodo(todo));
     return todo;
   }
 
@@ -95,5 +95,16 @@ public class TodoSource
     cv.put(TodoProviderContract.COLUMN_constraint, todo.constraint);
     cv.put(TodoProviderContract.COLUMN_estimatedTime, todo.estimatedTime);
     return cv;
+  }
+
+  public boolean isOpen(@NonNull final Todo todo)
+  {
+    final Uri uri = Uri.withAppendedPath(TodoProviderContract.BASE_URI_METADATA, todo.id);
+    final Cursor c = mResolver.query(uri, null, null, null, null);
+    if (null == c || c.getCount() != 1) return true;
+    c.moveToFirst();
+    final int open = c.getShort(TodoProviderContract.COLUMNINDEX_open);
+    c.close();
+    return open != 0;
   }
 }

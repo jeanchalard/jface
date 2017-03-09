@@ -16,7 +16,6 @@ public class TodoProvider extends WrappedContentProvider
 {
   @NonNull private final static String DB_NAME = "TodoDb";
   private final static int DB_VERSION = 1;
-  @NonNull private final static String TABLE_NAME = "todo";
 
   private class TodoOpenHelper extends SQLiteOpenHelper
   {
@@ -27,7 +26,7 @@ public class TodoProvider extends WrappedContentProvider
 
     @Override public void onCreate(final SQLiteDatabase sqLiteDatabase)
     {
-      sqLiteDatabase.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
+      sqLiteDatabase.execSQL("CREATE TABLE " + TodoProviderContract.TABLE_NAME + " (" +
        /*  0 */              TodoProviderContract.COLUMN_id + " TEXT PRIMARY KEY NOT NULL," +
        /*  1 */              TodoProviderContract.COLUMN_ord + " TEXT," +
        /*  2 */              TodoProviderContract.COLUMN_creationTime + " INTEGER," +
@@ -41,6 +40,9 @@ public class TodoProvider extends WrappedContentProvider
        /* 10 */              TodoProviderContract.COLUMN_constraint + " TINYINT," +
        /* 11 */              TodoProviderContract.COLUMN_estimatedTime + " INTEGER," +
        /* 12 */              TodoProviderContract.COLUMN_status + " INTEGER)");
+      sqLiteDatabase.execSQL("CREATE TABLE " + TodoProviderContract.UI_METADATA_TABLE_NAME + " (" +
+       /*  0 */              TodoProviderContract.COLUMN_id + " TEXT PRIMARY KEY NOT NULL," +
+       /*  1 */              TodoProviderContract.COLUMN_open + " SHORT DEFAULT 1)");
     }
 
     @Override public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1)
@@ -62,21 +64,28 @@ public class TodoProvider extends WrappedContentProvider
     final SQLiteDatabase db = mDb.getReadableDatabase();
     switch (TodoProviderMatcher.Matcher.match(uri))
     {
-      case TodoProviderMatcher.ALL_CONTENT:
-        return db.query(TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
-      case TodoProviderMatcher.INDIVIDUAL_TODO:
-        final String todoId = uri.getLastPathSegment();
-        return db.query(TABLE_NAME, projection, "id = ?", new String[] { todoId }, null, null, sortOrder);
+      case TodoProviderMatcher.ALL_CONTENT :
+        return db.query(TodoProviderContract.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+      case TodoProviderMatcher.INDIVIDUAL_TODO :
+        return getIndividualTodoData(db, TodoProviderContract.TABLE_NAME, uri, projection, sortOrder);
+      case TodoProviderMatcher.INDIVIDUAL_TODO_METADATA :
+        return getIndividualTodoData(db, TodoProviderContract.UI_METADATA_TABLE_NAME, uri, projection, sortOrder);
     }
     return null;
+  }
+
+  @Nullable private Cursor getIndividualTodoData(@NonNull SQLiteDatabase db, @NonNull final String tableName, @NonNull final Uri uri, @Nullable final String[] projection, @Nullable final String sortOrder)
+  {
+    final String todoId = uri.getLastPathSegment();
+    return db.query(tableName, projection, "id = ?", new String[] { todoId }, null, null, sortOrder);
   }
 
   @Nullable public String getType(@NonNull final Uri uri)
   {
     switch (TodoProviderMatcher.Matcher.match(uri))
     {
-      case TodoProviderMatcher.ALL_CONTENT: return TodoProviderContract.MIMETYPE_TODOLIST;
-      case TodoProviderMatcher.INDIVIDUAL_TODO: return TodoProviderContract.MIMETYPE_TODO;
+      case TodoProviderMatcher.ALL_CONTENT : return TodoProviderContract.MIMETYPE_TODOLIST;
+      case TodoProviderMatcher.INDIVIDUAL_TODO : return TodoProviderContract.MIMETYPE_TODO;
     }
     return null;
   }
@@ -85,20 +94,20 @@ public class TodoProvider extends WrappedContentProvider
   {
     final SQLiteDatabase db = mDb.getWritableDatabase();
     // TODO : sanitize
-    db.insertWithOnConflict(TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
-    return Uri.withAppendedPath(TodoProviderContract.BASE_URI, values.getAsString(TodoProviderContract.COLUMN_id));
+    db.insertWithOnConflict(TodoProviderContract.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+    return Uri.withAppendedPath(TodoProviderContract.BASE_URI_TODO, values.getAsString(TodoProviderContract.COLUMN_id));
   }
 
   public int delete(@NonNull final Uri uri, @Nullable final String selection, @Nullable final String[] selectionArgs)
   {
     final SQLiteDatabase db = mDb.getWritableDatabase();
-    return db.delete(TABLE_NAME, selection, selectionArgs);
+    return db.delete(TodoProviderContract.TABLE_NAME, selection, selectionArgs);
   }
 
   public int update(@NonNull final Uri uri, @NonNull final ContentValues values, @Nullable final String selection, @Nullable final String[] selectionArgs)
   {
     final SQLiteDatabase db = mDb.getWritableDatabase();
     // TODO : sanitize
-    return db.update(TABLE_NAME, values, selection, selectionArgs);
+    return db.update(TodoProviderContract.TABLE_NAME, values, selection, selectionArgs);
   }
 }

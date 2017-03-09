@@ -10,8 +10,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 
 import static com.j.jface.org.todo.Todo.NULL_TODO;
+import static java.util.Collections.binarySearch;
 
 // A todo list backed by a sorted ArrayList. It guarantees ordering according to the ID,
 // but provides indexation.
@@ -21,10 +23,13 @@ public class TodoList implements Handler.Callback
   {
     void notifyItemChanged(final int position, @NonNull final Todo payload);
     void notifyItemInserted(final int position, @NonNull final Todo payload);
-    void notifyItemsRemoved(int position, @NonNull final List<Todo> payload);
+    void notifyItemRangeInserted(final int position, final int count);
+    void notifyItemRangeRemoved(final int position, final int count);
   }
 
   @NonNull private final ArrayList<Todo> mList;
+  @NonNull private final ArrayList<Integer> mShownIndices;
+  @NonNull private final HashMap<String, TodoUIParams> mUIParams;
   @NonNull private final ArrayList<ChangeObserver> mObservers;
   @NonNull private final TodoSource mSource;
   @NonNull private final Handler mHandler;
@@ -32,9 +37,53 @@ public class TodoList implements Handler.Callback
   {
     mSource = new TodoSource(context);
     mList = mSource.fetchTodoList();
+    mUIParams = computeUIParams(mList, mSource);
+    mShownIndices = computeShown(mList, mUIParams);
     mObservers = new ArrayList<>();
     mHandler = new Handler(this);
     mTodosToPersist = new HashMap<>();
+  }
+
+  private static ArrayList<Integer> computeShown(@NonNull final ArrayList<Todo> list, @NonNull final HashMap<String, TodoUIParams> uiParams)
+  {
+    return computeShown(new ArrayList<Integer>(list.size()), list, uiParams);
+  }
+
+  private static ArrayList<Integer> computeShown(@NonNull final ArrayList<Integer> result, @NonNull final ArrayList<Todo> list, @NonNull final HashMap<String, TodoUIParams> uiParams)
+  {
+    result.clear();
+    int i = 0;
+    for (final Todo t : list)
+    {
+      final TodoUIParams todoUiParams = uiParams.get(t.id);
+      if (todoUiParams.allHierarchyOpen) result.add(i);
+      ++i;
+    }
+    return result;
+  }
+
+  private static HashMap<String, TodoUIParams> computeUIParams(@NonNull final ArrayList<Todo> list, @NonNull final TodoSource source)
+  {
+    final HashMap<String, TodoUIParams> results = new HashMap<>();
+    final Stack<Todo> parents = new Stack<>();
+    parents.push(NULL_TODO);
+    final int prevDepth = 0;
+    for (final Todo todo : list)
+    {
+      final boolean open = source.isOpen(todo);
+      if (prevDepth >= todo.depth) parents.pop();
+      if (parents.isEmpty())
+        results.put(todo.id, new TodoUIParams(null, open, true));
+      else
+      {
+        final Todo parent = parents.peek();
+        final TodoUIParams uiParams = results.get(parent.id);
+        uiParams.leaf = false;
+        results.put(todo.id, new TodoUIParams(parent, open, uiParams.allHierarchyOpen && uiParams.open));
+      }
+      parents.push(todo);
+    }
+    return results;
   }
 
   public void addObserver(@NonNull final ChangeObserver obs)
@@ -51,6 +100,16 @@ public class TodoList implements Handler.Callback
   @NonNull public Todo createAndInsertTodo(@NonNull final String text, @Nullable final Todo parent)
   {
     final Todo result = new Todo.Builder(text, ordForNewChild(parent)).setDepth(null == parent ? 0 : parent.depth + 1).build();
+    final boolean allHierarchyOpen;
+    if (null != parent)
+    {
+      final TodoUIParams parentUIParams = mUIParams.get(parent.id);
+      parentUIParams.leaf = false;
+      allHierarchyOpen = parentUIParams.allHierarchyOpen && parentUIParams.open;
+    }
+    else allHierarchyOpen = true;
+    final TodoUIParams uiParams = new TodoUIParams(parent, true, allHierarchyOpen);
+    mUIParams.put(result.id, uiParams);
     updateTodo(result);
     return result;
   }
@@ -59,24 +118,35 @@ public class TodoList implements Handler.Callback
   {
     if ("!".equals(todo.ord)) throw new RuntimeException("Trying to update a null Todo");
     mSource.updateTodo(todo);
-    final int index = Collections.binarySearch(mList, todo.ord);
+    final int index = binarySearch(mList, todo.ord);
     if (index >= 0)
     {
       if (todo.completionTime > 0)
       {
         // Completed todo. Remove.
+        final Todo parent = mUIParams.get(todo.id).parent;
+        if (null != parent)
+          if (getDescendants(parent).size() <= 1)
+          {
+            mUIParams.get(parent.id).leaf = true;
+//            for (final ChangeObserver obs : mObservers) obs.notifyItemChanged(??);
+          }
         final int lastChildIndex = getLastChildIndex(index);
         final List<Todo> subListToClear = mList.subList(index, lastChildIndex + 1); // inclusive, exclusive
         final ArrayList<Todo> removed = new ArrayList<>(subListToClear);
         subListToClear.clear();
         for (int i = 0; i < removed.size(); ++i)
           removed.set(i, new Todo.Builder(removed.get(i)).setCompletionTime(todo.completionTime).build());
-        for (final ChangeObserver obs : mObservers) obs.notifyItemsRemoved(index, removed);
+        final int from = Collections.binarySearch(mShownIndices, index);
+        final int iTo = Collections.binarySearch(mShownIndices, index + removed.size());
+        final int to = iTo < 0 ? -iTo - 1 : iTo;
+        for (final ChangeObserver obs : mObservers) obs.notifyItemRangeRemoved(from, to - from - 1);
       }
       else
       {
         mList.set(index, todo);
-        for (final ChangeObserver obs : mObservers) obs.notifyItemChanged(index, todo);
+        final int ref = Collections.binarySearch(mShownIndices, index);
+        for (final ChangeObserver obs : mObservers) obs.notifyItemChanged(ref, todo);
       }
     }
     else
@@ -84,8 +154,23 @@ public class TodoList implements Handler.Callback
       // BinarySearch returns -(insertion point) - 1 when the item is not in the list.
       final int insertionPoint = -index - 1;
       mList.add(insertionPoint, todo);
-      for (final ChangeObserver obs : mObservers) obs.notifyItemInserted(insertionPoint, todo);
+      final Todo parent = mUIParams.get(todo.id).parent;
+      if (null != parent)
+      {
+        final TodoUIParams parentUIParams = mUIParams.get(parent.id);
+        if (!parentUIParams.open) toggleOpen(parent);
+      }
+      computeShown(mShownIndices, mList, mUIParams);
+      final int inserted = -Collections.binarySearch(mShownIndices, insertionPoint) - 1;
+      for (final ChangeObserver obs : mObservers) obs.notifyItemInserted(inserted, todo);
     }
+  }
+
+  public ArrayList<Todo> getTreeRootedAt(@NonNull final Todo todo)
+  {
+    final ArrayList<Todo> subTree = getDescendants(todo);
+    subTree.add(0, todo);
+    return subTree;
   }
 
   public ArrayList<Todo> getDescendants(@NonNull final Todo todo)
@@ -93,8 +178,34 @@ public class TodoList implements Handler.Callback
     final int index = mList.indexOf(todo);
     if (index < 0) return new ArrayList<>();
     final int lastChildIndex = getLastChildIndex(index);
-    final List<Todo> subList = mList.subList(index, lastChildIndex + 1); // inclusive, exclusive
+    final List<Todo> subList = mList.subList(index + 1, lastChildIndex + 1); // inclusive, exclusive
     return new ArrayList<>(subList);
+  }
+
+  public void toggleOpen(@NonNull final Todo todo)
+  {
+    final TodoUIParams uiParams = mUIParams.get(todo.id);
+    uiParams.open = !uiParams.open;
+    final int index = mList.indexOf(todo);
+    final ArrayList<Todo> descendants = getDescendants(todo);
+    for (final Todo t : descendants) openOrCloseDescendants(t, uiParams.open);
+    computeShown(mShownIndices, mList, mUIParams);
+    final int iFrom = Collections.binarySearch(mShownIndices, index + 1);
+    final int iTo = Collections.binarySearch(mShownIndices, index + descendants.size());
+    final int from = iFrom > 0 ? iFrom : -iFrom - 1;
+    final int to = iTo > 0 ? iTo : -iTo - 1;
+    if (uiParams.open)
+      for (final ChangeObserver obs : mObservers) obs.notifyItemRangeInserted(from, descendants.size());
+    else
+      for (final ChangeObserver obs : mObservers) obs.notifyItemRangeRemoved(from, descendants.size());
+  }
+
+  private void openOrCloseDescendants(@NonNull final Todo todo, final boolean open)
+  {
+    final TodoUIParams uiParams = mUIParams.get(todo.id);
+    uiParams.allHierarchyOpen = open;
+    if (uiParams.open)
+      for (final Todo t : getDescendants(todo)) openOrCloseDescendants(t, open);
   }
 
   // -1 if no such element
@@ -122,10 +233,15 @@ public class TodoList implements Handler.Callback
     return Todo.ordBetween(prevOrd, nextOrd);
   }
 
-  @NonNull public Todo get(final int index) { return mList.get(index); }
+  @NonNull public Todo get(final int index)
+  {
+    final int deref = mShownIndices.get(index);
+    return mList.get(deref);
+  }
+
   @Nullable public Todo getFromOrd(@NonNull final String todoOrd)
   {
-    final int index = Collections.binarySearch(mList, todoOrd);
+    final int index = binarySearch(mList, todoOrd);
     if (index >= 0) return mList.get(index);
     return null;
   }
@@ -134,8 +250,12 @@ public class TodoList implements Handler.Callback
     for (final Todo t : mList) if (t.id.equals(todoId)) return t;
     return null;
   }
-  public int size() { return mList.size(); }
+  public int size() { return mShownIndices.size(); }
 
+  @NonNull public TodoUIParams getMetadata(@NonNull final Todo todo)
+  {
+    return mUIParams.get(todo.id);
+  }
 
   ///////////////////////////////////////////////////////////////////////////
   // Handler for delayed persistence
