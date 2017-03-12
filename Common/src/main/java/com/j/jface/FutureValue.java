@@ -11,7 +11,7 @@ public class FutureValue<T>
 
   public boolean isDone()
   {
-    return null == mValue;
+    return null != mValue;
   }
 
   @NonNull public T get()
