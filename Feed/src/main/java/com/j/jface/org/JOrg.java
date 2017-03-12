@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.j.jface.Const;
 import com.j.jface.R;
+import com.j.jface.client.Client;
 import com.j.jface.lifecycle.TodoEditorBoot;
 import com.j.jface.lifecycle.WrappedActivity;
 import com.j.jface.org.todo.Todo;
@@ -27,14 +28,16 @@ import com.j.jface.org.todo.TodoList;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 
 /**
  * Main activity class for JOrg.
  */
-public class JOrg extends WrappedActivity
+public class JOrg extends WrappedActivity implements TodoList.ChangeObserver
 {
+  @NonNull private final Client mClient;
   @NonNull private final SoundSource mSoundSource;
   @NonNull private final EditTextSoundRouter mSoundRouter;
   @NonNull private final TodoAdapter mAdapter;
@@ -45,11 +48,13 @@ public class JOrg extends WrappedActivity
   public JOrg(@NonNull final Args args)
   {
     super(args);
+    mClient = new Client(mA);
     mA.setContentView(R.layout.org_top);
     ((AppCompatActivity)mA).setSupportActionBar((Toolbar)mA.findViewById(R.id.orgTopActionBar));
     mSoundSource = new SoundSource(mA, (ViewGroup)mA.findViewById(R.id.sound_source));
     mSoundRouter = new EditTextSoundRouter(mSoundSource);
     mTodoList = TodoList.getInstance(mA.getApplicationContext());
+    mTodoList.addObserver(this);
 
     mTopLayout = (CoordinatorLayout)mA.findViewById(R.id.topLayout);
     final RecyclerView rv = (RecyclerView)mA.findViewById(R.id.todoList);
@@ -126,5 +131,13 @@ public class JOrg extends WrappedActivity
     final Intent editorIntent = new Intent(mA, TodoEditorBoot.class);
     editorIntent.putExtra(Const.EXTRA_TODO_ID, todo.id);
     mA.startActivity(editorIntent);
+  }
+
+  public void notifyItemChanged(final int position, @NonNull final Todo payload) { scheduleUpsync(); }
+  public void notifyItemInserted(final int position, @NonNull final Todo payload) { scheduleUpsync(); }
+  public void notifyItemsRemoved(final int position, @NonNull final List<Todo> payload) { scheduleUpsync(); }
+  private void scheduleUpsync()
+  {
+
   }
 }

@@ -1,6 +1,8 @@
 package com.j.jface.client;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.IntentSender;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -8,18 +10,20 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.drive.Drive;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.Wearable;
 import com.j.jface.FutureValue;
 import com.j.jface.client.action.Action;
+import com.j.jface.client.action.node.GetNodeNameAction;
 import com.j.jface.client.action.wear.DeleteAllDataAction;
 import com.j.jface.client.action.wear.DeleteDataAction;
 import com.j.jface.client.action.wear.GetDataAction;
-import com.j.jface.client.action.node.GetNodeNameAction;
 import com.j.jface.client.action.wear.PutDataAction;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -45,6 +49,7 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
      .addConnectionCallbacks(this)
      .addOnConnectionFailedListener(this)
      .addApi(Wearable.API).addApi(LocationServices.API)
+     .addApi(Drive.API).addScope(Drive.SCOPE_FILE)
      .build();
   }
 
@@ -142,11 +147,26 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
     enqueue(new DeleteAllDataAction(this));
   }
 
-  @Override public void onConnected(final Bundle bundle) { mConnectionFailures = 0; proceed(); }
+  @Override public void onConnected(final Bundle bundle) {
+    mConnectionFailures = 0;
+    proceed();
+  }
   @Override public void onConnectionSuspended(final int i) { proceed(); }
   @Override public void onConnectionFailed(@NonNull final ConnectionResult connectionResult)
   {
-    if (CONNECTION_FAILURES_BACKOFF.length > ++mConnectionFailures)
+    if (connectionResult.hasResolution())
+    {
+      try
+      {
+        // Requires this client has been passed an activity as context.
+        connectionResult.startResolutionForResult((Activity)mClient.getContext(), 1);
+      }
+      catch (final IntentSender.SendIntentException e)
+      {
+        Log.e("JFACE", "Google API can't resolve its own mess : " + e);
+      }
+    }
+    else if (CONNECTION_FAILURES_BACKOFF.length > ++mConnectionFailures)
       sendEmptyMessageDelayed(MSG_PROCESS_QUEUE, CONNECTION_FAILURES_BACKOFF[mConnectionFailures]);
   }
 }
