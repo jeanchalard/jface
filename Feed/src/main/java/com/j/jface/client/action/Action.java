@@ -6,5 +6,5 @@ import com.google.android.gms.common.api.GoogleApiClient;
 
 public interface Action
 {
-  void run(@NonNull final GoogleApiClient client);
+  public void run(@NonNull final GoogleApiClient client);
 }
