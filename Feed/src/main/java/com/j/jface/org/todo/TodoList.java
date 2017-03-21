@@ -53,12 +53,16 @@ public class TodoList implements Handler.Callback
   {
     result.clear();
     int i = 0;
+    TodoUIParams todoUiParams = null; int lastDepth = 2;
     for (final Todo t : list)
     {
-      final TodoUIParams todoUiParams = uiParams.get(t.id);
+      if (null != todoUiParams) todoUiParams.leaf = t.depth <= lastDepth;
+      lastDepth = t.depth;
+      todoUiParams = uiParams.get(t.id);
       if (todoUiParams.allHierarchyOpen) result.add(i);
       ++i;
     }
+    if (null != todoUiParams) todoUiParams.leaf = true;
     return result;
   }
 

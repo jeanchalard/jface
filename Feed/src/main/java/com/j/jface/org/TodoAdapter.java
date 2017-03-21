@@ -176,6 +176,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
       mDetails.bind(todo);
       mExpanderLayoutParams.leftMargin = todo.depth * 40 + 10;
       mExpander.setLayoutParams(mExpanderLayoutParams);
+      mExpander.setVisibility(mList.getMetadata(todo).leaf ? View.INVISIBLE : View.VISIBLE);
       mExpansion.setVisibility(View.GONE);
       mEditText.setText(todo.text);
     }
