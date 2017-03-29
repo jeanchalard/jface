@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-import static com.j.jface.org.todo.Todo.NULL_TODO;
 import static java.util.Collections.binarySearch;
 
 // A todo list backed by a sorted ArrayList. It guarantees ordering according to the ID,
@@ -70,12 +69,10 @@ public class TodoList implements Handler.Callback
   {
     final HashMap<String, TodoUIParams> results = new HashMap<>();
     final Stack<Todo> parents = new Stack<>();
-    parents.push(NULL_TODO);
-    final int prevDepth = 0;
     for (final Todo todo : list)
     {
       final boolean open = source.isOpen(todo);
-      if (prevDepth >= todo.depth) parents.pop();
+      while (!parents.isEmpty() && parents.peek().depth >= todo.depth) parents.pop();
       if (parents.isEmpty())
         results.put(todo.id, new TodoUIParams(null, open, true));
       else
@@ -122,29 +119,30 @@ public class TodoList implements Handler.Callback
   {
     if ("!".equals(todo.ord)) throw new RuntimeException("Trying to update a null Todo");
     mSource.updateTodo(todo);
-    final int index = binarySearch(mList, todo.ord);
+    final int index = Collections.binarySearch(mList, todo.ord);
     if (index >= 0)
     {
       if (todo.completionTime > 0)
       {
         // Completed todo. Remove.
-        final Todo parent = mUIParams.get(todo.id).parent;
-        if (null != parent)
-          if (getDescendants(parent).size() <= 1)
-          {
-            mUIParams.get(parent.id).leaf = true;
-//            for (final ChangeObserver obs : mObservers) obs.notifyItemChanged(??);
-          }
         final int lastChildIndex = getLastChildIndex(index);
         final List<Todo> subListToClear = mList.subList(index, lastChildIndex + 1); // inclusive, exclusive
         final ArrayList<Todo> removed = new ArrayList<>(subListToClear);
         subListToClear.clear();
+        final Todo parent = mUIParams.get(todo.id).parent;
+        if (null != parent)
+          if (hasDescendants(parent))
+            mUIParams.get(parent.id).leaf = true;
         for (int i = 0; i < removed.size(); ++i)
           removed.set(i, new Todo.Builder(removed.get(i)).setCompletionTime(todo.completionTime).build());
+        final int before = mShownIndices.size();
+        computeShown(mShownIndices, mList, mUIParams);
         final int from = Collections.binarySearch(mShownIndices, index);
         final int iTo = Collections.binarySearch(mShownIndices, index + removed.size());
         final int to = iTo < 0 ? -iTo - 1 : iTo;
-        for (final ChangeObserver obs : mObservers) obs.notifyItemRangeRemoved(from, to - from - 1);
+        // Make it easier to identify bugs happening here
+        if (mShownIndices.size() - before != to - from) throw new RuntimeException("Badsize.");
+        for (final ChangeObserver obs : mObservers) obs.notifyItemRangeRemoved(from, to - from);
       }
       else
       {
@@ -177,9 +175,16 @@ public class TodoList implements Handler.Callback
     return subTree;
   }
 
+  public boolean hasDescendants(@NonNull final Todo todo)
+  {
+    final int index = Collections.binarySearch(mList, todo.ord);
+    if (mList.size() <= index + 1) return false;
+    return mList.get(index + 1).depth > todo.depth;
+  }
+
   public ArrayList<Todo> getDescendants(@NonNull final Todo todo)
   {
-    final int index = mList.indexOf(todo);
+    final int index = Collections.binarySearch(mList, todo.ord);
     if (index < 0) return new ArrayList<>();
     final int lastChildIndex = getLastChildIndex(index);
     final List<Todo> subList = mList.subList(index + 1, lastChildIndex + 1); // inclusive, exclusive
@@ -190,6 +195,7 @@ public class TodoList implements Handler.Callback
   {
     final TodoUIParams uiParams = mUIParams.get(todo.id);
     uiParams.open = !uiParams.open;
+    mSource.updateTodoOpen(todo, uiParams.open);
     final int index = mList.indexOf(todo);
     final ArrayList<Todo> descendants = getDescendants(todo);
     for (final Todo t : descendants) openOrCloseDescendants(t, uiParams.open);
