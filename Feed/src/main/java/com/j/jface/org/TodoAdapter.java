@@ -87,17 +87,17 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
     @Override public void onClick(@NonNull final View view)
     {
       if (view == mAddSubTodoButton)
-      {
-        toggleShowActions();
         mJorg.addNewSubTodo(mCurrentTodo);
-      }
       else if (view == mClearTodoButton)
       {
         toggleShowActions();
         mJorg.clearTodo(mCurrentTodo);
       }
       else if (view == mShowActionsButton)
+      {
         toggleShowActions();
+        mRecyclerView.scrollToPosition(getAdapterPosition());
+      }
       else if (view == mExpander)
         mList.toggleOpen(mCurrentTodo);
     }
@@ -177,7 +177,10 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
       mExpanderLayoutParams.leftMargin = todo.depth * 40 + 10;
       mExpander.setLayoutParams(mExpanderLayoutParams);
       mExpander.setVisibility(mList.getMetadata(todo).leaf ? View.INVISIBLE : View.VISIBLE);
+      mShowActionsButton.setRotation(0f);
       mExpansion.setVisibility(View.GONE);
+      mClearTodoButton.setVisibility(View.GONE);
+      mAddSubTodoButton.setVisibility(View.GONE);
       mEditText.setText(todo.text);
     }
 

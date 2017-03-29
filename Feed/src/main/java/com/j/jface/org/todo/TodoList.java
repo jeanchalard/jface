@@ -141,7 +141,7 @@ public class TodoList implements Handler.Callback
         final int iTo = Collections.binarySearch(mShownIndices, index + removed.size());
         final int to = iTo < 0 ? -iTo - 1 : iTo;
         // Make it easier to identify bugs happening here
-        if (mShownIndices.size() - before != to - from) throw new RuntimeException("Badsize.");
+        if (before - mShownIndices.size() != to - from) throw new RuntimeException("Badsize. " + before + " → " + mShownIndices.size() + " :: " + from + " → " + to);
         for (final ChangeObserver obs : mObservers) obs.notifyItemRangeRemoved(from, to - from);
       }
       else
@@ -163,7 +163,7 @@ public class TodoList implements Handler.Callback
         if (!parentUIParams.open) toggleOpen(parent);
       }
       computeShown(mShownIndices, mList, mUIParams);
-      final int inserted = -Collections.binarySearch(mShownIndices, insertionPoint) - 1;
+      final int inserted = Collections.binarySearch(mShownIndices, insertionPoint);
       for (final ChangeObserver obs : mObservers) obs.notifyItemInserted(inserted, todo);
     }
   }
