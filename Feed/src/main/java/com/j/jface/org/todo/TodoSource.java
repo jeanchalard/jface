@@ -75,7 +75,7 @@ public class TodoSource
 
   @NonNull public Todo updateTodo(@NonNull final Todo todo)
   {
-    mResolver.insert(TodoProviderContract.BASE_URI_TODO, contentValuesFromTodo(todo));
+    mResolver.insert(Uri.withAppendedPath(TodoProviderContract.BASE_URI_TODO, todo.id), contentValuesFromTodo(todo));
     return todo;
   }
 
