@@ -69,21 +69,24 @@ public class TodoList implements Handler.Callback
   {
     final HashMap<String, TodoUIParams> results = new HashMap<>();
     final Stack<Todo> parents = new Stack<>();
+    final TodoUIParams lastUIParams = null;
     for (final Todo todo : list)
     {
       final boolean open = source.isOpen(todo);
+      if (!parents.isEmpty() && parents.peek().depth > todo.depth) results.get(parents.pop().id).lastChild = true;
       while (!parents.isEmpty() && parents.peek().depth >= todo.depth) parents.pop();
       if (parents.isEmpty())
-        results.put(todo.id, new TodoUIParams(null, open, true));
+        results.put(todo.id, new TodoUIParams(null, open, true, false));
       else
       {
         final Todo parent = parents.peek();
         final TodoUIParams uiParams = results.get(parent.id);
         uiParams.leaf = false;
-        results.put(todo.id, new TodoUIParams(parent, open, uiParams.allHierarchyOpen && uiParams.open));
+        results.put(todo.id, new TodoUIParams(parent, open, uiParams.allHierarchyOpen && uiParams.open, false));
       }
       parents.push(todo);
     }
+    results.get(parents.pop().id).lastChild = true;
     return results;
   }
 
@@ -107,9 +110,17 @@ public class TodoList implements Handler.Callback
       final TodoUIParams parentUIParams = mUIParams.get(parent.id);
       parentUIParams.leaf = false;
       allHierarchyOpen = parentUIParams.allHierarchyOpen && parentUIParams.open;
+      final int parentIndex = Collections.binarySearch(mList, parent.id);
+      final int lastSiblingIndex = getLastChildIndex(parentIndex);
+      if (lastSiblingIndex > 0)
+      {
+        final Todo lastSibling = mList.get(lastSiblingIndex);
+        getMetadata(lastSibling).lastChild = false;
+        for (final ChangeObserver obs : mObservers) obs.notifyItemChanged(lastSiblingIndex, lastSibling);
+      }
     }
     else allHierarchyOpen = true;
-    final TodoUIParams uiParams = new TodoUIParams(parent, true, allHierarchyOpen);
+    final TodoUIParams uiParams = new TodoUIParams(parent, true, allHierarchyOpen, true);
     mUIParams.put(result.id, uiParams);
     updateTodo(result);
     return result;
@@ -136,10 +147,10 @@ public class TodoList implements Handler.Callback
         for (int i = 0; i < removed.size(); ++i)
           removed.set(i, new Todo.Builder(removed.get(i)).setCompletionTime(todo.completionTime).build());
         final int before = mShownIndices.size();
-        computeShown(mShownIndices, mList, mUIParams);
         final int from = Collections.binarySearch(mShownIndices, index);
         final int iTo = Collections.binarySearch(mShownIndices, index + removed.size());
         final int to = iTo < 0 ? -iTo - 1 : iTo;
+        computeShown(mShownIndices, mList, mUIParams);
         // Make it easier to identify bugs happening here
         if (before - mShownIndices.size() != to - from) throw new RuntimeException("Badsize. " + before + " → " + mShownIndices.size() + " :: " + from + " → " + to);
         for (final ChangeObserver obs : mObservers) obs.notifyItemRangeRemoved(from, to - from);
@@ -205,9 +216,17 @@ public class TodoList implements Handler.Callback
     final int from = iFrom > 0 ? iFrom : -iFrom - 1;
     final int to = iTo > 0 ? iTo : -iTo - 1;
     if (uiParams.open)
-      for (final ChangeObserver obs : mObservers) obs.notifyItemRangeInserted(from, descendants.size());
+      for (final ChangeObserver obs : mObservers)
+      {
+        obs.notifyItemChanged(index, todo);
+        obs.notifyItemRangeInserted(from, descendants.size());
+      }
     else
-      for (final ChangeObserver obs : mObservers) obs.notifyItemRangeRemoved(from, descendants.size());
+      for (final ChangeObserver obs : mObservers)
+      {
+        obs.notifyItemChanged(index, todo);
+        obs.notifyItemRangeRemoved(from, descendants.size());
+      }
   }
 
   private void openOrCloseDescendants(@NonNull final Todo todo, final boolean open)

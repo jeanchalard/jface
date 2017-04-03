@@ -19,12 +19,13 @@
       android:minHeight="32dp"
       android:clipChildren="false">
 
-      <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+      <com.j.jface.org.ExpanderView
         android:id="@+id/expander"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
         android:layout_weight="0"
-        android:src="@drawable/tree_expand"
         android:layout_gravity="center_vertical"/>
 
       <com.j.jface.org.SelReportEditText
@@ -38,7 +39,6 @@
         android:imeOptions="actionDone"
         android:inputType="textCapSentences|textAutoCorrect|textAutoComplete"
         android:layout_marginEnd="12dp"
-        android:layout_marginStart="12dp"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="4dp"
         />

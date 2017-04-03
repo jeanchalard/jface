@@ -16,8 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 
 import com.j.jface.R;
 import com.j.jface.org.editor.TodoEditor.TodoDetails;
@@ -46,8 +44,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
     @NonNull final private JOrg mJorg;
     @NonNull final private RecyclerView mRecyclerView;
 
-    @NonNull final private ImageView mExpander;
-    @NonNull final private LinearLayout.LayoutParams mExpanderLayoutParams;
+    @NonNull final private ExpanderView mExpander;
     @NonNull final private SelReportEditText mEditText;
     @NonNull final private View mExpansion;
     @NonNull final private TodoList mList;
@@ -64,8 +61,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
       mList = list;
       mList.addObserver(this);
       mRecyclerView = recyclerView;
-      mExpander = (ImageView)itemView.findViewById(R.id.expander);
-      mExpanderLayoutParams = (LinearLayout.LayoutParams)mExpander.getLayoutParams();
+      mExpander = (ExpanderView)itemView.findViewById(R.id.expander);
       mExpander.setOnClickListener(this);
       mEditText = (SelReportEditText)itemView.findViewById(R.id.todoText);
       mEditText.setOnFocusChangeListener(router);
@@ -174,9 +170,8 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
       if (todo.id.equals(mCurrentTodo.id)) return;
       mCurrentTodo = todo;
       mDetails.bind(todo);
-      mExpanderLayoutParams.leftMargin = todo.depth * 40 + 10;
-      mExpander.setLayoutParams(mExpanderLayoutParams);
-      mExpander.setVisibility(mList.getMetadata(todo).leaf ? View.INVISIBLE : View.VISIBLE);
+      mExpander.setDepth(todo.depth);
+      setupExpander(metadata);
       mShowActionsButton.setRotation(0f);
       mExpansion.setVisibility(View.GONE);
       mClearTodoButton.setVisibility(View.GONE);
@@ -194,7 +189,19 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
     @Override
     public void notifyItemChanged(final int position, @NonNull final Todo payload)
     {
-      if (payload.id.equals(mCurrentTodo.id)) mCurrentTodo = payload;
+      if (!payload.id.equals(mCurrentTodo.id)) return;
+      mCurrentTodo = payload;
+      setupExpander(mList.getMetadata(payload));
+    }
+
+    private void setupExpander(@NonNull final TodoUIParams metadata)
+    {
+      final int pos = getAdapterPosition();
+      final int expansions = metadata.leaf ? ExpanderView.EXPANSIONS_NONE : (metadata.open ? ExpanderView.EXPANSIONS_OPEN : ExpanderView.EXPANSIONS_CLOSED);
+      final int connectionUp = 0 == pos ? 0 : ExpanderView.CONNECTIONS_UP;
+      final int connectionDown = !metadata.lastChild ? ExpanderView.CONNECTIONS_DOWN : 0;
+      mExpander.setConnections(connectionUp | connectionDown);
+      mExpander.setExpansions(expansions);
     }
 
     @Override public void notifyItemInserted(final int position, @NonNull final Todo payload) {}

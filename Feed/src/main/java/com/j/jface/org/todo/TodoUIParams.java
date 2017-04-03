@@ -12,12 +12,14 @@ public class TodoUIParams
   public boolean open;
   public boolean allHierarchyOpen; // Whether this is visible ; an item is visible if all of its parents are open.
   public boolean leaf;
+  public boolean lastChild;
 
-  public TodoUIParams(@Nullable final Todo parent, final boolean open, final boolean allHierarchyOpen)
+  public TodoUIParams(@Nullable final Todo parent, final boolean open, final boolean allHierarchyOpen, final boolean lastChild)
   {
     this.parent = parent;
     this.open = open;
     this.allHierarchyOpen = allHierarchyOpen;
     this.leaf = true;
+    this.lastChild = lastChild;
   }
 }
