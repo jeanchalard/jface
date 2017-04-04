@@ -110,14 +110,6 @@ public class TodoList implements Handler.Callback
       final TodoUIParams parentUIParams = mUIParams.get(parent.id);
       parentUIParams.leaf = false;
       allHierarchyOpen = parentUIParams.allHierarchyOpen && parentUIParams.open;
-      final int parentIndex = Collections.binarySearch(mList, parent.id);
-      final int lastSiblingIndex = getLastChildIndex(parentIndex);
-      if (lastSiblingIndex > 0)
-      {
-        final Todo lastSibling = mList.get(lastSiblingIndex);
-        getMetadata(lastSibling).lastChild = false;
-        for (final ChangeObserver obs : mObservers) obs.notifyItemChanged(lastSiblingIndex, lastSibling);
-      }
     }
     else allHierarchyOpen = true;
     final TodoUIParams uiParams = new TodoUIParams(parent, true, allHierarchyOpen, true);
@@ -136,14 +128,23 @@ public class TodoList implements Handler.Callback
       if (todo.completionTime > 0)
       {
         // Completed todo. Remove.
+        final TodoUIParams params = mUIParams.get(todo.id);
+        if (params.lastChild && index > 0)
+        {
+          final Todo prevItem = mList.get(index - 1);
+          if (prevItem.depth == todo.depth)
+          {
+            mUIParams.get(prevItem.id).lastChild = true;
+            for (final ChangeObserver obs : mObservers) obs.notifyItemChanged(index - 1, prevItem);
+          }
+        }
         final int lastChildIndex = getLastChildIndex(index);
         final List<Todo> subListToClear = mList.subList(index, lastChildIndex + 1); // inclusive, exclusive
         final ArrayList<Todo> removed = new ArrayList<>(subListToClear);
         subListToClear.clear();
-        final Todo parent = mUIParams.get(todo.id).parent;
-        if (null != parent)
-          if (hasDescendants(parent))
-            mUIParams.get(parent.id).leaf = true;
+        if (null != params.parent)
+          if (hasDescendants(params.parent))
+            mUIParams.get(params.parent.id).leaf = true;
         for (int i = 0; i < removed.size(); ++i)
           removed.set(i, new Todo.Builder(removed.get(i)).setCompletionTime(todo.completionTime).build());
         final int before = mShownIndices.size();
@@ -167,6 +168,13 @@ public class TodoList implements Handler.Callback
       // BinarySearch returns -(insertion point) - 1 when the item is not in the list.
       final int insertionPoint = -index - 1;
       mList.add(insertionPoint, todo);
+      // Not inserted yet, so we'll get -(insertion index) - 1
+      if (insertionPoint > 0)
+      {
+        final Todo previousItem = mList.get(insertionPoint - 1);
+        getMetadata(previousItem).lastChild = false;
+        for (final ChangeObserver obs : mObservers) obs.notifyItemChanged(index - 1, previousItem);
+      }
       final Todo parent = mUIParams.get(todo.id).parent;
       if (null != parent)
       {
