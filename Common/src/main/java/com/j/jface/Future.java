@@ -1,5 +1,7 @@
 package com.j.jface;
 
+import android.support.annotation.NonNull;
+
 /**
  * A simpler Future
  */
@@ -11,4 +13,5 @@ public interface Future<T>
 
   public T get();
   public int status();
+  @NonNull public String getError();
 }

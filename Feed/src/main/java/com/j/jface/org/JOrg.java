@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.j.jface.Const;
 import com.j.jface.R;
 import com.j.jface.client.Client;
+import com.j.jface.client.action.drive.RecursiveBackupAction;
 import com.j.jface.lifecycle.TodoEditorBoot;
 import com.j.jface.lifecycle.WrappedActivity;
 import com.j.jface.org.todo.Todo;
@@ -67,6 +68,8 @@ public class JOrg extends WrappedActivity
         addNewSubTodo(null);
       }
     });
+
+    scheduleBackup();
   }
 
   public Context getContext()
@@ -129,5 +132,10 @@ public class JOrg extends WrappedActivity
     final Intent editorIntent = new Intent(mA, TodoEditorBoot.class);
     editorIntent.putExtra(Const.EXTRA_TODO_ID, todo.id);
     mA.startActivity(editorIntent);
+  }
+
+  private void scheduleBackup()
+  {
+    new RecursiveBackupAction(mClient, null).enqueue();
   }
 }

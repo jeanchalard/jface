@@ -126,12 +126,11 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
   /**
    * Data API convenience methods.
    */
-
   @Nullable public DataMap getData(@NonNull final String path)
   {
-    final FutureValue<DataMap> f = new FutureValue<>();
-    enqueue(new GetDataAction(this, null, path, f));
-    return f.get();
+    final GetDataAction action = new GetDataAction(this, null, path);
+    enqueue(action);
+    return action.get();
   }
 
   public void getData(@NonNull final String path, @NonNull final GetDataCallback callback)

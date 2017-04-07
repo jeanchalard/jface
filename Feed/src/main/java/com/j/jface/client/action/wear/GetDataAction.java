@@ -20,7 +20,7 @@ public class GetDataAction extends ResultAction<DataMap> implements ResultCallba
   @NonNull private final String mPath;
   @Nullable private final Client.GetDataCallback mCallback;
 
-  public GetDataAction(@NonNull final Client client, @Nullable Action then, @NonNull final String path, @NonNull final FutureValue<DataMap> f)
+  public GetDataAction(@NonNull final Client client, @Nullable Action then, @NonNull final String path)
   {
     super(client, then);
     mPath = path;

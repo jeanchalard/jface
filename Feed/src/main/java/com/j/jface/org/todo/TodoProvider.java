@@ -6,13 +6,23 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
+import com.j.jface.client.Client;
+import com.j.jface.client.action.drive.WriteFileAction;
 import com.j.jface.lifecycle.WrappedContentProvider;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
 // A provider of Todos.
-public class TodoProvider extends WrappedContentProvider
+public class TodoProvider extends WrappedContentProvider implements Handler.Callback
 {
   @NonNull private final static String DB_NAME = "TodoDb";
   private final static int DB_VERSION = 1;
@@ -51,11 +61,16 @@ public class TodoProvider extends WrappedContentProvider
     }
   }
 
+  @NonNull private final Client mClient;
+  @NonNull private final Handler mHandler;
   @NonNull private final TodoOpenHelper mDb;
 
   public TodoProvider(@NonNull Args a)
   {
     super(a);
+    //noinspection ConstantConditions – we are called in the original onCreate, making getContext NonNull. According to the doc.
+    mClient = new Client(mC.getContext());
+    mHandler = new Handler(this);
     mDb = new TodoOpenHelper(mC);
   }
 
@@ -117,5 +132,40 @@ public class TodoProvider extends WrappedContentProvider
     final SQLiteDatabase db = mDb.getWritableDatabase();
     // TODO : sanitize
     return db.update(TodoProviderContract.TABLE_NAME, values, selection, selectionArgs);
+  }
+
+
+  private static final int SYNC = 1;
+  private void scheduleSync()
+  {
+    mHandler.removeMessages(SYNC);
+    mHandler.sendEmptyMessageDelayed(SYNC, 3000); // 3 secs
+  }
+
+  @Override public boolean handleMessage(@NonNull final Message msg)
+  {
+    switch (msg.what)
+    {
+      case SYNC:
+        syncUp();
+        return true;
+    }
+    return false;
+  }
+
+  private void syncUp()
+  {
+    // getContext() is guaranteed to be non-null, because we are running after onCreate.
+    @SuppressWarnings("ConstantConditions") final File path = mC.getContext().getDatabasePath(DB_NAME);
+    try
+    {
+      final FileInputStream inputStream = new FileInputStream(path);
+//      mClient.enqueue(new WriteFileAction("Jormungand/Saves/latest", inputStream));
+    }
+    catch (FileNotFoundException e)
+    {
+      Log.w("Jorg", "The todo DB in " + path.getPath() + " can't be found ; can't back it up in the cloud.");
+      return;
+    }
   }
 }

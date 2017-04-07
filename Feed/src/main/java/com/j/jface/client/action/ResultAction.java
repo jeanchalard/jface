@@ -27,8 +27,11 @@ public abstract class ResultAction<T> extends Action implements Future<T>
   protected void finish(final T value)
   {
     result.set(value);
+    super.finish();
   }
+  protected void fail(@NonNull final String error) { result.fail(error); }
 
   @Nullable public T get() { return result.get(); }
   public int status() { return result.status(); }
+  @NonNull public String getError() { return result.getError(); }
 }
