@@ -22,7 +22,7 @@ public class TodoSource
   }
 
   // Returns null if no such Todo, or if multiple Todos with this ID (which is supposed to be impossible)
-  // Does not perform the expensive lookup for parent and children ; any client needing that should
+  // Does not perform the expensive lookup for parent and children ; any mClient needing that should
   // just look up the entire tree.
   @Nullable public Todo getTodoFromIdWithoutHierarchy(@NonNull final String id)
   {

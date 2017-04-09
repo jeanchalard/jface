@@ -31,14 +31,15 @@ import java.util.List;
 /**
  * An action that writes a file to Drive with the given data.
  */
-public class WriteFileAction implements Action
+public class WriteFileAction extends Action
 {
   @NonNull private static final String FOLDER_MIME_TYPE = "application/vnd.google-apps.folder";
 
   @NonNull final String mFilepath;
   @NonNull final InputStream mSource;
-  public WriteFileAction(@NonNull final String filepath, @NonNull final InputStream source)
+  public WriteFileAction(@NonNull final Client client, @NonNull final String filepath, @NonNull final InputStream source)
   {
+    super(client, null);
     mSource = source;
     mFilepath = filepath;
   }
@@ -122,5 +123,6 @@ public class WriteFileAction implements Action
       status = contents.commit(gClient, null).await();
     if (!status.isSuccess())
       Log.e("Jorg", "Save unsuccessful : " + status.getStatusMessage());
+    finish();
   }
 }

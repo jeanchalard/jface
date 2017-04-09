@@ -10,6 +10,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -18,6 +19,7 @@ import com.google.android.gms.drive.Drive;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.Wearable;
+import com.j.jface.Future;
 import com.j.jface.FutureValue;
 import com.j.jface.client.action.Action;
 import com.j.jface.client.action.node.GetNodeNameAction;
@@ -54,7 +56,7 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
   }
 
   private static Looper getInitialLooper() {
-    final HandlerThread handlerThread = new HandlerThread("client worker", android.os.Process.THREAD_PRIORITY_BACKGROUND);
+    final HandlerThread handlerThread = new HandlerThread("mClient worker", android.os.Process.THREAD_PRIORITY_BACKGROUND);
     handlerThread.start();
     return handlerThread.getLooper();
   }
@@ -97,56 +99,6 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
     proceed();
   }
 
-  public DataMap getData(@NonNull final String path)
-  {
-    final FutureValue<DataMap> f = new FutureValue<>();
-    enqueue(new GetDataAction(path, f));
-    return f.get();
-  }
-
-  public void getData(@NonNull final String path, @NonNull final GetDataCallback callback)
-  {
-    enqueue(new GetDataAction(path, callback));
-  }
-
-  // Helper methods to put data and forget about it
-  public void putData(@NonNull final String path, @NonNull final String key, @NonNull final String value)
-  {
-    enqueue(new PutDataAction(path, key, value));
-  }
-
-  public void putData(@NonNull final String path, @NonNull final String key, final boolean value)
-  {
-    enqueue(new PutDataAction(path, key, value));
-  }
-
-  public void putData(@NonNull final String path, @NonNull final String key, final long value)
-  {
-    enqueue(new PutDataAction(path, key, value));
-  }
-
-  public void putData(@NonNull final String path, @NonNull final DataMap map)
-  {
-    enqueue(new PutDataAction(path, map));
-  }
-
-  public FutureValue<String> getNodeId()
-  {
-    final GetNodeNameAction action = new GetNodeNameAction();
-    enqueue(action);
-    return action.mResult;
-  }
-
-  public void deleteData(@NonNull final Uri uri)
-  {
-    enqueue(new DeleteDataAction(uri));
-  }
-
-  public void clearAllData()
-  {
-    enqueue(new DeleteAllDataAction(this));
-  }
-
   @Override public void onConnected(final Bundle bundle) {
     mConnectionFailures = 0;
     proceed();
@@ -158,7 +110,7 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
     {
       try
       {
-        // Requires this client has been passed an activity as context.
+        // Requires this mClient has been passed an activity as context.
         connectionResult.startResolutionForResult((Activity)mClient.getContext(), 1);
       }
       catch (final IntentSender.SendIntentException e)
@@ -168,5 +120,60 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
     }
     else if (CONNECTION_FAILURES_BACKOFF.length > ++mConnectionFailures)
       sendEmptyMessageDelayed(MSG_PROCESS_QUEUE, CONNECTION_FAILURES_BACKOFF[mConnectionFailures]);
+  }
+
+
+  /**
+   * Data API convenience methods.
+   */
+
+  @Nullable public DataMap getData(@NonNull final String path)
+  {
+    final FutureValue<DataMap> f = new FutureValue<>();
+    enqueue(new GetDataAction(this, null, path, f));
+    return f.get();
+  }
+
+  public void getData(@NonNull final String path, @NonNull final GetDataCallback callback)
+  {
+    enqueue(new GetDataAction(this, null, path, callback));
+  }
+
+  // Helper methods to put data and forget about it
+  public void putData(@NonNull final String path, @NonNull final String key, @NonNull final String value)
+  {
+    enqueue(new PutDataAction(this, path, key, value));
+  }
+
+  public void putData(@NonNull final String path, @NonNull final String key, final boolean value)
+  {
+    enqueue(new PutDataAction(this, path, key, value));
+  }
+
+  public void putData(@NonNull final String path, @NonNull final String key, final long value)
+  {
+    enqueue(new PutDataAction(this, path, key, value));
+  }
+
+  public void putData(@NonNull final String path, @NonNull final DataMap map)
+  {
+    enqueue(new PutDataAction(this, path, map));
+  }
+
+  public Future<String> getNodeId()
+  {
+    final GetNodeNameAction action = new GetNodeNameAction(this, null);
+    enqueue(action);
+    return action;
+  }
+
+  public void deleteData(@NonNull final Uri uri)
+  {
+    enqueue(new DeleteDataAction(this, uri));
+  }
+
+  public void clearAllData()
+  {
+    enqueue(new DeleteAllDataAction(this));
   }
 }

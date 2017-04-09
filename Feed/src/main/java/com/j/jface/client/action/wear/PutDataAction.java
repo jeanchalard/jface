@@ -10,35 +10,40 @@ import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
+import com.j.jface.client.Client;
 import com.j.jface.client.action.Action;
 
-public class PutDataAction implements Action, ResultCallback<DataApi.DataItemResult>
+public class PutDataAction extends Action implements ResultCallback<DataApi.DataItemResult>
 {
   @NonNull private final PutDataRequest mRequest;
 
-  public PutDataAction(@NonNull final String path, @NonNull final String key, @NonNull final String value)
+  public PutDataAction(@NonNull final Client client, @NonNull final String path, @NonNull final String key, @NonNull final String value)
   {
+    super(client, null);
     final PutDataMapRequest dmRequest = PutDataMapRequest.create(path);
     dmRequest.getDataMap().putString(key, value);
     mRequest = dmRequest.asPutDataRequest();
   }
 
-  public PutDataAction(@NonNull final String path, @NonNull final String key, final boolean value)
+  public PutDataAction(@NonNull final Client client, @NonNull final String path, @NonNull final String key, final boolean value)
   {
+    super(client, null);
     final PutDataMapRequest dmRequest = PutDataMapRequest.create(path);
     dmRequest.getDataMap().putBoolean(key, value);
     mRequest = dmRequest.asPutDataRequest();
   }
 
-  public PutDataAction(@NonNull final String path, @NonNull final String key, final long value)
+  public PutDataAction(@NonNull final Client client, @NonNull final String path, @NonNull final String key, final long value)
   {
+    super(client, null);
     final PutDataMapRequest dmRequest = PutDataMapRequest.create(path);
     dmRequest.getDataMap().putLong(key, value);
     mRequest = dmRequest.asPutDataRequest();
   }
 
-  public PutDataAction(@NonNull final String path, @NonNull final DataMap map)
+  public PutDataAction(@NonNull final Client client, @NonNull final String path, @NonNull final DataMap map)
   {
+    super(client, null);
     final PutDataMapRequest dmRequest = PutDataMapRequest.create(path);
     dmRequest.getDataMap().putAll(map);
     mRequest = dmRequest.asPutDataRequest();
@@ -50,5 +55,8 @@ public class PutDataAction implements Action, ResultCallback<DataApi.DataItemRes
     pendingResult.setResultCallback(this);
   }
 
-  @Override public void onResult(@NonNull DataApi.DataItemResult dataItemResult) {}
+  @Override public void onResult(@NonNull DataApi.DataItemResult dataItemResult)
+  {
+    finish();
+  }
 }

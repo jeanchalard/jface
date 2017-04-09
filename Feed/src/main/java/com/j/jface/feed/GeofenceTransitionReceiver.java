@@ -31,7 +31,7 @@ public class GeofenceTransitionReceiver
   {
     final String action = intent.getAction();
     if (Intent.ACTION_BOOT_COMPLETED.equals(action) || ACTION_MANUAL_START.equals(action))
-      mClient.enqueue(new SetupGeofenceAction(getNotificationIntent()));
+      new SetupGeofenceAction(mClient, getNotificationIntent()).enqueue();
     if (ACTION_GEOFENCE.equals(action)) handleGeofenceTransitions(intent);
     FeedLoader.startAllLoads(mClient);
   }

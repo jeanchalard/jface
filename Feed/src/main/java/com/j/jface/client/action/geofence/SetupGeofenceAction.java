@@ -13,14 +13,16 @@ import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
 import com.j.jface.Const;
+import com.j.jface.client.Client;
 import com.j.jface.client.action.Action;
 import com.j.jface.feed.Fences;
 
-public class SetupGeofenceAction implements Action, ResultCallback<Status>
+public class SetupGeofenceAction extends Action implements ResultCallback<Status>
 {
   @NonNull private final PendingIntent mIntent;
-  public SetupGeofenceAction(@NonNull final PendingIntent intent)
+  public SetupGeofenceAction(@NonNull final Client client, @NonNull final PendingIntent intent)
   {
+    super(client, null);
     mIntent = intent;
   }
 
@@ -53,5 +55,8 @@ public class SetupGeofenceAction implements Action, ResultCallback<Status>
        .setResultCallback(this);
   }
 
-  @Override public void onResult(@NonNull final Status status) {}
+  @Override public void onResult(@NonNull final Status status)
+  {
+    finish();
+  }
 }

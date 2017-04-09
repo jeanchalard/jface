@@ -13,24 +13,24 @@ import com.google.android.gms.wearable.Wearable;
 import com.j.jface.FutureValue;
 import com.j.jface.client.action.Action;
 import com.j.jface.client.Client;
+import com.j.jface.client.action.ResultAction;
 
-public class GetDataAction implements Action, ResultCallback<DataItemBuffer>
+public class GetDataAction extends ResultAction<DataMap> implements ResultCallback<DataItemBuffer>
 {
   @NonNull private final String mPath;
-  @Nullable private final FutureValue<DataMap> mFuture;
   @Nullable private final Client.GetDataCallback mCallback;
 
-  public GetDataAction(@NonNull final String path, @NonNull final FutureValue<DataMap> f)
+  public GetDataAction(@NonNull final Client client, @Nullable Action then, @NonNull final String path, @NonNull final FutureValue<DataMap> f)
   {
+    super(client, then);
     mPath = path;
-    mFuture = f;
     mCallback = null;
   }
 
-  public GetDataAction(@NonNull final String path, @NonNull final Client.GetDataCallback callback)
+  public GetDataAction(@NonNull final Client client, @Nullable Action then, @NonNull final String path, @NonNull final Client.GetDataCallback callback)
   {
+    super(client, then);
     mPath = path;
-    mFuture = null;
     mCallback = callback;
   }
 
@@ -44,17 +44,19 @@ public class GetDataAction implements Action, ResultCallback<DataItemBuffer>
 
   @Override public void onResult(@NonNull final DataItemBuffer dataItems)
   {
+    final DataMap result;
     if (dataItems.getCount() == 1)
     {
       final DataMap dataMap = DataMapItem.fromDataItem(dataItems.get(0)).getDataMap();
       if (null != mCallback) mCallback.run(mPath, dataMap);
-      if (null != mFuture) mFuture.set(dataMap);
+      result = dataMap;
     }
     else
     {
       if (null != mCallback) mCallback.run(mPath, new DataMap());
-      if (null != mFuture) mFuture.set(new DataMap());
+      result = new DataMap();
     }
     dataItems.release();
+    finish(result);
   }
 }

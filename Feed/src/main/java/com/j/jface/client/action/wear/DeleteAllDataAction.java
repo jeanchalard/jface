@@ -9,13 +9,11 @@ import com.google.android.gms.wearable.Wearable;
 import com.j.jface.client.action.Action;
 import com.j.jface.client.Client;
 
-public class DeleteAllDataAction implements Action, ResultCallback<DataItemBuffer>
+public class DeleteAllDataAction extends Action implements ResultCallback<DataItemBuffer>
 {
-  @NonNull private final Client mClient;
-
   public DeleteAllDataAction(@NonNull final Client client)
   {
-    mClient = client;
+    super(client, null);
   }
 
   @Override public void run(@NonNull final GoogleApiClient client)
@@ -28,5 +26,8 @@ public class DeleteAllDataAction implements Action, ResultCallback<DataItemBuffe
     final int count = dataItems.getCount();
     for (int i = 0; i < count; ++i)
       mClient.deleteData(dataItems.get(i).getUri());
+    // Because it initializes its dependency with null explicitly, it does not matter if this object calls finish() or not.
+    // If someone ever cares about it, then it should be implemented correctly, waiting for all spawned data deletions to
+    // end and then calling finish() appropriately.
   }
 }
