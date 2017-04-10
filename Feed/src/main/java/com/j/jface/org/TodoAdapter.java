@@ -20,6 +20,8 @@ import android.widget.LinearLayout;
 
 import com.j.jface.R;
 import com.j.jface.org.editor.TodoEditor.TodoDetails;
+import com.j.jface.org.sound.EditTextSoundRouter;
+import com.j.jface.org.sound.SelReportEditText;
 import com.j.jface.org.todo.Todo;
 import com.j.jface.org.todo.TodoList;
 import com.j.jface.org.todo.TodoUIParams;

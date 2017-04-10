@@ -1,4 +1,4 @@
-package com.j.jface.org;
+package com.j.jface.org.sound;
 
 import android.Manifest;
 import android.app.Activity;
@@ -18,7 +18,6 @@ import android.view.ViewGroup;
 import com.j.jface.R;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
 // An object that acts as the source for sound / speech and implements visualisation and
 // all the technical details of the lifecycle of the speech recognition objects.
