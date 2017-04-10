@@ -167,23 +167,43 @@ public class TodoList implements Handler.Callback
     {
       // BinarySearch returns -(insertion point) - 1 when the item is not in the list.
       final int insertionPoint = -index - 1;
-      mList.add(insertionPoint, todo);
-      // Not inserted yet, so we'll get -(insertion index) - 1
-      if (insertionPoint > 0)
+      final Todo oldTodo = getFromId(todo.id);
+      if (null == oldTodo)
       {
-        final Todo previousItem = mList.get(insertionPoint - 1);
-        getMetadata(previousItem).lastChild = false;
-        for (final ChangeObserver obs : mObservers) obs.notifyItemChanged(index - 1, previousItem);
+        // This todo was actually not here, it's a new one.
+        mList.add(insertionPoint, todo);
+        // Not inserted yet, so we'll get -(insertion index) - 1
+        if (insertionPoint > 0)
+        {
+          final Todo previousItem = mList.get(insertionPoint - 1);
+          getMetadata(previousItem).lastChild = false;
+          for (final ChangeObserver obs : mObservers) obs.notifyItemChanged(index - 1, previousItem);
+        }
+        final Todo parent = mUIParams.get(todo.id).parent;
+        if (null != parent)
+        {
+          final TodoUIParams parentUIParams = mUIParams.get(parent.id);
+          if (!parentUIParams.open) toggleOpen(parent);
+        }
+        computeShown(mShownIndices, mList, mUIParams);
+        final int inserted = Collections.binarySearch(mShownIndices, insertionPoint);
+        for (final ChangeObserver obs : mObservers) obs.notifyItemInserted(inserted, todo);
       }
-      final Todo parent = mUIParams.get(todo.id).parent;
-      if (null != parent)
+      else
       {
-        final TodoUIParams parentUIParams = mUIParams.get(parent.id);
-        if (!parentUIParams.open) toggleOpen(parent);
+        // This todo was here but not with this ord ; it's a reorder.
+        final int oldPos = Collections.binarySearch(mList, oldTodo.ord);
+        mList.remove(oldPos);
+        mList.add(insertionPoint, todo);
+        computeShown(mShownIndices, mList, mUIParams);
+        final Todo parent = mUIParams.get(oldTodo.id).parent;
+        final ArrayList<Todo> descendants = getDirectDescendants(parent);
+        if (descendants.size() > 0)
+        {
+          for (final Todo child : descendants) mUIParams.get(child.id).lastChild = false;
+          mUIParams.get(descendants.get(descendants.size() - 1).id).lastChild = true;
+        }
       }
-      computeShown(mShownIndices, mList, mUIParams);
-      final int inserted = Collections.binarySearch(mShownIndices, insertionPoint);
-      for (final ChangeObserver obs : mObservers) obs.notifyItemInserted(inserted, todo);
     }
   }
 
@@ -208,6 +228,31 @@ public class TodoList implements Handler.Callback
     final int lastChildIndex = getLastChildIndex(index);
     final List<Todo> subList = mList.subList(index + 1, lastChildIndex + 1); // inclusive, exclusive
     return new ArrayList<>(subList);
+  }
+
+  public ArrayList<Todo> getDirectDescendants(@Nullable final Todo todo)
+  {
+    int index;
+    final int depth;
+    if (null != todo)
+    {
+      index = Collections.binarySearch(mList, todo.ord);
+      depth = todo.depth + 1;
+    }
+    else
+    {
+      index = 0;
+      depth = 0;
+    }
+    final ArrayList<Todo> descendants = new ArrayList<>();
+    while (index < mList.size())
+    {
+      final Todo prospectiveChild = mList.get(index);
+      if (prospectiveChild.depth < depth) return descendants;
+      if (prospectiveChild.depth == depth) descendants.add(prospectiveChild);
+      ++index;
+    }
+    return descendants;
   }
 
   public void toggleOpen(@NonNull final Todo todo)

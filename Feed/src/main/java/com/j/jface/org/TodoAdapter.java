@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 
 import com.j.jface.R;
 import com.j.jface.org.editor.TodoEditor.TodoDetails;
@@ -28,7 +29,7 @@ import static com.j.jface.R.layout.todo;
 // Adapter for Todo Recycler view.
 public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
 {
-  public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, TextWatcher, TodoList.ChangeObserver
+  public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, TextWatcher, TodoList.ChangeObserver, View.OnLongClickListener
   {
     @NonNull final static TransitionSet expandCollapseTransition;
     static
@@ -49,6 +50,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
     @NonNull final private View mExpansion;
     @NonNull final private TodoList mList;
     @NonNull final private TodoDetails mDetails;
+    @NonNull final private LinearLayout mTodoActionButtons;
     @NonNull final private ImageButton mAddSubTodoButton, mClearTodoButton, mShowActionsButton;
     public ViewHolder(@NonNull final View itemView,
                       @NonNull final JOrg jorg,
@@ -57,18 +59,21 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
                       @NonNull final TodoList list)
     {
       super(itemView);
+      itemView.setElevation(60);
       mJorg = jorg;
       mList = list;
       mList.addObserver(this);
       mRecyclerView = recyclerView;
       mExpander = (ExpanderView)itemView.findViewById(R.id.expander);
       mExpander.setOnClickListener(this);
+      mExpander.setOnLongClickListener(this);
       mEditText = (SelReportEditText)itemView.findViewById(R.id.todoText);
       mEditText.setOnFocusChangeListener(router);
       mEditText.mListener = router;
       mEditText.addTextChangedListener(this);
       mExpansion = itemView.findViewById(R.id.todoExpanded);
       mCurrentTodo = NULL_TODO;
+      mTodoActionButtons = (LinearLayout)itemView.findViewById(R.id.todoActionButtons);
       mAddSubTodoButton = (ImageButton)itemView.findViewById(R.id.todoAddButton);
       mAddSubTodoButton.setOnClickListener(this);
       mAddSubTodoButton.setVisibility(View.GONE);
@@ -78,6 +83,11 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
       mShowActionsButton = (ImageButton)itemView.findViewById(R.id.todoShowActionsButton);
       mShowActionsButton.setOnClickListener(this);
       mDetails = new TodoDetails(mJorg.getContext(), mCurrentTodo, (ViewGroup)mExpansion);
+    }
+
+    @Nullable public Todo parent()
+    {
+      return mList.getMetadata(mCurrentTodo).parent;
     }
 
     @Override public void onClick(@NonNull final View view)
@@ -96,6 +106,12 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
       }
       else if (view == mExpander)
         mList.toggleOpen(mCurrentTodo);
+    }
+
+    @Override public boolean onLongClick(@NonNull final View v)
+    {
+      mJorg.startDrag(this);
+      return true;
     }
 
     private void toggleShowActions()
@@ -202,6 +218,43 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
       final int connectionDown = !metadata.lastChild ? ExpanderView.CONNECTIONS_DOWN : 0;
       mExpander.setConnections(connectionUp | connectionDown);
       mExpander.setExpansions(expansions);
+    }
+
+    public void prepareViewForDrag()
+    {
+      mExpander.setVisibility(View.INVISIBLE);
+      mTodoActionButtons.setVisibility(View.INVISIBLE);
+    }
+
+    public void cleanupViewAterDrag()
+    {
+      mExpander.setVisibility(View.VISIBLE);
+      mTodoActionButtons.setVisibility(View.VISIBLE);
+    }
+
+    public void moveTodo(final int newPos)
+    {
+      final int oldPos = getAdapterPosition();
+      final int prevTodoPos, nextTodoPos;
+      if (oldPos < newPos)
+      {
+        prevTodoPos = newPos;
+        nextTodoPos = newPos + 1 >= mList.size() ? -1 : newPos + 1;
+      }
+      else
+      {
+        prevTodoPos = newPos - 1;
+        nextTodoPos = newPos;
+      }
+      final Todo prevTodo = prevTodoPos < 0 ? null : mList.get(prevTodoPos);
+      final Todo nextTodo = nextTodoPos < 0 ? null : mList.get(nextTodoPos);
+      final Todo parent = parent();
+      final String parentOrd = null == parent ? "" : parent.ord;
+      final String prevTodoOrd = null == prevTodo || prevTodo.depth != mCurrentTodo.depth ? parentOrd + Todo.SEP_ORD + Todo.MIN_ORD : prevTodo.ord;
+      final String nextTodoOrd = null == nextTodo || nextTodo.depth != mCurrentTodo.depth ? parentOrd + Todo.SEP_ORD + Todo.MAX_ORD : nextTodo.ord;
+      final String newOrd = Todo.ordBetween(prevTodoOrd, nextTodoOrd);
+      final Todo newTodo = new Todo.Builder(mCurrentTodo).setOrd(newOrd).build();
+      mList.updateTodo(newTodo);
     }
 
     @Override public void notifyItemInserted(final int position, @NonNull final Todo payload) {}

@@ -31,6 +31,7 @@
   </android.support.v7.widget.Toolbar>
 
   <android.support.design.widget.CoordinatorLayout
+    android:background="@color/org_background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/topLayout">

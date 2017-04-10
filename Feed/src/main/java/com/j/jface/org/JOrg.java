@@ -12,6 +12,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +43,7 @@ public class JOrg extends WrappedActivity
   @NonNull private final EditTextSoundRouter mSoundRouter;
   @NonNull private final TodoAdapter mAdapter;
   @NonNull private final CoordinatorLayout mTopLayout;
+  @NonNull private final ItemTouchHelper mTouchHelper;
 
   @NonNull private final TodoList mTodoList;
 
@@ -68,6 +70,52 @@ public class JOrg extends WrappedActivity
         addNewSubTodo(null);
       }
     });
+
+    mTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
+      int mDestination = -1;
+
+      @Override public boolean onMove(@NonNull final RecyclerView recyclerView, @NonNull final RecyclerView.ViewHolder viewHolder, @NonNull final RecyclerView.ViewHolder target)
+      {
+        mAdapter.notifyItemMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+        return true;
+      }
+
+      public void onMoved(@NonNull final RecyclerView recyclerView, @NonNull final RecyclerView.ViewHolder viewHolder, final int fromPos, @NonNull final RecyclerView.ViewHolder target, final int toPos, final int x, final int y)
+      {
+        super.onMoved(recyclerView, viewHolder, fromPos, target, toPos, x, y);
+        mDestination = toPos;
+      }
+
+      @Override public boolean canDropOver(@NonNull final RecyclerView recyclerView, @NonNull final RecyclerView.ViewHolder current, @NonNull final RecyclerView.ViewHolder target)
+      {
+        return ((TodoAdapter.ViewHolder)current).parent() == ((TodoAdapter.ViewHolder)target).parent();
+      }
+
+      @Override public int interpolateOutOfBoundsScroll(@NonNull final RecyclerView recyclerView, final int viewSize, final int viewSizeOutOfBounds, final int totalSize, final long msSinceStartScroll)
+      {
+        final int i = super.interpolateOutOfBoundsScroll(recyclerView, viewSize, viewSizeOutOfBounds, totalSize, msSinceStartScroll);
+        return i > 0 ? Math.max(i, 10) : Math.min(i, -10);
+      }
+
+      @Override public void clearView(@NonNull final RecyclerView recyclerView, @NonNull final RecyclerView.ViewHolder viewHolder)
+      {
+        super.clearView(recyclerView, viewHolder);
+        ((TodoAdapter.ViewHolder)viewHolder).cleanupViewAterDrag();
+        ((TodoAdapter.ViewHolder)viewHolder).moveTodo(mDestination);
+      }
+
+      public void onSelectedChanged(@Nullable final RecyclerView.ViewHolder viewHolder, final int actionState)
+      {
+        super.onSelectedChanged(viewHolder, actionState);
+        if (null == viewHolder) return;
+        ((TodoAdapter.ViewHolder)viewHolder).prepareViewForDrag();
+        mDestination = -1;
+      }
+
+      @Override public boolean isItemViewSwipeEnabled() { return false; }
+      @Override public void onSwiped(final RecyclerView.ViewHolder viewHolder, final int direction) {}
+    });
+    mTouchHelper.attachToRecyclerView(rv);
 
     scheduleBackup();
   }
@@ -132,6 +180,11 @@ public class JOrg extends WrappedActivity
     final Intent editorIntent = new Intent(mA, TodoEditorBoot.class);
     editorIntent.putExtra(Const.EXTRA_TODO_ID, todo.id);
     mA.startActivity(editorIntent);
+  }
+
+  public void startDrag(@NonNull final TodoAdapter.ViewHolder holder)
+  {
+    mTouchHelper.startDrag(holder);
   }
 
   private void scheduleBackup()
