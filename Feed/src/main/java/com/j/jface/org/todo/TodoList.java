@@ -28,36 +28,34 @@ public class TodoList implements Handler.Callback
 
   @NonNull private final ArrayList<Todo> mList;
   @NonNull private final ArrayList<Integer> mShownIndices;
-  @NonNull private final HashMap<String, TodoUIParams> mUIParams;
   @NonNull private final ArrayList<ChangeObserver> mObservers;
   @NonNull private final TodoSource mSource;
   @NonNull private final Handler mHandler;
   private TodoList(@NonNull final Context context)
   {
     mSource = new TodoSource(context);
-    mList = mSource.fetchTodoList();
-    mUIParams = computeUIParams(mList, mSource);
-    mShownIndices = computeShown(mList, mUIParams);
+    mList = decorateForUI(mSource.fetchTodoList(), mSource);
+    mShownIndices = computeShown(mList);
     mObservers = new ArrayList<>();
     mHandler = new Handler(this);
     mTodosToPersist = new HashMap<>();
   }
 
-  private static ArrayList<Integer> computeShown(@NonNull final ArrayList<Todo> list, @NonNull final HashMap<String, TodoUIParams> uiParams)
+  private static ArrayList<Integer> computeShown(@NonNull final ArrayList<Todo> list)
   {
-    return computeShown(new ArrayList<Integer>(list.size()), list, uiParams);
+    return computeShown(new ArrayList<Integer>(list.size()), list);
   }
 
-  private static ArrayList<Integer> computeShown(@NonNull final ArrayList<Integer> result, @NonNull final ArrayList<Todo> list, @NonNull final HashMap<String, TodoUIParams> uiParams)
+  private static ArrayList<Integer> computeShown(@NonNull final ArrayList<Integer> result, @NonNull final ArrayList<Todo> list)
   {
     result.clear();
     int i = 0;
-    TodoUIParams todoUiParams = null; int lastDepth = 2;
+    Todo.TodoUI todoUiParams = null; int lastDepth = 2;
     for (final Todo t : list)
     {
       if (null != todoUiParams) todoUiParams.leaf = t.depth <= lastDepth;
       lastDepth = t.depth;
-      todoUiParams = uiParams.get(t.id);
+      todoUiParams = t.ui;
       if (todoUiParams.allHierarchyOpen) result.add(i);
       ++i;
     }
@@ -65,28 +63,28 @@ public class TodoList implements Handler.Callback
     return result;
   }
 
-  private static HashMap<String, TodoUIParams> computeUIParams(@NonNull final ArrayList<Todo> list, @NonNull final TodoSource source)
+  private static ArrayList<Todo> decorateForUI(@NonNull final ArrayList<TodoCore> list, @NonNull final TodoSource source)
   {
-    final HashMap<String, TodoUIParams> results = new HashMap<>();
+    final ArrayList<Todo> results = new ArrayList<>(list.size());
     final Stack<Todo> parents = new Stack<>();
-    final TodoUIParams lastUIParams = null;
-    for (final Todo todo : list)
+    for (final TodoCore todoCore : list)
     {
-      final boolean open = source.isOpen(todo);
-      if (!parents.isEmpty() && parents.peek().depth > todo.depth) results.get(parents.pop().id).lastChild = true;
-      while (!parents.isEmpty() && parents.peek().depth >= todo.depth) parents.pop();
-      if (parents.isEmpty())
-        results.put(todo.id, new TodoUIParams(null, open, true, false));
-      else
-      {
+      final Todo.Builder builder = new Todo.Builder(todoCore);
+      builder.setOpen(source.isOpen(todoCore));
+      if (!parents.isEmpty() && parents.peek().depth > todoCore.depth) parents.pop().ui.lastChild = true;
+      while (!parents.isEmpty() && parents.peek().depth >= todoCore.depth) parents.pop();
+      if (!parents.isEmpty()) {
         final Todo parent = parents.peek();
-        final TodoUIParams uiParams = results.get(parent.id);
-        uiParams.leaf = false;
-        results.put(todo.id, new TodoUIParams(parent, open, uiParams.allHierarchyOpen && uiParams.open, false));
+        parent.ui.leaf = false;
+        builder.setParent(parent);
+        builder.setAllHierarchyOpen(parent.ui.allHierarchyOpen && parent.ui.open);
       }
+      else builder.setAllHierarchyOpen(true);
+      final Todo todo = builder.build();
+      results.add(todo);
       parents.push(todo);
     }
-    results.get(parents.pop().id).lastChild = true;
+    parents.pop().ui.lastChild = true;
     return results;
   }
 
@@ -103,17 +101,18 @@ public class TodoList implements Handler.Callback
   // Pass null for a top-level todo.
   @NonNull public Todo createAndInsertTodo(@NonNull final String text, @Nullable final Todo parent)
   {
-    final Todo result = new Todo.Builder(text, ordForNewChild(parent)).setDepth(null == parent ? 0 : parent.depth + 1).build();
     final boolean allHierarchyOpen;
     if (null != parent)
     {
-      final TodoUIParams parentUIParams = mUIParams.get(parent.id);
-      parentUIParams.leaf = false;
-      allHierarchyOpen = parentUIParams.allHierarchyOpen && parentUIParams.open;
+      parent.ui.leaf = false;
+      allHierarchyOpen = parent.ui.allHierarchyOpen && parent.ui.open;
     }
     else allHierarchyOpen = true;
-    final TodoUIParams uiParams = new TodoUIParams(parent, true, allHierarchyOpen, true);
-    mUIParams.put(result.id, uiParams);
+    final Todo result = new Todo.Builder(text, ordForNewChild(parent))
+     .setDepth(null == parent ? 0 : parent.depth + 1)
+     .setParent(parent)
+     .setOpen(true).setAllHierarchyOpen(allHierarchyOpen).setLastChild(true)
+     .build();
     updateTodo(result);
     return result;
   }
@@ -128,13 +127,12 @@ public class TodoList implements Handler.Callback
       if (todo.completionTime > 0)
       {
         // Completed todo. Remove.
-        final TodoUIParams params = mUIParams.get(todo.id);
-        if (params.lastChild && index > 0)
+        if (todo.ui.lastChild && index > 0)
         {
           final Todo prevItem = mList.get(index - 1);
           if (prevItem.depth == todo.depth)
           {
-            mUIParams.get(prevItem.id).lastChild = true;
+            prevItem.ui.lastChild = true;
             for (final ChangeObserver obs : mObservers) obs.notifyItemChanged(index - 1, prevItem);
           }
         }
@@ -142,16 +140,16 @@ public class TodoList implements Handler.Callback
         final List<Todo> subListToClear = mList.subList(index, lastChildIndex + 1); // inclusive, exclusive
         final ArrayList<Todo> removed = new ArrayList<>(subListToClear);
         subListToClear.clear();
-        if (null != params.parent)
-          if (hasDescendants(params.parent))
-            mUIParams.get(params.parent.id).leaf = true;
+        if (null != todo.ui.parent)
+          if (hasDescendants(todo.ui.parent))
+            todo.ui.parent.ui.leaf = true;
         for (int i = 0; i < removed.size(); ++i)
           removed.set(i, new Todo.Builder(removed.get(i)).setCompletionTime(todo.completionTime).build());
         final int before = mShownIndices.size();
         final int from = Collections.binarySearch(mShownIndices, index);
         final int iTo = Collections.binarySearch(mShownIndices, index + removed.size());
         final int to = iTo < 0 ? -iTo - 1 : iTo;
-        computeShown(mShownIndices, mList, mUIParams);
+        computeShown(mShownIndices, mList);
         // Make it easier to identify bugs happening here
         if (before - mShownIndices.size() != to - from) throw new RuntimeException("Badsize. " + before + " → " + mShownIndices.size() + " :: " + from + " → " + to);
         for (final ChangeObserver obs : mObservers) obs.notifyItemRangeRemoved(from, to - from);
@@ -176,16 +174,12 @@ public class TodoList implements Handler.Callback
         if (insertionPoint > 0)
         {
           final Todo previousItem = mList.get(insertionPoint - 1);
-          getMetadata(previousItem).lastChild = false;
+          previousItem.ui.lastChild = false;
           for (final ChangeObserver obs : mObservers) obs.notifyItemChanged(index - 1, previousItem);
         }
-        final Todo parent = mUIParams.get(todo.id).parent;
-        if (null != parent)
-        {
-          final TodoUIParams parentUIParams = mUIParams.get(parent.id);
-          if (!parentUIParams.open) toggleOpen(parent);
-        }
-        computeShown(mShownIndices, mList, mUIParams);
+        final Todo parent = todo.ui.parent;
+        if (null != parent && !parent.ui.open) toggleOpen(parent);
+        computeShown(mShownIndices, mList);
         final int inserted = Collections.binarySearch(mShownIndices, insertionPoint);
         for (final ChangeObserver obs : mObservers) obs.notifyItemInserted(inserted, todo);
       }
@@ -195,13 +189,13 @@ public class TodoList implements Handler.Callback
         final int oldPos = Collections.binarySearch(mList, oldTodo.ord);
         mList.remove(oldPos);
         mList.add(insertionPoint, todo);
-        computeShown(mShownIndices, mList, mUIParams);
-        final Todo parent = mUIParams.get(oldTodo.id).parent;
+        computeShown(mShownIndices, mList);
+        final Todo parent = oldTodo.ui.parent;
         final ArrayList<Todo> descendants = getDirectDescendants(parent);
         if (descendants.size() > 0)
         {
-          for (final Todo child : descendants) mUIParams.get(child.id).lastChild = false;
-          mUIParams.get(descendants.get(descendants.size() - 1).id).lastChild = true;
+          for (final Todo child : descendants) child.ui.lastChild = false;
+          descendants.get(descendants.size() - 1).ui.lastChild = true;
         }
       }
     }
@@ -257,18 +251,17 @@ public class TodoList implements Handler.Callback
 
   public void toggleOpen(@NonNull final Todo todo)
   {
-    final TodoUIParams uiParams = mUIParams.get(todo.id);
-    uiParams.open = !uiParams.open;
-    mSource.updateTodoOpen(todo, uiParams.open);
+    todo.ui.open = !todo.ui.open;
+    mSource.updateTodoOpen(todo, todo.ui.open);
     final int index = mList.indexOf(todo);
     final ArrayList<Todo> descendants = getDescendants(todo);
-    for (final Todo t : descendants) openOrCloseDescendants(t, uiParams.open);
-    computeShown(mShownIndices, mList, mUIParams);
+    for (final Todo t : descendants) openOrCloseDescendants(t, todo.ui.open);
+    computeShown(mShownIndices, mList);
     final int iFrom = Collections.binarySearch(mShownIndices, index + 1);
     final int iTo = Collections.binarySearch(mShownIndices, index + descendants.size());
     final int from = iFrom > 0 ? iFrom : -iFrom - 1;
     final int to = iTo > 0 ? iTo : -iTo - 1;
-    if (uiParams.open)
+    if (todo.ui.open)
       for (final ChangeObserver obs : mObservers)
       {
         obs.notifyItemChanged(index, todo);
@@ -284,9 +277,8 @@ public class TodoList implements Handler.Callback
 
   private void openOrCloseDescendants(@NonNull final Todo todo, final boolean open)
   {
-    final TodoUIParams uiParams = mUIParams.get(todo.id);
-    uiParams.allHierarchyOpen = open;
-    if (uiParams.open)
+    todo.ui.allHierarchyOpen = open;
+    if (todo.ui.open)
       for (final Todo t : getDescendants(todo)) openOrCloseDescendants(t, open);
   }
 
@@ -333,11 +325,6 @@ public class TodoList implements Handler.Callback
     return null;
   }
   public int size() { return mShownIndices.size(); }
-
-  @NonNull public TodoUIParams getMetadata(@NonNull final Todo todo)
-  {
-    return mUIParams.get(todo.id);
-  }
 
   ///////////////////////////////////////////////////////////////////////////
   // Handler for delayed persistence

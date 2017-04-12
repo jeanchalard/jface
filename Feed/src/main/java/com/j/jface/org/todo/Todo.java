@@ -3,46 +3,44 @@ package com.j.jface.org.todo;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.j.jface.feed.Fences;
-
-import java.util.UUID;
-
-/**
- * A class representing a single TODO.
- */
-
-public class Todo implements Comparable<String>
+public class Todo extends TodoCore
 {
   @NonNull public static final Todo NULL_TODO = new Todo("", "");
 
-  public static final int UNKNOWN = 0;
+  /**
+   * A class to store UI-related Todo stuff. It encapsulates the mutable part of Todo, the parts that Todo adds over TodoCore.
+   * This stores data that is either not persisted but kept for performance reasons, or local to this device.
+   */
+  public static class TodoUI
+  {
+    @Nullable public final Todo parent;
+    public boolean open;
+    public boolean allHierarchyOpen; // Whether this is visible ; an item is visible if all of its parents are open.
+    public boolean leaf;
+    public boolean lastChild;
 
-  // Deadline hardnesses
-  public static final int SOFT_DEADLINE = 1; // Decided myself
-  public static final int SEMIHARD_DEADLINE = 2; // Important, but not the end of the world if missed
-  public static final int HARD_DEADLINE = 3; // Really needs to be done
+    public TodoUI()
+    {
+      this(null, true, true, true);
+    }
 
-  // Add other patterns here if ever necessary
-  public static final int ANY = 0;
-  public static final int ON_HOME = 1;
-  public static final int ON_WORK = 2;
-  public static final int ON_WEEKNIGHT = 3;
-  public static final int ON_WEEKEND = 4;
-  public static final int ON_NIGHT = 5;
-  public static final String[] CONSTRAINT_NAMES = new String[] { "Any", "Home", "Work", "Weeknight", "Weekend", "Night" };
+    public TodoUI(@Nullable final Todo parent, final boolean open, final boolean allHierarchyOpen, final boolean lastChild)
+    {
+      this.parent = parent;
+      this.open = open;
+      this.allHierarchyOpen = allHierarchyOpen;
+      this.leaf = true;
+      this.lastChild = lastChild;
+    }
 
-  @NonNull public final String id;
-  @NonNull public final String ord;
-  public final long creationTime;
-  public final long completionTime;
-  @NonNull public final String text;
-  public final int depth;
-  public final long lifeline; // Timestamp : when this can be started
-  public final long deadline; // Timestamp : when this has to be done
-  public final int hardness; // UNKNOWN or *_DEADLINE
-  public final int constraint; // ANY or ON_*
-  public final int estimatedTime;
+    public TodoUI(@NonNull final TodoUI ui)
+    {
+      this(ui.parent, ui.open, ui.allHierarchyOpen, ui.lastChild);
+      this.leaf = ui.leaf;
+    }
+  }
 
+  @NonNull public final TodoUI ui; // The members of this member are mutable.
   public Todo(@Nullable final String id,
               @NonNull final String ord,
               final long creationTime,
@@ -53,29 +51,17 @@ public class Todo implements Comparable<String>
               final long deadline,
               final int hardness,
               final int constraint,
-              final int estimatedTime)
+              final int estimatedTime,
+              @NonNull final TodoUI params)
   {
-    this.id = null == id ? UUID.randomUUID().toString() : id;
-    this.ord = ord;
-    this.creationTime = creationTime;
-    this.completionTime = completionTime;
-    this.text = text;
-    this.depth = depth;
-    this.lifeline = lifeline;
-    this.deadline = deadline;
-    this.hardness = hardness;
-    this.constraint = constraint;
-    this.estimatedTime = estimatedTime;
+    super(id, ord, creationTime, completionTime, text, depth, lifeline, deadline, hardness, constraint, estimatedTime);
+    ui = params;
   }
 
   public Todo(@NonNull final String text, @NonNull final String ord)
   {
-    this(null, ord, System.currentTimeMillis(), 0, text, 0, 0, 0, UNKNOWN, UNKNOWN, -1);
-  }
-
-  public int compareTo(@NonNull final String otherOrd)
-  {
-    return ord.compareTo(otherOrd);
+    super(text, ord);
+    ui = new TodoUI(null, true, true, true);
   }
 
   public static class Builder
@@ -91,21 +77,43 @@ public class Todo implements Comparable<String>
     private int hardness;
     private int constraint;
     private int estimatedTime;
+    @Nullable public Todo parent;
+    public boolean open;
+    public boolean allHierarchyOpen;
+    public boolean leaf;
+    public boolean lastChild;
 
     public Builder(@NonNull final String text, @NonNull final String ord) { creationTime = System.currentTimeMillis(); this.text = text; this.ord = ord; this.estimatedTime = -1; }
-    public Builder(@NonNull final Todo todo)
+    public Builder(@NonNull final TodoCore todoCore)
     {
-      id = todo.id;
-      ord = todo.ord;
-      creationTime = todo.creationTime;
-      completionTime = todo.completionTime;
-      text = todo.text;
-      depth = todo.depth;
-      lifeline = todo.lifeline;
-      deadline = todo.deadline;
-      hardness = todo.hardness;
-      constraint = todo.constraint;
-      estimatedTime = todo.estimatedTime;
+      id = todoCore.id;
+      ord = todoCore.ord;
+      creationTime = todoCore.creationTime;
+      completionTime = todoCore.completionTime;
+      text = todoCore.text;
+      depth = todoCore.depth;
+      lifeline = todoCore.lifeline;
+      deadline = todoCore.deadline;
+      hardness = todoCore.hardness;
+      constraint = todoCore.constraint;
+      estimatedTime = todoCore.estimatedTime;
+      if (todoCore instanceof Todo)
+      {
+        final Todo todo = (Todo)todoCore;
+        parent = todo.ui.parent;
+        open = todo.ui.open;
+        allHierarchyOpen = todo.ui.allHierarchyOpen;
+        leaf = todo.ui.leaf;
+        lastChild = todo.ui.lastChild;
+      }
+      else
+      {
+        parent = null;
+        open = true;
+        allHierarchyOpen = true;
+        leaf = true;
+        lastChild = false;
+      }
     }
     public Builder setId(@Nullable final String id) { this.id = id; return this; }
     public Builder setOrd(@NonNull final String ord) { this.ord = ord; return this; }
@@ -117,55 +125,17 @@ public class Todo implements Comparable<String>
     public Builder setHardness(final int hardness) { this.hardness = hardness; return this; }
     public Builder setConstraint(final int constraint) { this.constraint = constraint; return this; }
     public Builder setEstimatedTime(final int estimatedTime) { this.estimatedTime = estimatedTime; return this; }
+    public Builder setParent(@Nullable final Todo parent) { this.parent = parent; return this; }
+    public Builder setOpen(final boolean open) { this.open = open; return this; }
+    public Builder setAllHierarchyOpen(final boolean allHierarchyOpen) { this.allHierarchyOpen = allHierarchyOpen; return this; }
+    public Builder setLeaf(final boolean leaf) { this.leaf = leaf; return this; }
+    public Builder setLastChild(final boolean lastChild) { this.lastChild = lastChild; return this; }
 
     public Todo build()
     {
-      return new Todo(id, ord, creationTime, completionTime, text, depth, lifeline, deadline, hardness, constraint, estimatedTime);
+      final TodoUI ui = new TodoUI(parent, open, allHierarchyOpen, lastChild);
+      ui.leaf = leaf;
+      return new Todo(id, ord, creationTime, completionTime, text, depth, lifeline, deadline, hardness, constraint, estimatedTime, ui);
     }
-  }
-
-  private static final char SEPARATOR_ORD = ' ';
-  private static final char MINIMUM_ORD = SEPARATOR_ORD + 1;
-  private static final char MAXIMUM_ORD = '~';
-  public static final String SEP_ORD = String.valueOf(SEPARATOR_ORD);
-  public static final String MIN_ORD = String.valueOf(MINIMUM_ORD);
-  public static final String MAX_ORD = String.valueOf(MAXIMUM_ORD);
-  public static final String SEP_MAX_ORD = SEP_ORD + MAX_ORD;
-  @NonNull private static String getAppendix(final int length)
-  {
-    final StringBuffer buf = new StringBuffer(length);
-    for (int i = 0; i < length; ++i) buf.append(MINIMUM_ORD);
-    return buf.toString();
-  }
-  private static int diffPoint(@NonNull final String ord1, @NonNull final String ord2)
-  {
-    int i = 0;
-    while (ord1.charAt(i) == ord2.charAt(i)) ++i;
-    return i;
-  }
-
-  @NonNull public static String ordBetween(@NonNull String ord1, @NonNull String ord2)
-  {
-    if (ord1.length() != ord2.length())
-    {
-      final String appendix = getAppendix(Math.abs(ord1.length() - ord2.length()));
-      if (ord1.length() < ord2.length()) ord1 = ord1 + appendix;
-      else ord2 = ord2 + appendix;
-    }
-    int diffPoint = diffPoint(ord1, ord2);
-    String id = ord1.substring(0, diffPoint);
-    char o1, o2, on;
-    do
-    {
-      o1 = ord1.charAt(diffPoint);
-      o2 = ord2.charAt(diffPoint);
-      if (o2 == MINIMUM_ORD) o2 = MAXIMUM_ORD;
-      on = (char)((o1 + o2) / 2); // Guaranteed to fit
-      id += String.valueOf(on);
-      if (o1 != on) return id;
-      diffPoint += 1;
-      if (diffPoint >= ord1.length()) return id + String.valueOf((char)((MINIMUM_ORD + MAXIMUM_ORD) / 2));
-    }
-    while(true);
   }
 }

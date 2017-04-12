@@ -24,13 +24,13 @@ public class TodoSource
   // Returns null if no such Todo, or if multiple Todos with this ID (which is supposed to be impossible)
   // Does not perform the expensive lookup for parent and children ; any mClient needing that should
   // just look up the entire tree.
-  @Nullable public Todo getTodoFromIdWithoutHierarchy(@NonNull final String id)
+  @Nullable public TodoCore getTodoFromIdWithoutHierarchy(@NonNull final String id)
   {
     final Uri uri = Uri.withAppendedPath(TodoProviderContract.BASE_URI_TODO, id);
     final Cursor c = mResolver.query(uri, null, null, null, null);
     if (null == c || c.getCount() != 1) return null;
     c.moveToFirst();
-    final Todo t = new Todo(
+    final TodoCore t = new TodoCore(
      c.getString(TodoProviderContract.COLUMNINDEX_id),
      c.getString(TodoProviderContract.COLUMNINDEX_ord),
      c.getLong(TodoProviderContract.COLUMNINDEX_creationTime),
@@ -46,15 +46,15 @@ public class TodoSource
     return t;
   }
 
-  @NonNull public ArrayList<Todo> fetchTodoList()
+  @NonNull public ArrayList<TodoCore> fetchTodoList()
   {
     final String condition = "completionTime = 0";
     final Cursor c = mResolver.query(TodoProviderContract.BASE_URI_TODO, null, condition, null, "ord");
     if (null == c || !c.moveToFirst()) return new ArrayList<>();
-    final ArrayList<Todo> todos = new ArrayList<>(c.getCount());
+    final ArrayList<TodoCore> todos = new ArrayList<>(c.getCount());
     while (!c.isAfterLast())
     {
-      final Todo t = new Todo(
+      final TodoCore t = new TodoCore(
        c.getString(TodoProviderContract.COLUMNINDEX_id),
        c.getString(TodoProviderContract.COLUMNINDEX_ord),
        c.getLong(TodoProviderContract.COLUMNINDEX_creationTime),
@@ -73,13 +73,13 @@ public class TodoSource
     return todos;
   }
 
-  @NonNull public Todo updateTodo(@NonNull final Todo todo)
+  @NonNull public TodoCore updateTodo(@NonNull final TodoCore todo)
   {
     mResolver.insert(Uri.withAppendedPath(TodoProviderContract.BASE_URI_TODO, todo.id), contentValuesFromTodo(todo));
     return todo;
   }
 
-  @NonNull private ContentValues contentValuesFromTodo(@NonNull final Todo todo)
+  @NonNull private ContentValues contentValuesFromTodo(@NonNull final TodoCore todo)
   {
     final ContentValues cv = new ContentValues();
     cv.put(TodoProviderContract.COLUMN_id, todo.id);
@@ -97,7 +97,7 @@ public class TodoSource
     return cv;
   }
 
-  public boolean updateTodoOpen(@NonNull final Todo todo, final boolean open)
+  public boolean updateTodoOpen(@NonNull final TodoCore todo, final boolean open)
   {
     final ContentValues cv = new ContentValues();
     cv.put(TodoProviderContract.COLUMN_id, todo.id);
@@ -107,7 +107,7 @@ public class TodoSource
     return open;
   }
 
-  public boolean isOpen(@NonNull final Todo todo)
+  public boolean isOpen(@NonNull final TodoCore todo)
   {
     final Uri uri = Uri.withAppendedPath(TodoProviderContract.BASE_URI_METADATA, todo.id);
     final Cursor c = mResolver.query(uri, null, null, null, null);

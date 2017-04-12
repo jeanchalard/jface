@@ -24,7 +24,6 @@ import com.j.jface.org.sound.EditTextSoundRouter;
 import com.j.jface.org.sound.SelReportEditText;
 import com.j.jface.org.todo.Todo;
 import com.j.jface.org.todo.TodoList;
-import com.j.jface.org.todo.TodoUIParams;
 
 import static com.j.jface.R.layout.todo;
 
@@ -89,7 +88,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
 
     @Nullable public Todo parent()
     {
-      return mList.getMetadata(mCurrentTodo).parent;
+      return mCurrentTodo.ui.parent;
     }
 
     @Override public void onClick(@NonNull final View view)
@@ -183,13 +182,13 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
       mCurrentTodo = mJorg.updateTodoContents(mCurrentTodo, editable);
     }
 
-    public void bind(@NonNull final Todo todo, @NonNull final TodoUIParams metadata)
+    public void bind(@NonNull final Todo todo)
     {
       if (todo.id.equals(mCurrentTodo.id)) return;
       mCurrentTodo = todo;
       mDetails.bind(todo);
       mExpander.setDepth(todo.depth);
-      setupExpander(metadata);
+      setupExpander(todo);
       mShowActionsButton.setRotation(0f);
       mExpansion.setVisibility(View.GONE);
       mClearTodoButton.setVisibility(View.GONE);
@@ -209,15 +208,15 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
     {
       if (!payload.id.equals(mCurrentTodo.id)) return;
       mCurrentTodo = payload;
-      setupExpander(mList.getMetadata(payload));
+      setupExpander(payload);
     }
 
-    private void setupExpander(@NonNull final TodoUIParams metadata)
+    private void setupExpander(@NonNull final Todo todo)
     {
       final int pos = getAdapterPosition();
-      final int expansions = metadata.leaf ? ExpanderView.EXPANSIONS_NONE : (metadata.open ? ExpanderView.EXPANSIONS_OPEN : ExpanderView.EXPANSIONS_CLOSED);
+      final int expansions = todo.ui.leaf ? ExpanderView.EXPANSIONS_NONE : (todo.ui.open ? ExpanderView.EXPANSIONS_OPEN : ExpanderView.EXPANSIONS_CLOSED);
       final int connectionUp = 0 == pos ? 0 : ExpanderView.CONNECTIONS_UP;
-      final int connectionDown = !metadata.lastChild ? ExpanderView.CONNECTIONS_DOWN : 0;
+      final int connectionDown = !todo.ui.lastChild ? ExpanderView.CONNECTIONS_DOWN : 0;
       mExpander.setConnections(connectionUp | connectionDown);
       mExpander.setExpansions(expansions);
     }
@@ -316,8 +315,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
   @Override public void onBindViewHolder(@NonNull final ViewHolder holder, final int position)
   {
     final Todo todo = mTodoList.get(position);
-    final TodoUIParams metadata = mTodoList.getMetadata(todo);
-    holder.bind(todo, metadata);
+    holder.bind(todo);
   }
 
   @Override public void onViewAttachedToWindow(final ViewHolder holder)
