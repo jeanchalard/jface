@@ -30,7 +30,7 @@ public class FutureValue<T> implements Future<T>
     return obj.value;
   }
 
-  public void set(final T value)
+  public void set(@Nullable final T value)
   {
     if (sem.tryAcquire()) throw new RuntimeException("FutureValue.set/fail called multiple times ; old \"" + obj.value + "\" ; new \"" + value + "\"");
     obj = new Obj(value, SUCCESS, Obj.UNKNOWN_ERROR);

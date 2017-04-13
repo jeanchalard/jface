@@ -24,7 +24,7 @@ public abstract class ResultAction<T> extends Action implements Future<T>
     throw new RuntimeException("Can't finish a ResultAction without a result.");
   }
 
-  protected void finish(final T value)
+  protected void finish(@Nullable final T value)
   {
     result.set(value);
     super.finish();

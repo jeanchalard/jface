@@ -13,10 +13,8 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.j.jface.client.Client;
-import com.j.jface.client.action.drive.WriteFileAction;
 import com.j.jface.lifecycle.WrappedContentProvider;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
