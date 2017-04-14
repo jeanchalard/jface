@@ -96,7 +96,7 @@ public class RecursiveBackupAction extends Action
       if (!historyFiles.isEmpty())
       {
         final Metadata lastFile = historyFiles.get(historyFiles.size() - 1);
-        rename(lastFile, datedName(lastFile));
+        // rename(lastFile, datedName(lastFile));
       }
 
     if (!historyFiles.isEmpty())

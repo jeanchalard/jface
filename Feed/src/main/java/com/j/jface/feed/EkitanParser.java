@@ -1,6 +1,7 @@
 package com.j.jface.feed;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
@@ -13,35 +14,40 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class HibiyaParser extends FeedParser
+public class EkitanParser extends FeedParser
 {
   @Override @NonNull
   public DataMap parseStream(@NonNull final String dataName, @NonNull final BufferedInputStream srcStream) throws IOException
   {
     final DataMap result = new DataMap();
     final BufferedReader src = new BufferedReader(new InputStreamReader(srcStream));
-    if (null == find(src, "table summary=\"平日の時刻表\"") || null == find(src, "</tr>"))
-      return result;
-    final Scanner srcTable = new Scanner(find(src, "</table>"));
+
+    // Warning. 駅情報 appears twice in the page, once for each direction. For now we only parse this
+    // page for 稲城 towards 新宿 and 本蓮沼 toward 目黒, and as it happens both of these have the relevant
+    // direction in first, so it's going to work for our purposes. However we'll need something more
+    // sophisticated if we ever need to disambiguate.
+    find(src, "駅情報");
+    final Scanner srcTable = new Scanner(find(src, "駅情報"));
     final ArrayList<DataMap> buildData = new ArrayList<>();
-    srcTable.useDelimiter("(\\s|<|>)+");
+    srcTable.useDelimiter("(<|>|:)+");
     int hour = -1;
     int minute = -1;
-    boolean 始発 = false;
-    while (srcTable.hasNext()) {
+    while (srcTable.hasNext())
+    {
       final String p = srcTable.next();
-      if (p.startsWith("class=\"hour\""))
+      if (p.startsWith("span class=\"dep-time\""))
+      {
         hour = srcTable.nextInt();
-      else if ("class=\"item02\"".equals(p) && "●".equals(srcTable.next()))
-        始発 = true;
-      else if ("class=\"info02\"".equals(p))
         minute = srcTable.nextInt();
-      else if (p.startsWith("/p")) {
+      }
+      else if (p.startsWith("span class=\"train-type"))
+      {
+        final String type = srcTable.next().substring(0, 1);
+        final String mark = "各".equals(type) || "普".equals(type) ? "" : type;
         final DataMap departure = new DataMap();
         departure.putInt(Const.DATA_KEY_DEPTIME, hour * 3600 + minute * 60);
-        departure.putString(Const.DATA_KEY_EXTRA, 始発 ? "始" : "");
+        departure.putString(Const.DATA_KEY_EXTRA, mark);
         buildData.add(departure);
-        始発 = false;
       }
     }
     result.putDataMapArrayList(Const.DATA_KEY_DEPLIST, buildData);

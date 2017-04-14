@@ -303,30 +303,24 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
           departure1 = mDataStore.findClosestDeparture(Const.京成線_日暮里_千住大橋方面_休日, mTime);
           departure2 = null;
           break;
-        case COMMUTE_MORNING_平日_RIO :
         case HOME_平日_RIO :
-          departure1 = mDataStore.findClosestDeparture(Const.日比谷線_三ノ輪_北千住方面_平日, mTime);
-          departure2 = mDataStore.findClosestDeparture(Const.日比谷線_三ノ輪_中目黒方面_平日, mTime);
+          departure1 = mDataStore.findClosestDeparture(Const.京王線_稲城駅_新宿方面_平日, mTime);
+          departure2 = null;
           break;
-        case COMMUTE_EVENING_平日_RIO :
-          departure1 = mDataStore.findClosestDeparture(Const.京成線_お花茶屋_上野方面_平日, mTime);
-          departure2 = mDataStore.findClosestDeparture(Const.京成線_立石_人形町方面_平日, mTime);
-          break;
-        case COMMUTE_MORNING_休日_RIO :
         case HOME_休日_RIO :
-          departure1 = mDataStore.findClosestDeparture(Const.日比谷線_三ノ輪_北千住方面_休日, mTime);
-          departure2 = mDataStore.findClosestDeparture(Const.日比谷線_三ノ輪_中目黒方面_休日, mTime);
+          departure1 = mDataStore.findClosestDeparture(Const.京王線_稲城駅_新宿方面_休日, mTime);
+          departure2 = null;
           break;
-        case COMMUTE_EVENING_休日_RIO :
-          departure1 = mDataStore.findClosestDeparture(Const.京成線_お花茶屋_上野方面_休日, mTime);
-          departure2 = mDataStore.findClosestDeparture(Const.京成線_立石_人形町方面_休日, mTime);
+        case WORK_平日_RIO:
+          departure1 = mDataStore.findClosestDeparture(Const.都営三田線_本蓮沼_目黒方面_平日, mTime);
+          departure2 = null;
           break;
-        case COMMUTE_水曜_RIO :
-          departure1 = mDataStore.findClosestDeparture(Const.京成線_お花茶屋_上野方面_平日, mTime);
-          departure2 = mDataStore.findClosestDeparture(Const.京成線_立石_人形町方面_平日, mTime);
+        case WORK_休日_RIO :
+          departure1 = mDataStore.findClosestDeparture(Const.都営三田線_本蓮沼_目黒方面_休日, mTime);
+          departure2 = null;
           break;
-        case JUGGLING_水曜_RIO :
-          departure1 = mDataStore.findClosestDeparture(Const.日比谷線_六本木_平日, mTime);
+        case JUGGLING_月曜_RIO :
+          departure1 = mDataStore.findClosestDeparture(Const.大江戸線_六本木_新宿方面_平日, mTime);
           departure2 = null;
           break;
         default:
@@ -334,7 +328,6 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
           departure2 = null;
       }
 
-      mDataStore.isWithinFence(Const.千住大橋_FENCE_NAME);
       final int ambientFlag = isInAmbientMode() ? Draw.AMBIENT_MODE : 0;
       if (mDraw.draw(mDrawTools, mModeFlags | ambientFlag, canvas, bounds,
        departure1, departure2, status, mTime, /*mSensors,*/ Status.getSymbolicLocationName(mDataStore),
@@ -351,8 +344,8 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
 
     @Override public void onTapCommand(@TapType final int tapType, final int x, final int y, final long eventTime)
     {
-      if (WatchFaceService.TAP_TYPE_TAP == tapType) {
-
+      if (WatchFaceService.TAP_TYPE_TAP == tapType)
+      {
       }
       else super.onTapCommand(tapType, x, y, eventTime);
     }

@@ -24,8 +24,8 @@ public class Draw
 
   private BitmapCache[] mCache;
   public Draw() {
-    mCache = new BitmapCache[] { new BitmapCache(0, 0, 0, null, new Paint()),
-      new BitmapCache(0, 0, 0, null, new Paint()) };
+    mCache = new BitmapCache[] { new BitmapCache(0, 0, 0, 1, null, new Paint()),
+      new BitmapCache(0, 0, 0, 1, null, new Paint()) };
   }
 
   final StringBuilder mTmpSb = new StringBuilder(256);
@@ -98,23 +98,20 @@ public class Draw
     {
       final float lineHeight = drawTools.departurePaint.getTextSize() + 2;
       // Draw header
-      canvas.drawText(departure1.headSign, drawTools.departurePosX, drawTools.departurePosY, drawTools.departurePaint);
-      // Draw icon
+      canvas.drawText(departure1.headSign, center, drawTools.departurePosY, drawTools.departurePaint);
+      final float headerSize = drawTools.departurePaint.measureText(departure1.headSign, 0, 2);
       final float y1 = drawTools.departurePosY + lineHeight;
-      drawIcon(drawTools.departurePosX, y1, departure1.key, drawTools, canvas);
       // Draw departures
-      mustInvalidate = drawDepartureSet(0, departure1, drawTools.departurePosX, y1, drawTools, canvas);
+      mustInvalidate = drawDepartureSet(0, departure1, center, y1, drawTools, canvas);
 
       // Draw header
       if (null != departure2)
       {
         final float y1e = y1 + lineHeight;
-        canvas.drawText(departure2.headSign, drawTools.departurePosX, y1e, drawTools.departurePaint);
-        // Draw icon
+        canvas.drawText(departure2.headSign, center, y1e, drawTools.departurePaint);
         final float y2 = y1e + lineHeight;
-        drawIcon(drawTools.departurePosX, y2, departure2.key, drawTools, canvas);
         // Draw departures
-        mustInvalidate |= drawDepartureSet(1, departure2, drawTools.departurePosX, y2, drawTools, canvas);
+        mustInvalidate |= drawDepartureSet(1, departure2, center, y2, drawTools, canvas);
       }
     }
 
@@ -139,7 +136,7 @@ public class Draw
 
   private final static String separator = " ◈ ";
   private boolean drawDepartureSet(final int index, @Nullable final Departure departure,
-                                   final float x, final float y,
+                                   final float center, final float y,
                                    @NonNull final DrawTools drawTools, @NonNull final Canvas canvas)
   {
     if (null == departure) return false;
@@ -172,18 +169,23 @@ public class Draw
       final float sizeNext = drawTools.departurePaint.measureText(text, startOfSecond, text.length());
       final float sizeNow = drawTools.departurePaint.measureText(text, 0, endOfNextToLast);
       final float sizeTotal = drawTools.departurePaint.measureText(text, 0, text.length());
-      cache = new BitmapCache(sizeNow, sizeNext, sizeTotal - sizeNext, departure, drawTools.departurePaint);
+      cache = new BitmapCache(sizeNow, sizeNext, sizeTotal - sizeNext, sizeTotal, departure, drawTools.departurePaint);
       cache.clear();
-      cache.drawText(text);
+      cache.drawText(text, sizeTotal / 2);
       mCache[index] = cache;
     }
-    return cache.drawOn(canvas, x, y, drawTools.imagePaint);
+    final Bitmap icon = drawTools.getIconForKey(departure.key);
+    if (null == icon) throw new RuntimeException("Unknown icon for key " + departure.key);
+    // True width is textwidth + iconwidth + padding, but the following draw() methods need the x coord of the start
+    // of the text and not the start of the icon. That is textwidth / 2 + icon.width + padding, or (textwidth - iconwidth - padding) / 2
+    final float width = mCache[index].width() - icon.getWidth() - drawTools.iconToDepartureXPadding;
+    final boolean mustInvalidate = cache.drawOn(canvas, center - width / 2, y, drawTools.imagePaint);
+    drawIcon(icon, center - width / 2, y, drawTools, canvas);
+    return mustInvalidate;
   }
 
-  private static void drawIcon(final float x, final float y, @NonNull final String key,
+  private static void drawIcon(@NonNull final Bitmap icon, final float x, final float y,
                                @NonNull final DrawTools drawTools, @NonNull final Canvas canvas) {
-    final Bitmap icon = drawTools.getIconForKey(key);
-    if (null == icon) throw new RuntimeException("Unknown icon for key " + key);
     canvas.drawBitmap(icon,
      x - icon.getWidth() - drawTools.iconToDepartureXPadding,
      y - icon.getHeight() + 5, // + 5 for alignment because I can't be assed to compute it

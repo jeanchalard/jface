@@ -50,7 +50,7 @@ public class FeedLoader
         final HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
         if (url.getAuthority().startsWith("keisei"))
           urlConnection.addRequestProperty("User-Agent", "Mozilla");
-        InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+        final BufferedInputStream in = new BufferedInputStream(urlConnection.getInputStream());
         final FeedParser parser = ds.parser.newInstance();
         final DataMap data = parser.parseStream(ds.name, in);
         client.putData(dataPath, data);

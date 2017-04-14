@@ -13,14 +13,11 @@ public enum Status
   HOME_休日_J("J : At home (holiday)"),
   日暮里_平日_J("J : Nippori (workday)"),
   日暮里_休日_J("J : Nippori (holiday)"),
-  COMMUTE_MORNING_平日_RIO("Rio : Commute (morning, workday)"),
-  COMMUTE_EVENING_平日_RIO("Rio : Commute (evening, workday)"),
-  COMMUTE_MORNING_休日_RIO("Rio : Commute (morning, holiday)"),
-  COMMUTE_EVENING_休日_RIO("Rio : Commute (evening, workday)"),
-  COMMUTE_水曜_RIO("Rio : Work ▶ Juggling"),
-  JUGGLING_水曜_RIO("Rio : Juggling ▶ Home"),
   HOME_平日_RIO("Rio : At home (workday)"),
   HOME_休日_RIO("Rio : At home (holiday)"),
+  WORK_平日_RIO("Rio : At work (workday)"),
+  WORK_休日_RIO("Rio : Commute (holiday)"),
+  JUGGLING_月曜_RIO("Rio : Juggling ▶ Home"),
   OTHER("Somewhere");
 
   @NonNull public final String description;
@@ -29,8 +26,8 @@ public enum Status
   private static final int 千住大橋 = 1;
   private static final int 六本木 = 2;
   private static final int 日暮里 = 3;
-  private static final int 立石 = 4;
-  private static final int 三ノ輪 = 5;
+  private static final int 稲城 = 4;
+  private static final int 本蓮沼 = 5;
   private static final int 東京 = 6;
   private static final int TRAVEL = 7;
 
@@ -40,12 +37,12 @@ public enum Status
   {
     if (Const.RIO_MODE)
     {
-      final Boolean in立石 = dataStore.isWithinFence(Const.立石_FENCE_NAME);
-      if (null == in立石) return DUNNO;
-      if (in立石) return 立石;
-      final Boolean in三ノ輪 = dataStore.isWithinFence(Const.三ノ輪_FENCE_NAME);
-      if (null == in三ノ輪) return DUNNO;
-      if (in三ノ輪) return 三ノ輪;
+      final Boolean in稲城 = dataStore.isWithinFence(Const.稲城_FENCE_NAME);
+      if (null == in稲城) return DUNNO;
+      if (in稲城) return 稲城;
+      final Boolean in本蓮沼 = dataStore.isWithinFence(Const.本蓮沼_FENCE_NAME);
+      if (null == in本蓮沼) return DUNNO;
+      if (in本蓮沼) return 本蓮沼;
       final Boolean in六本木 = dataStore.isWithinFence(Const.六本木_FENCE_NAME);
       if (null == in六本木) return DUNNO;
       if (in六本木) return 六本木;
@@ -74,9 +71,9 @@ public enum Status
     {
       case 日暮里 : return "日暮里";
       case 千住大橋 :
-      case 三ノ輪 : return "Home";
+      case 稲城 : return "Home";
       case 六本木 : return "六本木";
-      case 立石   : return "立石";
+      case 本蓮沼   : return "本蓮沼";
       case 東京   : return "東京";
       default    : return "Somewhere";
     }
@@ -114,23 +111,21 @@ public enum Status
     // TODO : figure out national holidays
     workDay = (time.weekDay >= Time.MONDAY && time.weekDay <= Time.SATURDAY);
 
-    if ((time.hour >= 5 && time.hour <= 16)
-     && (DUNNO == symbolicLocation || 三ノ輪 == symbolicLocation))
-      return workDay ? COMMUTE_MORNING_平日_RIO : COMMUTE_MORNING_休日_RIO;
-
-    if (((time.weekDay == Time.WEDNESDAY && time.hour >= 22) || (time.weekDay == Time.THURSDAY && time.hour < 1))
-     && (DUNNO == symbolicLocation || 六本木 == symbolicLocation))
-      return JUGGLING_水曜_RIO;
-
-    if ((time.hour >= 17 || time.hour <= 0)
-     && (DUNNO == symbolicLocation || 立石 == symbolicLocation))
-    {
-      if (time.weekDay == Time.WEDNESDAY) return COMMUTE_水曜_RIO;
-      return workDay ? COMMUTE_EVENING_平日_RIO : COMMUTE_EVENING_休日_RIO;
-    }
-
-    if (DUNNO == symbolicLocation || 三ノ輪 == symbolicLocation)
+    if (稲城 == symbolicLocation)
       return workDay ? HOME_平日_RIO : HOME_休日_RIO;
+
+    if (本蓮沼 == symbolicLocation)
+      return workDay ? WORK_平日_RIO : WORK_休日_RIO;
+
+    if (((time.weekDay == Time.MONDAY && time.hour >= 19) || (time.weekDay == Time.TUESDAY && time.hour < 1))
+     && (DUNNO == symbolicLocation || 六本木 == symbolicLocation))
+      return JUGGLING_月曜_RIO;
+
+    if (DUNNO == symbolicLocation && workDay)
+    {
+      if (time.hour >= 4 && time.hour <= 12) return HOME_平日_RIO;
+      if (time.hour >= 17 && time.hour <= 23) return WORK_平日_RIO;
+    }
 
     return OTHER;
   }

@@ -38,26 +38,18 @@ public class DataSource
     "http://keisei.ekitan.com/norikae/pc/T5?dir=52&dw=1&slCode=254-1&d=2", KeiseiParser.class)
   };
   private static final DataSource[] RIO_SOURCES = {
-   new DataSource(Const.日比谷線_三ノ輪_中目黒方面_平日,
-    "http://www.tokyometro.jp/station/minowa/timetable/hibiya/a/index.html", HibiyaParser.class),
-   new DataSource(Const.日比谷線_三ノ輪_中目黒方面_休日,
-    "http://www.tokyometro.jp/station/minowa/timetable/hibiya/a/holiday.html", HibiyaParser.class),
-   new DataSource(Const.日比谷線_三ノ輪_北千住方面_平日,
-    "http://www.tokyometro.jp/station/minowa/timetable/hibiya/b/index.html", HibiyaParser.class),
-   new DataSource(Const.日比谷線_三ノ輪_北千住方面_休日,
-    "http://www.tokyometro.jp/station/minowa/timetable/hibiya/b/holiday.html", HibiyaParser.class),
+   new DataSource(Const.京王線_稲城駅_新宿方面_平日,
+    "https://timetable.ekitan.com/railway/line-station/261-4?d=1&dw=0&view=list", EkitanParser.class),
+   new DataSource(Const.京王線_稲城駅_新宿方面_休日,
+    "https://timetable.ekitan.com/railway/line-station/261-4?d=1&dw=2&view=list", EkitanParser.class),
 
-   new DataSource(Const.京成線_お花茶屋_上野方面_平日,
-    "http://keisei.ekitan.com/norikae/pc/T5?dir=28&dw=0&slCode=254-7&d=1", KeiseiParser.class),
-   new DataSource(Const.京成線_お花茶屋_上野方面_休日,
-    "http://keisei.ekitan.com/norikae/pc/T5?dir=49&dw=1&slCode=254-7&d=1", KeiseiParser.class),
-   new DataSource(Const.京成線_立石_人形町方面_平日,
-    "http://keisei.ekitan.com/norikae/pc/T5?dir=12&dw=0&slCode=258-4&d=1", KeiseiParser.class),
-   new DataSource(Const.京成線_立石_人形町方面_休日,
-    "http://keisei.ekitan.com/norikae/pc/T5?dir=43&dw=1&slCode=258-4&d=1", KeiseiParser.class),
+   new DataSource(Const.都営三田線_本蓮沼_目黒方面_平日,
+    "https://timetable.ekitan.com/railway/line-station/224-19?d=1&dw=0&view=list", EkitanParser.class),
+   new DataSource(Const.都営三田線_本蓮沼_目黒方面_休日,
+    "https://timetable.ekitan.com/railway/line-station/224-19?d=1&dw=2&view=list", EkitanParser.class),
 
-   new DataSource(Const.日比谷線_六本木_平日,
-    "http://www.tokyometro.jp/station/roppongi/timetable/hibiya/b/index.html", HibiyaParser.class),
+   new DataSource(Const.大江戸線_六本木_新宿方面_平日,
+    "https://timetable.ekitan.com/railway/line-station/225-35?d=2&view=list", EkitanParser.class),
   };
   public static final DataSource[] ALL_SOURCES = Const.RIO_MODE ? RIO_SOURCES : J_SOURCES;
 }

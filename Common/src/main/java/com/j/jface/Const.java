@@ -47,20 +47,17 @@ public class Const
   @NonNull public static final String 日比谷線_北千住_休日 = "日比谷線・北千住・休日";
   @NonNull public static final String 日比谷線_六本木_平日 = "日比谷線・六本木・平日";
   @NonNull public static final String 日比谷線_六本木_休日 = "日比谷線・六本木・休日";
-  @NonNull public static final String 日比谷線_三ノ輪_中目黒方面_平日 = "日比谷線・三ノ輪・中目黒方面・平日";
-  @NonNull public static final String 日比谷線_三ノ輪_中目黒方面_休日 = "日比谷線・三ノ輪・中目黒方面・休日";
-  @NonNull public static final String 日比谷線_三ノ輪_北千住方面_平日 = "日比谷線・三ノ輪・北千住方面・平日";
-  @NonNull public static final String 日比谷線_三ノ輪_北千住方面_休日 = "日比谷線・三ノ輪・北千住方面・休日";
+  @NonNull public static final String 大江戸線_六本木_新宿方面_平日 = "大江戸線・六本木・新宿方面・平日";
+  @NonNull public static final String 京王線_稲城駅_新宿方面_平日 = "京王線・稲城駅・新宿方面・平日";
+  @NonNull public static final String 京王線_稲城駅_新宿方面_休日 = "京王線・稲城駅・新宿方面・休日";
+  @NonNull public static final String 都営三田線_本蓮沼_目黒方面_平日 = "都営三田線・本蓮沼・目黒方面・平日";
+  @NonNull public static final String 都営三田線_本蓮沼_目黒方面_休日 = "都営三田線・本蓮沼・目黒方面・休日";
   @NonNull public static final String 京成線_千住大橋_上野方面_平日 = "京成線・千住大橋・上野方面・平日";
   @NonNull public static final String 京成線_千住大橋_上野方面_休日 = "京成線・千住大橋・上野方面・休日";
   @NonNull public static final String 京成線_千住大橋_成田方面_平日 = "京成線・千住大橋・成田方面・平日";
   @NonNull public static final String 京成線_千住大橋_成田方面_休日 = "京成線・千住大橋・成田方面・休日";
   @NonNull public static final String 京成線_日暮里_千住大橋方面_平日 = "京成線・日暮里・千住大橋方面・平日";
   @NonNull public static final String 京成線_日暮里_千住大橋方面_休日 = "京成線・日暮里・千住大橋方面・休日";
-  @NonNull public static final String 京成線_お花茶屋_上野方面_平日 = "京成線・お花茶屋・上野方面・平日";
-  @NonNull public static final String 京成線_お花茶屋_上野方面_休日 = "京成線・お花茶屋・上野方面・休日";
-  @NonNull public static final String 京成線_立石_人形町方面_平日 = "京成線・立石・人形町方面・平日";
-  @NonNull public static final String 京成線_立石_人形町方面_休日 = "京成線・立石・人形町方面・休日";
 
   @NonNull public static final HashMap<String, String> HEADSIGNS = new HashMap <>();
 
@@ -69,20 +66,17 @@ public class Const
     HEADSIGNS.put(日比谷線_北千住_休日, "北千住 ▶ 六本木");
     HEADSIGNS.put(日比谷線_六本木_平日, "六本木 ▶ 北千住");
     HEADSIGNS.put(日比谷線_六本木_休日, "六本木 ▶ 北千住");
-    HEADSIGNS.put(日比谷線_三ノ輪_中目黒方面_平日, "三ノ輪 ▶ 立石");
-    HEADSIGNS.put(日比谷線_三ノ輪_中目黒方面_休日, "三ノ輪 ▶ 立石");
-    HEADSIGNS.put(日比谷線_三ノ輪_北千住方面_平日, "三ノ輪 ▶ お花茶屋");
-    HEADSIGNS.put(日比谷線_三ノ輪_北千住方面_休日, "三ノ輪 ▶ お花茶屋");
+    HEADSIGNS.put(大江戸線_六本木_新宿方面_平日, "六本木 ▶ 新宿");
+    HEADSIGNS.put(京王線_稲城駅_新宿方面_平日, "稲城 ▶ 新宿");
+    HEADSIGNS.put(京王線_稲城駅_新宿方面_休日, "稲城 ▶ 新宿");
+    HEADSIGNS.put(都営三田線_本蓮沼_目黒方面_平日, "本蓮沼 ▶ 巣鴨");
+    HEADSIGNS.put(都営三田線_本蓮沼_目黒方面_休日, "本蓮沼 ▶ 巣鴨");
     HEADSIGNS.put(京成線_千住大橋_上野方面_平日, "千住大橋 ▶ 日暮里");
     HEADSIGNS.put(京成線_千住大橋_上野方面_休日, "千住大橋 ▶ 日暮里");
     HEADSIGNS.put(京成線_千住大橋_成田方面_平日, "千住大橋 ▶ 成田");
     HEADSIGNS.put(京成線_千住大橋_成田方面_休日, "千住大橋 ▶ 成田");
     HEADSIGNS.put(京成線_日暮里_千住大橋方面_平日, "日暮里 ▶ 千住大橋");
     HEADSIGNS.put(京成線_日暮里_千住大橋方面_休日, "日暮里 ▶ 千住大橋");
-    HEADSIGNS.put(京成線_お花茶屋_上野方面_平日, "お花茶屋 ▶ 三ノ輪");
-    HEADSIGNS.put(京成線_お花茶屋_上野方面_休日, "お花茶屋 ▶ 三ノ輪");
-    HEADSIGNS.put(京成線_立石_人形町方面_平日, "立石 ▶ 人形町");
-    HEADSIGNS.put(京成線_立石_人形町方面_休日, "立石 ▶ 人形町");
   }
 
   @NonNull public static final String[] J_DEPLIST_DATA_PATHS =
@@ -94,11 +88,9 @@ public class Const
     京成線_日暮里_千住大橋方面_平日, 京成線_日暮里_千住大橋方面_休日 };
   @NonNull public static final String[] RIO_DEPLIST_DATA_PATHS =
    {
-    日比谷線_三ノ輪_中目黒方面_平日, 日比谷線_三ノ輪_中目黒方面_休日,
-    日比谷線_三ノ輪_北千住方面_平日, 日比谷線_三ノ輪_北千住方面_休日,
-    京成線_お花茶屋_上野方面_平日, 京成線_お花茶屋_上野方面_休日,
-    京成線_立石_人形町方面_平日, 京成線_立石_人形町方面_休日,
-    日比谷線_六本木_平日
+    京王線_稲城駅_新宿方面_平日, 京王線_稲城駅_新宿方面_休日,
+    都営三田線_本蓮沼_目黒方面_平日, 都営三田線_本蓮沼_目黒方面_休日,
+    大江戸線_六本木_新宿方面_平日
    };
   @NonNull public static final String[] ALL_DEPLIST_DATA_PATHS = RIO_MODE ? RIO_DEPLIST_DATA_PATHS : J_DEPLIST_DATA_PATHS;
 
@@ -106,11 +98,11 @@ public class Const
   @NonNull public static final String 六本木_FENCE_NAME = "六本木";
   @NonNull public static final String 日暮里_FENCE_NAME = "日暮里";
   @NonNull public static final String 東京_FENCE_NAME = "東京";
-  @NonNull public static final String 立石_FENCE_NAME = "立石";
-  @NonNull public static final String 三ノ輪_FENCE_NAME = "三ノ輪";
+  @NonNull public static final String 稲城_FENCE_NAME = "稲城";
+  @NonNull public static final String 本蓮沼_FENCE_NAME = "本蓮沼";
   @NonNull public static final String[] J_FENCE_NAMES =
    { 千住大橋_FENCE_NAME, 六本木_FENCE_NAME, 日暮里_FENCE_NAME, 東京_FENCE_NAME };
   @NonNull public static final String[] RIO_FENCE_NAMES =
-   { 三ノ輪_FENCE_NAME, 立石_FENCE_NAME, 六本木_FENCE_NAME, 東京_FENCE_NAME };
+   { 稲城_FENCE_NAME, 本蓮沼_FENCE_NAME, 六本木_FENCE_NAME, 東京_FENCE_NAME };
   @NonNull public static final String[] ALL_FENCE_NAMES = RIO_MODE ? RIO_FENCE_NAMES : J_FENCE_NAMES;
 }

@@ -189,6 +189,6 @@ public class JOrg extends WrappedActivity
 
   private void scheduleBackup()
   {
-    new RecursiveBackupAction(mClient, null).enqueue();
+    //new RecursiveBackupAction(mClient, null).enqueue();
   }
 }
