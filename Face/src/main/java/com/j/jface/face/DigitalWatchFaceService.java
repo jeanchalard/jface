@@ -331,7 +331,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       final int ambientFlag = isInAmbientMode() ? Draw.AMBIENT_MODE : 0;
       if (mDraw.draw(mDrawTools, mModeFlags | ambientFlag, canvas, bounds,
        departure1, departure2, status, mTime, /*mSensors,*/ Status.getSymbolicLocationName(mDataStore),
-       mDataStore.mTopic))
+       mDataStore.mTopic, mDataStore.mTopicColors))
         invalidate();
 
       if (null == departure1)
@@ -380,7 +380,10 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
           else if (Const.DATA_KEY_DEBUG_TIME_OFFSET.equals(key))
             mDataStore.mTimeOffset = data.getLong(key);
           else if (Const.DATA_KEY_TOPIC.equals(key))
-            mDataStore.mTopic = Util.NonNullString(data.getString(key));
+          {
+            mDataStore.mTopic = Util.NonNullString(data.getString(Const.DATA_KEY_TOPIC));
+            mDataStore.mTopicColors = Util.intArrayFromNullableArrayList(data.getIntegerArrayList(Const.DATA_KEY_TOPIC_COLORS));
+          }
         updateTimer();
       }
       else if (path.startsWith(Const.LOCATION_PATH))

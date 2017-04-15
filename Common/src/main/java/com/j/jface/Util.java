@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Util
@@ -14,6 +15,14 @@ public class Util
   public static @NonNull String NonNullString(@Nullable String s)
   {
     return null == s ? "" : s;
+  }
+
+  public static int[] intArrayFromNullableArrayList(@Nullable final ArrayList<Integer> list)
+  {
+    if (null == list) return new int[0];
+    final int[] array = new int[list.size()];
+    for (int i = 0; i < array.length; ++i) array[i] = list.get(i);
+    return array;
   }
 
   public static @NonNull int[] concat(int[] a1, int[] a2)

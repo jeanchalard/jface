@@ -35,7 +35,7 @@ public class Draw
                       @Nullable final Departure departureLine1, @Nullable final Departure departureLine2,
                       @NonNull final Status status, @NonNull final Time time, /*@NonNull final Sensors sensors,*/
                       @NonNull final String locationDescriptor,
-                      @NonNull final String topic)
+                      @NonNull final String topic, @NonNull final int[] topicColors)
   {
     long start = System.currentTimeMillis();
 
@@ -116,8 +116,11 @@ public class Draw
     }
 
     float ty = topicPosY;
-    for (final String s : topicLines)
+    for (int i = 0; i < topicLines.length; ++i)
     {
+      final String s = topicLines[i];
+      final int color = i < topicColors.length ? topicColors[i] : Const.TOPIC_DEFAULT_COLOR;
+      drawTools.topicPaint.setColor(color);
       canvas.drawText(s, center, ty, drawTools.topicPaint);
       ty += drawTools.topicPaint.getTextSize() + 2;
     }

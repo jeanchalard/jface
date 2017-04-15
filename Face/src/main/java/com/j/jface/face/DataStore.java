@@ -17,6 +17,7 @@ public class DataStore
   @NonNull private final HashMap<String, ArrayList<Departure>> mDepartures = new HashMap<>();
   @NonNull private final HashMap<String, Boolean> mLocationStatuses = new HashMap<>();
   @NonNull public String mTopic = "";
+  @NonNull public int[] mTopicColors = new int[0];
   public long mTimeOffset;
   public long mDebugFences;
 
