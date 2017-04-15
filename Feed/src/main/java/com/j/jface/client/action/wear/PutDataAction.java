@@ -13,6 +13,8 @@ import com.google.android.gms.wearable.Wearable;
 import com.j.jface.client.Client;
 import com.j.jface.client.action.Action;
 
+import java.util.ArrayList;
+
 public class PutDataAction extends Action implements ResultCallback<DataApi.DataItemResult>
 {
   @NonNull private final PutDataRequest mRequest;
@@ -38,6 +40,14 @@ public class PutDataAction extends Action implements ResultCallback<DataApi.Data
     super(client, null);
     final PutDataMapRequest dmRequest = PutDataMapRequest.create(path);
     dmRequest.getDataMap().putLong(key, value);
+    mRequest = dmRequest.asPutDataRequest();
+  }
+
+  public PutDataAction(@NonNull final Client client, @NonNull final String path, @NonNull final String key, final ArrayList<Integer> value)
+  {
+    super(client, null);
+    final PutDataMapRequest dmRequest = PutDataMapRequest.create(path);
+    dmRequest.getDataMap().putIntegerArrayList(key, value);
     mRequest = dmRequest.asPutDataRequest();
   }
 

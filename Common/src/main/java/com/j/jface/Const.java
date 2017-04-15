@@ -29,6 +29,7 @@ public class Const
   @NonNull public static final String DATA_KEY_EXTRA = "extra";
   @NonNull public static final String DATA_KEY_DEPLIST = "depList";
   @NonNull public static final String DATA_KEY_TOPIC = "topic";
+  @NonNull public static final String DATA_KEY_TOPIC_COLORS = "topicColors";
   @NonNull public static final String DATA_KEY_ADHOC = "adHoc";
   @NonNull public static final String DATA_KEY_INSIDE = "inside";
   @NonNull public static final String DATA_KEY_SUCCESSFUL_UPDATE_DATE = "updateTime";
@@ -39,6 +40,7 @@ public class Const
   @NonNull public static final String DATA_KEY_LAST_ACTIVITY_MNEMONIC = "lastActivityMnemonic";
   @NonNull public static final String DATA_KEY_LAST_ACTIVITY_START_TIME = "lastActivityStartTime";
   @NonNull public static final String CONFIG_KEY_BACKGROUND = "background";
+  public static final int TOPIC_DEFAULT_COLOR = 0xFFAACCAA;
 
   @NonNull public static final String EXTRA_TODO_ID = "todoId";
   @NonNull public static final String EXTRA_FONT_SIZE = "fontSize";

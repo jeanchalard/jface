@@ -48,7 +48,7 @@ public class DrawTools
     statusPaint = createTextPaint(0xFFCCCCCC, NORMAL_TYPEFACE);
     statusPaint.setTextAlign(Paint.Align.CENTER);
     departurePaint.setTextAlign(Paint.Align.CENTER);
-    topicPaint = createTextPaint(0xFFAACCAA, NORMAL_TYPEFACE);
+    topicPaint = createTextPaint(Const.TOPIC_DEFAULT_COLOR, NORMAL_TYPEFACE);
     topicPaint.setTextAlign(Paint.Align.CENTER);
 
     final int statusFontSize = 18;

@@ -34,7 +34,6 @@ public class PaletteView extends ImageView
 
   @Override public boolean onTouchEvent(@NonNull final MotionEvent event)
   {
-    Log.e("Touch", "" + event.getX() + " x " + event.getY());
     final float[] pts = new float[] { event.getX(), event.getY() };
     mImageMatrix.mapPoints(pts);
     if (pts[0] < 0 || pts[1] < 0 || pts[0] >= mPaletteBitmap.getWidth() || pts[1] >= mPaletteBitmap.getHeight()) return true;

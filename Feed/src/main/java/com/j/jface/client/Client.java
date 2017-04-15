@@ -28,6 +28,7 @@ import com.j.jface.client.action.wear.DeleteDataAction;
 import com.j.jface.client.action.wear.GetDataAction;
 import com.j.jface.client.action.wear.PutDataAction;
 
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Client extends Handler implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
@@ -150,6 +151,11 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
   }
 
   public void putData(@NonNull final String path, @NonNull final String key, final long value)
+  {
+    enqueue(new PutDataAction(this, path, key, value));
+  }
+
+  public void putData(@NonNull final String path, @NonNull final String key, final ArrayList<Integer> value)
   {
     enqueue(new PutDataAction(this, path, key, value));
   }
