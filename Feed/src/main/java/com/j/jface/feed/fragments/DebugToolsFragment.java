@@ -23,7 +23,6 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
   private static final int GRACE_FOR_UPDATE = 3000;
 
   @NonNull private final Client mClient;
-  @NonNull private final EditText mTopicDataEdit;
   private long mOffset = 0;
   private boolean mTicking = false;
   @NonNull private final Time mTime1, mTime2;
@@ -55,8 +54,6 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
     super(a.inflater.inflate(R.layout.fragment_debug_tools, a.container, false));
     mClient = b;
     mTime1 = new Time(); mTime2 = new Time();
-    mTopicDataEdit = (EditText)mView.findViewById(R.id.topicDataEdit);
-    mView.findViewById(R.id.button_set).setOnClickListener(this);
     mView.findViewById(R.id.button_now).setOnClickListener(this);
     mDaysOffsetUI = (NumberPicker)mView.findViewById(R.id.daysOffsetUI);
     mDaysOffsetUI.setMinValue(0); mDaysOffsetUI.setMaxValue(14);
@@ -82,17 +79,6 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
     mFenceUIs[3] = (CheckBox)mView.findViewById(R.id.fence4);
     for (final CheckBox c : mFenceUIs) c.setOnClickListener(this);
     if (Const.RIO_MODE) mFenceUIs[2].setText("六本木");
-
-    b.getData(Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC, new Client.GetDataCallback() {
-      public void run(@NonNull final String path, @NonNull final DataMap dataMap) {
-        a.fragment.getActivity().runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            mTopicDataEdit.setText(dataMap.getString(Const.DATA_KEY_TOPIC));
-          }
-        });
-      }
-    });
   }
 
   private void tick()
@@ -136,9 +122,6 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
   {
     switch (v.getId())
     {
-      case R.id.button_set:
-        mClient.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC, Const.DATA_KEY_TOPIC, mTopicDataEdit.getText().toString());
-        break;
       case R.id.button_now:
         mOffset = 0;
         tick();

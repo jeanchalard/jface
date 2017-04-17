@@ -58,11 +58,12 @@ public class MessagesFragment extends WrappedFragment implements TextWatcher, Pa
             final int[] starts = getLineStartOffsets(topic);
             final SpannableString text = new SpannableString(topic);
             final ArrayList<Integer> colors = dataMap.getIntegerArrayList(Const.DATA_KEY_TOPIC_COLORS);
-            if (null != colors) // Just in case
+            if (null != colors && starts.length == colors.size())
               for (int i = 0; i < colors.size(); ++i)
               {
-                final int end = i + 1 >= starts.length ? topic.length() - 1 : starts[i + 1];
-                text.setSpan(new ForegroundColorSpan(colors.get(i)), starts[i], end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                final int start = starts[i];
+                final int end = Math.max(start, i + 1 >= starts.length ? topic.length() : starts[i + 1]);
+                text.setSpan(new ForegroundColorSpan(colors.get(i)), start, end, Spanned.SPAN_PARAGRAPH);
               }
             mTopicDataEdit.setText(text);
           }
@@ -80,9 +81,20 @@ public class MessagesFragment extends WrappedFragment implements TextWatcher, Pa
     for (final ForegroundColorSpan span : s.getSpans(0, s.length() - 1, ForegroundColorSpan.class))
     {
       final int spanStart = s.getSpanStart(span);
+      final int spanEnd = s.getSpanEnd(span);
       final int index = Arrays.binarySearch(starts, spanStart);
-      if (index >= 0) // Should always be, but just in case
+      if (index >= 0 && spanStart != spanEnd)
+      {
         colors.set(index, span.getForegroundColor());
+        final int expectedEnd = index + 1 >= starts.length ? s.length() : starts[index + 1];
+        if (spanEnd != expectedEnd)
+        {
+          s.removeSpan(span);
+          s.setSpan(span, spanStart, expectedEnd, Spanned.SPAN_PARAGRAPH);
+        }
+      }
+      else
+        s.removeSpan(span); // Removed the new line on which this was anchored
     }
     final DataMap dataMap = new DataMap();
     dataMap.putString(Const.DATA_KEY_TOPIC, mTopicDataEdit.getText().toString());
@@ -92,6 +104,7 @@ public class MessagesFragment extends WrappedFragment implements TextWatcher, Pa
 
   private int[] getLineStartOffsets(@NonNull final String s)
   {
+    if (s.length() <= 0) return new int[0];
     final String[] lines = s.split("\n");
     final int[] starts = new int[lines.length];
     int start = 0;
@@ -116,9 +129,15 @@ public class MessagesFragment extends WrappedFragment implements TextWatcher, Pa
     final String[] lines = text.toString().split("\n");
     for (final String line : lines)
     {
-      end = start + line.length();
-      if (cursorStart <= end && cursorEnd >= start) text.setSpan(new ForegroundColorSpan(color), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-      start = end + 1;
+      end = start + line.length() + 1;
+      if (cursorStart < end && cursorEnd >= start)
+      {
+        for (final ForegroundColorSpan span : text.getSpans(0, text.length() - 1, ForegroundColorSpan.class))
+          if (text.getSpanStart(span) == start)
+            text.removeSpan(span);
+        text.setSpan(new ForegroundColorSpan(color), start, Math.min(end, text.length()), Spannable.SPAN_PARAGRAPH);
+      }
+      start = end;
     }
     afterTextChanged(text);
   }
