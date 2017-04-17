@@ -75,31 +75,34 @@ public class MessagesFragment extends WrappedFragment implements TextWatcher, Pa
   @Override public void afterTextChanged(@NonNull final Editable s)
   {
     if (!mDataFetched) return;
-    final int[] starts = getLineStartOffsets(s.toString());
-    final ArrayList<Integer> colors = new ArrayList<>(starts.length);
-    for (int i = 0; i < starts.length; ++i) colors.add(Const.TOPIC_DEFAULT_COLOR);
-    for (final ForegroundColorSpan span : s.getSpans(0, s.length() - 1, ForegroundColorSpan.class))
+    try
     {
-      final int spanStart = s.getSpanStart(span);
-      final int spanEnd = s.getSpanEnd(span);
-      final int index = Arrays.binarySearch(starts, spanStart);
-      if (index >= 0 && spanStart != spanEnd)
+      final int[] starts = getLineStartOffsets(s.toString());
+      final ArrayList<Integer> colors = new ArrayList<>(starts.length);
+      for (int i = 0; i < starts.length; ++i) colors.add(Const.TOPIC_DEFAULT_COLOR);
+      for (final ForegroundColorSpan span : s.getSpans(0, s.length() - 1, ForegroundColorSpan.class))
       {
-        colors.set(index, span.getForegroundColor());
-        final int expectedEnd = index + 1 >= starts.length ? s.length() : starts[index + 1];
-        if (spanEnd != expectedEnd)
+        final int spanStart = s.getSpanStart(span);
+        final int spanEnd = s.getSpanEnd(span);
+        final int index = Arrays.binarySearch(starts, spanStart);
+        if (index >= 0 && spanStart != spanEnd)
         {
-          s.removeSpan(span);
-          s.setSpan(span, spanStart, expectedEnd, Spanned.SPAN_PARAGRAPH);
-        }
+          colors.set(index, span.getForegroundColor());
+          final int expectedEnd = index + 1 >= starts.length ? s.length() : starts[index + 1];
+          if (spanEnd != expectedEnd)
+          {
+            s.removeSpan(span);
+            s.setSpan(span, spanStart, expectedEnd, Spanned.SPAN_PARAGRAPH);
+          }
+        } else
+          s.removeSpan(span); // Removed the new line on which this was anchored
       }
-      else
-        s.removeSpan(span); // Removed the new line on which this was anchored
+      final DataMap dataMap = new DataMap();
+      dataMap.putString(Const.DATA_KEY_TOPIC, mTopicDataEdit.getText().toString());
+      dataMap.putIntegerArrayList(Const.DATA_KEY_TOPIC_COLORS, colors);
+      mClient.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC, dataMap);
     }
-    final DataMap dataMap = new DataMap();
-    dataMap.putString(Const.DATA_KEY_TOPIC, mTopicDataEdit.getText().toString());
-    dataMap.putIntegerArrayList(Const.DATA_KEY_TOPIC_COLORS, colors);
-    mClient.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC, dataMap);
+    catch (Exception e) { removeAllSpans(); }
   }
 
   private int[] getLineStartOffsets(@NonNull final String s)
@@ -121,24 +124,34 @@ public class MessagesFragment extends WrappedFragment implements TextWatcher, Pa
 
   @Override public void onColorSet(final int color)
   {
-    final Editable text = mTopicDataEdit.getText();
-    final int cursorStart = Selection.getSelectionStart(text);
-    final int cursorEnd = Selection.getSelectionEnd(text);
-
-    int start = 0, end = 0;
-    final String[] lines = text.toString().split("\n");
-    for (final String line : lines)
+    try
     {
-      end = start + line.length() + 1;
-      if (cursorStart < end && cursorEnd >= start)
+      final Editable text = mTopicDataEdit.getText();
+      final int cursorStart = Selection.getSelectionStart(text);
+      final int cursorEnd = Selection.getSelectionEnd(text);
+
+      int start = 0, end = 0;
+      final String[] lines = text.toString().split("\n");
+      for (final String line : lines)
       {
-        for (final ForegroundColorSpan span : text.getSpans(0, text.length() - 1, ForegroundColorSpan.class))
-          if (text.getSpanStart(span) == start)
-            text.removeSpan(span);
-        text.setSpan(new ForegroundColorSpan(color), start, Math.min(end, text.length()), Spannable.SPAN_PARAGRAPH);
+        end = start + line.length() + 1;
+        if (cursorStart < end && cursorEnd >= start)
+        {
+          for (final ForegroundColorSpan span : text.getSpans(0, text.length() - 1, ForegroundColorSpan.class))
+            if (text.getSpanStart(span) == start)
+              text.removeSpan(span);
+          text.setSpan(new ForegroundColorSpan(color), start, Math.min(end, text.length()), Spannable.SPAN_PARAGRAPH);
+        }
+        start = end;
       }
-      start = end;
+      afterTextChanged(text);
     }
-    afterTextChanged(text);
+    catch (Exception e) { removeAllSpans(); }
+  }
+
+  private void removeAllSpans()
+  {
+    final Editable text = mTopicDataEdit.getText();
+    for (final ForegroundColorSpan span : text.getSpans(0, text.length() - 1, ForegroundColorSpan.class)) text.removeSpan(span);
   }
 }
