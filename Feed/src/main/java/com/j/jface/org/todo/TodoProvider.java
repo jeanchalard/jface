@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.j.jface.client.Client;
+import com.j.jface.client.action.drive.WriteFileAction;
 import com.j.jface.lifecycle.WrappedContentProvider;
 
 import java.io.File;
@@ -116,20 +117,26 @@ public class TodoProvider extends WrappedContentProvider implements Handler.Call
         db.insertWithOnConflict(TodoProviderContract.UI_METADATA_TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
         break;
     }
-    return Uri.withAppendedPath(TodoProviderContract.BASE_URI_TODO, values.getAsString(TodoProviderContract.COLUMN_id));
+    final Uri result = Uri.withAppendedPath(TodoProviderContract.BASE_URI_TODO, values.getAsString(TodoProviderContract.COLUMN_id));
+    scheduleSync();
+    return result;
   }
 
   public int delete(@NonNull final Uri uri, @Nullable final String selection, @Nullable final String[] selectionArgs)
   {
     final SQLiteDatabase db = mDb.getWritableDatabase();
-    return db.delete(TodoProviderContract.TABLE_NAME, selection, selectionArgs);
+    final int result = db.delete(TodoProviderContract.TABLE_NAME, selection, selectionArgs);
+    scheduleSync();
+    return result;
   }
 
   public int update(@NonNull final Uri uri, @NonNull final ContentValues values, @Nullable final String selection, @Nullable final String[] selectionArgs)
   {
     final SQLiteDatabase db = mDb.getWritableDatabase();
     // TODO : sanitize
-    return db.update(TodoProviderContract.TABLE_NAME, values, selection, selectionArgs);
+    final int result = db.update(TodoProviderContract.TABLE_NAME, values, selection, selectionArgs);
+    scheduleSync();
+    return result;
   }
 
 
@@ -157,8 +164,7 @@ public class TodoProvider extends WrappedContentProvider implements Handler.Call
     @SuppressWarnings("ConstantConditions") final File path = mC.getContext().getDatabasePath(DB_NAME);
     try
     {
-      final FileInputStream inputStream = new FileInputStream(path);
-//      mClient.enqueue(new WriteFileAction("Jormungand/Saves/latest", inputStream));
+      new WriteFileAction(mClient, "Jormungand/Saves/latest", new FileInputStream(path)).enqueue();
     }
     catch (FileNotFoundException e)
     {

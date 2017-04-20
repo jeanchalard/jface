@@ -3,6 +3,7 @@ package com.j.jface.client.action;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.j.jface.Future;
 import com.j.jface.FutureValue;
 import com.j.jface.client.Client;
@@ -34,4 +35,14 @@ public abstract class ResultAction<T> extends Action implements Future<T>
   @Nullable public T get() { return result.get(); }
   public int status() { return result.status(); }
   @NonNull public String getError() { return result.getError(); }
+
+  public static class Done<T> extends ResultAction<T>
+  {
+    public Done(@NonNull final Client client, @Nullable T value)
+    {
+      super(client, null);
+      finish(value);
+    }
+    @Override public void run(@NonNull final GoogleApiClient client) {}
+  }
 }

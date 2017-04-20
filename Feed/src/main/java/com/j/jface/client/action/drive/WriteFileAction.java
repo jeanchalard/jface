@@ -1,109 +1,76 @@
 package com.j.jface.client.action.drive;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Result;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi.DriveContentsResult;
-import com.google.android.gms.drive.DriveApi.MetadataBufferResult;
 import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveFile;
-import com.google.android.gms.drive.DriveId;
-import com.google.android.gms.drive.Metadata;
+import com.google.android.gms.drive.DriveFolder.DriveFileResult;
 import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.drive.query.Filters;
-import com.google.android.gms.drive.query.Query;
 import com.google.android.gms.drive.query.SearchableField;
+import com.j.jface.FutureValue;
 import com.j.jface.Util;
 import com.j.jface.client.Client;
-import com.j.jface.client.action.Action;
+import com.j.jface.client.action.ResultAction;
+import com.j.jface.client.action.drive.ResolveDriveResourcesAction.ResolveFirstFileAction;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 /**
  * An action that writes a file to Drive with the given data.
  */
-public class WriteFileAction extends Action
+public class WriteFileAction extends ResultAction<Integer> implements ResultCallback<Result>
 {
-  @NonNull private static final String FOLDER_MIME_TYPE = "application/vnd.google-apps.folder";
-
-  @NonNull final String mFilepath;
+  @NonNull final String mFilename;
   @NonNull final InputStream mSource;
+  @NonNull final ResultAction<WithPath.DriveFolder> mParent;
+  @NonNull final ResultAction<WithPath.Metadata> mResolvedMetadata;
+  @NonNull final FutureValue<DriveContents> mResolvedContents;
   public WriteFileAction(@NonNull final Client client, @NonNull final String filepath, @NonNull final InputStream source)
   {
     super(client, null);
     mSource = source;
-    mFilepath = filepath;
-  }
-
-  @NonNull private DriveId findOrCreateFolder(@NonNull final GoogleApiClient gClient, @NonNull final DriveId parent, @NonNull final String name)
-  {
-    final Query q = new Query.Builder()
-     .addFilter(Filters.eq(SearchableField.TITLE, name))
-     .addFilter(Filters.in(SearchableField.PARENTS, parent))
-     .addFilter(Filters.eq(SearchableField.MIME_TYPE, FOLDER_MIME_TYPE))
-     .addFilter(Filters.eq(SearchableField.TRASHED, false))
-     .build();
-    final MetadataBufferResult result = Drive.DriveApi.query(gClient, q).await();
-    if (result.getStatus().isSuccess())
-      for (final Metadata m : result.getMetadataBuffer())
-        if (m.isFolder()) return m.getDriveId();
-    final MetadataChangeSet changeSet = new MetadataChangeSet.Builder().setTitle(name).build();
-    return parent.asDriveFolder().createFolder(gClient, changeSet).await().getDriveFolder().getDriveId();
-  }
-
-  @Nullable private DriveContents findDriveContentsOrReturnNull(@NonNull final GoogleApiClient gClient, @NonNull final DriveId parent, @NonNull final String name)
-  {
-    final Query q = new Query.Builder()
-     .addFilter(Filters.eq(SearchableField.TITLE, name))
-     .addFilter(Filters.in(SearchableField.PARENTS, parent))
-     .build();
-    final MetadataBufferResult result = Drive.DriveApi.query(gClient, q).await();
-    if (result.getStatus().isSuccess())
-      for (final Metadata m : result.getMetadataBuffer())
-      {
-        final DriveContentsResult r = m.getDriveId().asDriveFile().open(gClient, DriveFile.MODE_WRITE_ONLY, null).await();
-        if (r.getStatus().isSuccess()) return r.getDriveContents();
-      }
-    return null;
+    final List<String> path = Arrays.asList(filepath.split("/"));
+    mFilename = path.get(path.size() - 1);
+    if (path.size() <= 1)
+      mParent = new ResolveRootFolder(client, this);
+    else
+      mParent = new ResolveOrCreateDriveFolderAction(client, this, path.subList(0, path.size() - 1));
+    mResolvedMetadata = new ResolveFirstFileAction(client, this, mParent, Filters.eq(SearchableField.TITLE, mFilename));
+    mResolvedContents = new FutureValue<>();
   }
 
   @Override public void run(@NonNull final GoogleApiClient gClient)
   {
-    final ArrayList<String> folderNamesToResolve = new ArrayList<>(Arrays.asList(mFilepath.split("/")));
-    final String filename = folderNamesToResolve.remove(folderNamesToResolve.size() - 1);
-    final ArrayList<DriveId> folderIds = new ArrayList<>(folderNamesToResolve.size() + 1);
-    folderIds.add(Drive.DriveApi.getRootFolder(gClient).getDriveId());
+    if (FAILURE == mParent.status()) { fail(mParent.getError()); return; }
+    if (NOT_DONE == mParent.status()) { mParent.enqueue(); return; }
+    if (FAILURE == mResolvedMetadata.status()) { fail(mResolvedMetadata.getError()); return; }
+    if (NOT_DONE == mResolvedMetadata.status()) { mResolvedMetadata.enqueue(); return; }
 
-    // Find or create folder hierarchy
-    while (!folderNamesToResolve.isEmpty())
+    if (FAILURE == mResolvedContents.status()) { fail(mResolvedContents.getError()); return; }
+    if (NOT_DONE == mResolvedContents.status())
     {
-      final String folderName = folderNamesToResolve.remove(0);
-      final DriveId id = findOrCreateFolder(gClient, folderIds.get(folderIds.size() - 1), folderName);
-      folderIds.add(id);
+      final WithPath.Metadata metadata = mResolvedMetadata.get();
+      if (null == metadata)
+        Drive.DriveApi.newDriveContents(gClient).setResultCallback(this);
+      else
+        metadata.metadata.getDriveId().asDriveFile().open(gClient, DriveFile.MODE_WRITE_ONLY, null).setResultCallback(this); // File exists, find drive contents
+      return;
     }
 
-    final DriveContents contents;
-    final boolean isNewFile;
-    final DriveContents existingContents = findDriveContentsOrReturnNull(gClient, folderIds.get(folderIds.size() - 1), filename);
-    if (null != existingContents)
-    {
-      contents = existingContents;
-      isNewFile = false;
-    }
-    else
-    {
-      contents = Drive.DriveApi.newDriveContents(gClient).await().getDriveContents();
-      isNewFile = true;
-    }
+    final DriveContents contents = mResolvedContents.get();
+    if (null == contents) { fail("Resolved contents is null in write file action"); return; }
+
     final OutputStream out = contents.getOutputStream();
     try
     {
@@ -111,18 +78,34 @@ public class WriteFileAction extends Action
     }
     catch (IOException e)
     {
-      Log.e("Jorg", "Can't write file : " + e);
+      fail("IOException in writing file : " + e);
     }
-    final Status status;
-    if (isNewFile)
+
+    if (null == mResolvedMetadata.get())
     {
-      final MetadataChangeSet newFileChanges = new MetadataChangeSet.Builder().setTitle(filename).build();
-      status = folderIds.get(folderIds.size() - 1).asDriveFolder().createFile(gClient, newFileChanges, contents).await().getStatus();
+      // New file
+      final WithPath.DriveFolder parent = mParent.get();
+      if (null == parent) { fail("Resolved parent is null in write file action"); return; }
+      final MetadataChangeSet newFileChanges = new MetadataChangeSet.Builder().setTitle(mFilename).build();
+      parent.folder.createFile(gClient, newFileChanges, contents).setResultCallback(this);
     }
     else
-      status = contents.commit(gClient, null).await();
-    if (!status.isSuccess())
-      Log.e("Jorg", "Save unsuccessful : " + status.getStatusMessage());
-    finish();
+      contents.commit(gClient, null).setResultCallback(this);
+  }
+
+  @Override public void onResult(@NonNull final Result result)
+  {
+    if (result instanceof DriveContentsResult)
+    {
+      if (!result.getStatus().isSuccess()) { fail(ResultHelpers.errorMessage(result, "Failure in getting drive contents in write file action")); return; }
+      mResolvedContents.set(((DriveContentsResult)result).getDriveContents());
+      enqueue();
+    }
+    else if (result instanceof Status || result instanceof DriveFileResult)
+    {
+      if (!result.getStatus().isSuccess()) { fail(ResultHelpers.errorMessage(result, "Failure in writing drive contents in write file action")); return; }
+      finish(SUCCESS);
+    }
+    else fail("Unknown result type in write file action : " + result.getClass());
   }
 }

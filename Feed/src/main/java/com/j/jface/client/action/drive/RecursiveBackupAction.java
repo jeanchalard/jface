@@ -2,9 +2,9 @@ package com.j.jface.client.action.drive;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.View;
 
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.drive.Metadata;
 import com.google.android.gms.drive.query.Filters;
 import com.google.android.gms.drive.query.SearchableField;
 import com.google.android.gms.drive.query.SortOrder;
@@ -12,14 +12,18 @@ import com.google.android.gms.drive.query.SortableField;
 import com.j.jface.client.Client;
 import com.j.jface.client.action.Action;
 import com.j.jface.client.action.ResultAction;
-import com.j.jface.client.action.drive.ResolveDriveResourceAction.ResolveFilesAction;
-import com.j.jface.client.action.drive.ResolveDriveResourceAction.ResolveFirstFileAction;
+import com.j.jface.client.action.drive.ResolveDriveResourcesAction;
+import com.j.jface.client.action.drive.ResolveDriveResourcesAction.ResolveFirstFileAction;
+import com.j.jface.client.action.ui.ReportActionWithSnackbar;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
@@ -45,41 +49,62 @@ import static com.j.jface.Future.SUCCESS;
 
 public class RecursiveBackupAction extends Action
 {
-  private static final int ONEDAY_MILLIS = 86_400 * 1_000;
+  private static class FileSpec
+  {
+    @NonNull public final String name;
+    @NonNull public final WithPath.DriveFolder parent;
+    public FileSpec(@NonNull final String name, @NonNull final WithPath.DriveFolder parent) { this.name = name; this.parent = parent; }
+  }
 
+  private static final int ONEDAY_MILLIS = 86_400 * 1_000;
+  private static final String ITERATIVE_SAVE_TRUNK = "save";
+  private static final int LAST_ITERATIVE_SAVE_NUMBER = 14;
+  private static final String PREVIOUS_RUN_NAME = "previousRun";
+  private static final String LAST_RUN_NAME = "lastRun";
+  private static final String LATEST_NAME = "latest";
+
+  @NonNull final View mViewToSnackbarInto;
   @NonNull final List<ResultAction> mPreconditions;
+  @NonNull final ReportActionWithSnackbar mReportStartAction;
   @NonNull final ResolveOrCreateDriveFolderAction mSavesFolder;
   @NonNull final ResolveOrCreateDriveFolderAction mHistoryFolder;
   @NonNull final ResolveOrCreateDriveFolderAction mArchiveFolder;
   @NonNull final ResolveFirstFileAction mMostRecentArchive;
-  @NonNull final ResolveFilesAction mHistoryFiles;
+  @NonNull final ResolveDriveResourcesAction mHistoryFiles;
   @NonNull final ResolveFirstFileAction mPreviousRun;
   @NonNull final ResolveFirstFileAction mLastRun;
   @NonNull final ResolveFirstFileAction mLatest;
 
-  public RecursiveBackupAction(@NonNull final Client client, @Nullable final Action then)
+  @Nullable ArrayList<ResultAction> mFileOps;
+
+  public RecursiveBackupAction(@NonNull final Client client, @Nullable final Action then, @NonNull final View viewToSnackbarInto)
   {
     super(client, then);
+    mViewToSnackbarInto = viewToSnackbarInto;
+    mReportStartAction = new ReportActionWithSnackbar(client, this, viewToSnackbarInto, "Starting backup");
     mSavesFolder = new ResolveOrCreateDriveFolderAction(client, this, "Jormungand/Saves");
     mHistoryFolder = new ResolveOrCreateDriveFolderAction(client, this, mSavesFolder, "History");
     mArchiveFolder = new ResolveOrCreateDriveFolderAction(client, this, mSavesFolder, "Archive");
 
     mMostRecentArchive = new ResolveFirstFileAction(client, this, mArchiveFolder, null, new SortOrder.Builder().addSortDescending(SortableField.CREATED_DATE).build());
-    mHistoryFiles = new ResolveFilesAction(client, this, mHistoryFolder, Filters.contains(SearchableField.TITLE, "save"), new SortOrder.Builder().addSortAscending(SortableField.TITLE).build());
-    mPreviousRun = new ResolveFirstFileAction(client, this, mHistoryFolder, Filters.eq(SearchableField.TITLE, "previousRun"));
-    mLastRun = new ResolveFirstFileAction(client, this, mHistoryFolder, Filters.eq(SearchableField.TITLE, "lastRun"));
-    mLatest = new ResolveFirstFileAction(client, this, mSavesFolder, Filters.eq(SearchableField.TITLE, "latest"));
+    mHistoryFiles = new ResolveDriveResourcesAction(client, this, mHistoryFolder, Filters.contains(SearchableField.TITLE, ITERATIVE_SAVE_TRUNK), new SortOrder.Builder().addSortAscending(SortableField.TITLE).build());
+    mPreviousRun = new ResolveFirstFileAction(client, this, mHistoryFolder, Filters.eq(SearchableField.TITLE, PREVIOUS_RUN_NAME));
+    mLastRun = new ResolveFirstFileAction(client, this, mHistoryFolder, Filters.eq(SearchableField.TITLE, LAST_RUN_NAME));
+    mLatest = new ResolveFirstFileAction(client, this, mSavesFolder, Filters.eq(SearchableField.TITLE, LATEST_NAME));
 
-    mPreconditions = Arrays.asList(new ResultAction[] { mSavesFolder, mHistoryFolder, mArchiveFolder, mMostRecentArchive, mHistoryFiles, mPreviousRun, mLastRun, mLatest });
+    mPreconditions = Arrays.asList(new ResultAction[] { mReportStartAction, mSavesFolder, mHistoryFolder, mArchiveFolder, mMostRecentArchive, mHistoryFiles, mPreviousRun, mLastRun, mLatest });
+
+    mFileOps = null;
   }
 
   @Override public void run(@NonNull final GoogleApiClient gClient)
   {
+    if (null != mFileOps && mFileOps.isEmpty()) return; // Not very clean, but it'll hold
     for (final ResultAction r : mPreconditions)
       switch (r.status())
       {
         case FAILURE :
-          // TODO : display something to the user.
+          new ReportActionWithSnackbar(mClient, null, mViewToSnackbarInto, "Backup ended with error : " + r.getError()).enqueue();
           return;
         case NOT_DONE :
           r.enqueue();
@@ -89,23 +114,88 @@ public class RecursiveBackupAction extends Action
       }
     // When the control comes here all preconditions are resolved.
 
-    final Metadata mostRecent = mMostRecentArchive.get();
-    final ArrayList<Metadata> historyFiles = mHistoryFiles.get();
+    if (null == mFileOps)
+    {
+      final WithPath.DriveFolder archiveFolder = mArchiveFolder.get();
+      final WithPath.DriveFolder historyFolder = mHistoryFolder.get();
+      if (null == archiveFolder || null == historyFolder) return; // This is not supposed to be possible ; get() on a ResolveOrCreate action only returns null if failure.
+      final HashMap<WithPath.Metadata, FileSpec> renames = new HashMap<>();
+      final HashMap<String, WithPath.Metadata> fileList = new HashMap<>();
+      final WithPath.Metadata mostRecent = mMostRecentArchive.get();
+      final WithPath.Metadata previousRun = mPreviousRun.get();
+      final ArrayList<WithPath.Metadata> historyFiles = mHistoryFiles.get();
 
-    if (null != mostRecent && isAtLeastThisOld(mostRecent.getCreatedDate(), 14 * ONEDAY_MILLIS))
+      if (null != mostRecent && isAtLeastThisOld(mostRecent.metadata.getCreatedDate(), 14 * ONEDAY_MILLIS))
+        if (!historyFiles.isEmpty())
+        {
+          final WithPath.Metadata lastFile = historyFiles.get(historyFiles.size() - 1);
+          renames.put(lastFile, new FileSpec(datedName(lastFile), archiveFolder));
+        }
+
       if (!historyFiles.isEmpty())
       {
-        final Metadata lastFile = historyFiles.get(historyFiles.size() - 1);
-        // rename(lastFile, datedName(lastFile));
+        final WithPath.Metadata firstFile = historyFiles.get(0);
+        if (isAtLeastThisOld(firstFile.metadata.getCreatedDate(), ONEDAY_MILLIS))
+        {
+          for (final WithPath.Metadata f : historyFiles)
+          {
+            final String name = f.metadata.getTitle();
+            if (!ITERATIVE_SAVE_TRUNK.equals(name.substring(0, 4))) continue;
+            final int num = Integer.parseInt(name.substring(4, 6));
+            if (num < 0 || num >= LAST_ITERATIVE_SAVE_NUMBER) continue;
+            renames.put(f, new FileSpec(String.format(Locale.JAPAN, "%s%02d", ITERATIVE_SAVE_TRUNK, num + 1), historyFolder));
+          }
+          if (null != previousRun)
+            renames.put(previousRun, new FileSpec(ITERATIVE_SAVE_TRUNK + "00", historyFolder));
+        }
       }
 
-    if (!historyFiles.isEmpty())
-    {
-      final Metadata firstFile = historyFiles.get(0);
-      if (isAtLeastThisOld(firstFile.getCreatedDate(), ONEDAY_MILLIS))
+      final WithPath.Metadata lastRun = mLastRun.get();
+      if (null != lastRun) renames.put(lastRun, new FileSpec(PREVIOUS_RUN_NAME, historyFolder));
+
+      final WithPath.Metadata latest = mLatest.get();
+      if (null != latest) renames.put(latest, new FileSpec(LAST_RUN_NAME, historyFolder));
+
+      if (null != mostRecent) fileList.put(mostRecent.path, mostRecent);
+      for (final WithPath.Metadata f : historyFiles) fileList.put(f.path, f);
+      if (null != previousRun) fileList.put(previousRun.path, previousRun);
+      if (null != lastRun) fileList.put(lastRun.path, lastRun);
+      if (null != latest) fileList.put(latest.path, latest);
+
+      HashSet<String> destinations = new HashSet<>();
+      for (final FileSpec spec : renames.values()) destinations.add(spec.parent.path + File.separator + spec.name);
+
+      // No Collection.partition method :(
+      mFileOps = new ArrayList<>();
+      for (final WithPath.Metadata f : renames.keySet())
+        if (destinations.contains(f.path))
+          mFileOps.add(new MoveFileAction(mClient, this, f, renames.get(f).name, renames.get(f).parent));
+        else
+          mFileOps.add(new CopyFileAction(mClient, this, f, renames.get(f).name, renames.get(f).parent));
+      for (final WithPath.Metadata f : renames.keySet()) destinations.remove(f.path);
+      for (final String path : destinations)
       {
-
+        final WithPath.Metadata file = fileList.get(path);
+        if (null != file)
+          mFileOps.add(new TrashFileAction(mClient, this, file));
       }
+      for (final Action a : mFileOps) a.enqueue();
+    }
+    else
+    {
+      for (final ResultAction a : mFileOps)
+      {
+        final int status = a.status();
+        if (FAILURE == status)
+        {
+          mFileOps.clear();
+          new ReportActionWithSnackbar(mClient, null, mViewToSnackbarInto, a.getError()).enqueue();
+          finish();
+        }
+        else if (NOT_DONE == status) return;
+      }
+      new ReportActionWithSnackbar(mClient, null, mViewToSnackbarInto, "Backup ended successfully.").enqueue();
+      finish();
     }
   }
 
@@ -116,9 +206,9 @@ public class RecursiveBackupAction extends Action
     return (System.currentTimeMillis() - date.getTime() >= milliseconds);
   }
 
-  private static String datedName(@NonNull final Metadata file)
+  private static String datedName(@NonNull final WithPath.Metadata file)
   {
-    final Date date = file.getCreatedDate();
+    final Date date = file.metadata.getCreatedDate();
     final GregorianCalendar calendar = new GregorianCalendar();
     calendar.setTime(date);
     return String.format(Locale.JAPANESE, "%04d%02d%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
