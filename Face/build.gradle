@@ -27,6 +27,7 @@ android {
         androidTest.java.srcDirs = ['tests/src']
     }
     lintOptions {
+        checkReleaseBuilds false
         abortOnError true
     }
 }
