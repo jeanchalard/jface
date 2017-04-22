@@ -15,27 +15,25 @@ public class Todo extends TodoCore
   {
     @Nullable public final Todo parent;
     public boolean open;
-    public boolean allHierarchyOpen; // Whether this is visible ; an item is visible if all of its parents are open.
     public boolean leaf;
     public boolean lastChild;
 
     public TodoUI()
     {
-      this(null, true, true, true);
+      this(null, true, true);
     }
 
-    public TodoUI(@Nullable final Todo parent, final boolean open, final boolean allHierarchyOpen, final boolean lastChild)
+    public TodoUI(@Nullable final Todo parent, final boolean open, final boolean lastChild)
     {
       this.parent = parent;
       this.open = open;
-      this.allHierarchyOpen = allHierarchyOpen;
       this.leaf = true;
       this.lastChild = lastChild;
     }
 
     public TodoUI(@NonNull final TodoUI ui)
     {
-      this(ui.parent, ui.open, ui.allHierarchyOpen, ui.lastChild);
+      this(ui.parent, ui.open, ui.lastChild);
       this.leaf = ui.leaf;
     }
   }
@@ -61,7 +59,7 @@ public class Todo extends TodoCore
   public Todo(@NonNull final String text, @NonNull final String ord)
   {
     super(text, ord);
-    ui = new TodoUI(null, true, true, true);
+    ui = new TodoUI(null, true, true);
   }
 
   public static class Builder
@@ -102,7 +100,6 @@ public class Todo extends TodoCore
         final Todo todo = (Todo)todoCore;
         parent = todo.ui.parent;
         open = todo.ui.open;
-        allHierarchyOpen = todo.ui.allHierarchyOpen;
         leaf = todo.ui.leaf;
         lastChild = todo.ui.lastChild;
       }
@@ -127,15 +124,22 @@ public class Todo extends TodoCore
     public Builder setEstimatedTime(final int estimatedTime) { this.estimatedTime = estimatedTime; return this; }
     public Builder setParent(@Nullable final Todo parent) { this.parent = parent; return this; }
     public Builder setOpen(final boolean open) { this.open = open; return this; }
-    public Builder setAllHierarchyOpen(final boolean allHierarchyOpen) { this.allHierarchyOpen = allHierarchyOpen; return this; }
     public Builder setLeaf(final boolean leaf) { this.leaf = leaf; return this; }
     public Builder setLastChild(final boolean lastChild) { this.lastChild = lastChild; return this; }
 
     public Todo build()
     {
-      final TodoUI ui = new TodoUI(parent, open, allHierarchyOpen, lastChild);
+      final TodoUI ui = new TodoUI(parent, open, lastChild);
       ui.leaf = leaf;
       return new Todo(id, ord, creationTime, completionTime, text, depth, lifeline, deadline, hardness, constraint, estimatedTime, ui);
     }
+  }
+
+  // Utility functions
+  public boolean descendsFrom(@Nullable final Todo parent)
+  {
+    for (Todo cp = ui.parent; cp != null; cp = cp.ui.parent)
+      if (parent == cp) return true;
+    return null == parent;
   }
 }

@@ -97,14 +97,14 @@ public class TodoSource
     return cv;
   }
 
-  public boolean updateTodoOpen(@NonNull final TodoCore todo, final boolean open)
+  public boolean updateTodoOpen(@NonNull final Todo todo)
   {
     final ContentValues cv = new ContentValues();
     cv.put(TodoProviderContract.COLUMN_id, todo.id);
-    cv.put(TodoProviderContract.COLUMN_open, open);
+    cv.put(TodoProviderContract.COLUMN_open, todo.ui.open);
     final Uri uri = Uri.withAppendedPath(TodoProviderContract.BASE_URI_METADATA, todo.id);
     mResolver.insert(uri, cv);
-    return open;
+    return todo.ui.open;
   }
 
   public boolean isOpen(@NonNull final TodoCore todo)

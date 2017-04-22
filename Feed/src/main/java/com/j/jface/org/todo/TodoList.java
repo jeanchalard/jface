@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
@@ -16,221 +17,69 @@ import static java.util.Collections.binarySearch;
 
 // A todo list backed by a sorted ArrayList. It guarantees ordering according to the ID,
 // but provides indexation.
-public class TodoList implements Handler.Callback
+public class TodoList implements Iterable<Todo>, Handler.Callback
 {
-  public interface ChangeObserver
-  {
-    void notifyItemChanged(final int position, @NonNull final Todo payload);
-    void notifyItemInserted(final int position, @NonNull final Todo payload);
-    void notifyItemRangeInserted(final int position, final int count);
-    void notifyItemRangeRemoved(final int position, final int count);
-  }
-
   @NonNull private final ArrayList<Todo> mList;
-  @NonNull private final ArrayList<Integer> mShownIndices;
-  @NonNull private final ArrayList<ChangeObserver> mObservers;
   @NonNull private final TodoSource mSource;
   @NonNull private final Handler mHandler;
   private TodoList(@NonNull final Context context)
   {
     mSource = new TodoSource(context);
     mList = decorateForUI(mSource.fetchTodoList(), mSource);
-    mShownIndices = computeShown(mList);
-    mObservers = new ArrayList<>();
     mHandler = new Handler(this);
     mTodosToPersist = new HashMap<>();
+    mObservers = new ArrayList<>();
   }
 
-  private static ArrayList<Integer> computeShown(@NonNull final ArrayList<Todo> list)
+  /******************
+   * Query methods.
+   ******************/
+  public int size() { return mList.size(); }
+
+  @NonNull public Todo get(final int index)
   {
-    return computeShown(new ArrayList<Integer>(list.size()), list);
+    return mList.get(index);
   }
 
-  private static ArrayList<Integer> computeShown(@NonNull final ArrayList<Integer> result, @NonNull final ArrayList<Todo> list)
+  // This simply calls binarySearch and follows the same semantics for insertion points.
+  public int rindex(final TodoCore todo)
   {
-    result.clear();
-    int i = 0;
-    Todo.TodoUI todoUiParams = null; int lastDepth = 2;
-    for (final Todo t : list)
-    {
-      if (null != todoUiParams) todoUiParams.leaf = t.depth <= lastDepth;
-      lastDepth = t.depth;
-      todoUiParams = t.ui;
-      if (todoUiParams.allHierarchyOpen) result.add(i);
-      ++i;
-    }
-    if (null != todoUiParams) todoUiParams.leaf = true;
-    return result;
+    return Collections.binarySearch(mList, todo.ord);
   }
 
-  private static ArrayList<Todo> decorateForUI(@NonNull final ArrayList<TodoCore> list, @NonNull final TodoSource source)
+  public boolean hasDescendants(@NonNull final TodoCore todo)
   {
-    final ArrayList<Todo> results = new ArrayList<>(list.size());
-    final Stack<Todo> parents = new Stack<>();
-    for (final TodoCore todoCore : list)
-    {
-      final Todo.Builder builder = new Todo.Builder(todoCore);
-      builder.setOpen(source.isOpen(todoCore));
-      if (!parents.isEmpty() && parents.peek().depth > todoCore.depth) parents.pop().ui.lastChild = true;
-      while (!parents.isEmpty() && parents.peek().depth >= todoCore.depth) parents.pop();
-      if (!parents.isEmpty()) {
-        final Todo parent = parents.peek();
-        parent.ui.leaf = false;
-        builder.setParent(parent);
-        builder.setAllHierarchyOpen(parent.ui.allHierarchyOpen && parent.ui.open);
-      }
-      else builder.setAllHierarchyOpen(true);
-      final Todo todo = builder.build();
-      results.add(todo);
-      parents.push(todo);
-    }
-    parents.pop().ui.lastChild = true;
-    return results;
-  }
-
-  public void addObserver(@NonNull final ChangeObserver obs)
-  {
-    mObservers.add(obs);
-  }
-
-  public void removeObserver(@NonNull final ChangeObserver obs)
-  {
-    mObservers.remove(obs);
-  }
-
-  // Pass null for a top-level todo.
-  @NonNull public Todo createAndInsertTodo(@NonNull final String text, @Nullable final Todo parent)
-  {
-    final boolean allHierarchyOpen;
-    if (null != parent)
-    {
-      parent.ui.leaf = false;
-      allHierarchyOpen = parent.ui.allHierarchyOpen && parent.ui.open;
-    }
-    else allHierarchyOpen = true;
-    final Todo result = new Todo.Builder(text, ordForNewChild(parent))
-     .setDepth(null == parent ? 0 : parent.depth + 1)
-     .setParent(parent)
-     .setOpen(true).setAllHierarchyOpen(allHierarchyOpen).setLastChild(true)
-     .build();
-    updateTodo(result);
-    return result;
-  }
-
-  public void updateTodo(@NonNull final Todo todo)
-  {
-    if ("!".equals(todo.ord)) throw new RuntimeException("Trying to update a null Todo");
-    mSource.updateTodo(todo);
-    final int index = Collections.binarySearch(mList, todo.ord);
-    if (index >= 0)
-    {
-      if (todo.completionTime > 0)
-      {
-        // Completed todo. Remove.
-        if (todo.ui.lastChild && index > 0)
-        {
-          final Todo prevItem = mList.get(index - 1);
-          if (prevItem.depth == todo.depth)
-          {
-            prevItem.ui.lastChild = true;
-            for (final ChangeObserver obs : mObservers) obs.notifyItemChanged(index - 1, prevItem);
-          }
-        }
-        final int lastChildIndex = getLastChildIndex(index);
-        final List<Todo> subListToClear = mList.subList(index, lastChildIndex + 1); // inclusive, exclusive
-        final ArrayList<Todo> removed = new ArrayList<>(subListToClear);
-        subListToClear.clear();
-        if (null != todo.ui.parent)
-          if (hasDescendants(todo.ui.parent))
-            todo.ui.parent.ui.leaf = true;
-        for (int i = 0; i < removed.size(); ++i)
-          removed.set(i, new Todo.Builder(removed.get(i)).setCompletionTime(todo.completionTime).build());
-        final int before = mShownIndices.size();
-        final int from = Collections.binarySearch(mShownIndices, index);
-        final int iTo = Collections.binarySearch(mShownIndices, index + removed.size());
-        final int to = iTo < 0 ? -iTo - 1 : iTo;
-        computeShown(mShownIndices, mList);
-        // Make it easier to identify bugs happening here
-        if (before - mShownIndices.size() != to - from) throw new RuntimeException("Badsize. " + before + " → " + mShownIndices.size() + " :: " + from + " → " + to);
-        for (final ChangeObserver obs : mObservers) obs.notifyItemRangeRemoved(from, to - from);
-      }
-      else
-      {
-        mList.set(index, todo);
-        final int ref = Collections.binarySearch(mShownIndices, index);
-        for (final ChangeObserver obs : mObservers) obs.notifyItemChanged(ref, todo);
-      }
-    }
-    else
-    {
-      // BinarySearch returns -(insertion point) - 1 when the item is not in the list.
-      final int insertionPoint = -index - 1;
-      final Todo oldTodo = getFromId(todo.id);
-      if (null == oldTodo)
-      {
-        // This todo was actually not here, it's a new one.
-        mList.add(insertionPoint, todo);
-        // Not inserted yet, so we'll get -(insertion index) - 1
-        if (insertionPoint > 0)
-        {
-          final Todo previousItem = mList.get(insertionPoint - 1);
-          previousItem.ui.lastChild = false;
-          for (final ChangeObserver obs : mObservers) obs.notifyItemChanged(index - 1, previousItem);
-        }
-        final Todo parent = todo.ui.parent;
-        if (null != parent && !parent.ui.open) toggleOpen(parent);
-        computeShown(mShownIndices, mList);
-        final int inserted = Collections.binarySearch(mShownIndices, insertionPoint);
-        for (final ChangeObserver obs : mObservers) obs.notifyItemInserted(inserted, todo);
-      }
-      else
-      {
-        // This todo was here but not with this ord ; it's a reorder.
-        final int oldPos = Collections.binarySearch(mList, oldTodo.ord);
-        mList.remove(oldPos);
-        mList.add(insertionPoint, todo);
-        computeShown(mShownIndices, mList);
-        final Todo parent = oldTodo.ui.parent;
-        final ArrayList<Todo> descendants = getDirectDescendants(parent);
-        if (descendants.size() > 0)
-        {
-          for (final Todo child : descendants) child.ui.lastChild = false;
-          descendants.get(descendants.size() - 1).ui.lastChild = true;
-        }
-      }
-    }
-  }
-
-  public ArrayList<Todo> getTreeRootedAt(@NonNull final Todo todo)
-  {
-    final ArrayList<Todo> subTree = getDescendants(todo);
-    subTree.add(0, todo);
-    return subTree;
-  }
-
-  public boolean hasDescendants(@NonNull final Todo todo)
-  {
-    final int index = Collections.binarySearch(mList, todo.ord);
+    final int index = rindex(todo);
     if (mList.size() <= index + 1) return false;
     return mList.get(index + 1).depth > todo.depth;
   }
 
-  public ArrayList<Todo> getDescendants(@NonNull final Todo todo)
+  public ArrayList<Todo> getTreeRootedAt(@NonNull final TodoCore todo)
   {
-    final int index = Collections.binarySearch(mList, todo.ord);
+    return getDescendantsInternal(todo, true);
+  }
+
+  public ArrayList<Todo> getDescendants(@NonNull final TodoCore todo)
+  {
+    return getDescendantsInternal(todo, false);
+  }
+
+  private ArrayList<Todo> getDescendantsInternal(@NonNull final TodoCore todo, final boolean includeRoot)
+  {
+    final int index = rindex(todo);
     if (index < 0) return new ArrayList<>();
     final int lastChildIndex = getLastChildIndex(index);
-    final List<Todo> subList = mList.subList(index + 1, lastChildIndex + 1); // inclusive, exclusive
+    final List<Todo> subList = mList.subList(index + (includeRoot ? 0 : 1), lastChildIndex + 1); // inclusive, exclusive
     return new ArrayList<>(subList);
   }
 
-  public ArrayList<Todo> getDirectDescendants(@Nullable final Todo todo)
+  public ArrayList<Todo> getDirectDescendants(@Nullable final TodoCore todo)
   {
     int index;
     final int depth;
     if (null != todo)
     {
-      index = Collections.binarySearch(mList, todo.ord);
+      index = rindex(todo);
       depth = todo.depth + 1;
     }
     else
@@ -249,37 +98,33 @@ public class TodoList implements Handler.Callback
     return descendants;
   }
 
-  public void toggleOpen(@NonNull final Todo todo)
+  private static ArrayList<Todo> decorateForUI(@NonNull final ArrayList<TodoCore> list, @NonNull final TodoSource source)
   {
-    todo.ui.open = !todo.ui.open;
-    mSource.updateTodoOpen(todo, todo.ui.open);
-    final int index = mList.indexOf(todo);
-    final ArrayList<Todo> descendants = getDescendants(todo);
-    for (final Todo t : descendants) openOrCloseDescendants(t, todo.ui.open);
-    computeShown(mShownIndices, mList);
-    final int iFrom = Collections.binarySearch(mShownIndices, index + 1);
-    final int iTo = Collections.binarySearch(mShownIndices, index + descendants.size());
-    final int from = iFrom > 0 ? iFrom : -iFrom - 1;
-    final int to = iTo > 0 ? iTo : -iTo - 1;
-    if (todo.ui.open)
-      for (final ChangeObserver obs : mObservers)
-      {
-        obs.notifyItemChanged(index, todo);
-        obs.notifyItemRangeInserted(from, descendants.size());
+    final ArrayList<Todo> results = new ArrayList<>(list.size());
+    final Stack<Todo> parents = new Stack<>();
+    for (final TodoCore todoCore : list)
+    {
+      final Todo.Builder builder = new Todo.Builder(todoCore);
+      builder.setOpen(source.isOpen(todoCore));
+      if (!parents.isEmpty() && parents.peek().depth > todoCore.depth) parents.pop().ui.lastChild = true;
+      while (!parents.isEmpty() && parents.peek().depth >= todoCore.depth) parents.pop();
+      if (!parents.isEmpty()) {
+        final Todo parent = parents.peek();
+        parent.ui.leaf = false;
+        builder.setParent(parent);
       }
-    else
-      for (final ChangeObserver obs : mObservers)
-      {
-        obs.notifyItemChanged(index, todo);
-        obs.notifyItemRangeRemoved(from, descendants.size());
-      }
+      final Todo todo = builder.build();
+      results.add(todo);
+      parents.push(todo);
+    }
+    parents.pop().ui.lastChild = true;
+    return results;
   }
 
-  private void openOrCloseDescendants(@NonNull final Todo todo, final boolean open)
+  @NonNull private static Todo decorate(@NonNull final TodoCore t)
   {
-    todo.ui.allHierarchyOpen = open;
-    if (todo.ui.open)
-      for (final Todo t : getDescendants(todo)) openOrCloseDescendants(t, open);
+    if (t instanceof Todo) return (Todo)t;
+    return new Todo.Builder(t).build();
   }
 
   // -1 if no such element
@@ -292,6 +137,127 @@ public class TodoList implements Handler.Callback
     for (int i = parentIndex + 1; i < size; ++i)
       if (mList.get(i).depth <= parentDepth) return i - 1;
     return size - 1;
+  }
+
+  @Nullable public Todo getFromOrd(@NonNull final String todoOrd)
+  {
+    final int index = binarySearch(mList, todoOrd);
+    if (index >= 0) return mList.get(index);
+    return null;
+  }
+
+  @Nullable public Todo getFromId(@NonNull final String todoId)
+  {
+    for (final Todo t : mList) if (t.id.equals(todoId)) return t;
+    return null;
+  }
+
+
+  /*********************
+   * Mutation methods.
+   *********************/
+  // Pass null into parent for a top-level todo.
+  @NonNull public Todo createAndInsertTodo(@NonNull final String text, @Nullable final Todo parent)
+  {
+    final Todo result = new Todo.Builder(text, ordForNewChild(parent))
+     .setDepth(null == parent ? 0 : parent.depth + 1)
+     .setParent(parent)
+     .setOpen(true)
+     .setLastChild(true)
+     .build();
+    updateTodo(result);
+    return result;
+  }
+
+  public void updateTodo(@NonNull final TodoCore todo)
+  {
+    if ("!".equals(todo.ord)) throw new RuntimeException("Trying to update a null Todo");
+    mSource.updateTodo(todo);
+    final int index = rindex(todo);
+    if (index >= 0)
+    {
+      if (todo.completionTime > 0)
+        internalUpdateCompleteTodo(todo, index);
+      else
+        internalUpdateTodoContents(todo, index);
+    }
+    else
+    {
+      // BinarySearch returns -(insertion point) - 1 when the item is not in the list.
+      final Todo oldTodo = getFromId(todo.id);
+      if (null == oldTodo)
+        internalUpdateAddTodo(todo, -index - 1);
+      else
+        internalUpdateReorderTodo(oldTodo, todo);
+    }
+  }
+
+  public void updateTodoOpen(@NonNull final Todo todo)
+  {
+    mSource.updateTodoOpen(todo);
+  }
+
+  private void internalUpdateTodoContents(@NonNull final TodoCore todo, final int index)
+  {
+    final Todo nTodo = decorate(todo);
+    mList.set(index, nTodo);
+    for (final ListChangeObserver obs : mObservers) obs.notifyItemChanged(index, nTodo);
+  }
+
+  private void internalUpdateCompleteTodo(@NonNull final TodoCore todo, final int index)
+  {
+    // Completed todo. Remove.
+    final int lastChildIndex = getLastChildIndex(index);
+    final List<Todo> subListToClear = mList.subList(index, lastChildIndex + 1); // inclusive, exclusive
+    final ArrayList<Todo> removed = new ArrayList<>(subListToClear);
+    subListToClear.clear();
+    for (int i = 0; i < removed.size(); ++i)
+    {
+      final Todo completedTodo = new Todo.Builder(removed.get(i)).setCompletionTime(todo.completionTime).build();
+      mSource.updateTodo(completedTodo);
+      removed.set(i, completedTodo);
+    }
+    for (final ListChangeObserver obs : mObservers) obs.notifyItemRangeRemoved(index, removed);
+  }
+
+  private void internalUpdateAddTodo(@NonNull final TodoCore todo, final int insertionPoint)
+  {
+    // This todo was actually not here, it's a new one.
+    final Todo nTodo = decorate(todo);
+    mList.add(insertionPoint, nTodo);
+    for (final ListChangeObserver obs : mObservers) obs.notifyItemInserted(insertionPoint, nTodo);
+  }
+
+  private void internalUpdateReorderTodo(@NonNull final TodoCore oldTodo, @NonNull final TodoCore newTodo)
+  {
+    // This todo was here but not with this ord : it's a reorder.
+    final int oldPos = rindex(oldTodo);
+    final Todo todo = decorate(newTodo);
+    mSource.updateTodo(todo);
+    if (hasDescendants(oldTodo))
+    {
+      final int oldTodoOrdLength = oldTodo.ord.length();
+      final ArrayList<Todo> oldTree = getDescendants(oldTodo);
+      final ArrayList<Todo> newTree = new ArrayList<>(oldTree.size());
+      for (int i = 1; i < oldTree.size(); ++i)
+      {
+        final Todo oldChild = oldTree.get(i);
+        final Todo.Builder newChildBuilder = new Todo.Builder(oldChild);
+        newChildBuilder.setOrd(todo.ord + oldChild.ord.substring(oldTodoOrdLength));
+        newChildBuilder.setParent(todo);
+        final Todo newChild = newChildBuilder.build();
+        newTree.add(newChild);
+        mSource.updateTodo(newChild);
+      }
+      final int lastRemovedIndex = oldPos + oldTree.size() + 1;
+      mList.subList(oldPos + 1, lastRemovedIndex).clear(); // incl, excl
+      for (final ListChangeObserver obs : mObservers) obs.notifyItemRangeRemoved(oldPos, oldTree);
+      final int insertionPoint = -rindex(todo) - 1;
+      mList.add(insertionPoint, todo);
+      for (final ListChangeObserver obs : mObservers) obs.notifyItemMoved(oldPos, insertionPoint, todo);
+      mList.addAll(insertionPoint + 1, newTree);
+      for (final ListChangeObserver obs : mObservers) obs.notifyItemRangeInserted(insertionPoint, newTree);
+    }
   }
 
   // Pass null to get an ord for the end of the list.
@@ -307,31 +273,13 @@ public class TodoList implements Handler.Callback
     return Todo.ordBetween(prevOrd, nextOrd);
   }
 
-  @NonNull public Todo get(final int index)
-  {
-    final int deref = mShownIndices.get(index);
-    return mList.get(deref);
-  }
 
-  @Nullable public Todo getFromOrd(@NonNull final String todoOrd)
-  {
-    final int index = binarySearch(mList, todoOrd);
-    if (index >= 0) return mList.get(index);
-    return null;
-  }
-  @Nullable public Todo getFromId(@NonNull final String todoId)
-  {
-    for (final Todo t : mList) if (t.id.equals(todoId)) return t;
-    return null;
-  }
-  public int size() { return mShownIndices.size(); }
-
-  ///////////////////////////////////////////////////////////////////////////
-  // Handler for delayed persistence
-  ///////////////////////////////////////////////////////////////////////////
+  /**************************************************
+   * Handler for delayed persistence, and lifecycle.
+   **************************************************/
   private static final int PERSIST_TODOS = 1;
   @NonNull private final HashMap<String, Todo> mTodosToPersist;
-  public boolean handleMessage(@NonNull final Message msg)
+  @Override public boolean handleMessage(@NonNull final Message msg)
   {
     switch (msg.what)
     {
@@ -370,13 +318,51 @@ public class TodoList implements Handler.Callback
     persistAllTodos();
   }
 
-  ///////////////////////////////////////////////////////////////////////////
-  // Singleton behavior
-  ///////////////////////////////////////////////////////////////////////////
+
+
+  /*********************
+   * Singleton behavior.
+   *********************/
   @Nullable static TodoList sList;
   synchronized static public TodoList getInstance(@NonNull final Context context)
   {
     if (null == sList) sList = new TodoList(context);
     return sList;
+  }
+
+  /*************
+   * Iteration.
+   *************/
+  private class TodoIterator implements Iterator<Todo>
+  {
+    private int index = 0;
+    @Override public boolean hasNext()
+    {
+      return index < mList.size();
+    }
+
+    @Override public Todo next()
+    {
+      return mList.get(index++);
+    }
+  }
+
+  @Override public Iterator<Todo> iterator()
+  {
+    return new TodoIterator();
+  }
+
+
+  /***************
+   * Observation.
+   ***************/
+  @NonNull private final ArrayList<ListChangeObserver> mObservers;
+  public void addObserver(@NonNull final ListChangeObserver obs)
+  {
+    mObservers.add(obs);
+  }
+  public void removeObserver(@NonNull final ListChangeObserver obs)
+  {
+    mObservers.remove(obs);
   }
 }

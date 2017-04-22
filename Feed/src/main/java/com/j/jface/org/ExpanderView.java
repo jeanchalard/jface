@@ -42,7 +42,7 @@ public class ExpanderView extends View
 
   public void setConnections(final int connections) { mConnections = connections; invalidate(); }
   public void setExpansions(final int expansions) { mExpansions = expansions; invalidate(); }
-  public void setDepth(final int depth) { mDepth = depth; invalidate(); }
+  public void setDepth(final int depth) { mDepth = depth; invalidate(); requestLayout(); }
 
   public ExpanderView(@NonNull final  Context context)
   {

@@ -28,11 +28,11 @@ import com.j.jface.org.sound.EditTextSoundRouter;
 import com.j.jface.org.sound.SoundSource;
 import com.j.jface.org.todo.Todo;
 import com.j.jface.org.todo.TodoList;
+import com.j.jface.org.todo.TodoListView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.ListIterator;
 import java.util.Locale;
 
 /**
@@ -47,7 +47,8 @@ public class JOrg extends WrappedActivity
   @NonNull private final CoordinatorLayout mTopLayout;
   @NonNull private final ItemTouchHelper mTouchHelper;
 
-  @NonNull private final TodoList mTodoList;
+  @NonNull private final TodoList mTodoList; // TODO : remove this member and go through the view instead
+  @NonNull private final TodoListView mTodoListView;
 
   public JOrg(@NonNull final Args args)
   {
@@ -61,7 +62,8 @@ public class JOrg extends WrappedActivity
 
     mTopLayout = (CoordinatorLayout)mA.findViewById(R.id.topLayout);
     final RecyclerView rv = (RecyclerView)mA.findViewById(R.id.todoList);
-    mAdapter = new TodoAdapter(this, mA, mSoundRouter, mTodoList, rv);
+    mTodoListView = new TodoListView(mTodoList);
+    mAdapter = new TodoAdapter(this, mA, mSoundRouter, mTodoListView, rv);
     rv.setAdapter(mAdapter);
     rv.addItemDecoration(new DividerItemDecoration(mA, ((LinearLayoutManager)rv.getLayoutManager()).getOrientation()));
 
@@ -102,7 +104,7 @@ public class JOrg extends WrappedActivity
       @Override public void clearView(@NonNull final RecyclerView recyclerView, @NonNull final RecyclerView.ViewHolder viewHolder)
       {
         super.clearView(recyclerView, viewHolder);
-        ((TodoAdapter.ViewHolder)viewHolder).cleanupViewAterDrag();
+        ((TodoAdapter.ViewHolder)viewHolder).cleanupViewAfterDrag();
         ((TodoAdapter.ViewHolder)viewHolder).moveTodo(mDestination);
       }
 
@@ -152,12 +154,8 @@ public class JOrg extends WrappedActivity
   public void clearTodo(@NonNull final Todo todo)
   {
     final ArrayList<Todo> descendants = mTodoList.getTreeRootedAt(todo);
-    for (final ListIterator<Todo> it = descendants.listIterator(descendants.size()); it.hasPrevious(); )
-    {
-      final Todo t = it.previous();
-      final Todo newTodo = new Todo.Builder(t).setCompletionTime(System.currentTimeMillis()).build();
-      mTodoList.updateTodo(newTodo);
-    }
+    final Todo newTodo = new Todo.Builder(todo).setCompletionTime(System.currentTimeMillis()).build();
+    mTodoList.updateTodo(newTodo);
     final Snackbar undoChance = Snackbar.make(mTopLayout, "Marked done.", Snackbar.LENGTH_LONG);
     undoChance.setDuration(8000); // 8 seconds, because LENGTH_LONG is punily short
     undoChance.setAction("Undo", new View.OnClickListener() {

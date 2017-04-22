@@ -22,15 +22,18 @@ import com.j.jface.R;
 import com.j.jface.org.editor.TodoEditor.TodoDetails;
 import com.j.jface.org.sound.EditTextSoundRouter;
 import com.j.jface.org.sound.SelReportEditText;
+import com.j.jface.org.todo.ListChangeObserver;
 import com.j.jface.org.todo.Todo;
-import com.j.jface.org.todo.TodoList;
+import com.j.jface.org.todo.TodoListView;
+
+import java.util.ArrayList;
 
 import static com.j.jface.R.layout.todo;
 
 // Adapter for Todo Recycler view.
 public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
 {
-  public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, TextWatcher, TodoList.ChangeObserver, View.OnLongClickListener
+  public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, TextWatcher, ListChangeObserver, View.OnLongClickListener
   {
     @NonNull final static TransitionSet expandCollapseTransition;
     static
@@ -49,7 +52,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
     @NonNull final private ExpanderView mExpander;
     @NonNull final private SelReportEditText mEditText;
     @NonNull final private View mExpansion;
-    @NonNull final private TodoList mList;
+    @NonNull final private TodoListView mList;
     @NonNull final private TodoDetails mDetails;
     @NonNull final private LinearLayout mTodoActionButtons;
     @NonNull final private ImageButton mAddSubTodoButton, mClearTodoButton, mShowActionsButton;
@@ -57,7 +60,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
                       @NonNull final JOrg jorg,
                       @NonNull final EditTextSoundRouter router,
                       @NonNull final RecyclerView recyclerView,
-                      @NonNull final TodoList list)
+                      @NonNull final TodoListView list)
     {
       super(itemView);
       itemView.setElevation(60);
@@ -106,7 +109,10 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
         mRecyclerView.scrollToPosition(getAdapterPosition());
       }
       else if (view == mExpander)
+      {
         mList.toggleOpen(mCurrentTodo);
+        setupExpander(mCurrentTodo);
+      }
     }
 
     @Override public boolean onLongClick(@NonNull final View v)
@@ -184,7 +190,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
 
     public void bind(@NonNull final Todo todo)
     {
-      if (todo.id.equals(mCurrentTodo.id)) return;
+      if (todo == mCurrentTodo) return;
       mCurrentTodo = todo;
       mDetails.bind(todo);
       mExpander.setDepth(todo.depth);
@@ -203,14 +209,6 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
       imm.showSoftInput(mEditText, 0);
     }
 
-    @Override
-    public void notifyItemChanged(final int position, @NonNull final Todo payload)
-    {
-      if (!payload.id.equals(mCurrentTodo.id)) return;
-      mCurrentTodo = payload;
-      setupExpander(payload);
-    }
-
     private void setupExpander(@NonNull final Todo todo)
     {
       final int pos = getAdapterPosition();
@@ -227,7 +225,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
       mTodoActionButtons.setVisibility(View.INVISIBLE);
     }
 
-    public void cleanupViewAterDrag()
+    public void cleanupViewAfterDrag()
     {
       mExpander.setVisibility(View.VISIBLE);
       mTodoActionButtons.setVisibility(View.VISIBLE);
@@ -236,34 +234,22 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
     public void moveTodo(final int newPos)
     {
       final int oldPos = getAdapterPosition();
-      final int prevTodoPos, nextTodoPos;
-      if (oldPos < newPos)
-      {
-        prevTodoPos = newPos;
-        nextTodoPos = newPos + 1 >= mList.size() ? -1 : newPos + 1;
-      }
-      else
-      {
-        prevTodoPos = newPos - 1;
-        nextTodoPos = newPos;
-      }
-      final Todo prevTodo = prevTodoPos < 0 ? null : mList.get(prevTodoPos);
-      final Todo nextTodo = nextTodoPos < 0 ? null : mList.get(nextTodoPos);
-      final Todo parent = parent();
-      final String parentOrd = null == parent ? "" : parent.ord;
-      final String prevTodoOrd = null == prevTodo || prevTodo.depth != mCurrentTodo.depth ? parentOrd + Todo.SEP_ORD + Todo.MIN_ORD : prevTodo.ord;
-      final String nextTodoOrd = null == nextTodo || nextTodo.depth != mCurrentTodo.depth ? parentOrd + Todo.SEP_ORD + Todo.MAX_ORD : nextTodo.ord;
-      final String newOrd = Todo.ordBetween(prevTodoOrd, nextTodoOrd);
-      final Todo newTodo = new Todo.Builder(mCurrentTodo).setOrd(newOrd).build();
-      mList.updateTodo(newTodo);
+      mList.moveTodo(oldPos, newPos);
     }
 
+    @Override public void notifyItemChanged(final int position, @NonNull final Todo payload)
+    {
+      if (!payload.id.equals(mCurrentTodo.id)) return;
+      mCurrentTodo = payload;
+      setupExpander(payload);
+    }
     @Override public void notifyItemInserted(final int position, @NonNull final Todo payload) {}
-    @Override public void notifyItemRangeInserted(final int from, final int count) {}
-    @Override public void notifyItemRangeRemoved(final int from, final int count) {}
+    @Override public void notifyItemMoved(int from, int to, @NonNull Todo payload){}
+    @Override public void notifyItemRangeInserted(final int from, @NonNull final ArrayList<Todo> payload) {}
+    @Override public void notifyItemRangeRemoved(final int from, @NonNull final ArrayList<Todo> payload) {}
   }
 
-  private class TodoChangeObserver implements TodoList.ChangeObserver
+  private class TodoListChangeObserver implements ListChangeObserver
   {
     @Override public void notifyItemChanged(final int position, @NonNull final Todo payload)
     {
@@ -275,34 +261,40 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>
       TodoAdapter.this.notifyItemInserted(position);
     }
 
-    @Override public void notifyItemRangeInserted(final int from, final int count)
+    @Override public void notifyItemMoved(final int from, final int to, @NonNull final Todo payload)
     {
-      TodoAdapter.this.notifyItemRangeInserted(from, count);
+      if (mTodoList.get(to) != payload)
+        TodoAdapter.this.notifyItemMoved(from, to);
     }
 
-    @Override public void notifyItemRangeRemoved(final int from, final int count)
+    @Override public void notifyItemRangeInserted(final int from, @NonNull final ArrayList<Todo> payload)
     {
-      TodoAdapter.this.notifyItemRangeRemoved(from, count);
+      TodoAdapter.this.notifyItemRangeInserted(from, payload.size());
+    }
+
+    @Override public void notifyItemRangeRemoved(final int from, @NonNull final ArrayList<Todo> payload)
+    {
+      TodoAdapter.this.notifyItemRangeRemoved(from, payload.size());
     }
   }
 
   @NonNull private final JOrg mJorg;
   @NonNull private final EditTextSoundRouter mRouter;
   @NonNull private final LayoutInflater mInflater;
-  @NonNull private final TodoList mTodoList;
+  @NonNull private final TodoListView mTodoList;
   @NonNull private final RecyclerView mRecyclerView;
   @Nullable private Todo mExpectFocus;
   public TodoAdapter(@NonNull final JOrg jorg,
                      @NonNull final Context context,
                      @NonNull final EditTextSoundRouter router,
-                     @NonNull final TodoList todoList,
+                     @NonNull final TodoListView todoList,
                      @NonNull final RecyclerView recyclerView)
   {
     mJorg = jorg;
     mRouter = router;
     mInflater = LayoutInflater.from(context);
     mTodoList = todoList;
-    todoList.addObserver(new TodoChangeObserver());
+    todoList.addObserver(new TodoListChangeObserver());
     mRecyclerView = recyclerView;
     mExpectFocus = null;
   }
