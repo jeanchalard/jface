@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 import com.j.jface.Const;
 
 // Contract constants for the todo provider.
-public class TodoProviderContract
+class TodoProviderContract
 {
   @NonNull public static final String BASE_URI_SCHEME = "content";
   @NonNull public static final String BASE_URI_HOST = Const.APP_PACKAGE + ".provider";

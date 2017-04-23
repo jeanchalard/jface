@@ -27,7 +27,6 @@ import com.j.jface.lifecycle.WrappedActivity;
 import com.j.jface.org.sound.EditTextSoundRouter;
 import com.j.jface.org.sound.SoundSource;
 import com.j.jface.org.todo.Todo;
-import com.j.jface.org.todo.TodoList;
 import com.j.jface.org.todo.TodoListView;
 
 import java.util.ArrayList;
@@ -57,11 +56,10 @@ public class JOrg extends WrappedActivity
     ((AppCompatActivity)mA).setSupportActionBar((Toolbar)mA.findViewById(R.id.orgTopActionBar));
     mSoundSource = new SoundSource(mA, (ViewGroup)mA.findViewById(R.id.sound_source));
     mSoundRouter = new EditTextSoundRouter(mSoundSource);
-    final TodoList todoList = TodoList.getInstance(mA.getApplicationContext());
 
     mTopLayout = (CoordinatorLayout)mA.findViewById(R.id.topLayout);
     final RecyclerView rv = (RecyclerView)mA.findViewById(R.id.todoList);
-    mTodoListView = new TodoListView(todoList);
+    mTodoListView = new TodoListView(mA.getApplicationContext());
     mAdapter = new TodoAdapter(this, mA, mSoundRouter, mTodoListView, rv);
     rv.setAdapter(mAdapter);
     rv.addItemDecoration(new DividerItemDecoration(mA, ((LinearLayoutManager)rv.getLayoutManager()).getOrientation()));
@@ -91,7 +89,7 @@ public class JOrg extends WrappedActivity
 
       @Override public boolean canDropOver(@NonNull final RecyclerView recyclerView, @NonNull final RecyclerView.ViewHolder current, @NonNull final RecyclerView.ViewHolder target)
       {
-        return ((TodoAdapter.ViewHolder)current).parent() == ((TodoAdapter.ViewHolder)target).parent();
+        return ((TodoViewHolder)current).todo().ui.parent == ((TodoViewHolder)target).todo().ui.parent;
       }
 
       @Override public int interpolateOutOfBoundsScroll(@NonNull final RecyclerView recyclerView, final int viewSize, final int viewSizeOutOfBounds, final int totalSize, final long msSinceStartScroll)
@@ -103,15 +101,15 @@ public class JOrg extends WrappedActivity
       @Override public void clearView(@NonNull final RecyclerView recyclerView, @NonNull final RecyclerView.ViewHolder viewHolder)
       {
         super.clearView(recyclerView, viewHolder);
-        ((TodoAdapter.ViewHolder)viewHolder).cleanupViewAfterDrag();
-        ((TodoAdapter.ViewHolder)viewHolder).moveTodo(mDestination);
+        ((TodoViewHolder)viewHolder).cleanupViewAfterDrag();
+        ((TodoViewHolder)viewHolder).moveTodo(mDestination);
       }
 
       public void onSelectedChanged(@Nullable final RecyclerView.ViewHolder viewHolder, final int actionState)
       {
         super.onSelectedChanged(viewHolder, actionState);
         if (null == viewHolder) return;
-        ((TodoAdapter.ViewHolder)viewHolder).prepareViewForDrag();
+        ((TodoViewHolder)viewHolder).prepareViewForDrag();
         mDestination = -1;
       }
 
@@ -179,7 +177,7 @@ public class JOrg extends WrappedActivity
     mA.startActivity(editorIntent);
   }
 
-  public void startDrag(@NonNull final TodoAdapter.ViewHolder holder)
+  public void startDrag(@NonNull final TodoViewHolder holder)
   {
     mTouchHelper.startDrag(holder);
   }

@@ -15,9 +15,12 @@ import java.util.Stack;
 
 import static java.util.Collections.binarySearch;
 
-// A todo list backed by a sorted ArrayList. It guarantees ordering according to the ID,
-// but provides indexation.
-public class TodoList implements Iterable<Todo>, Handler.Callback
+/**
+ * A todo list backed by a sorted ArrayList. It guarantees ordering according to the ID,
+ * but provides indexation.
+ */
+// Package private ; need a strong business use to use this instead of a view.
+class TodoList implements Iterable<Todo>, Handler.Callback
 {
   @NonNull private final ArrayList<Todo> mList;
   @NonNull private final TodoSource mSource;

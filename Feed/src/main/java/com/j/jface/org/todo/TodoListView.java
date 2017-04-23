@@ -1,5 +1,6 @@
 package com.j.jface.org.todo;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -19,6 +20,11 @@ public class TodoListView implements ListChangeObserver
 
   @NonNull private final TodoList mList;
   @NonNull private ArrayList<Integer> mView;
+
+  public TodoListView(@NonNull final Context context)
+  {
+    this(TodoList.getInstance(context));
+  }
 
   public TodoListView(@NonNull final TodoList sourceList)
   {

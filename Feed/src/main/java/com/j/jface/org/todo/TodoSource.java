@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 // Get Todo from the provider. This bridges the awful content provider interface
 // to an easy to use one.
-public class TodoSource
+class TodoSource
 {
   @NonNull final ContentResolver mResolver;
 

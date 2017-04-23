@@ -4,7 +4,7 @@ import android.content.UriMatcher;
 import android.support.annotation.NonNull;
 
 // URI matcher for the Todo provider.
-public class TodoProviderMatcher extends UriMatcher
+class TodoProviderMatcher extends UriMatcher
 {
   @NonNull public static final TodoProviderMatcher Matcher = new TodoProviderMatcher();
 
