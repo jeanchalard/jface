@@ -47,7 +47,6 @@ public class JOrg extends WrappedActivity
   @NonNull private final CoordinatorLayout mTopLayout;
   @NonNull private final ItemTouchHelper mTouchHelper;
 
-  @NonNull private final TodoList mTodoList; // TODO : remove this member and go through the view instead
   @NonNull private final TodoListView mTodoListView;
 
   public JOrg(@NonNull final Args args)
@@ -58,11 +57,11 @@ public class JOrg extends WrappedActivity
     ((AppCompatActivity)mA).setSupportActionBar((Toolbar)mA.findViewById(R.id.orgTopActionBar));
     mSoundSource = new SoundSource(mA, (ViewGroup)mA.findViewById(R.id.sound_source));
     mSoundRouter = new EditTextSoundRouter(mSoundSource);
-    mTodoList = TodoList.getInstance(mA.getApplicationContext());
+    final TodoList todoList = TodoList.getInstance(mA.getApplicationContext());
 
     mTopLayout = (CoordinatorLayout)mA.findViewById(R.id.topLayout);
     final RecyclerView rv = (RecyclerView)mA.findViewById(R.id.todoList);
-    mTodoListView = new TodoListView(mTodoList);
+    mTodoListView = new TodoListView(todoList);
     mAdapter = new TodoAdapter(this, mA, mSoundRouter, mTodoListView, rv);
     rv.setAdapter(mAdapter);
     rv.addItemDecoration(new DividerItemDecoration(mA, ((LinearLayoutManager)rv.getLayoutManager()).getOrientation()));
@@ -132,7 +131,7 @@ public class JOrg extends WrappedActivity
   public void onPause()
   {
     mSoundSource.onPause();
-    mTodoList.onPauseApplication();
+    mTodoListView.onPauseApplication();
   }
   public void onResume()
   {
@@ -146,22 +145,20 @@ public class JOrg extends WrappedActivity
   // Null parent means top level, as always
   @NonNull public Todo addNewSubTodo(@Nullable final Todo parent)
   {
-    final Todo todo = mTodoList.createAndInsertTodo("", parent);
+    final Todo todo = mTodoListView.createAndInsertTodo("", parent);
     mAdapter.passFocusTo(todo);
     return todo;
   }
 
   public void clearTodo(@NonNull final Todo todo)
   {
-    final ArrayList<Todo> descendants = mTodoList.getTreeRootedAt(todo);
-    final Todo newTodo = new Todo.Builder(todo).setCompletionTime(System.currentTimeMillis()).build();
-    mTodoList.updateTodo(newTodo);
+    final ArrayList<Todo> oldTree = mTodoListView.markTodoCompleteAndReturnOldTree(todo);
     final Snackbar undoChance = Snackbar.make(mTopLayout, "Marked done.", Snackbar.LENGTH_LONG);
     undoChance.setDuration(8000); // 8 seconds, because LENGTH_LONG is punily short
     undoChance.setAction("Undo", new View.OnClickListener() {
       @Override public void onClick(View v)
       {
-        for (final Todo todo : descendants) mTodoList.updateTodo(todo);
+        for (final Todo todo : oldTree) mTodoListView.updateRawTodo(todo);
       }
     });
     undoChance.show();
@@ -171,7 +168,7 @@ public class JOrg extends WrappedActivity
   {
     final String text = editable.toString();
     final Todo newTodo = new Todo.Builder(todo).setText(text).build();
-    mTodoList.scheduleUpdateTodo(newTodo);
+    mTodoListView.scheduleUpdateTodo(newTodo);
     return newTodo;
   }
 

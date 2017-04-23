@@ -1,6 +1,7 @@
 package com.j.jface.org.todo;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class TodoListView implements ListChangeObserver
 
   public void updateTodo(@NonNull final Todo todo)
   {
-    mList.updateTodo(todo);
+    mList.updateRawTodo(todo);
   }
 
   public int size()
@@ -327,7 +328,7 @@ public class TodoListView implements ListChangeObserver
     final String nextTodoOrd = (null == nextTodo || nextTodo.depth != newDepth) ? parentOrdAndSep + Todo.MAX_ORD : nextTodo.ord;
     final String newOrd = Todo.ordBetween(prevTodoOrd, nextTodoOrd);
     final Todo newTodo = new Todo.Builder(todo).setOrd(newOrd).build();
-    mList.updateTodo(newTodo);
+    mList.updateRawTodo(newTodo);
   }
 
   public void dumpView(String tag)
@@ -342,6 +343,22 @@ public class TodoListView implements ListChangeObserver
       s += t.text;
       Log.e(tag, String.format("> %02d %02d : %s", i, l, s));
     }
+  }
+
+  /***************
+   * App lifecycle and todo operations.
+   ***************/
+  public void onPauseApplication() { mList.onPauseApplication(); }
+  @NonNull public TodoCore updateRawTodo(@NonNull final TodoCore todo) { return mList.updateRawTodo(todo); }
+  @NonNull public Todo scheduleUpdateTodo(@NonNull final Todo todo) { return mList.scheduleUpdateTodo(todo); }
+  @NonNull public Todo createAndInsertTodo(@NonNull final String text, @Nullable final Todo parent) { return mList.createAndInsertTodo(text, parent); }
+
+  @NonNull public ArrayList<Todo> markTodoCompleteAndReturnOldTree(@NonNull final Todo todo)
+  {
+    final ArrayList<Todo> descendants = mList.getTreeRootedAt(todo);
+    final Todo newTodo = new Todo.Builder(todo).setCompletionTime(System.currentTimeMillis()).build();
+    mList.updateRawTodo(newTodo);
+    return descendants;
   }
 
   /***************

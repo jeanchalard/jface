@@ -165,11 +165,11 @@ public class TodoList implements Iterable<Todo>, Handler.Callback
      .setOpen(true)
      .setLastChild(true)
      .build();
-    updateTodo(result);
+    updateRawTodo(result);
     return result;
   }
 
-  public void updateTodo(@NonNull final TodoCore todo)
+  public TodoCore updateRawTodo(@NonNull final TodoCore todo)
   {
     if ("!".equals(todo.ord)) throw new RuntimeException("Trying to update a null Todo");
     mSource.updateTodo(todo);
@@ -190,6 +190,7 @@ public class TodoList implements Iterable<Todo>, Handler.Callback
       else
         internalUpdateReorderTodo(oldTodo, todo);
     }
+    return todo;
   }
 
   public void updateTodoOpen(@NonNull final Todo todo)
@@ -310,7 +311,7 @@ public class TodoList implements Iterable<Todo>, Handler.Callback
       todosToPersist.putAll(mTodosToPersist);
       mTodosToPersist.clear();
     }
-    for (final Todo t : todosToPersist.values()) updateTodo(t);
+    for (final Todo t : todosToPersist.values()) updateRawTodo(t);
   }
 
   public void onPauseApplication()
