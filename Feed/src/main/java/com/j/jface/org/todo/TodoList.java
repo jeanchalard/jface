@@ -124,7 +124,7 @@ class TodoList implements Iterable<Todo>, Handler.Callback
     return results;
   }
 
-  @NonNull private static Todo decorate(@NonNull final TodoCore t)
+  @NonNull public static Todo decorate(@NonNull final TodoCore t)
   {
     if (t instanceof Todo) return (Todo)t;
     return new Todo.Builder(t).build();
@@ -191,7 +191,7 @@ class TodoList implements Iterable<Todo>, Handler.Callback
       if (null == oldTodo)
         internalUpdateAddTodo(todo, -index - 1);
       else
-        internalUpdateReorderTodo(oldTodo, todo);
+        return internalUpdateReorderTodo(oldTodo, todo);
     }
     return todo;
   }
@@ -232,7 +232,7 @@ class TodoList implements Iterable<Todo>, Handler.Callback
     for (final ListChangeObserver obs : mObservers) obs.notifyItemInserted(insertionPoint, nTodo);
   }
 
-  private void internalUpdateReorderTodo(@NonNull final TodoCore oldTodo, @NonNull final TodoCore newTodo)
+  private Todo internalUpdateReorderTodo(@NonNull final TodoCore oldTodo, @NonNull final TodoCore newTodo)
   {
     // This todo was here but not with this ord : it's a reorder.
     final int oldPos = rindex(oldTodo);
@@ -243,25 +243,35 @@ class TodoList implements Iterable<Todo>, Handler.Callback
       final int oldTodoOrdLength = oldTodo.ord.length();
       final ArrayList<Todo> oldTree = getDescendants(oldTodo);
       final ArrayList<Todo> newTree = new ArrayList<>(oldTree.size());
-      for (int i = 1; i < oldTree.size(); ++i)
+      for (int i = 0; i < oldTree.size(); ++i)
       {
         final Todo oldChild = oldTree.get(i);
         final Todo.Builder newChildBuilder = new Todo.Builder(oldChild);
-        newChildBuilder.setOrd(todo.ord + oldChild.ord.substring(oldTodoOrdLength));
-        newChildBuilder.setParent(todo);
+        newChildBuilder.setOrd(todo.ord + oldChild.ord.substring(oldTodoOrdLength))
+         .setDepth(oldChild.depth + newTodo.depth - oldTodo.depth)
+         .setParent(todo);
         final Todo newChild = newChildBuilder.build();
         newTree.add(newChild);
         mSource.updateTodo(newChild);
       }
       final int lastRemovedIndex = oldPos + oldTree.size() + 1;
       mList.subList(oldPos + 1, lastRemovedIndex).clear(); // incl, excl
-      for (final ListChangeObserver obs : mObservers) obs.notifyItemRangeRemoved(oldPos, oldTree);
+      for (final ListChangeObserver obs : mObservers) obs.notifyItemRangeRemoved(oldPos + 1, oldTree);
+      mList.remove(oldPos);
       final int insertionPoint = -rindex(todo) - 1;
       mList.add(insertionPoint, todo);
       for (final ListChangeObserver obs : mObservers) obs.notifyItemMoved(oldPos, insertionPoint, todo);
       mList.addAll(insertionPoint + 1, newTree);
-      for (final ListChangeObserver obs : mObservers) obs.notifyItemRangeInserted(insertionPoint, newTree);
+      for (final ListChangeObserver obs : mObservers) obs.notifyItemRangeInserted(insertionPoint + 1, newTree);
     }
+    else
+    {
+      mList.remove(oldPos);
+      final int insertionPoint = -rindex(todo) - 1;
+      mList.add(insertionPoint, todo);
+      for (final ListChangeObserver obs : mObservers) obs.notifyItemMoved(oldPos, insertionPoint, todo);
+    }
+    return todo;
   }
 
   // Pass null to get an ord for the end of the list.

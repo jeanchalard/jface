@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -48,5 +47,19 @@ public class Util
       out.write(buffer, 0, i);
       i = in.read(buffer);
     }
+  }
+
+  public static String getStackTrace(final int depth)
+  {
+    final StringBuilder b = new StringBuilder();
+    final StackTraceElement[] st = Thread.currentThread().getStackTrace();
+    final int min = 3;
+    final int max = Math.min(min + depth, st.length - 1);
+    for (final StackTraceElement e : Arrays.copyOfRange(st, min, max))
+    {
+      b.append(e.toString());
+      b.append("\n");
+    }
+    return b.toString();
   }
 }

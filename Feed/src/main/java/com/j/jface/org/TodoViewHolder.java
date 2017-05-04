@@ -26,9 +26,6 @@ import com.j.jface.org.todo.TodoListView;
 
 import java.util.ArrayList;
 
-/**
- * Created by jchalard on 4/23/17.
- */
 public class TodoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, TextWatcher, ListChangeObserver, View.OnLongClickListener
 {
   @NonNull final static TransitionSet expandCollapseTransition;
@@ -230,21 +227,19 @@ public class TodoViewHolder extends RecyclerView.ViewHolder implements View.OnCl
     mTodoActionButtons.setVisibility(View.VISIBLE);
   }
 
-  public void moveTodo(final int newPos)
-  {
-    final int oldPos = getAdapterPosition();
-    mList.moveTodo(oldPos, newPos);
-  }
-
   @Override public void notifyItemChanged(final int position, @NonNull final Todo payload)
   {
     if (!payload.id.equals(mCurrentTodo.id)) return;
-    mCurrentTodo = payload;
-    setupExpander(payload);
+    TransitionManager.beginDelayedTransition((ViewGroup)itemView);
+    bind(payload); // This also sets mCurrentTodo.
+  }
+
+  @Override public void notifyItemMoved(int from, int to, @NonNull Todo payload)
+  {
+    notifyItemChanged(to, payload);
   }
 
   @Override public void notifyItemInserted(final int position, @NonNull final Todo payload) {}
-  @Override public void notifyItemMoved(int from, int to, @NonNull Todo payload) {}
   @Override public void notifyItemRangeInserted(final int from, @NonNull final ArrayList<Todo> payload) {}
   @Override public void notifyItemRangeRemoved(final int from, @NonNull final ArrayList<Todo> payload) {}
 }

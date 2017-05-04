@@ -25,7 +25,7 @@ public class TodoCore implements Comparable<String>
   public static final int ON_WEEKNIGHT = 3;
   public static final int ON_WEEKEND = 4;
   public static final int ON_NIGHT = 5;
-  public static final String[] CONSTRAINT_NAMES = new String[] { "Any", "Home", "Work", "Weeknight", "Weekend", "Night" };
+  public static final String[] CONSTRAINT_NAMES = new String[]{"Any", "Home", "Work", "Weeknight", "Weekend", "Night"};
 
   @NonNull public final String id;
   @NonNull public final String ord;
@@ -81,12 +81,14 @@ public class TodoCore implements Comparable<String>
   public static final String MIN_ORD = String.valueOf(MINIMUM_ORD);
   public static final String MAX_ORD = String.valueOf(MAXIMUM_ORD);
   public static final String SEP_MAX_ORD = SEP_ORD + MAX_ORD;
+
   @NonNull private static String getAppendix(final int length)
   {
     final StringBuffer buf = new StringBuffer(length);
     for (int i = 0; i < length; ++i) buf.append(MINIMUM_ORD);
     return buf.toString();
   }
+
   private static int diffPoint(@NonNull final String ord1, @NonNull final String ord2)
   {
     int i = 0;
@@ -114,8 +116,9 @@ public class TodoCore implements Comparable<String>
       id += String.valueOf(on);
       if (o1 != on) return id;
       diffPoint += 1;
-      if (diffPoint >= ord1.length()) return id + String.valueOf((char)((MINIMUM_ORD + MAXIMUM_ORD) / 2));
+      if (diffPoint >= ord1.length())
+        return id + String.valueOf((char)((MINIMUM_ORD + MAXIMUM_ORD) / 2));
     }
-    while(true);
+    while (true);
   }
 }

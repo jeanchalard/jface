@@ -40,6 +40,13 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder>
     mExpectFocus = null;
   }
 
+  /*******************
+   * Adapter methods.
+   *******************/
+  @Override public int getItemCount()
+  {
+    return mTodoList.size();
+  }
   @Override public TodoViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType)
   {
     return new TodoViewHolder(mInflater.inflate(todo, parent, false), mJorg, mRouter, mRecyclerView, mTodoList);
@@ -50,32 +57,36 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder>
     holder.bind(mTodoList.get(position));
   }
 
-  @Override public void onViewAttachedToWindow(final TodoViewHolder holder)
-  {
-    if (holder.todo() == mExpectFocus) holder.requestFocus();
-  }
-
-  @Override public int getItemCount()
-  {
-    return mTodoList.size();
-  }
-
+  /******************
+   * Focus handling.
+   ******************/
   public void passFocusTo(@NonNull final Todo todo)
   {
     mExpectFocus = todo;
   }
+  @Override public void onViewAttachedToWindow(final TodoViewHolder holder) { if (holder.todo() == mExpectFocus) holder.requestFocus(); }
 
-
+  /****************************************
+   * Forwarding UI-worthy events to super.
+   ****************************************/
   private class TodoListChangeObserver implements ListChangeObserver
   {
     @Override public void notifyItemChanged(final int position, @NonNull final Todo payload) {}
     @Override public void notifyItemInserted(final int position, @NonNull final Todo payload)
-    { TodoAdapter.this.notifyItemInserted(position); }
+    {
+      TodoAdapter.this.notifyItemInserted(position);
+    }
     @Override public void notifyItemMoved(final int from, final int to, @NonNull final Todo payload)
-    { if (mTodoList.get(to) != payload) TodoAdapter.this.notifyItemMoved(from, to); }
+    {
+      if (!mTodoList.get(to).id.equals(payload.id)) TodoAdapter.this.notifyItemMoved(from, to);
+    }
     @Override public void notifyItemRangeInserted(final int from, @NonNull final ArrayList<Todo> payload)
-    { TodoAdapter.this.notifyItemRangeInserted(from, payload.size()); }
+    {
+      TodoAdapter.this.notifyItemRangeInserted(from, payload.size());
+    }
     @Override public void notifyItemRangeRemoved(final int from, @NonNull final ArrayList<Todo> payload)
-    { TodoAdapter.this.notifyItemRangeRemoved(from, payload.size()); }
+    {
+      TodoAdapter.this.notifyItemRangeRemoved(from, payload.size());
+    }
   }
 }

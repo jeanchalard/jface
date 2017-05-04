@@ -46,7 +46,7 @@ public class JOrg extends WrappedActivity
   @NonNull private final CoordinatorLayout mTopLayout;
   @NonNull private final ItemTouchHelper mTouchHelper;
 
-  @NonNull private final TodoListView mTodoListView;
+  @NonNull private final TodoListView mTodoList;
 
   public JOrg(@NonNull final Args args)
   {
@@ -59,8 +59,8 @@ public class JOrg extends WrappedActivity
 
     mTopLayout = (CoordinatorLayout)mA.findViewById(R.id.topLayout);
     final RecyclerView rv = (RecyclerView)mA.findViewById(R.id.todoList);
-    mTodoListView = new TodoListView(mA.getApplicationContext());
-    mAdapter = new TodoAdapter(this, mA, mSoundRouter, mTodoListView, rv);
+    mTodoList = new TodoListView(mA.getApplicationContext());
+    mAdapter = new TodoAdapter(this, mA, mSoundRouter, mTodoList, rv);
     rv.setAdapter(mAdapter);
     rv.addItemDecoration(new DividerItemDecoration(mA, ((LinearLayoutManager)rv.getLayoutManager()).getOrientation()));
 
@@ -72,50 +72,7 @@ public class JOrg extends WrappedActivity
       }
     });
 
-    mTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
-      int mDestination = -1;
-
-      @Override public boolean onMove(@NonNull final RecyclerView recyclerView, @NonNull final RecyclerView.ViewHolder viewHolder, @NonNull final RecyclerView.ViewHolder target)
-      {
-        mAdapter.notifyItemMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
-        return true;
-      }
-
-      public void onMoved(@NonNull final RecyclerView recyclerView, @NonNull final RecyclerView.ViewHolder viewHolder, final int fromPos, @NonNull final RecyclerView.ViewHolder target, final int toPos, final int x, final int y)
-      {
-        super.onMoved(recyclerView, viewHolder, fromPos, target, toPos, x, y);
-        mDestination = toPos;
-      }
-
-      @Override public boolean canDropOver(@NonNull final RecyclerView recyclerView, @NonNull final RecyclerView.ViewHolder current, @NonNull final RecyclerView.ViewHolder target)
-      {
-        return ((TodoViewHolder)current).todo().ui.parent == ((TodoViewHolder)target).todo().ui.parent;
-      }
-
-      @Override public int interpolateOutOfBoundsScroll(@NonNull final RecyclerView recyclerView, final int viewSize, final int viewSizeOutOfBounds, final int totalSize, final long msSinceStartScroll)
-      {
-        final int i = super.interpolateOutOfBoundsScroll(recyclerView, viewSize, viewSizeOutOfBounds, totalSize, msSinceStartScroll);
-        return i > 0 ? Math.max(i, 10) : Math.min(i, -10);
-      }
-
-      @Override public void clearView(@NonNull final RecyclerView recyclerView, @NonNull final RecyclerView.ViewHolder viewHolder)
-      {
-        super.clearView(recyclerView, viewHolder);
-        ((TodoViewHolder)viewHolder).cleanupViewAfterDrag();
-        ((TodoViewHolder)viewHolder).moveTodo(mDestination);
-      }
-
-      public void onSelectedChanged(@Nullable final RecyclerView.ViewHolder viewHolder, final int actionState)
-      {
-        super.onSelectedChanged(viewHolder, actionState);
-        if (null == viewHolder) return;
-        ((TodoViewHolder)viewHolder).prepareViewForDrag();
-        mDestination = -1;
-      }
-
-      @Override public boolean isItemViewSwipeEnabled() { return false; }
-      @Override public void onSwiped(final RecyclerView.ViewHolder viewHolder, final int direction) {}
-    });
+    mTouchHelper = new ItemTouchHelper(new TodoMover(mAdapter, mTodoList));
     mTouchHelper.attachToRecyclerView(rv);
 
     scheduleBackup();
@@ -129,7 +86,7 @@ public class JOrg extends WrappedActivity
   public void onPause()
   {
     mSoundSource.onPause();
-    mTodoListView.onPauseApplication();
+    mTodoList.onPauseApplication();
   }
   public void onResume()
   {
@@ -143,20 +100,20 @@ public class JOrg extends WrappedActivity
   // Null parent means top level, as always
   @NonNull public Todo addNewSubTodo(@Nullable final Todo parent)
   {
-    final Todo todo = mTodoListView.createAndInsertTodo("", parent);
+    final Todo todo = mTodoList.createAndInsertTodo("", parent);
     mAdapter.passFocusTo(todo);
     return todo;
   }
 
   public void clearTodo(@NonNull final Todo todo)
   {
-    final ArrayList<Todo> oldTree = mTodoListView.markTodoCompleteAndReturnOldTree(todo);
+    final ArrayList<Todo> oldTree = mTodoList.markTodoCompleteAndReturnOldTree(todo);
     final Snackbar undoChance = Snackbar.make(mTopLayout, "Marked done.", Snackbar.LENGTH_LONG);
     undoChance.setDuration(8000); // 8 seconds, because LENGTH_LONG is punily short
     undoChance.setAction("Undo", new View.OnClickListener() {
       @Override public void onClick(View v)
       {
-        for (final Todo todo : oldTree) mTodoListView.updateRawTodo(todo);
+        for (final Todo todo : oldTree) mTodoList.updateRawTodo(todo);
       }
     });
     undoChance.show();
@@ -166,7 +123,7 @@ public class JOrg extends WrappedActivity
   {
     final String text = editable.toString();
     final Todo newTodo = new Todo.Builder(todo).setText(text).build();
-    mTodoListView.scheduleUpdateTodo(newTodo);
+    mTodoList.scheduleUpdateTodo(newTodo);
     return newTodo;
   }
 
