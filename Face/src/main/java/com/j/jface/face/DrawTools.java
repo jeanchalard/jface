@@ -59,7 +59,7 @@ public class DrawTools
      -269, 358); // startAngle, sweepAngle
 
     if (null != resources) {
-      background = resources.getDrawable(R.drawable.bg);
+      background = resources.getDrawable(R.drawable.chat);
       background.setBounds(0, 0, Const.SCREEN_SIZE, Const.SCREEN_SIZE);
       hibiyaIcon = ((BitmapDrawable)resources.getDrawable(R.drawable.hibiya)).getBitmap();
       keiseiIcon = ((BitmapDrawable)resources.getDrawable(R.drawable.keisei)).getBitmap();

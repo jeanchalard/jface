@@ -19,6 +19,7 @@ import com.google.android.gms.drive.Drive;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.Wearable;
+import com.j.jface.Const;
 import com.j.jface.Future;
 import com.j.jface.FutureValue;
 import com.j.jface.client.action.Action;
@@ -48,12 +49,12 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
   public Client(@NonNull final Context context)
   {
     super(getInitialLooper());
-    mClient = new GoogleApiClient.Builder(context)
+    final GoogleApiClient.Builder builder = new GoogleApiClient.Builder(context)
      .addConnectionCallbacks(this)
      .addOnConnectionFailedListener(this)
-     .addApi(Wearable.API).addApi(LocationServices.API)
-     .addApi(Drive.API).addScope(Drive.SCOPE_FILE)
-     .build();
+     .addApi(Wearable.API).addApi(LocationServices.API);
+    if (!Const.RIO_MODE) builder.addApi(Drive.API).addScope(Drive.SCOPE_FILE);
+    mClient = builder.build();
   }
 
   private static Looper getInitialLooper() {
