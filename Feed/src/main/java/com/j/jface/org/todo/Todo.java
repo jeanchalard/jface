@@ -62,6 +62,22 @@ public class Todo extends TodoCore
     ui = new TodoUI(null, true, true);
   }
 
+  public boolean equals(@Nullable final Todo other)
+  {
+    if (null == other) return false;
+    return other.id.equals(id)
+     && other.ord.equals(ord)
+     && other.creationTime == creationTime
+     && other.completionTime == completionTime
+     && other.text.equals(text)
+     && other.depth == depth
+     && other.lifeline == lifeline
+     && other.deadline == deadline
+     && other.hardness == hardness
+     && other.constraint == constraint
+     && other.estimatedTime == estimatedTime;
+  }
+
   public static class Builder
   {
     @Nullable private String id;

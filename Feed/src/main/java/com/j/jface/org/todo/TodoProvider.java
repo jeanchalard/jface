@@ -2,6 +2,7 @@ package com.j.jface.org.todo;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -65,7 +66,7 @@ public class TodoProvider extends WrappedContentProvider implements Handler.Call
   @NonNull private final Handler mHandler;
   @NonNull private final TodoOpenHelper mDb;
 
-  public TodoProvider(@NonNull Args a)
+  public TodoProvider(@NonNull final Args a)
   {
     super(a);
     //noinspection ConstantConditions – we are called in the original onCreate, making getContext NonNull. According to the doc.
