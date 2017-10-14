@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Stack;
 
 import static java.util.Collections.binarySearch;
+import static junit.framework.Assert.assertEquals;
 
 /**
  * A todo list backed by a sorted ArrayList. It guarantees ordering according to the ID,
@@ -120,7 +121,7 @@ class TodoList implements Iterable<Todo>, Handler.Callback
       results.add(todo);
       parents.push(todo);
     }
-    parents.pop().ui.lastChild = true;
+    if (!parents.isEmpty()) parents.pop().ui.lastChild = true;
     return results;
   }
 
@@ -378,5 +379,18 @@ class TodoList implements Iterable<Todo>, Handler.Callback
   public void removeObserver(@NonNull final ListChangeObserver obs)
   {
     mObservers.remove(obs);
+  }
+
+
+  /***************
+   * Debug tools.
+   ***************/
+  void assertListIsConsistentWithDB()
+  {
+    assertEquals(mList, mSource.fetchTodoList());
+  }
+  void unload() // Please do not use this out of tests.
+  {
+    sList = null;
   }
 }

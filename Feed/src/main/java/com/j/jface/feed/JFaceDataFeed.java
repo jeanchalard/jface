@@ -24,6 +24,7 @@ import com.j.jface.R;
 import com.j.jface.client.Client;
 import com.j.jface.feed.fragments.ActivityLogFragment;
 import com.j.jface.feed.fragments.DebugToolsFragment;
+import com.j.jface.feed.fragments.ImageSelectorFragment;
 import com.j.jface.feed.fragments.LogsAndDataFragment;
 import com.j.jface.feed.fragments.MessagesFragment;
 import com.j.jface.lifecycle.FragmentWrapper;
@@ -46,7 +47,7 @@ public class JFaceDataFeed extends WrappedActivity
     final DrawerLayout drawer = (DrawerLayout)mA.findViewById(R.id.dataFeedDrawer);
 
     final ListView list = (ListView)mA.findViewById(R.id.dataFeedDrawerContents);
-    list.setAdapter(new ArrayAdapter<>(mA, R.layout.data_feed_drawer_item, new String[] { "Messages", "Activity log", "Logs & data", "Debug tools" }));
+    list.setAdapter(new ArrayAdapter<>(mA, R.layout.data_feed_drawer_item, new String[] { "Messages", "Settings", "Activity log", "Logs & data", "Debug tools" }));
     final AdapterView.OnItemClickListener listener = new AdapterView.OnItemClickListener()
     {
       @Override public void onItemClick(@Nullable final AdapterView<?> parent, @Nullable final View view, final int position, final long id)
@@ -106,9 +107,10 @@ public class JFaceDataFeed extends WrappedActivity
     switch (position)
     {
       case 0 : return new FragmentWrapper<MessagesFragment>(client){};
-      case 1 : return new FragmentWrapper<ActivityLogFragment>(client){}; // TODO : put the new content there
-      case 2 : return new FragmentWrapper<LogsAndDataFragment>(client){};
-      case 3 : return new FragmentWrapper<DebugToolsFragment>(client){};
+      case 1 : return new FragmentWrapper<ImageSelectorFragment>(client){};
+      case 2 : return new FragmentWrapper<ActivityLogFragment>(client){};
+      case 3 : return new FragmentWrapper<LogsAndDataFragment>(client){};
+      case 4 : return new FragmentWrapper<DebugToolsFragment>(client){};
     }
     return null;
   }

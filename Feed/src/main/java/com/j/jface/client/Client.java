@@ -13,14 +13,19 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInApi;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.Wearable;
 import com.j.jface.Future;
-import com.j.jface.FutureValue;
+import com.j.jface.Util;
 import com.j.jface.client.action.Action;
 import com.j.jface.client.action.node.GetNodeNameAction;
 import com.j.jface.client.action.wear.DeleteAllDataAction;
@@ -36,23 +41,33 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
   public interface GetDataCallback { void run(@NonNull final String path, @NonNull final DataMap data); }
 
   private static final int MSG_PROCESS_QUEUE = 1;
-  private static final int MSG_CONNECT = 2;
-  private static final int MSG_RUN_ACTIONS = 3;
-  private static final int MSG_DISCONNECT = 4;
-  private static final long[] CONNECTION_FAILURES_BACKOFF = { 0, 1000, 10000, 300000 }; // in milliseconds
+  private static final int MSG_SIGN_IN = 2;
+  private static final int MSG_CONNECT = 3;
+  private static final int MSG_RUN_ACTIONS = 4;
+  private static final int MSG_DISCONNECT = 5;
+  private static final long[] CONNECTION_FAILURES_BACKOFF = { 0, 1000, 10000, 300000 }; // in
+
+  private static final int SIGNIN_OFF = 0;
+  private static final int SIGNIN_INPROGRESS = 1;
+  private static final int SIGNIN_OK = 2;
 
   @NonNull final private GoogleApiClient mClient;
   @NonNull final private ConcurrentLinkedQueue<Action> mUpdates = new ConcurrentLinkedQueue<>();
   private int mConnectionFailures = 0;
+  private int mSignedInState = SIGNIN_OFF;
 
   public Client(@NonNull final Context context)
   {
     super(getInitialLooper());
+    Log.e("CREATE CLIENT", "" + context);
+    Log.e("CREATE", Util.getStackTrace(5));
     mClient = new GoogleApiClient.Builder(context)
      .addConnectionCallbacks(this)
      .addOnConnectionFailedListener(this)
-     .addApi(Wearable.API).addApi(LocationServices.API)
-     .addApi(Drive.API).addScope(Drive.SCOPE_FILE)
+     .addApiIfAvailable(Wearable.API)
+     .addApi(LocationServices.API)
+     .addApi(Auth.GOOGLE_SIGN_IN_API, new GoogleSignInOptions.Builder().requestScopes(Drive.SCOPE_FILE).build())
+     .addApiIfAvailable(Drive.API)
      .build();
   }
 
@@ -66,18 +81,20 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
   {
     switch (msg.what)
     {
-      case MSG_PROCESS_QUEUE:
+      case MSG_PROCESS_QUEUE :
         proceed();
         break;
-      case MSG_CONNECT:
-        mClient.connect();
+      case MSG_CONNECT :
+        mClient.connect(GoogleApiClient.SIGN_IN_MODE_OPTIONAL);
         break;
-      case MSG_RUN_ACTIONS:
+      case MSG_SIGN_IN :
+        trySignIn();
+      case MSG_RUN_ACTIONS :
         final Action a = mUpdates.poll();
         if (null != a) a.run(mClient);
         proceed();
         break;
-      case MSG_DISCONNECT:
+      case MSG_DISCONNECT :
         mClient.disconnect();
         break;
     }
@@ -88,10 +105,35 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
     removeMessages(MSG_DISCONNECT);
     final int what; final int delay;
     if (!mClient.isConnected()) { what = MSG_CONNECT; delay = 0; }
-    else if (mClient.isConnecting()) { what = MSG_PROCESS_QUEUE; delay = 2 * 1000; } // check again in 2 secs
+    else if (mClient.isConnecting() || SIGNIN_INPROGRESS == mSignedInState) { what = MSG_PROCESS_QUEUE; delay = 2 * 1000; } // check again in 2 secs
+    else if (SIGNIN_OFF == mSignedInState) { what = MSG_SIGN_IN; delay = 0; }
     else if (mUpdates.isEmpty()) { what = MSG_DISCONNECT; delay = 20 * 1000; } // 20 seconds delay to disconnect
     else { what = MSG_RUN_ACTIONS; delay = 0; }
     sendEmptyMessageDelayed(what, delay);
+  }
+
+  private void signInHelper(final GoogleSignInResult res)
+  {
+    if (res.isSuccess())
+    {
+      mSignedInState = SIGNIN_OK;
+      proceed();
+    }
+    else
+    {
+      final Context context = mClient.getContext();
+      context.startActivity(Auth.GoogleSignInApi.getSignInIntent(mClient));
+    }
+  }
+
+  private void trySignIn()
+  {
+    mSignedInState = SIGNIN_INPROGRESS;
+    OptionalPendingResult<GoogleSignInResult> res = Auth.GoogleSignInApi.silentSignIn(mClient);
+    if (res.isDone())
+      signInHelper(res.get());
+    else
+      res.setResultCallback((final GoogleSignInResult result) -> signInHelper(result));
   }
 
   public void enqueue(@NonNull final Action action)
@@ -104,6 +146,7 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
     mConnectionFailures = 0;
     proceed();
   }
+
   @Override public void onConnectionSuspended(final int i) { proceed(); }
   @Override public void onConnectionFailed(@NonNull final ConnectionResult connectionResult)
   {
@@ -112,7 +155,11 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
       try
       {
         // Requires this mClient has been passed an activity as context.
-        connectionResult.startResolutionForResult((Activity)mClient.getContext(), 1);
+        final Context context = mClient.getContext();
+        if (context instanceof Activity)
+          connectionResult.startResolutionForResult((Activity)mClient.getContext(), 1);
+        else
+          Log.e("JFACE", "Not an activity : can't help Google API resolve its mess");
       }
       catch (final IntentSender.SendIntentException e)
       {

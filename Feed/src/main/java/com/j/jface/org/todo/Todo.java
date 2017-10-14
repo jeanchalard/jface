@@ -36,6 +36,17 @@ public class Todo extends TodoCore
       this(ui.parent, ui.open, ui.lastChild);
       this.leaf = ui.leaf;
     }
+
+    public boolean equals(@Nullable final TodoUI other)
+    {
+      if (null == other) return false;
+      if (other.open != open
+       || other.leaf != leaf
+       || other.lastChild != lastChild) return false;
+      if (null == other.parent) return null == parent;
+      if (null == parent) return false;
+      return other.parent.id.equals(parent.id);
+    }
   }
 
   @NonNull public final TodoUI ui; // The members of this member are mutable.
@@ -62,20 +73,12 @@ public class Todo extends TodoCore
     ui = new TodoUI(null, true, true);
   }
 
-  public boolean equals(@Nullable final Todo other)
+  public boolean equals(@Nullable final Object other)
   {
-    if (null == other) return false;
-    return other.id.equals(id)
-     && other.ord.equals(ord)
-     && other.creationTime == creationTime
-     && other.completionTime == completionTime
-     && other.text.equals(text)
-     && other.depth == depth
-     && other.lifeline == lifeline
-     && other.deadline == deadline
-     && other.hardness == hardness
-     && other.constraint == constraint
-     && other.estimatedTime == estimatedTime;
+    if (!super.equals(other)) return false;
+    if (other instanceof Todo)
+      return ui.equals(((Todo)other).ui);
+    else return other instanceof TodoCore;
   }
 
   public static class Builder

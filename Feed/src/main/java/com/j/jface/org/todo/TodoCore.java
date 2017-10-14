@@ -74,6 +74,23 @@ public class TodoCore implements Comparable<String>
     return ord.compareTo(otherOrd);
   }
 
+  public boolean equals(@Nullable final Object o)
+  {
+    if (!(o instanceof TodoCore)) return false;
+    final TodoCore other = (TodoCore)o;
+    return other.id.equals(id)
+     && other.ord.equals(ord)
+     && other.creationTime == creationTime
+     && other.completionTime == completionTime
+     && other.text.equals(text)
+     && other.depth == depth
+     && other.lifeline == lifeline
+     && other.deadline == deadline
+     && other.hardness == hardness
+     && other.constraint == constraint
+     && other.estimatedTime == estimatedTime;
+  }
+
   private static final char SEPARATOR_ORD = ' ';
   private static final char MINIMUM_ORD = SEPARATOR_ORD + 1;
   private static final char MAXIMUM_ORD = '~';

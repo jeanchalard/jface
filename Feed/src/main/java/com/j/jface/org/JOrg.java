@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.gms.auth.api.Auth;
 import com.j.jface.Const;
 import com.j.jface.R;
 import com.j.jface.client.Client;
@@ -65,12 +66,7 @@ public class JOrg extends WrappedActivity
     rv.addItemDecoration(new DividerItemDecoration(mA, ((LinearLayoutManager)rv.getLayoutManager()).getOrientation()));
 
     final FloatingActionButton fab = (FloatingActionButton)mA.findViewById(R.id.addTodo);
-    fab.setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View view)
-      {
-        addNewSubTodo(null);
-      }
-    });
+    fab.setOnClickListener(view -> addNewSubTodo(null));
 
     mTouchHelper = new ItemTouchHelper(new TodoMover(mAdapter, mTodoList));
     mTouchHelper.attachToRecyclerView(rv);
@@ -110,12 +106,7 @@ public class JOrg extends WrappedActivity
     final ArrayList<Todo> oldTree = mTodoList.markTodoCompleteAndReturnOldTree(todo);
     final Snackbar undoChance = Snackbar.make(mTopLayout, "Marked done.", Snackbar.LENGTH_LONG);
     undoChance.setDuration(8000); // 8 seconds, because LENGTH_LONG is punily short
-    undoChance.setAction("Undo", new View.OnClickListener() {
-      @Override public void onClick(View v)
-      {
-        for (final Todo todo : oldTree) mTodoList.updateRawTodo(todo);
-      }
-    });
+    undoChance.setAction("Undo", v -> { for (final Todo t : oldTree) mTodoList.updateRawTodo(t); });
     undoChance.show();
   }
 

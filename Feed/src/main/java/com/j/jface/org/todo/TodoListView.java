@@ -16,7 +16,7 @@ import java.util.HashSet;
  */
 public class TodoListView implements ListChangeObserver
 {
-  private static final boolean DEBUG_VIEW = true;
+  private static final boolean DEBUG_VIEW = false;// true;
 
   @NonNull private final TodoList mList;
   @NonNull private ArrayList<Integer> mView;
@@ -44,6 +44,13 @@ public class TodoListView implements ListChangeObserver
   {
     final int deref = mView.get(index);
     return mList.get(deref);
+  }
+
+  public int findByOrd(final String ord) // Used for testing. Returns the index.
+  {
+    for (int i = size() - 1; i >= 0; --i)
+      if (get(i).ord.equals(ord)) return i;
+    return -1;
   }
 
   @Nullable public Todo getOrNull(final int index)
@@ -131,7 +138,7 @@ public class TodoListView implements ListChangeObserver
   }
   private void insertItem(final int position, @NonNull final Todo payload, final boolean shiftExisting)
   {
-    Log.e("insertItem", "" + position + " (" + (shiftExisting ? "shift" : "view") + ") : " + payload.text);
+    if (DEBUG_VIEW) Log.e("insertItem", "" + position + " (" + (shiftExisting ? "shift" : "view") + ") : " + payload.text);
     Todo parent = payload.ui.parent;
     while (null != parent)
     {
@@ -163,7 +170,7 @@ public class TodoListView implements ListChangeObserver
 
   private void insertRange(final int position, final ArrayList<Todo> payload, final boolean shiftExisting)
   {
-    Log.e("insertRange", "" + position + " (" + (shiftExisting ? "shift" : "view") + ") : " + payload.size());
+    if (DEBUG_VIEW) Log.e("insertRange", "" + position + " (" + (shiftExisting ? "shift" : "view") + ") : " + payload.size());
     final int index = Collections.binarySearch(mView, position);
     final int insertionPoint = index > 0 ? index : -index - 1;
     if (shiftExisting) shiftView(insertionPoint, payload.size());
@@ -222,8 +229,11 @@ public class TodoListView implements ListChangeObserver
   }
   private void removeRange(final int position, @NonNull final ArrayList<Todo> payload, final boolean shiftExisting)
   {
-    Log.e("removeRange", "" + position + " (" + (shiftExisting ? "shift" : "view") + ") : " + payload.size());
-    for (final Todo t : payload) Log.e("removeRange", t.text);
+    if (DEBUG_VIEW)
+    {
+      Log.e("removeRange", "" + position + " (" + (shiftExisting ? "shift" : "view") + ") : " + payload.size());
+      for (final Todo t : payload) Log.e("removeRange", t.text);
+    }
     final ArrayList<RemovedRange> ranges = new ArrayList<>();
     RemovedRange currentRange = null;
     int curPos = position;
@@ -245,7 +255,7 @@ public class TodoListView implements ListChangeObserver
       final int insertionPoint = index > 0 ? index : -index - 1;
       shiftView(insertionPoint, -payload.size());
     }
-    dumpView("before removeRange");
+    if (DEBUG_VIEW) dumpView("before removeRange");
     for (final RemovedRange range : ranges)
     {
       mView.subList(range.start, range.end()).clear(); // Incl, excl
@@ -317,7 +327,7 @@ public class TodoListView implements ListChangeObserver
       String s = "";
       for (int k = t.depth; k > 0; --k) s = s + "  ";
       s += t.text;
-      Log.e(tag, String.format("> %02d %02d : %s", i, l, s));
+      if (DEBUG_VIEW) Log.e(tag, String.format("> %02d %02d : %s", i, l, s));
     }
   }
 
@@ -333,7 +343,7 @@ public class TodoListView implements ListChangeObserver
     public int currentIndexInView;
     public DragData(@NonNull final Todo todo, final int indexInList, final int indexInView)
     {
-      Log.e("New DragData", todo.text + " = " + indexInView + ":" + indexInList);
+      if (DEBUG_VIEW) Log.e("New DragData", todo.text + " = " + indexInView + ":" + indexInList);
       this.todo = todo;
       openBeforeMove = todo.ui.open;
       indexInListBeforeMove = indexInList;
@@ -344,20 +354,20 @@ public class TodoListView implements ListChangeObserver
   private DragData mCurrentDrag = null;
   public void startDragging(@NonNull final Todo todo)
   {
-    Log.e("Start dragging", todo.text);
+    if (DEBUG_VIEW) Log.e("Start dragging", todo.text);
     final int indexInList = mList.rindex(todo);
     mCurrentDrag = new DragData(todo, indexInList, Collections.binarySearch(mView, indexInList));
     if (todo.ui.open) toggleOpen(todo);
   }
   public void moveTemporarily(final int from, final int to)
   {
-    Log.e("Move temporarily", "" + from + ":" + mView.get(from) + " → " + to + ":" + mView.get(to));
+    if (DEBUG_VIEW) Log.e("Move temporarily", "" + from + ":" + mView.get(from) + " → " + to + ":" + mView.get(to));
     if (from != mCurrentDrag.currentIndexInView) throw new RuntimeException("Not in this position (" + from + ") but in " + mCurrentDrag.currentIndexInView);
     mCurrentDrag.currentIndexInView = to;
   }
   public void stopDragging(@NonNull final Todo todo)
   {
-    Log.e("Stop dragging", todo.text + " = " + mCurrentDrag.indexInViewBeforeMove + ":" + mCurrentDrag.indexInListBeforeMove + " → " + mCurrentDrag.currentIndexInView);
+    if (DEBUG_VIEW) Log.e("Stop dragging", todo.text + " = " + mCurrentDrag.indexInViewBeforeMove + ":" + mCurrentDrag.indexInListBeforeMove + " → " + mCurrentDrag.currentIndexInView);
     if (mCurrentDrag.todo != todo) throw new RuntimeException("Not dragging this todo (" + todo.text + ") but another (" + mCurrentDrag.todo.text + ")");
     if (mCurrentDrag.indexInViewBeforeMove != mCurrentDrag.currentIndexInView)
     {
@@ -399,12 +409,12 @@ public class TodoListView implements ListChangeObserver
         toggleOpen(newTodo);
     }
     mCurrentDrag = null;
-    dumpView("moved");
+    if (DEBUG_VIEW) dumpView("moved");
   }
 
   public TodoCore moveTodoBetween(@NonNull final Todo todo, @Nullable final Todo prevTodo, @Nullable final Todo nextTodo)
   {
-    Log.e("Move todo between", todo.text + " → (" + (null == prevTodo ? "null" : prevTodo.text) + " ; " + (null == nextTodo ? "null" : nextTodo.text) + ")");
+    if (DEBUG_VIEW) Log.e("Move todo between", todo.text + " → (" + (null == prevTodo ? "null" : prevTodo.text) + " ; " + (null == nextTodo ? "null" : nextTodo.text) + ")");
     final Todo parent;
     final String prevOrd, nextOrd;
     if (null == prevTodo)
@@ -482,5 +492,13 @@ public class TodoListView implements ListChangeObserver
   public void removeObserver(@NonNull final ListChangeObserver obs)
   {
     mObservers.remove(obs);
+  }
+
+  /***************
+   * Debug tools.
+   ***************/
+  void assertListIsConsistentWithDB()
+  {
+    mList.assertListIsConsistentWithDB();
   }
 }

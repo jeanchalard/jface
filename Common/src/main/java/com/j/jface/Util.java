@@ -23,6 +23,12 @@ public class Util
     for (int i = 0; i < array.length; ++i) array[i] = list.get(i);
     return array;
   }
+  public static ArrayList<Integer> arrayListFromIntArray(@NonNull int a[])
+  {
+    final ArrayList<Integer> al = new ArrayList<>(a.length);
+    for (int x : a) al.add(x);
+    return al;
+  }
 
   public static @NonNull int[] concat(int[] a1, int[] a2)
   {

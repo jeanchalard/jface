@@ -6,12 +6,10 @@ import android.support.annotation.NonNull;
 import android.text.format.Time;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
 import com.j.jface.R;
 import com.j.jface.client.Client;

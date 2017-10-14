@@ -22,5 +22,4 @@ import com.j.jface.lifecycle.ActivityWrapper;
 /**
  * The activity wrapper for the feed app for Jface.
  */
-public class JFaceDataFeedBoot extends ActivityWrapper<JFaceDataFeed>
-{}
+public class JFaceDataFeedBoot extends ActivityWrapper<JFaceDataFeed> {}

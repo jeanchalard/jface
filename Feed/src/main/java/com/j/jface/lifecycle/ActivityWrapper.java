@@ -1,6 +1,7 @@
 package com.j.jface.lifecycle;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -55,6 +56,13 @@ public abstract class ActivityWrapper<T extends WrappedActivity> extends Activit
     super.onRequestPermissionsResult(requestCode, permissions, results);
     assert mW != null;
     mW.onRequestPermissionsResult(requestCode, permissions, results);
+  }
+
+  @Override protected void onActivityResult(final int requestCode, final int resultCode, final Intent data)
+  {
+    super.onActivityResult(requestCode, resultCode, data);
+    assert mW != null;
+    mW.onActivityResult(requestCode, resultCode, data);
   }
 
   @Override public void onPause()

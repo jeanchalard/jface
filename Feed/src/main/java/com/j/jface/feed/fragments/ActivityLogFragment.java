@@ -48,5 +48,4 @@ public class ActivityLogFragment extends WrappedFragment
     }
     };
   }
-
 }
