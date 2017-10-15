@@ -61,33 +61,6 @@ public final class DigitalWatchFaceUtil
   }
 
   /**
-   * Overwrites (or sets, if not present) the keys in the current config {@link DataItem} with
-   * the ones appearing in the given {@link DataMap}. If the config DataItem doesn't exist,
-   * it's created.
-   * <p>
-   * It is allowed that only some of the keys used in the config DataItem appear in
-   * {@code configKeysToOverwrite}. The rest of the keys remains unmodified in this case.
-   */
-  public static void overwriteKeysInConfigDataMap(final GoogleApiClient googleApiClient,
-                                                  final DataMap configKeysToOverwrite)
-  {
-
-    DigitalWatchFaceUtil.fetchData(googleApiClient, Const.CONFIG_PATH,
-     new FetchConfigDataMapCallback()
-     {
-       @Override
-       public void onDataFetched(@NonNull final String path, @NonNull final DataMap currentConfig)
-       {
-         DataMap overwrittenConfig = new DataMap();
-         overwrittenConfig.putAll(currentConfig);
-         overwrittenConfig.putAll(configKeysToOverwrite);
-         DigitalWatchFaceUtil.putConfigDataItem(googleApiClient, overwrittenConfig);
-       }
-     }
-    );
-  }
-
-  /**
    * Overwrites the current config {@link DataItem}'s {@link DataMap} with {@code newConfig}.
    * If the config DataItem doesn't exist, it's created.
    */
