@@ -1,5 +1,6 @@
 package com.j.jface.face;
 
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.format.Time;
@@ -18,6 +19,7 @@ public class DataStore
   @NonNull private final HashMap<String, Boolean> mLocationStatuses = new HashMap<>();
   @NonNull public String mTopic = "";
   @NonNull public int[] mTopicColors = new int[0];
+  @Nullable public Bitmap mBackground;
   public long mTimeOffset;
   public long mDebugFences;
 

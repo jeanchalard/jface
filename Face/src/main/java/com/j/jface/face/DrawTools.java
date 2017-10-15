@@ -32,7 +32,6 @@ public class DrawTools
 
   public final Path watchContourPath;
 
-  public final Drawable background;
   private final Bitmap hibiyaIcon;
   private final Bitmap keiseiIcon;
   private final Bitmap keiōIcon;
@@ -59,15 +58,12 @@ public class DrawTools
      -269, 358); // startAngle, sweepAngle
 
     if (null != resources) {
-      background = resources.getDrawable(R.drawable.bg);
-      background.setBounds(0, 0, Const.SCREEN_SIZE, Const.SCREEN_SIZE);
       hibiyaIcon = ((BitmapDrawable)resources.getDrawable(R.drawable.hibiya)).getBitmap();
       keiseiIcon = ((BitmapDrawable)resources.getDrawable(R.drawable.keisei)).getBitmap();
       keiōIcon = ((BitmapDrawable)resources.getDrawable(R.drawable.keiou)).getBitmap();
       mitaIcon = ((BitmapDrawable)resources.getDrawable(R.drawable.mita)).getBitmap();
       ōedoIcon = ((BitmapDrawable)resources.getDrawable(R.drawable.ooedo)).getBitmap();
     } else {
-      background = new ColorDrawable();
       hibiyaIcon = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
       keiseiIcon = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
       keiōIcon = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);

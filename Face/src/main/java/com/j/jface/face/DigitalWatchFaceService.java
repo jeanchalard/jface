@@ -20,8 +20,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -36,6 +39,8 @@ import android.view.SurfaceHolder;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
@@ -45,6 +50,7 @@ import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
 import com.j.jface.Const;
 import com.j.jface.Departure;
+import com.j.jface.R;
 import com.j.jface.Util;
 
 import java.util.TimeZone;
@@ -131,7 +137,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     private DrawTools mDrawTools = new DrawTools(null);
     @NonNull private final Time mTime = new Time();
     @Nullable private Departure mNextDeparture;
-    private int mModeFlags = Draw.BACKGROUND_PRESENT; // Default mode is background on, mute off, ambient off
+    private int mModeFlags = 0; // Default mode mute off, ambient off
 
     /**
      * Whether the display supports fewer bits for each color in ambient mode. When true, we
@@ -329,7 +335,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       }
 
       final int ambientFlag = isInAmbientMode() ? Draw.AMBIENT_MODE : 0;
-      if (mDraw.draw(mDrawTools, mModeFlags | ambientFlag, canvas, bounds,
+      if (mDraw.draw(mDrawTools, mModeFlags | ambientFlag, canvas, bounds, mDataStore.mBackground,
        departure1, departure2, status, mTime, /*mSensors,*/ Status.getSymbolicLocationName(mDataStore),
        mDataStore.mTopic, mDataStore.mTopicColors))
         invalidate();
@@ -368,7 +374,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
 
     private void updateDataItem(@NonNull final String path, @NonNull final DataMap data) {
       if (path.equals(Const.CONFIG_PATH))
-        updateUiForConfigDataMap(data);
+        ;
       else if (path.startsWith(Const.DATA_PATH))
       {
         final String dataName = path.substring(Const.DATA_PATH.length() + 1); // + 1 for the "/"
@@ -379,6 +385,21 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
             mDataStore.mDebugFences = data.getLong(key);
           else if (Const.DATA_KEY_DEBUG_TIME_OFFSET.equals(key))
             mDataStore.mTimeOffset = data.getLong(key);
+          else if (Const.DATA_KEY_BACKGROUND.equals(key))
+          {
+            final Asset asset = data.getAsset(key);
+            if (null == asset)
+            {
+              mDataStore.mBackground = ((BitmapDrawable)getResources().getDrawable(R.drawable.bg)).getBitmap();
+              return;
+            }
+            Wearable.DataApi.getFdForAsset(mGoogleApiClient, asset).setResultCallback(result ->
+             {
+               if (!result.getStatus().isSuccess()) return;
+               mDataStore.mBackground = BitmapFactory.decodeStream(result.getInputStream());
+             }
+            );
+          }
           else if (Const.DATA_KEY_TOPIC.equals(key))
           {
             mDataStore.mTopic = Util.NonNullString(data.getString(Const.DATA_KEY_TOPIC));
@@ -396,26 +417,14 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     private void updateConfigAndData()
     {
       DigitalWatchFaceUtil.fetchData(mGoogleApiClient, Const.CONFIG_PATH,
-       new DigitalWatchFaceUtil.FetchConfigDataMapCallback()
+       (path, startupConfig) ->
        {
-         @Override
-         public void onDataFetched(@NonNull final String path, @NonNull final DataMap startupConfig)
-         {
-           setDefaultValuesForMissingConfigKeys(startupConfig);
-           DigitalWatchFaceUtil.putConfigDataItem(mGoogleApiClient, startupConfig);
-           updateUiForConfigDataMap(startupConfig);
-         }
+         setDefaultValuesForMissingConfigKeys(startupConfig);
+         DigitalWatchFaceUtil.putConfigDataItem(mGoogleApiClient, startupConfig);
        }
       );
-      final DigitalWatchFaceUtil.FetchConfigDataMapCallback dataHandler =
-       new DigitalWatchFaceUtil.FetchConfigDataMapCallback()
-       {
-         @Override
-         public void onDataFetched(@NonNull final String path, @NonNull final DataMap data)
-         {
-           updateDataItem(path, data);
-         }
-       };
+      final DigitalWatchFaceUtil.FetchConfigDataMapCallback dataHandler;
+      dataHandler = (path, data) -> updateDataItem(path, data);
       for (final String path : Const.ALL_DEPLIST_DATA_PATHS)
         DigitalWatchFaceUtil.fetchData(mGoogleApiClient, Const.DATA_PATH + "/" + path, dataHandler);
       for (final String path : Const.ALL_FENCE_NAMES)
@@ -440,17 +449,6 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       {
         dataEvents.release();
       }
-    }
-
-    private void updateUiForConfigDataMap(@NonNull final DataMap config)
-    {
-      final boolean isBackgroundPresent = config.getBoolean(Const.CONFIG_KEY_BACKGROUND,
-       0 != (mModeFlags & Draw.BACKGROUND_PRESENT));
-      if (isBackgroundPresent)
-        mModeFlags |= Draw.BACKGROUND_PRESENT;
-      else
-        mModeFlags &= ~Draw.BACKGROUND_PRESENT;
-      invalidate();
     }
 
     @Override  // GoogleApiClient.ConnectionCallbacks

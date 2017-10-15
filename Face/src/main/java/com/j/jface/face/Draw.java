@@ -14,7 +14,6 @@ import com.j.jface.Departure;
 
 public class Draw
 {
-  public static final int BACKGROUND_PRESENT = 1;
   public static final int AMBIENT_MODE = 2;
   public static final int MUTE_MODE = 4;
 
@@ -32,6 +31,7 @@ public class Draw
   final char[] mTmpChr = new char[256];
   public boolean draw(@NonNull final DrawTools drawTools, final int modeFlags,
                       @NonNull final Canvas canvas, @NonNull final Rect bounds,
+                      @Nullable final Bitmap background,
                       @Nullable final Departure departureLine1, @Nullable final Departure departureLine2,
                       @NonNull final Status status, @NonNull final Time time, /*@NonNull final Sensors sensors,*/
                       @NonNull final String locationDescriptor,
@@ -67,8 +67,8 @@ public class Draw
 
     // Draw the background.
     // TODO: only update the relevant part of the display.
-    if (0 != (BACKGROUND_PRESENT & modeFlags))
-      drawTools.background.draw(canvas);
+    if (null != background)
+      canvas.drawBitmap(background, 0f, 0f, drawTools.imagePaint);
     else
       canvas.drawRect(0, 0, bounds.width(), bounds.height(), drawTools.imagePaint);
 
