@@ -13,7 +13,7 @@ import android.widget.ImageView;
 
 import java.util.ArrayList;
 
-public class PaletteView extends ImageView
+public class PaletteView extends android.support.v7.widget.AppCompatImageView
 {
   @NonNull final private Bitmap mPaletteBitmap;
   @NonNull final private Matrix mImageMatrix;

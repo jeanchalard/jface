@@ -24,6 +24,7 @@ import com.j.jface.R;
 import com.j.jface.client.Client;
 import com.j.jface.feed.fragments.ActivityLogFragment;
 import com.j.jface.feed.fragments.DebugToolsFragment;
+import com.j.jface.feed.fragments.ImageEditorFragment;
 import com.j.jface.feed.fragments.ImageSelectorFragment;
 import com.j.jface.feed.fragments.LogsAndDataFragment;
 import com.j.jface.feed.fragments.MessagesFragment;
@@ -48,18 +49,15 @@ public class JFaceDataFeed extends WrappedActivity
 
     final ListView list = (ListView)mA.findViewById(R.id.dataFeedDrawerContents);
     list.setAdapter(new ArrayAdapter<>(mA, R.layout.data_feed_drawer_item, new String[] { "Messages", "Settings", "Activity log", "Logs & data", "Debug tools" }));
-    final AdapterView.OnItemClickListener listener = new AdapterView.OnItemClickListener()
+    final AdapterView.OnItemClickListener listener = (parent, view, position, id) ->
     {
-      @Override public void onItemClick(@Nullable final AdapterView<?> parent, @Nullable final View view, final int position, final long id)
-      {
-        final Fragment f = getFragmentForPosition(position, mClient);
-        mA.getFragmentManager().beginTransaction()
-                              .replace(R.id.dataFeedContents, f)
-                              .commit();
-        list.setItemChecked(position, true);
-        drawer.closeDrawer(list);
-        mCurrentlyDisplayedFragmentIndex = position;
-      }
+      final Fragment f = getFragmentForPosition(position, mClient);
+      mA.getFragmentManager().beginTransaction()
+                            .replace(R.id.dataFeedContents, f)
+                            .commit();
+      list.setItemChecked(position, true);
+      drawer.closeDrawer(list);
+      mCurrentlyDisplayedFragmentIndex = position;
     };
     list.setOnItemClickListener(listener);
 
@@ -120,5 +118,16 @@ public class JFaceDataFeed extends WrappedActivity
     final Intent i = new Intent(activity, GeofenceTransitionReceiverService.class);
     i.setAction(GeofenceTransitionReceiver.ACTION_MANUAL_START);
     activity.startService(i);
+  }
+
+  @Override protected void onActivityResult(final int requestCode, final int resultCode, final Intent data)
+  {
+    switch (requestCode)
+    {
+      case ImageSelectorFragment.CHOOSE_IMAGE_INTENT :
+        mA.getFragmentManager().beginTransaction()
+         .replace(R.id.dataFeedContents, new FragmentWrapper<ImageEditorFragment>(data){})
+         .commit();
+    }
   }
 }

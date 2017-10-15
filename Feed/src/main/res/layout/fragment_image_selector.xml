@@ -12,5 +12,4 @@
    android:onClick="onClickChangePicture"
    android:src="@drawable/jormungand"
    />
-
 </FrameLayout>

@@ -47,29 +47,23 @@ public class MessagesFragment extends WrappedFragment implements TextWatcher, Pa
     mPalette = (PaletteView)mView.findViewById(R.id.messagesFragment_palette);
     mPalette.addOnColorSetListener(this);
     mDataFetched = false;
-    b.getData(Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC, new Client.GetDataCallback() {
-      public void run(@NonNull final String path, @NonNull final DataMap dataMap) {
-        a.fragment.getActivity().runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            mDataFetched = true;
-            final String topic = dataMap.getString(Const.DATA_KEY_TOPIC);
-            if (null == topic) return;
-            final int[] starts = getLineStartOffsets(topic);
-            final SpannableString text = new SpannableString(topic);
-            final ArrayList<Integer> colors = dataMap.getIntegerArrayList(Const.DATA_KEY_TOPIC_COLORS);
-            if (null != colors && starts.length == colors.size())
-              for (int i = 0; i < colors.size(); ++i)
-              {
-                final int start = starts[i];
-                final int end = Math.max(start, i + 1 >= starts.length ? topic.length() : starts[i + 1]);
-                text.setSpan(new ForegroundColorSpan(colors.get(i)), start, end, Spanned.SPAN_PARAGRAPH);
-              }
-            mTopicDataEdit.setText(text);
-          }
-        });
-      }
-    });
+    b.getData(Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC, (path, dataMap) -> a.fragment.getActivity().runOnUiThread(() ->
+    {
+      mDataFetched = true;
+      final String topic = dataMap.getString(Const.DATA_KEY_TOPIC);
+      if (null == topic) return;
+      final int[] starts = getLineStartOffsets(topic);
+      final SpannableString text = new SpannableString(topic);
+      final ArrayList<Integer> colors = dataMap.getIntegerArrayList(Const.DATA_KEY_TOPIC_COLORS);
+      if (null != colors && starts.length == colors.size())
+        for (int i = 0; i < colors.size(); ++i)
+        {
+          final int start = starts[i];
+          final int end = Math.max(start, i + 1 >= starts.length ? topic.length() : starts[i + 1]);
+          text.setSpan(new ForegroundColorSpan(colors.get(i)), start, end, Spanned.SPAN_PARAGRAPH);
+        }
+      mTopicDataEdit.setText(text);
+    }));
   }
 
   @Override public void afterTextChanged(@NonNull final Editable s)

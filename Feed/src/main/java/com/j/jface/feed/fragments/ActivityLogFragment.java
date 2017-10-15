@@ -33,19 +33,15 @@ public class ActivityLogFragment extends WrappedFragment
 
   private Client.GetDataCallback showDataCallback()
   {
-    return new Client.GetDataCallback() { public void run(@NonNull final String path, @NonNull final DataMap dataMap) {
-      mF.getActivity().runOnUiThread(new Runnable() { @Override public void run()
-      {
-        final String mnemonic = dataMap.getString(Const.DATA_KEY_LAST_ACTIVITY_MNEMONIC);
-        final long startTime = dataMap.getLong(Const.DATA_KEY_LAST_ACTIVITY_START_TIME);
-        mLastActivityMnemonic.setText(mnemonic);
-        final GregorianCalendar cal = new GregorianCalendar();
-        cal.setTimeInMillis(startTime);
-        mLastActivityStartTime.setText("" + cal.get(Calendar.YEAR) + "/" + cal.get(Calendar.MONTH) + "/" + cal.get(Calendar.DAY_OF_MONTH) + "  "
-         + cal.get(Calendar.HOUR) + ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND));
-      }
-      });
-    }
-    };
+    return (path, dataMap) -> mF.getActivity().runOnUiThread(() ->
+    {
+      final String mnemonic = dataMap.getString(Const.DATA_KEY_LAST_ACTIVITY_MNEMONIC);
+      final long startTime = dataMap.getLong(Const.DATA_KEY_LAST_ACTIVITY_START_TIME);
+      mLastActivityMnemonic.setText(mnemonic);
+      final GregorianCalendar cal = new GregorianCalendar();
+      cal.setTimeInMillis(startTime);
+      mLastActivityStartTime.setText("" + cal.get(Calendar.YEAR) + "/" + cal.get(Calendar.MONTH) + "/" + cal.get(Calendar.DAY_OF_MONTH) + "  "
+       + cal.get(Calendar.HOUR) + ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND));
+    });
   }
 }
