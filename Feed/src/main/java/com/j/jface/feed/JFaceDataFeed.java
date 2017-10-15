@@ -126,7 +126,8 @@ public class JFaceDataFeed extends WrappedActivity
     {
       case ImageSelectorFragment.CHOOSE_IMAGE_INTENT :
         mA.getFragmentManager().beginTransaction()
-         .replace(R.id.dataFeedContents, new FragmentWrapper<ImageEditorFragment>(data){})
+         .addToBackStack("ImageEditor")
+         .replace(R.id.dataFeedContents, new FragmentWrapper<ImageEditorFragment>(new ImageEditorFragment.ImageEditorArgs(mClient, data)){})
          .commit();
     }
   }

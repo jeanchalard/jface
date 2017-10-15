@@ -4,18 +4,24 @@ import android.content.Intent
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.provider.MediaStore
+import com.google.android.gms.wearable.Asset
 import com.j.jface.Const
 import com.j.jface.R
+import com.j.jface.client.Client
 import com.j.jface.feed.views.SquareImageView
 import com.j.jface.lifecycle.WrappedFragment
 import com.ortiz.touch.TouchImageView
+import java.io.ByteArrayOutputStream
 
-class ImageEditorFragment(a : Args, receivedData : Intent) : WrappedFragment(a.inflater.inflate(R.layout.fragment_image_editor, a.container, false))
+class ImageEditorFragment(a : Args, iea : ImageEditorArgs) : WrappedFragment(a.inflater.inflate(R.layout.fragment_image_editor, a.container, false))
 {
+  data class ImageEditorArgs(val client : Client, val receivedData : Intent)
+  private val mFragment = a.fragment
+  private val mClient = iea.client
   private val mViewFinder = mView.findViewById(R.id.view_finder) as SquareImageView
   init
   {
-    val bitmap = MediaStore.Images.Media.getBitmap(a.fragment.context.contentResolver, receivedData.data)
+    val bitmap = MediaStore.Images.Media.getBitmap(a.fragment.context.contentResolver, iea.receivedData.data)
     val imageView = mView.findViewById(R.id.edited_image) as TouchImageView
     imageView.setImageBitmap(bitmap)
     mView.findViewById(R.id.image_set_button).setOnClickListener { imageChosen(imageView) }
@@ -61,6 +67,10 @@ class ImageEditorFragment(a : Args, receivedData : Intent) : WrappedFragment(a.i
     c.drawBitmap(src, 0f, 0f, paint)
     c.setBitmap(null)
 
-    mViewFinder.setImageBitmap(background)
+    val data = ByteArrayOutputStream();
+    background.compress(Bitmap.CompressFormat.PNG, 100, data)
+    val asset = Asset.createFromBytes(data.toByteArray())
+    mClient.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_BACKGROUND, Const.DATA_KEY_BACKGROUND, asset)
+    mFragment.fragmentManager.popBackStack()
   }
 }

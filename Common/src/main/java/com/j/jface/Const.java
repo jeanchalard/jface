@@ -39,6 +39,7 @@ public class Const
   @NonNull public static final String DATA_KEY_DEBUG_FENCES = "debugFences";
   @NonNull public static final String DATA_KEY_LAST_ACTIVITY_MNEMONIC = "lastActivityMnemonic";
   @NonNull public static final String DATA_KEY_LAST_ACTIVITY_START_TIME = "lastActivityStartTime";
+  @NonNull public static final String DATA_KEY_BACKGROUND = "background";
   @NonNull public static final String CONFIG_KEY_BACKGROUND = "background";
   public static final int TOPIC_DEFAULT_COLOR = 0xFFAACCAA;
 

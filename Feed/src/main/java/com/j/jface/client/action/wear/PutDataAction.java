@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.PutDataMapRequest;
@@ -40,6 +41,14 @@ public class PutDataAction extends Action implements ResultCallback<DataApi.Data
     super(client, null);
     final PutDataMapRequest dmRequest = PutDataMapRequest.create(path);
     dmRequest.getDataMap().putLong(key, value);
+    mRequest = dmRequest.asPutDataRequest();
+  }
+
+  public PutDataAction(@NonNull final Client client, @NonNull final String path, @NonNull final String key, final Asset value)
+  {
+    super(client, null);
+    final PutDataMapRequest dmRequest = PutDataMapRequest.create(path);
+    dmRequest.getDataMap().putAsset(key, value);
     mRequest = dmRequest.asPutDataRequest();
   }
 

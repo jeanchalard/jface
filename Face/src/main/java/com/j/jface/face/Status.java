@@ -117,7 +117,7 @@ public enum Status
     if (本蓮沼 == symbolicLocation)
       return workDay ? WORK_平日_RIO : WORK_休日_RIO;
 
-    if (((time.weekDay == Time.MONDAY && time.hour >= 19) || (time.weekDay == Time.TUESDAY && time.hour < 1))
+    if (((time.weekDay == Time.THURSDAY && time.hour >= 19) || (time.weekDay == Time.FRIDAY && time.hour < 1))
      && (DUNNO == symbolicLocation || 六本木 == symbolicLocation))
       return JUGGLING_月曜_RIO;
 

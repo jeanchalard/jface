@@ -3,6 +3,8 @@ package com.j.jface.client;
 import android.app.Activity;
 import android.content.Context;
 import android.content.IntentSender;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,23 +24,28 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.Wearable;
+import com.j.jface.Const;
 import com.j.jface.Future;
 import com.j.jface.Util;
 import com.j.jface.client.action.Action;
 import com.j.jface.client.action.node.GetNodeNameAction;
 import com.j.jface.client.action.wear.DeleteAllDataAction;
 import com.j.jface.client.action.wear.DeleteDataAction;
+import com.j.jface.client.action.wear.GetBitmapAction;
 import com.j.jface.client.action.wear.GetDataAction;
 import com.j.jface.client.action.wear.PutDataAction;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Client extends Handler implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
 {
   public interface GetDataCallback { void run(@NonNull final String path, @NonNull final DataMap data); }
+  public interface GetBitmapCallback { void run(@NonNull final String path, @NonNull final String key, @Nullable final Bitmap bitmap); }
 
   private static final int MSG_PROCESS_QUEUE = 1;
   private static final int MSG_SIGN_IN = 2;
@@ -59,9 +66,8 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
   public Client(@NonNull final Context context)
   {
     super(getInitialLooper());
-    Log.e("CREATE CLIENT", "" + context);
-    Log.e("CREATE", Util.getStackTrace(5));
     mClient = new GoogleApiClient.Builder(context)
+     .setHandler(this)
      .addConnectionCallbacks(this)
      .addOnConnectionFailedListener(this)
      .addApiIfAvailable(Wearable.API)
@@ -186,6 +192,11 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
     enqueue(new GetDataAction(this, null, path, callback));
   }
 
+  public void getBitmap(@NonNull final String path, @NonNull final String key, @Nullable final GetBitmapCallback callback)
+  {
+    enqueue(new GetBitmapAction(this, path, key, null, callback));
+  }
+
   // Helper methods to put data and forget about it
   public void putData(@NonNull final String path, @NonNull final String key, @NonNull final String value)
   {
@@ -198,6 +209,11 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
   }
 
   public void putData(@NonNull final String path, @NonNull final String key, final long value)
+  {
+    enqueue(new PutDataAction(this, path, key, value));
+  }
+
+  public void putData(@NonNull final String path, @NonNull final String key, final Asset value)
   {
     enqueue(new PutDataAction(this, path, key, value));
   }
