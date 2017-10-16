@@ -430,6 +430,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       for (final String path : Const.ALL_FENCE_NAMES)
         DigitalWatchFaceUtil.fetchData(mGoogleApiClient, Const.LOCATION_PATH + "/" + path, dataHandler);
       DigitalWatchFaceUtil.fetchData(mGoogleApiClient, Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC, dataHandler);
+      DigitalWatchFaceUtil.fetchData(mGoogleApiClient, Const.DATA_PATH + "/" + Const.DATA_KEY_BACKGROUND, dataHandler);
     }
 
     @Override // DataApi.DataListener
