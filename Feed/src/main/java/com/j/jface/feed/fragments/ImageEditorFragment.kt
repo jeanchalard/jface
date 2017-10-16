@@ -4,22 +4,24 @@ import android.content.Intent
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.provider.MediaStore
+import android.widget.ImageView
 import android.widget.SeekBar
 import com.google.android.gms.wearable.Asset
 import com.j.jface.Const
 import com.j.jface.R
 import com.j.jface.client.Client
-import com.j.jface.feed.views.SquareImageView
+import com.j.jface.feed.views.SquareFrameLayout
 import com.j.jface.lifecycle.WrappedFragment
 import com.ortiz.touch.TouchImageView
 import java.io.ByteArrayOutputStream
 
-class ImageEditorFragment(a : Args, iea : ImageEditorArgs) : WrappedFragment(a.inflater.inflate(R.layout.fragment_image_editor, a.container, false))
+class ImageEditorFragment(a : Args, iea : ImageEditorArgs) : WrappedFragment(a.inflater.inflate(R.layout.fragment_image_editor, a.container, false)), SeekBar.OnSeekBarChangeListener
 {
   data class ImageEditorArgs(val client : Client, val receivedData : Intent)
   private val mFragment = a.fragment
   private val mClient = iea.client
-  private val mViewFinder = mView.findViewById(R.id.view_finder) as SquareImageView
+  private val mViewFinder = mView.findViewById(R.id.view_finder)
+  private val mBlackener = mView.findViewById(R.id.blackener)
   private val mBrightnessBar : SeekBar = mView.findViewById(R.id.select_image_brightness) as SeekBar
   init
   {
@@ -27,6 +29,9 @@ class ImageEditorFragment(a : Args, iea : ImageEditorArgs) : WrappedFragment(a.i
     val imageView = mView.findViewById(R.id.edited_image) as TouchImageView
     imageView.setImageBitmap(bitmap)
     mView.findViewById(R.id.image_set_button).setOnClickListener { imageChosen(imageView) }
+    mBlackener.alpha = 0f
+    mBrightnessBar.progress = 1000
+    mBrightnessBar.setOnSeekBarChangeListener(this)
   }
 
   fun makeSquare(r : Rect)
@@ -60,6 +65,8 @@ class ImageEditorFragment(a : Args, iea : ImageEditorArgs) : WrappedFragment(a.i
     val paint = Paint()
     paint.isFilterBitmap = true
     paint.isAntiAlias = true
+    val scaledBrightness = 255 * mBrightnessBar.progress.toFloat() / 1000
+    paint.colorFilter = LightingColorFilter(Color.rgb(scaledBrightness.toInt(), scaledBrightness.toInt(), scaledBrightness.toInt()), 0)
     val c = Canvas()
     val background = Bitmap.createBitmap(Const.SCREEN_SIZE, Const.SCREEN_SIZE, Bitmap.Config.ARGB_8888)
     background.density = src.density
@@ -74,5 +81,12 @@ class ImageEditorFragment(a : Args, iea : ImageEditorArgs) : WrappedFragment(a.i
     val asset = Asset.createFromBytes(data.toByteArray())
     mClient.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_BACKGROUND, Const.DATA_KEY_BACKGROUND, asset)
     mFragment.fragmentManager.popBackStack()
+  }
+
+  override fun onStartTrackingTouch(seekBar : SeekBar?) {}
+  override fun onStopTrackingTouch(seekBar : SeekBar?) {}
+  override fun onProgressChanged(seekBar : SeekBar?, progress : Int, fromUser : Boolean)
+  {
+    mBlackener.alpha = 1f - progress.toFloat() / 1000
   }
 }

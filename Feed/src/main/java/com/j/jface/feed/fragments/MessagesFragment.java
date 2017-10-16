@@ -1,5 +1,6 @@
 package com.j.jface.feed.fragments;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.support.annotation.NonNull;
 import android.text.Editable;
@@ -47,7 +48,8 @@ public class MessagesFragment extends WrappedFragment implements TextWatcher, Pa
     mPalette = (PaletteView)mView.findViewById(R.id.messagesFragment_palette);
     mPalette.addOnColorSetListener(this);
     mDataFetched = false;
-    b.getData(Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC, (path, dataMap) -> a.fragment.getActivity().runOnUiThread(() ->
+    final Activity activity = a.fragment.getActivity();
+    b.getData(Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC, (path, dataMap) -> activity.runOnUiThread(() ->
     {
       mDataFetched = true;
       final String topic = dataMap.getString(Const.DATA_KEY_TOPIC);

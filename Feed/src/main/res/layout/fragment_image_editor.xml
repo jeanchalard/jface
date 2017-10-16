@@ -3,32 +3,49 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
+
   <FrameLayout
    android:layout_weight="1"
-   android:layout_width="match_parent"
-   android:layout_height="wrap_content">
-    <com.ortiz.touch.TouchImageView
-     android:id="@+id/edited_image"
-     android:layout_width="wrap_content"
-     android:layout_height="wrap_content"
-     android:layout_gravity="center"/>
-    <com.j.jface.feed.views.SquareImageView
-     android:id="@+id/view_finder"
-     android:src="@drawable/rectangle"
-     android:layout_gravity="center"
+   android:layout_width="wrap_content"
+   android:layout_height="match_parent">
+    <com.j.jface.feed.views.SquareFrameLayout
+     android:background="@color/black"
      android:layout_width="match_parent"
-     android:layout_height="match_parent"/>
+     android:layout_height="wrap_content"
+     android:layout_gravity="center">
+      <com.ortiz.touch.TouchImageView
+       android:id="@+id/edited_image"
+       android:layout_gravity="center"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"/>
+      <ImageView
+       android:id="@+id/blackener"
+       android:src="@drawable/black_box"
+       android:layout_gravity="center"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"/>
+      <com.j.jface.feed.views.SquareFrameLayout
+       android:id="@+id/view_finder"
+       android:background="@drawable/rectangle"
+       android:layout_gravity="center"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"/>
+    </com.j.jface.feed.views.SquareFrameLayout>
   </FrameLayout>
+
   <SeekBar
    android:id="@+id/select_image_brightness"
-   android:layout_marginTop="16dp"
-   android:layout_marginBottom="12dp"
    android:layout_width="match_parent"
-   android:layout_height="wrap_content"/>
+   android:layout_height="wrap_content"
+   android:layout_marginBottom="12dp"
+   android:layout_marginTop="16dp"
+   android:max="1000"/>
+
   <Button
    android:id="@+id/image_set_button"
    android:layout_weight="0"
    android:layout_width="match_parent"
    android:layout_height="wrap_content"
    android:text="OK"/>
+
 </LinearLayout>

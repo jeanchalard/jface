@@ -2,9 +2,9 @@ package com.j.jface.feed.views
 
 import android.content.Context
 import android.util.AttributeSet
-import android.widget.ImageView
+import android.widget.FrameLayout
 
-class SquareImageView @JvmOverloads constructor(context : Context, attrs : AttributeSet? = null, defStyleAttr : Int = 0) : ImageView(context, attrs, defStyleAttr)
+class SquareFrameLayout @JvmOverloads constructor(context : Context, attrs : AttributeSet? = null, defStyleAttr : Int = 0) : FrameLayout(context, attrs, defStyleAttr)
 {
   override fun onMeasure(widthMeasureSpec : Int, heightMeasureSpec : Int)
   {

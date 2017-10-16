@@ -160,6 +160,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
        .setAcceptsTapEvents(true)
        .build());
       mDrawTools = new DrawTools(DigitalWatchFaceService.this.getResources());
+      mDataStore.mBackground = ((BitmapDrawable)getResources().getDrawable(R.drawable.bg)).getBitmap();
 //      mSensors = new Sensors(DigitalWatchFaceService.this);
       mTime.setToNow();
     }
