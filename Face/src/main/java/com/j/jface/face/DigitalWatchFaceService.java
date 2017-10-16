@@ -226,7 +226,6 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     @Override
     public void onInterruptionFilterChanged(int interruptionFilter)
     {
-      Log.d(TAG, "onInterruptionFilterChanged: " + interruptionFilter);
       super.onInterruptionFilterChanged(interruptionFilter);
       boolean inMuteMode = interruptionFilter == WatchFaceService.INTERRUPTION_FILTER_NONE;
       // We only need to update once a minute in mute mode.
@@ -372,7 +371,14 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
         config.putBoolean(Const.CONFIG_KEY_BACKGROUND, true);
     }
 
-    private void updateDataItem(@NonNull final String path, @NonNull final DataMap data) {
+    private void deleteDataItem(@NonNull final String path)
+    {
+      if (path.equals(Const.DATA_PATH + "/" + Const.DATA_KEY_BACKGROUND))
+        mDataStore.mBackground = ((BitmapDrawable)getResources().getDrawable(R.drawable.bg)).getBitmap();
+    }
+
+    private void updateDataItem(@NonNull final String path, @NonNull final DataMap data)
+    {
       if (path.equals(Const.CONFIG_PATH))
         ;
       else if (path.startsWith(Const.DATA_PATH))
@@ -405,7 +411,6 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
             mDataStore.mTopic = Util.NonNullString(data.getString(Const.DATA_KEY_TOPIC));
             mDataStore.mTopicColors = Util.intArrayFromNullableArrayList(data.getIntegerArrayList(Const.DATA_KEY_TOPIC_COLORS));
           }
-        updateTimer();
       }
       else if (path.startsWith(Const.LOCATION_PATH))
       {
@@ -434,42 +439,38 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     }
 
     @Override // DataApi.DataListener
-    public void onDataChanged(@NonNull DataEventBuffer dataEvents)
+    public void onDataChanged(@NonNull final DataEventBuffer dataEvents)
     {
       try
       {
         for (final DataEvent dataEvent : dataEvents)
         {
-          if (dataEvent.getType() != DataEvent.TYPE_CHANGED) continue;
           final DataItem dataItem = dataEvent.getDataItem();
           final String path = dataItem.getUri().getPath();
-          updateDataItem(path, DataMapItem.fromDataItem(dataItem).getDataMap());
+          if (DataEvent.TYPE_DELETED == dataEvent.getType())
+            deleteDataItem(path);
+          else // TYPE_CHANGED
+            updateDataItem(path, DataMapItem.fromDataItem(dataItem).getDataMap());
         }
       }
       finally
       {
         dataEvents.release();
       }
+      updateTimer();
     }
 
     @Override  // GoogleApiClient.ConnectionCallbacks
     public void onConnected(final Bundle connectionHint)
     {
-      Log.d(TAG, "onConnected : " + connectionHint);
       Wearable.DataApi.addListener(mGoogleApiClient, Engine.this);
       updateConfigAndData();
     }
 
     @Override  // GoogleApiClient.ConnectionCallbacks
-    public void onConnectionSuspended(int cause)
-    {
-      Log.d(TAG, "onConnectionSuspended : " + cause);
-    }
+    public void onConnectionSuspended(final int cause) {}
 
     @Override  // GoogleApiClient.OnConnectionFailedListener
-    public void onConnectionFailed(@NonNull ConnectionResult result)
-    {
-      Log.d(TAG, "onConnectionFailed : " + result);
-    }
+    public void onConnectionFailed(@NonNull final ConnectionResult result) {}
   }
 }

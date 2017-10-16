@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.provider.MediaStore
+import android.widget.SeekBar
 import com.google.android.gms.wearable.Asset
 import com.j.jface.Const
 import com.j.jface.R
@@ -19,6 +20,7 @@ class ImageEditorFragment(a : Args, iea : ImageEditorArgs) : WrappedFragment(a.i
   private val mFragment = a.fragment
   private val mClient = iea.client
   private val mViewFinder = mView.findViewById(R.id.view_finder) as SquareImageView
+  private val mBrightnessBar : SeekBar = mView.findViewById(R.id.select_image_brightness) as SeekBar
   init
   {
     val bitmap = MediaStore.Images.Media.getBitmap(a.fragment.context.contentResolver, iea.receivedData.data)

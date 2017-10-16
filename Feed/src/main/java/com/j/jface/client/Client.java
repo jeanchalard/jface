@@ -26,6 +26,7 @@ import com.google.android.gms.drive.Drive;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.j.jface.Const;
 import com.j.jface.Future;
@@ -238,6 +239,12 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
   public void deleteData(@NonNull final Uri uri)
   {
     enqueue(new DeleteDataAction(this, uri));
+  }
+
+  public void deleteData(@NonNull final String path)
+  {
+    final PutDataMapRequest dmRequest = PutDataMapRequest.create(path);
+    enqueue(new DeleteDataAction(this, dmRequest.getUri()));
   }
 
   public void clearAllData()

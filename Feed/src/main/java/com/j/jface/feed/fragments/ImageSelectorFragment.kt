@@ -7,8 +7,10 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ShapeDrawable
 import android.view.View
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ProgressBar
+import android.widget.SeekBar
 import com.j.jface.Const
 import com.j.jface.R
 import com.j.jface.client.Client
@@ -34,6 +36,7 @@ class ImageSelectorFragment(a : Args, client : Client) : WrappedFragment(a.infla
     mSpinner.minimumWidth = Const.SCREEN_SIZE
     mSpinner.minimumHeight = Const.SCREEN_SIZE
     mClient.getBitmap(Const.DATA_PATH + "/" + Const.CONFIG_KEY_BACKGROUND, Const.CONFIG_KEY_BACKGROUND, this)
+    (mView.findViewById(R.id.select_image_none) as Button).setOnClickListener { removeBackground() }
   }
 
   fun onClickChangePicture()
@@ -54,5 +57,11 @@ class ImageSelectorFragment(a : Args, client : Client) : WrappedFragment(a.infla
       else
         mImageButton.setImageDrawable(mFragment.resources.getDrawable(R.drawable.black_box, mFragment.activity.theme))
     }
+  }
+
+  fun removeBackground()
+  {
+    mClient.deleteData(Const.DATA_PATH + "/" + Const.CONFIG_KEY_BACKGROUND)
+    mImageButton.setImageDrawable(mFragment.resources.getDrawable(R.drawable.black_box, mFragment.activity.theme))
   }
 }
