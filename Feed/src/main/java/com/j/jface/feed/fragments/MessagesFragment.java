@@ -49,7 +49,8 @@ public class MessagesFragment extends WrappedFragment implements TextWatcher, Pa
     mPalette.addOnColorSetListener(this);
     mDataFetched = false;
     final Activity activity = a.fragment.getActivity();
-    b.getData(Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC, (path, dataMap) -> activity.runOnUiThread(() ->
+    b.getData(Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC, (path, dataMap) ->
+     activity.runOnUiThread(() ->
     {
       mDataFetched = true;
       final String topic = dataMap.getString(Const.DATA_KEY_TOPIC);

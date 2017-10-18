@@ -56,8 +56,9 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
   private static final long[] CONNECTION_FAILURES_BACKOFF = { 0, 1000, 10000, 300000 }; // in
 
   private static final int SIGNIN_OFF = 0;
-  private static final int SIGNIN_INPROGRESS = 1;
-  private static final int SIGNIN_OK = 2;
+  private static final int SIGNIN_REQUIRED = 1;
+  private static final int SIGNIN_INPROGRESS = 2;
+  private static final int SIGNIN_OK = 3;
 
   @NonNull final private GoogleApiClient mClient;
   @NonNull final private ConcurrentLinkedQueue<Action> mUpdates = new ConcurrentLinkedQueue<>();
@@ -73,8 +74,8 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
      .addOnConnectionFailedListener(this)
      .addApiIfAvailable(Wearable.API)
      .addApi(LocationServices.API)
-     .addApi(Auth.GOOGLE_SIGN_IN_API, new GoogleSignInOptions.Builder().requestScopes(Drive.SCOPE_FILE).build())
-     .addApiIfAvailable(Drive.API)
+//     .addApi(Auth.GOOGLE_SIGN_IN_API, new GoogleSignInOptions.Builder().requestScopes(Drive.SCOPE_FILE).build())
+//     .addApiIfAvailable(Drive.API)
      .build();
   }
 
@@ -113,7 +114,7 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
     final int what; final int delay;
     if (!mClient.isConnected()) { what = MSG_CONNECT; delay = 0; }
     else if (mClient.isConnecting() || SIGNIN_INPROGRESS == mSignedInState) { what = MSG_PROCESS_QUEUE; delay = 2 * 1000; } // check again in 2 secs
-    else if (SIGNIN_OFF == mSignedInState) { what = MSG_SIGN_IN; delay = 0; }
+    else if (SIGNIN_REQUIRED == mSignedInState) { what = MSG_SIGN_IN; delay = 0; }
     else if (mUpdates.isEmpty()) { what = MSG_DISCONNECT; delay = 20 * 1000; } // 20 seconds delay to disconnect
     else { what = MSG_RUN_ACTIONS; delay = 0; }
     sendEmptyMessageDelayed(what, delay);

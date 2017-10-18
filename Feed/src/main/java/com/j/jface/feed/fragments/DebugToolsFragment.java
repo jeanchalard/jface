@@ -13,6 +13,7 @@ import android.widget.TimePicker;
 import com.j.jface.Const;
 import com.j.jface.R;
 import com.j.jface.client.Client;
+import com.j.jface.client.action.node.GetNodeNameAction;
 import com.j.jface.lifecycle.WrappedFragment;
 
 public class DebugToolsFragment extends WrappedFragment implements View.OnClickListener, NumberPicker.OnValueChangeListener, TimePicker.OnTimeChangedListener
@@ -77,6 +78,9 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
     mFenceUIs[3] = (CheckBox)mView.findViewById(R.id.fence4);
     for (final CheckBox c : mFenceUIs) c.setOnClickListener(this);
     if (Const.RIO_MODE) mFenceUIs[2].setText("六本木");
+
+    final TextView nodeNameTextView = (TextView)mView.findViewById(R.id.nodeId_textView);
+    new GetNodeNameAction(mClient, null, name -> a.fragment.getActivity().runOnUiThread(() -> nodeNameTextView.setText("Node id : " + name))).enqueue();
   }
 
   private void tick()

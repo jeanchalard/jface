@@ -15,9 +15,14 @@ import com.j.jface.client.action.ResultAction;
 // An Action that gets the name of the local node.
 public class GetNodeNameAction extends ResultAction<String> implements ResultCallback<NodeApi.GetLocalNodeResult>
 {
-  public GetNodeNameAction(@NonNull final Client client, @Nullable final Action then)
+  public interface GetNodeNameCallback { void run(@NonNull final String name); }
+  @Nullable private final GetNodeNameCallback mCallback;
+
+  public GetNodeNameAction(@NonNull final Client client, @Nullable final Action then) { this(client, then, null); }
+  public GetNodeNameAction(@NonNull final Client client, @Nullable final Action then, @Nullable GetNodeNameCallback callback)
   {
     super(client, then);
+    mCallback = callback;
   }
 
   @Override public void run(@NonNull final GoogleApiClient client)
@@ -27,6 +32,8 @@ public class GetNodeNameAction extends ResultAction<String> implements ResultCal
 
   @Override public void onResult(@NonNull final NodeApi.GetLocalNodeResult getLocalNodeResult)
   {
-    finish(getLocalNodeResult.getNode().getId());
+    final String nodeId = getLocalNodeResult.getNode().getId();
+    if (null != mCallback) mCallback.run(nodeId);
+    finish(nodeId);
   }
 }
