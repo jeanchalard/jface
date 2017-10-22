@@ -30,6 +30,12 @@ public class Util
     return al;
   }
 
+  public static void sleep(final long ms)
+  {
+    try { Thread.sleep(ms); }
+    catch (final InterruptedException e) { /* go f yourself */ }
+  }
+
   public static @NonNull int[] concat(int[] a1, int[] a2)
   {
     int[] r = Arrays.copyOf(a1, a1.length + a2.length);

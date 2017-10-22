@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -48,21 +49,25 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
   public interface GetDataCallback { void run(@NonNull final String path, @NonNull final DataMap data); }
   public interface GetBitmapCallback { void run(@NonNull final String path, @NonNull final String key, @Nullable final Bitmap bitmap); }
 
+  private static final boolean DEBUG_CLIENT = false;
   private static final int MSG_PROCESS_QUEUE = 1;
   private static final int MSG_SIGN_IN = 2;
   private static final int MSG_CONNECT = 3;
   private static final int MSG_RUN_ACTIONS = 4;
   private static final int MSG_DISCONNECT = 5;
-  private static final long[] CONNECTION_FAILURES_BACKOFF = { 0, 1000, 10000, 300000 }; // in
+  private static final long CONNECTION_NON_RESPONSIVE_RESET_DELAY = 4000; // ms
+  private static final long[] CONNECTION_FAILURES_BACKOFF = { 0, 1000, 10000, 300000 }; // ms
 
   private static final int SIGNIN_OFF = 0;
   private static final int SIGNIN_REQUIRED = 1;
   private static final int SIGNIN_INPROGRESS = 2;
   private static final int SIGNIN_OK = 3;
 
+  @NonNull final private String mCreator;
   @NonNull final private GoogleApiClient mClient;
   @NonNull final private ConcurrentLinkedQueue<Action> mUpdates = new ConcurrentLinkedQueue<>();
   private int mConnectionFailures = 0;
+  private long mConnectingSince = -1;
   private int mSignedInState = SIGNIN_OFF;
 
   public Client(@NonNull final Context context)
@@ -74,19 +79,40 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
      .addOnConnectionFailedListener(this)
      .addApiIfAvailable(Wearable.API)
      .addApi(LocationServices.API)
-//     .addApi(Auth.GOOGLE_SIGN_IN_API, new GoogleSignInOptions.Builder().requestScopes(Drive.SCOPE_FILE).build())
-//     .addApiIfAvailable(Drive.API)
+     .addApi(Auth.GOOGLE_SIGN_IN_API, new GoogleSignInOptions.Builder().requestScopes(Drive.SCOPE_FILE).build())
+     .addApiIfAvailable(Drive.API)
      .build();
+
+    final StackTraceElement caller = Thread.currentThread().getStackTrace()[3];
+    mCreator = caller.getClassName().replaceAll(".*\\.", "");
+    l("created in " + caller.getMethodName() + ":" + caller.getLineNumber());
   }
 
-  private static Looper getInitialLooper() {
+  private static Looper getInitialLooper()
+  {
     final HandlerThread handlerThread = new HandlerThread("mClient worker", android.os.Process.THREAD_PRIORITY_BACKGROUND);
     handlerThread.start();
     return handlerThread.getLooper();
   }
 
+  final private void l(final String m)
+  {
+    if (!DEBUG_CLIENT) return;
+    Log.e("Client " + mCreator + " {" + Integer.toHexString(System.identityHashCode(this)) + "}", m);
+  }
+  private String getMsgName(final int msg)
+  {
+    if (MSG_PROCESS_QUEUE == msg) return "PROCESS_QUEUE";
+    else if (MSG_SIGN_IN == msg) return "SIGN_IN";
+    else if (MSG_CONNECT == msg) return "CONNECT";
+    else if (MSG_RUN_ACTIONS == msg) return "RUN_ACTIONS";
+    else if (MSG_DISCONNECT == msg) return "DISCONNECT";
+    else return "UNKNOWN MSG !";
+  }
+
   @Override public void handleMessage(final Message msg)
   {
+    l("handleMessage " + getMsgName(msg.what));
     switch (msg.what)
     {
       case MSG_PROCESS_QUEUE :
@@ -94,6 +120,7 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
         break;
       case MSG_CONNECT :
         mClient.connect(GoogleApiClient.SIGN_IN_MODE_OPTIONAL);
+        mConnectingSince = SystemClock.elapsedRealtime();
         break;
       case MSG_SIGN_IN :
         trySignIn();
@@ -113,10 +140,24 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
     removeMessages(MSG_DISCONNECT);
     final int what; final int delay;
     if (!mClient.isConnected()) { what = MSG_CONNECT; delay = 0; }
-    else if (mClient.isConnecting() || SIGNIN_INPROGRESS == mSignedInState) { what = MSG_PROCESS_QUEUE; delay = 2 * 1000; } // check again in 2 secs
+    else if (mClient.isConnecting() || SIGNIN_INPROGRESS == mSignedInState)
+    {
+      if (mConnectingSince > 0 && mConnectingSince + CONNECTION_NON_RESPONSIVE_RESET_DELAY < SystemClock.elapsedRealtime())
+      {
+        // The connection is catatonic for some annoying reason. Reset it.
+        sendEmptyMessage(MSG_DISCONNECT);
+        sendEmptyMessage(MSG_CONNECT);
+        delay = 0;
+      }
+      else
+        delay = 2 * 1000; // 2s grace
+      what = MSG_PROCESS_QUEUE;
+    } // check again in 2 secs
     else if (SIGNIN_REQUIRED == mSignedInState) { what = MSG_SIGN_IN; delay = 0; }
     else if (mUpdates.isEmpty()) { what = MSG_DISCONNECT; delay = 20 * 1000; } // 20 seconds delay to disconnect
     else { what = MSG_RUN_ACTIONS; delay = 0; }
+    removeMessages(what);
+    l("proceed to " + getMsgName(what) + " in " + delay + "ms");
     sendEmptyMessageDelayed(what, delay);
   }
 
@@ -151,13 +192,20 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
   }
 
   @Override public void onConnected(final Bundle bundle) {
+    l("→ connected");
     mConnectionFailures = 0;
-    proceed();
+    mConnectingSince = -1;
+    // Ideally we should call proceed() here but the client reports still #isConnecting() == true at this point,
+    // prompting a wait for connection from proceed(). Is this a bug in the GoogleApiClient ? Anyway this is
+    // pretty annoying. Wait for the next run loop to continue, at least we'll only wait a frame for it to
+    // sort its mess.
+    sendEmptyMessageDelayed(MSG_PROCESS_QUEUE, 0);
   }
 
-  @Override public void onConnectionSuspended(final int i) { proceed(); }
+  @Override public void onConnectionSuspended(final int i) { l("→ suspended"); proceed(); }
   @Override public void onConnectionFailed(@NonNull final ConnectionResult connectionResult)
   {
+    l("→ failed");
     if (connectionResult.hasResolution())
     {
       try
