@@ -95,7 +95,7 @@ public class TestMovesInView
     {
       listView.assertListIsConsistentWithDB();
     }
-    catch (final AssertionError e)
+    catch (final Throwable e)
     {
       final String txS = "\"" + tx.ord + "\" (" + tx.text + ")";
       final String tyS = null == ty ? "null" : "\"" + ty.ord + "\" (" + ty.text + ")";
@@ -121,7 +121,7 @@ public class TestMovesInView
     if (movedIndex != destination)
     {
       try { testMoveXAfterY(listView, movedIndex, destination); }
-      catch (Throwable e)
+      catch (final Throwable e)
       {
         Log.e("CRASH", "    final int openablesState[] = { " + TextUtils.join(", ", Util.arrayListFromIntArray(openablesState)) + " }; final int iteration = " + iteration + ";");
         throw e;

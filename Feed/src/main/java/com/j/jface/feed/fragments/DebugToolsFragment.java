@@ -1,10 +1,15 @@
 package com.j.jface.feed.fragments;
 
+import android.app.Fragment;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.format.Time;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.NumberPicker;
 import android.widget.TextView;
@@ -14,14 +19,23 @@ import com.j.jface.Const;
 import com.j.jface.R;
 import com.j.jface.client.Client;
 import com.j.jface.client.action.node.GetNodeNameAction;
+import com.j.jface.client.action.ui.ReportActionWithSnackbar;
 import com.j.jface.lifecycle.WrappedFragment;
+import com.j.jface.org.todo.TodoProvider;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.net.URI;
 
 public class DebugToolsFragment extends WrappedFragment implements View.OnClickListener, NumberPicker.OnValueChangeListener, TimePicker.OnTimeChangedListener
 {
+  public static final int DESTROY_DATABASE_AND_REPLACE_WITH_FILE_CONTENTS = 200;
   private static final int MSG_UPDATE_TIME = 1;
   private static final int GRACE_FOR_UPDATE = 3000;
 
   @NonNull private final Client mClient;
+  @NonNull private final Fragment mFragment;
   private long mOffset = 0;
   private boolean mTicking = false;
   @NonNull private final Time mTime1, mTime2;
@@ -52,6 +66,7 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
   {
     super(a.inflater.inflate(R.layout.fragment_debug_tools, a.container, false));
     mClient = b;
+    mFragment = a.fragment;
     mTime1 = new Time(); mTime2 = new Time();
     mView.findViewById(R.id.button_now).setOnClickListener(this);
     mDaysOffsetUI = (NumberPicker)mView.findViewById(R.id.daysOffsetUI);
@@ -81,6 +96,33 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
 
     final TextView nodeNameTextView = (TextView)mView.findViewById(R.id.nodeId_textView);
     new GetNodeNameAction(mClient, null, name -> a.fragment.getActivity().runOnUiThread(() -> nodeNameTextView.setText("Node id : " + name))).enqueue();
+
+    mView.findViewById(R.id.button_copy_todo_from_storage).setOnClickListener(v ->
+    {
+      final Intent intent = new Intent();
+      intent.setType("*/*");
+      intent.setAction(Intent.ACTION_GET_CONTENT);
+      a.fragment.startActivityForResult(intent, DESTROY_DATABASE_AND_REPLACE_WITH_FILE_CONTENTS);
+    });
+  }
+
+  protected void onActivityResult(final int requestCode, final int resultCode, final Intent data)
+  {
+    final Uri fileUri = data.getData();
+    FileNotFoundException exception = null;
+    if (null != fileUri)
+    {
+      InputStream is = null;
+      try { is = mFragment.getContext().getContentResolver().openInputStream(fileUri); }
+      catch (final FileNotFoundException e) { exception = e; }
+      if (null == exception && null != is)
+      {
+        TodoProvider.destroyDatabaseAndReplaceWithFileContentsAction(mClient, mFragment.getContext(), is,
+         new ReportActionWithSnackbar(mClient, null, mView, "Database dumped, restart JOrg", "Kill", v -> System.exit(0))).enqueue();
+        return;
+      }
+    }
+    new ReportActionWithSnackbar(mClient, null, mView, "File can't be opened." + (null == exception ? "" : " " + exception.toString())).enqueue();
   }
 
   private void tick()

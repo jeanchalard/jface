@@ -14,6 +14,7 @@ import android.widget.SeekBar
 import com.j.jface.Const
 import com.j.jface.R
 import com.j.jface.client.Client
+import com.j.jface.lifecycle.FragmentWrapper
 import com.j.jface.lifecycle.WrappedFragment
 
 class ImageSelectorFragment(a : Args, client : Client) : WrappedFragment(a.inflater.inflate(R.layout.fragment_image_selector, a.container, false)), Client.GetBitmapCallback
@@ -44,12 +45,22 @@ class ImageSelectorFragment(a : Args, client : Client) : WrappedFragment(a.infla
     val intent = Intent()
     intent.type = "image/*"
     intent.action = Intent.ACTION_GET_CONTENT
-    (mFragment.context as Activity).startActivityForResult(intent, CHOOSE_IMAGE_INTENT)
+    mFragment.startActivityForResult(intent, CHOOSE_IMAGE_INTENT)
+  }
+
+  override fun onActivityResult(requestCode : Int, resultCode : Int, data : Intent?)
+  {
+    if (null == data) return
+    val f = object : FragmentWrapper<ImageEditorFragment>(ImageEditorFragment.ImageEditorArgs(mClient, data)){}
+    mFragment.fragmentManager.beginTransaction()
+     .addToBackStack("ImageEditor")
+     .replace(R.id.dataFeedContents, f)
+     .commit()
   }
 
   override fun run(path : String, key : String, bitmap : Bitmap?)
   {
-    mFragment.activity.runOnUiThread {
+    mFragment.activity?.runOnUiThread {
       mImageButton.visibility = View.VISIBLE
       mSpinner.visibility = View.GONE
       if (null != bitmap)

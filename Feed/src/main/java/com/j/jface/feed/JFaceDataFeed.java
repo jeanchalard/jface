@@ -6,6 +6,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -22,6 +23,7 @@ import android.widget.ListView;
 
 import com.j.jface.R;
 import com.j.jface.client.Client;
+import com.j.jface.client.action.ui.ReportActionWithSnackbar;
 import com.j.jface.feed.fragments.ActivityLogFragment;
 import com.j.jface.feed.fragments.DebugToolsFragment;
 import com.j.jface.feed.fragments.ImageEditorFragment;
@@ -30,6 +32,11 @@ import com.j.jface.feed.fragments.LogsAndDataFragment;
 import com.j.jface.feed.fragments.MessagesFragment;
 import com.j.jface.lifecycle.FragmentWrapper;
 import com.j.jface.lifecycle.WrappedActivity;
+import com.j.jface.org.todo.TodoProvider;
+
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class JFaceDataFeed extends WrappedActivity
 {
@@ -118,17 +125,5 @@ public class JFaceDataFeed extends WrappedActivity
     final Intent i = new Intent(activity, GeofenceTransitionReceiverService.class);
     i.setAction(GeofenceTransitionReceiver.ACTION_MANUAL_START);
     activity.startService(i);
-  }
-
-  @Override protected void onActivityResult(final int requestCode, final int resultCode, final Intent data)
-  {
-    switch (requestCode)
-    {
-      case ImageSelectorFragment.CHOOSE_IMAGE_INTENT :
-        mA.getFragmentManager().beginTransaction()
-         .addToBackStack("ImageEditor")
-         .replace(R.id.dataFeedContents, new FragmentWrapper<ImageEditorFragment>(new ImageEditorFragment.ImageEditorArgs(mClient, data)){})
-         .commit();
-    }
   }
 }

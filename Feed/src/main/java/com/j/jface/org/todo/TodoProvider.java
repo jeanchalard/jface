@@ -2,6 +2,7 @@ package com.j.jface.org.todo;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -14,12 +15,15 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.j.jface.client.Client;
+import com.j.jface.client.action.Action;
 import com.j.jface.client.action.drive.WriteFileAction;
+import com.j.jface.client.action.fileops.CopyAction;
 import com.j.jface.lifecycle.WrappedContentProvider;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 // A provider of Todos.
 // Needs to be public to be accessed by the booter
@@ -168,10 +172,19 @@ public class TodoProvider extends WrappedContentProvider implements Handler.Call
     {
       new WriteFileAction(mClient, "Jormungand/Saves/latest", new FileInputStream(path)).enqueue();
     }
-    catch (FileNotFoundException e)
+    catch (final FileNotFoundException e)
     {
       Log.w("Jorg", "The todo DB in " + path.getPath() + " can't be found ; can't back it up in the cloud.");
       return;
     }
+  }
+
+  // A most dangerous method. It will take the specified file, and overwrite the current database
+  // with its contents. It will destroy everything. So use it wisely.
+  @NonNull
+  public static Action destroyDatabaseAndReplaceWithFileContentsAction(@NonNull final Client client, @NonNull final Context context,
+                                                                       @NonNull final InputStream inputStream, @Nullable Action dependency)
+  {
+    return new CopyAction(client, dependency, inputStream, context.getDatabasePath(DB_NAME).getAbsoluteFile());
   }
 }

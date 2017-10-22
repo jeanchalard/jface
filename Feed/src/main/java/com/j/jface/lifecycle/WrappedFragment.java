@@ -1,6 +1,7 @@
 package com.j.jface.lifecycle;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
@@ -33,4 +34,5 @@ public abstract class WrappedFragment
 //    ...where T is whatever is passed to the constructor or the wrapper, or suffer a runtime crash.
 
   @NonNull public View getView() { return mView; }
+  protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {};
 }

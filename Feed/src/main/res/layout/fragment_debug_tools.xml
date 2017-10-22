@@ -107,7 +107,7 @@
   <LinearLayout
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     >
 
     <TextView
@@ -125,5 +125,20 @@
       android:id="@+id/button_now"
       android:layout_weight="1"/>
   </LinearLayout>
+
+  <FrameLayout
+   android:background="@color/primary_text_dark"
+   android:layout_marginStart="48dp"
+   android:layout_marginEnd="48dp"
+   android:layout_width="match_parent"
+   android:layout_height="1px"
+   android:layout_weight="0"/>
+
+  <Button
+   android:id="@+id/button_copy_todo_from_storage"
+   android:layout_width="match_parent"
+   android:layout_height="wrap_content"
+   android:layout_weight="0"
+   android:text="Copy TODO DB from storage"/>
 
 </LinearLayout>
