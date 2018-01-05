@@ -16,7 +16,7 @@ import java.util.HashSet;
  */
 public class TodoListView implements ListChangeObserver
 {
-  private static final boolean DEBUG_VIEW = false;// true;
+  private static final boolean DEBUG_VIEW = false;
 
   @NonNull private final TodoList mList;
   @NonNull private ArrayList<Integer> mView;
@@ -32,7 +32,7 @@ public class TodoListView implements ListChangeObserver
     mList.addObserver(this);
     mObservers = new ArrayList<>();
     mView = refreshView(mList);
-    if (DEBUG_VIEW) dumpView("start");
+    if (DEBUG_VIEW) dumpView("start " + this);
   }
 
   public int size()
@@ -105,7 +105,7 @@ public class TodoListView implements ListChangeObserver
   {
     final boolean removed, added;
     final int localFrom = Collections.binarySearch(mView, from);
-    if (localFrom > 0) // If it's not in the view don't do it
+    if (localFrom >= 0) // If it's not in the view don't do it
     {
       mView.remove(localFrom);
       shiftView(localFrom, -1);
@@ -129,7 +129,7 @@ public class TodoListView implements ListChangeObserver
       l.add(payload);
       for (final ListChangeObserver obs : mObservers) obs.notifyItemRangeRemoved(localFrom, l);
     }
-    if (DEBUG_VIEW) dumpView("itemMoved");
+    if (DEBUG_VIEW) dumpView("itemMoved " + this);
   }
 
   @Override public void notifyItemInserted(final int position, @NonNull final Todo payload)
@@ -231,8 +231,8 @@ public class TodoListView implements ListChangeObserver
   {
     if (DEBUG_VIEW)
     {
-      Log.e("removeRange", "" + position + " (" + (shiftExisting ? "shift" : "view") + ") : " + payload.size());
-      for (final Todo t : payload) Log.e("removeRange", t.text);
+      Log.e("removeRange " + this, "" + position + " (" + (shiftExisting ? "shift" : "view") + ") : " + payload.size());
+      for (final Todo t : payload) Log.e("removeRange " + this, t.text);
     }
     final ArrayList<RemovedRange> ranges = new ArrayList<>();
     RemovedRange currentRange = null;
@@ -255,7 +255,7 @@ public class TodoListView implements ListChangeObserver
       final int insertionPoint = index > 0 ? index : -index - 1;
       shiftView(insertionPoint, -payload.size());
     }
-    if (DEBUG_VIEW) dumpView("before removeRange");
+    if (DEBUG_VIEW) dumpView("before removeRange " + this);
     for (final RemovedRange range : ranges)
     {
       mView.subList(range.start, range.end()).clear(); // Incl, excl
@@ -268,7 +268,7 @@ public class TodoListView implements ListChangeObserver
       }
       for (final ListChangeObserver obs : mObservers) obs.notifyItemRangeRemoved(range.start, range.todos);
     }
-    if (DEBUG_VIEW) dumpView("rangeRemoved");
+    if (DEBUG_VIEW) dumpView("rangeRemoved " + this);
   }
 
   // Returns whether any change was made.

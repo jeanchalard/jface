@@ -238,7 +238,6 @@ class TodoList implements Iterable<Todo>, Handler.Callback
     // This todo was here but not with this ord : it's a reorder.
     final int oldPos = rindex(oldTodo);
     final Todo todo = decorate(newTodo);
-    mSource.updateTodo(todo);
     if (hasDescendants(oldTodo))
     {
       final int oldTodoOrdLength = oldTodo.ord.length();
@@ -362,7 +361,7 @@ class TodoList implements Iterable<Todo>, Handler.Callback
     }
   }
 
-  @Override public Iterator<Todo> iterator()
+  @Override @NonNull public Iterator<Todo> iterator()
   {
     return new TodoIterator();
   }

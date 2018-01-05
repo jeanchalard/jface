@@ -138,4 +138,12 @@ public class TodoCore implements Comparable<String>
     }
     while (true);
   }
+
+  @Override public String toString() {
+    final StringBuilder b = new StringBuilder("TODO : \"");
+    for (int i = depth; i > 0; --i) b.append("> ");
+    b.append(text);
+    b.append("\"");
+    return b.toString();
+  }
 }

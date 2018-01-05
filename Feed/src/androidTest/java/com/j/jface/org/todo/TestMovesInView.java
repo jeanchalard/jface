@@ -25,7 +25,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
@@ -79,16 +78,19 @@ public class TestMovesInView
     assertEquals(todoList, source.fetchTodoList());
   }
 
-  public void testMoveXAfterY(final TodoListView listView, final int x, final int y)
+  public void helperMoveXBeforeY(final TodoListView listView, final Todo tx, final Todo ty)
   {
-    final Todo tx = listView.get(x);
-    final Todo ty = y < 0 ? null : listView.get(y);
-    final int z = y + 1; final Todo tz = z >= listView.size() ? null : listView.get(z);
-    if (null != ty && ty.ord.startsWith(tx.ord)) return; // Don't try to order a todo after one if its children, it makes no sense
-// Ça suffit pas : quand tu startDragging ça change les indices, c'est la mouise
+    if (null != ty && ty.ord.startsWith(tx.ord) && tx != ty) return; // Don't try to order a todo after one if its children, it makes no sense
+    final int x = listView.findByOrd(tx.ord);
+    final int fy = null == ty ? listView.size() - 1 : listView.findByOrd(ty.ord);
+    if (x < 0 || fy < 0) return; // At least one of these Todos are not visible because a parent is closed
+//    Log.e("TESTING", "   " + x + " (" + tx.text + ") → " + fy + " (" + (null == ty ? "null" : ty.text) + ")");
     listView.startDragging(tx);
+    // StartDragging may have changed indices. It can't have changed x (as it only collapses stuff under the dragged Todo and x is
+    // that one) but if y is below x and x was not a leaf then the index for y will have changed. Find the new y.
+    final int y = null == ty ? listView.size() - 1 : listView.findByOrd(ty.ord);
     final int dir = x < y ? 1 : -1;
-    for (int cur = x; cur != z; cur += dir)
+    for (int cur = x; cur != y; cur += dir)
       listView.moveTemporarily(cur, cur + dir);
     listView.stopDragging(tx);
     try
@@ -99,56 +101,93 @@ public class TestMovesInView
     {
       final String txS = "\"" + tx.ord + "\" (" + tx.text + ")";
       final String tyS = null == ty ? "null" : "\"" + ty.ord + "\" (" + ty.text + ")";
-      final String tzS = null == tz ? "null" : "\"" + tz.ord + "\" (" + tz.text + ")";
-      Log.e("WRONG DRAG", "Trying to put " + txS + " between " + tyS + " and " + tzS);
+      Log.e("WRONG DRAG", "Trying to put " + txS + " between " + tyS + " and " + tyS + " " + e);
       throw e;
     }
   }
 
-  public int testMoveAllHelper(final TodoListView listView, final int openablesState[], final int iteration)
+  public void helperApplyOpenablesStateAndMoveXBeforeY(final int openablesState[], final int movedIndex, final int destination)
   {
-    Log.e("TESTING", "" + openablesState.length + " " + iteration);
+    // Don't eschew testing for moved == dest, because it must work to grab a Todo and drop it without moving it.
+    Log.e("TESTING", "moving " + movedIndex + " → " + destination);
     resetDB();
     final TodoList l = TodoList.getInstance(mContext);
-    final TodoListView view = new TodoListView(l);
+    final TodoListView listView = new TodoListView(l);
     // Apply openables. The openablesState array is already in large to small order.
     for (int index : openablesState)
       if (index < 0)
         listView.toggleOpen(listView.get(-index - 1));
-    final int destinationsCount = listView.size() + 1;
-    final int movedIndex = iteration / destinationsCount;
-    final int destination = (iteration % destinationsCount) - 1; // -1 to size()
-    if (movedIndex != destination)
+    try
     {
-      try { testMoveXAfterY(listView, movedIndex, destination); }
-      catch (final Throwable e)
-      {
-        Log.e("CRASH", "    final int openablesState[] = { " + TextUtils.join(", ", Util.arrayListFromIntArray(openablesState)) + " }; final int iteration = " + iteration + ";");
-        throw e;
-      }
+      final Todo movedTodo = l.get(movedIndex);
+      final Todo destTodo = l.get(destination);
+      helperMoveXBeforeY(listView, movedTodo, destTodo);
+    }
+    catch (final Throwable e)
+    {
+      Log.e("CRASH", "    final int openablesState[] = { " + TextUtils.join(", ", Util.arrayListFromIntArray(openablesState)) + " };");
+      Log.e("CRASH", "    helperApplyOpenablesStateAndMoveXBeforeY(openablesState, " + movedIndex + ", " + destination + ");");
+      throw e;
     }
     l.unload();
-    final int next = iteration + (destination + 1 == movedIndex ? 2 : 1);
-    return destinationsCount * listView.size() <= next ? -1 : next;
+  }
+
+  private static boolean nextOpenables(final int[] openables)
+  {
+    for (int i = openables.length - 1; i >= 0; --i)
+    {
+      openables[i] = -openables[i] - 1;
+      if (openables[i] < 0) return true;
+    }
+    return false;
+  }
+
+  private void printOpenablesStep(final int[] openables)
+  {
+    int l = 0;
+    for (int i = 0; i < openables.length; ++i)
+    {
+      l = l << 1;
+      if (openables[i] < 0) l += 1;
+    }
+    l += 1;
+    Log.e("STEP", "" + l + " / " + (1 << openables.length));
   }
 
   @Test public void testMove()
   {
-    final TodoListView listView = new TodoListView(TodoList.getInstance(mContext));
+    final long startTime = System.currentTimeMillis();
+    final TodoList list = TodoList.getInstance(mContext);
+    final TodoListView listView = new TodoListView(list);
     final ArrayList<Integer> openablesIndices = new ArrayList<>();
-    for (int i = listView.size() - 1 ; i >= 0; --i)
+    final int size = listView.size();
+    for (int i = size - 1 ; i >= 0; --i)
       if (!listView.get(i).ui.leaf) openablesIndices.add(i);
     final int openablesState[] = new int[openablesIndices.size()];
     for (int i = openablesState.length - 1; i >= 0; --i) openablesState[i] = openablesIndices.get(i);
+    list.unload();
 
-    for (int iteration = 2; iteration >= 0; )
-      iteration = testMoveAllHelper(listView, openablesState, iteration);
+    do
+    {
+      printOpenablesStep(openablesState);
+      // Source is the index of the Todo to move. It goes from 0 to size() - 1, obviously. Destination is the index
+      // to put it at, so it will replace the Todo that is currently at this position. So if source is before destination,
+      // it will go *after* destination ; if it's after, it will go *before*. That means there are only size() possible
+      // destinations. The apparent discrepancy comes from the fact that, while there are indeed size() + 1 possible
+      // "insertion points" for a new Todo, two of them surround the source Todo and are coded for by the same index.
+      for (int source = 0; source < size; ++source)
+        for (int destination = 0; destination < size; ++destination)
+          helperApplyOpenablesStateAndMoveXBeforeY(openablesState, source, destination);
+    }
+    while (nextOpenables(openablesState));
+    final long endTime = System.currentTimeMillis();
+    final double duration = endTime - startTime;
+    Log.e("TEST FINISHED", "Tested in " + (duration / 1_000) + "(" + startTime + " ~ " + endTime + ")");
   }
 
   @Test public void testOne()
   {
-    final TodoListView listView = new TodoListView(TodoList.getInstance(mContext));
     final int openablesState[] = { 32, 26, 12, 11, 5, 0 }; final int iteration = 4;
-    testMoveAllHelper(listView, openablesState, iteration);
+    helperApplyOpenablesStateAndMoveXBeforeY(openablesState, 0, 31);
   }
 }
