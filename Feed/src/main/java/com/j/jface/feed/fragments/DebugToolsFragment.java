@@ -108,6 +108,7 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
 
   protected void onActivityResult(final int requestCode, final int resultCode, final Intent data)
   {
+    if (null == data) return;
     final Uri fileUri = data.getData();
     FileNotFoundException exception = null;
     if (null != fileUri)
