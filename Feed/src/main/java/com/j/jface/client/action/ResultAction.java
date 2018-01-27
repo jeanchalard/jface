@@ -9,7 +9,7 @@ import com.j.jface.FutureValue;
 import com.j.jface.client.Client;
 
 /**
- * An action with a result.
+ * An action with a result of type T.
  */
 public abstract class ResultAction<T> extends Action implements Future<T>
 {
@@ -36,6 +36,10 @@ public abstract class ResultAction<T> extends Action implements Future<T>
   public int status() { return result.status(); }
   @NonNull public String getError() { return result.getError(); }
 
+  /**
+   * A result action which is already done at the time it starts.
+   * Pass the result to the constructor.
+   */
   public static class Done<T> extends ResultAction<T>
   {
     public Done(@NonNull final Client client, @Nullable T value)
