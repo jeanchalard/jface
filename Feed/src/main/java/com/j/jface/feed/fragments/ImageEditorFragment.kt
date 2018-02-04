@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.provider.MediaStore
+import android.view.View
 import android.widget.ImageView
 import android.widget.SeekBar
 import com.google.android.gms.wearable.Asset
@@ -20,15 +21,15 @@ class ImageEditorFragment(a : Args, iea : ImageEditorArgs) : WrappedFragment(a.i
   data class ImageEditorArgs(val client : Client, val receivedData : Intent)
   private val mFragment = a.fragment
   private val mClient = iea.client
-  private val mViewFinder = mView.findViewById(R.id.view_finder)
-  private val mBlackener = mView.findViewById(R.id.blackener)
+  private val mViewFinder : View = mView.findViewById(R.id.view_finder)
+  private val mBlackener : View = mView.findViewById(R.id.blackener)
   private val mBrightnessBar : SeekBar = mView.findViewById(R.id.select_image_brightness) as SeekBar
   init
   {
     val bitmap = MediaStore.Images.Media.getBitmap(a.fragment.context.contentResolver, iea.receivedData.data)
     val imageView = mView.findViewById(R.id.edited_image) as TouchImageView
     imageView.setImageBitmap(bitmap)
-    mView.findViewById(R.id.image_set_button).setOnClickListener { imageChosen(imageView) }
+    mView.findViewById<View>(R.id.image_set_button).setOnClickListener { imageChosen(imageView) }
     mBlackener.alpha = 0f
     mBrightnessBar.progress = 1000
     mBrightnessBar.setOnSeekBarChangeListener(this)

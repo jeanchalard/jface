@@ -8,10 +8,13 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
+import kotlin.Unit;
+import kotlin.jvm.functions.Function3;
+
 /**
  * A wrapper for activities.
  */
-public abstract class AppCompatActivityWrapper<T extends WrappedActivity> extends AppCompatActivity
+public abstract class AppCompatActivityWrapper<T extends WrappedActivity> extends AppCompatActivity implements ActivityForResultListener
 {
   @Nullable private T mW;
 
@@ -26,6 +29,7 @@ public abstract class AppCompatActivityWrapper<T extends WrappedActivity> extend
 
   @Override public void onSaveInstanceState(@NonNull final Bundle savedInstanceState)
   {
+    super.onSaveInstanceState(savedInstanceState);
     assert mW != null;
     mW.onSaveInstanceState(savedInstanceState);
   }
@@ -63,6 +67,7 @@ public abstract class AppCompatActivityWrapper<T extends WrappedActivity> extend
     super.onActivityResult(requestCode, resultCode, data);
     assert mW != null;
     mW.onActivityResult(requestCode, resultCode, data);
+    invokeListener(requestCode, resultCode, data);
   }
 
   @Override public void onPause()

@@ -2,6 +2,7 @@ package com.j.jface.client;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,6 +18,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInApi;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
@@ -39,10 +41,13 @@ import com.j.jface.client.action.wear.DeleteDataAction;
 import com.j.jface.client.action.wear.GetBitmapAction;
 import com.j.jface.client.action.wear.GetDataAction;
 import com.j.jface.client.action.wear.PutDataAction;
+import com.j.jface.lifecycle.ActivityForResultListener;
 
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import kotlin.Unit;
 
 public class Client extends Handler implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
 {
@@ -58,17 +63,11 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
   private static final long CONNECTION_NON_RESPONSIVE_RESET_DELAY = 4000; // ms
   private static final long[] CONNECTION_FAILURES_BACKOFF = { 0, 1000, 10000, 300000 }; // ms
 
-  private static final int SIGNIN_OFF = 0;
-  private static final int SIGNIN_REQUIRED = 1;
-  private static final int SIGNIN_INPROGRESS = 2;
-  private static final int SIGNIN_OK = 3;
-
   @NonNull final private String mCreator;
   @NonNull final private GoogleApiClient mClient;
   @NonNull final private ConcurrentLinkedQueue<Action> mUpdates = new ConcurrentLinkedQueue<>();
   private int mConnectionFailures = 0;
   private long mConnectingSince = -1;
-  private int mSignedInState = SIGNIN_OFF;
 
   public Client(@NonNull final Context context)
   {
@@ -167,10 +166,16 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
     {
       mSignedInState = SIGNIN_OK;
       proceed();
+      return;
     }
-    else
+    final Context context = mClient.getContext();
+    if (context instanceof ActivityForResultListener)
     {
-      final Context context = mClient.getContext();
+      final ActivityForResultListener l = (ActivityForResultListener)context;
+      l.setActivityForResultListener((final Integer requestCode, final Integer resultCode, final Intent data) -> {
+        GoogleSignIn.getSignedInAccountFromIntent(data);
+        return Unit.INSTANCE;
+      });
       context.startActivity(Auth.GoogleSignInApi.getSignInIntent(mClient));
     }
   }
@@ -182,7 +187,7 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
     if (res.isDone())
       signInHelper(res.get());
     else
-      res.setResultCallback((final GoogleSignInResult result) -> signInHelper(result));
+      res.setResultCallback(result -> signInHelper(result));
   }
 
   public void enqueue(@NonNull final Action action)

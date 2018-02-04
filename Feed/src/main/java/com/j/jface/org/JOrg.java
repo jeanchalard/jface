@@ -27,6 +27,7 @@ import com.j.jface.lifecycle.TodoEditorBoot;
 import com.j.jface.lifecycle.WrappedActivity;
 import com.j.jface.org.sound.EditTextSoundRouter;
 import com.j.jface.org.sound.SoundSource;
+import com.j.jface.org.todo.FirebaseTestWriterKt;
 import com.j.jface.org.todo.Todo;
 import com.j.jface.org.todo.TodoListView;
 
@@ -53,19 +54,20 @@ public class JOrg extends WrappedActivity
   {
     super(args);
     mClient = new Client(mA);
+
     mA.setContentView(R.layout.org_top);
-    ((AppCompatActivity)mA).setSupportActionBar((Toolbar)mA.findViewById(R.id.orgTopActionBar));
-    mSoundSource = new SoundSource(mA, (ViewGroup)mA.findViewById(R.id.sound_source));
+    ((AppCompatActivity)mA).setSupportActionBar(mA.findViewById(R.id.orgTopActionBar));
+    mSoundSource = new SoundSource(mA, mA.findViewById(R.id.sound_source));
     mSoundRouter = new EditTextSoundRouter(mSoundSource);
 
-    mTopLayout = (CoordinatorLayout)mA.findViewById(R.id.topLayout);
-    final RecyclerView rv = (RecyclerView)mA.findViewById(R.id.todoList);
+    mTopLayout = mA.findViewById(R.id.topLayout);
+    final RecyclerView rv = mA.findViewById(R.id.todoList);
     mTodoList = new TodoListView(mA.getApplicationContext());
     mAdapter = new TodoAdapter(this, mA, mSoundRouter, mTodoList, rv);
     rv.setAdapter(mAdapter);
     rv.addItemDecoration(new DividerItemDecoration(mA, ((LinearLayoutManager)rv.getLayoutManager()).getOrientation()));
 
-    final FloatingActionButton fab = (FloatingActionButton)mA.findViewById(R.id.addTodo);
+    final FloatingActionButton fab = mA.findViewById(R.id.addTodo);
     fab.setOnClickListener(view -> addNewSubTodo(null));
 
     mTouchHelper = new ItemTouchHelper(new TodoMover(mAdapter, mTodoList));
