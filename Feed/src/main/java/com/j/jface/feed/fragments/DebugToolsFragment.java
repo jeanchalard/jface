@@ -15,8 +15,8 @@ import android.widget.TimePicker;
 
 import com.j.jface.Const;
 import com.j.jface.R;
+import com.j.jface.action.GetNodeNameAction;
 import com.j.jface.client.Client;
-import com.j.jface.client.action.node.GetNodeNameAction;
 import com.j.jface.client.action.ui.ReportActionWithSnackbar;
 import com.j.jface.feed.views.Snackbarable;
 import com.j.jface.lifecycle.WrappedFragment;
@@ -27,6 +27,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+
+import kotlin.Unit;
 
 public class DebugToolsFragment extends WrappedFragment implements View.OnClickListener, NumberPicker.OnValueChangeListener, TimePicker.OnTimeChangedListener, Snackbarable
 {
@@ -68,15 +70,15 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
     mFragment = a.fragment;
     mTime1 = new Time(); mTime2 = new Time();
     mView.findViewById(R.id.button_now).setOnClickListener(this);
-    mDaysOffsetUI = (NumberPicker)mView.findViewById(R.id.daysOffsetUI);
+    mDaysOffsetUI = mView.findViewById(R.id.daysOffsetUI);
     mDaysOffsetUI.setMinValue(0); mDaysOffsetUI.setMaxValue(14);
-    mHoursUI = (NumberPicker)mView.findViewById(R.id.hoursUI);
+    mHoursUI = mView.findViewById(R.id.hoursUI);
     mHoursUI.setMinValue(0); mHoursUI.setMaxValue(23);
-    mMinutesUI = (NumberPicker)mView.findViewById(R.id.minutesUI);
+    mMinutesUI = mView.findViewById(R.id.minutesUI);
     mMinutesUI.setMinValue(0); mMinutesUI.setMaxValue(59);
-    mSecondsUI = (NumberPicker)mView.findViewById(R.id.secondsUI);
+    mSecondsUI = mView.findViewById(R.id.secondsUI);
     mSecondsUI.setMinValue(0); mSecondsUI.setMaxValue(59);
-    mOffsetLabel = (TextView)mView.findViewById(R.id.offsetLabel);
+    mOffsetLabel = mView.findViewById(R.id.offsetLabel);
     tick();
     mHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, 1000);
 
@@ -86,15 +88,15 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
     mDaysOffsetUI.setOnValueChangedListener(this);
 
     mFenceUIs = new CheckBox[4];
-    mFenceUIs[0] = (CheckBox)mView.findViewById(R.id.fence1);
-    mFenceUIs[1] = (CheckBox)mView.findViewById(R.id.fence2);
-    mFenceUIs[2] = (CheckBox)mView.findViewById(R.id.fence3);
-    mFenceUIs[3] = (CheckBox)mView.findViewById(R.id.fence4);
+    mFenceUIs[0] = mView.findViewById(R.id.fence1);
+    mFenceUIs[1] = mView.findViewById(R.id.fence2);
+    mFenceUIs[2] = mView.findViewById(R.id.fence3);
+    mFenceUIs[3] = mView.findViewById(R.id.fence4);
     for (final CheckBox c : mFenceUIs) c.setOnClickListener(this);
     if (Const.RIO_MODE) mFenceUIs[2].setText("六本木");
 
-    final TextView nodeNameTextView = (TextView)mView.findViewById(R.id.nodeId_textView);
-    new GetNodeNameAction(mClient, null, name -> a.fragment.getActivity().runOnUiThread(() -> nodeNameTextView.setText("Node id : " + name))).enqueue();
+    final TextView nodeNameTextView = mView.findViewById(R.id.nodeId_textView);
+    new GetNodeNameAction(mFragment.getContext(), name -> { a.fragment.getActivity().runOnUiThread(() -> nodeNameTextView.setText("Node id : " + name)); return Unit.INSTANCE; }).enqueue();
 
     mView.findViewById(R.id.button_copy_todo_from_storage).setOnClickListener(v ->
     {

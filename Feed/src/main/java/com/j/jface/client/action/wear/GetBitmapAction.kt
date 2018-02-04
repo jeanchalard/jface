@@ -35,7 +35,12 @@ class GetBitmapAction(client : Client, path : String, key : String, dependency :
 
   override fun onResult(fdResult : DataApi.GetFdForAssetResult)
   {
-    if (!fdResult.status.isSuccess) { mCallback?.run(mPath, mKey, null) ; fail("Error fetching asset fd " + fdResult.status.statusMessage ?: "Unknown error") ; return }
+    if (!fdResult.status.isSuccess)
+    {
+      mCallback?.run(mPath, mKey, null)
+      fail("Error fetching asset fd " + fdResult.status.statusMessage ?: "Unknown error")
+      return
+    }
     val bitmap = BitmapFactory.decodeStream(fdResult.inputStream)
     mCallback?.run(mPath, mKey, bitmap)
     finish(bitmap)

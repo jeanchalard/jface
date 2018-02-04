@@ -25,9 +25,7 @@ import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
-import com.j.jface.Future;
 import com.j.jface.client.action.Action;
-import com.j.jface.client.action.node.GetNodeNameAction;
 import com.j.jface.client.action.wear.DeleteAllDataAction;
 import com.j.jface.client.action.wear.DeleteDataAction;
 import com.j.jface.client.action.wear.GetBitmapAction;
@@ -243,13 +241,6 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
   public void putData(@NonNull final String path, @NonNull final DataMap map)
   {
     enqueue(new PutDataAction(this, path, map));
-  }
-
-  public Future<String> getNodeId()
-  {
-    final GetNodeNameAction action = new GetNodeNameAction(this, null);
-    enqueue(action);
-    return action;
   }
 
   public void deleteData(@NonNull final Uri uri)
