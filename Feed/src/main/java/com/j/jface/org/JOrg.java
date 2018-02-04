@@ -11,25 +11,24 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.google.android.gms.auth.api.Auth;
 import com.j.jface.Const;
 import com.j.jface.R;
 import com.j.jface.client.Client;
 import com.j.jface.client.action.drive.RecursiveBackupAction;
+import com.j.jface.feed.views.Snackbarable;
 import com.j.jface.lifecycle.TodoEditorBoot;
 import com.j.jface.lifecycle.WrappedActivity;
 import com.j.jface.org.sound.EditTextSoundRouter;
 import com.j.jface.org.sound.SoundSource;
-import com.j.jface.org.todo.FirebaseTestWriterKt;
 import com.j.jface.org.todo.Todo;
 import com.j.jface.org.todo.TodoListView;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -39,7 +38,7 @@ import java.util.Locale;
 /**
  * Main activity class for JOrg.
  */
-public class JOrg extends WrappedActivity
+public class JOrg extends WrappedActivity implements Snackbarable
 {
   @NonNull private final Client mClient;
   @NonNull private final SoundSource mSoundSource;
@@ -136,4 +135,16 @@ public class JOrg extends WrappedActivity
   {
     new RecursiveBackupAction(mClient, null, mTopLayout).enqueue();
   }
+
+  @NonNull @Override public View getSnackbarParent()
+  {
+    return mTopLayout;
+  }
+
+  // TODO : DELETE ME. There should be no need for these 2 methods as Java 8 has default
+  // interface impls already and it's super annoying to have to write it, but I don't
+  // have the net right now to check what the heck is wrong between the Kotlin and Java
+  // impls of default interface methods.
+  @Override public void showSnackbar(@NotNull String message) { Snackbarable.DefaultImpls.showSnackbar(this, message); }
+  @Override public void showSnackbar(@NotNull String message, @org.jetbrains.annotations.Nullable String actionTitle, @org.jetbrains.annotations.Nullable View.OnClickListener callback) { Snackbarable.DefaultImpls.showSnackbar(this, message, actionTitle, callback); }
 }

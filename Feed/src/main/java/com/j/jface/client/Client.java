@@ -2,10 +2,8 @@ package com.j.jface.client;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,22 +16,16 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInApi;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.drive.Drive;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
-import com.j.jface.Const;
 import com.j.jface.Future;
-import com.j.jface.Util;
 import com.j.jface.client.action.Action;
 import com.j.jface.client.action.node.GetNodeNameAction;
 import com.j.jface.client.action.wear.DeleteAllDataAction;
@@ -41,13 +33,9 @@ import com.j.jface.client.action.wear.DeleteDataAction;
 import com.j.jface.client.action.wear.GetBitmapAction;
 import com.j.jface.client.action.wear.GetDataAction;
 import com.j.jface.client.action.wear.PutDataAction;
-import com.j.jface.lifecycle.ActivityForResultListener;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import kotlin.Unit;
 
 public class Client extends Handler implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
 {
@@ -56,10 +44,9 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
 
   private static final boolean DEBUG_CLIENT = false;
   private static final int MSG_PROCESS_QUEUE = 1;
-  private static final int MSG_SIGN_IN = 2;
-  private static final int MSG_CONNECT = 3;
-  private static final int MSG_RUN_ACTIONS = 4;
-  private static final int MSG_DISCONNECT = 5;
+  private static final int MSG_CONNECT = 2;
+  private static final int MSG_RUN_ACTIONS = 3;
+  private static final int MSG_DISCONNECT = 4;
   private static final long CONNECTION_NON_RESPONSIVE_RESET_DELAY = 4000; // ms
   private static final long[] CONNECTION_FAILURES_BACKOFF = { 0, 1000, 10000, 300000 }; // ms
 
@@ -77,7 +64,6 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
      .addConnectionCallbacks(this)
      .addOnConnectionFailedListener(this)
      .addApiIfAvailable(Wearable.API)
-     .addApi(LocationServices.API)
      .addApi(Auth.GOOGLE_SIGN_IN_API, new GoogleSignInOptions.Builder().requestScopes(Drive.SCOPE_FILE).build())
      .addApiIfAvailable(Drive.API)
      .build();
@@ -102,7 +88,6 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
   private String getMsgName(final int msg)
   {
     if (MSG_PROCESS_QUEUE == msg) return "PROCESS_QUEUE";
-    else if (MSG_SIGN_IN == msg) return "SIGN_IN";
     else if (MSG_CONNECT == msg) return "CONNECT";
     else if (MSG_RUN_ACTIONS == msg) return "RUN_ACTIONS";
     else if (MSG_DISCONNECT == msg) return "DISCONNECT";
@@ -121,8 +106,6 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
         mClient.connect(GoogleApiClient.SIGN_IN_MODE_OPTIONAL);
         mConnectingSince = SystemClock.elapsedRealtime();
         break;
-      case MSG_SIGN_IN :
-        trySignIn();
       case MSG_RUN_ACTIONS :
         final Action a = mUpdates.poll();
         if (null != a) a.run(mClient);
@@ -139,7 +122,7 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
     removeMessages(MSG_DISCONNECT);
     final int what; final int delay;
     if (!mClient.isConnected()) { what = MSG_CONNECT; delay = 0; }
-    else if (mClient.isConnecting() || SIGNIN_INPROGRESS == mSignedInState)
+    else if (mClient.isConnecting())
     {
       if (mConnectingSince > 0 && mConnectingSince + CONNECTION_NON_RESPONSIVE_RESET_DELAY < SystemClock.elapsedRealtime())
       {
@@ -152,7 +135,6 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
         delay = 2 * 1000; // 2s grace
       what = MSG_PROCESS_QUEUE;
     } // check again in 2 secs
-    else if (SIGNIN_REQUIRED == mSignedInState) { what = MSG_SIGN_IN; delay = 0; }
     else if (mUpdates.isEmpty()) { what = MSG_DISCONNECT; delay = 20 * 1000; } // 20 seconds delay to disconnect
     else { what = MSG_RUN_ACTIONS; delay = 0; }
     removeMessages(what);
@@ -164,30 +146,10 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
   {
     if (res.isSuccess())
     {
-      mSignedInState = SIGNIN_OK;
       proceed();
       return;
     }
     final Context context = mClient.getContext();
-    if (context instanceof ActivityForResultListener)
-    {
-      final ActivityForResultListener l = (ActivityForResultListener)context;
-      l.setActivityForResultListener((final Integer requestCode, final Integer resultCode, final Intent data) -> {
-        GoogleSignIn.getSignedInAccountFromIntent(data);
-        return Unit.INSTANCE;
-      });
-      context.startActivity(Auth.GoogleSignInApi.getSignInIntent(mClient));
-    }
-  }
-
-  private void trySignIn()
-  {
-    mSignedInState = SIGNIN_INPROGRESS;
-    OptionalPendingResult<GoogleSignInResult> res = Auth.GoogleSignInApi.silentSignIn(mClient);
-    if (res.isDone())
-      signInHelper(res.get());
-    else
-      res.setResultCallback(result -> signInHelper(result));
   }
 
   public void enqueue(@NonNull final Action action)

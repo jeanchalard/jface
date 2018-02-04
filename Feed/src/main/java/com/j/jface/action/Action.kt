@@ -1,3 +1,10 @@
 package com.j.jface.action
 
-open class Action
+abstract class Action
+{
+  open fun enqueue()
+  {
+    // TODO : implement
+  }
+  abstract fun run()
+}

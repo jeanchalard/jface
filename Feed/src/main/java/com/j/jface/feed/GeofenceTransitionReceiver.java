@@ -8,8 +8,8 @@ import android.support.annotation.NonNull;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 import com.j.jface.Const;
+import com.j.jface.action.SetupGeofenceAction;
 import com.j.jface.client.Client;
-import com.j.jface.client.action.geofence.SetupGeofenceAction;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ public class GeofenceTransitionReceiver
   {
     final String action = intent.getAction();
     if (Intent.ACTION_BOOT_COMPLETED.equals(action) || ACTION_MANUAL_START.equals(action))
-      new SetupGeofenceAction(mClient, getNotificationIntent()).enqueue();
+      new SetupGeofenceAction(service, getNotificationIntent()).enqueue();
     if (ACTION_GEOFENCE.equals(action)) handleGeofenceTransitions(intent);
     FeedLoader.startAllLoads(mClient);
   }

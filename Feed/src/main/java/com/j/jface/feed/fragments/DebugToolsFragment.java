@@ -6,10 +6,8 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.format.Time;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.NumberPicker;
 import android.widget.TextView;
@@ -20,15 +18,17 @@ import com.j.jface.R;
 import com.j.jface.client.Client;
 import com.j.jface.client.action.node.GetNodeNameAction;
 import com.j.jface.client.action.ui.ReportActionWithSnackbar;
+import com.j.jface.feed.views.Snackbarable;
 import com.j.jface.lifecycle.WrappedFragment;
 import com.j.jface.org.todo.TodoProvider;
 
-import java.io.File;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.net.URI;
 
-public class DebugToolsFragment extends WrappedFragment implements View.OnClickListener, NumberPicker.OnValueChangeListener, TimePicker.OnTimeChangedListener
+public class DebugToolsFragment extends WrappedFragment implements View.OnClickListener, NumberPicker.OnValueChangeListener, TimePicker.OnTimeChangedListener, Snackbarable
 {
   public static final int DESTROY_DATABASE_AND_REPLACE_WITH_FILE_CONTENTS = 200;
   private static final int MSG_UPDATE_TIME = 1;
@@ -61,7 +61,6 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
     }
   }
   private final Handler mHandler = new TabDebugToolsHandler(this);
-
   public DebugToolsFragment(@NonNull final Args a, @NonNull final Client b)
   {
     super(a.inflater.inflate(R.layout.fragment_debug_tools, a.container, false));
@@ -187,4 +186,16 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
   {
     updateOffset(GRACE_FOR_UPDATE);
   }
+
+  @NonNull @Override public View getSnackbarParent()
+  {
+    return mView;
+  }
+
+  // TODO : DELETE ME. There should be no need for these 2 methods as Java 8 has default
+  // interface impls already and it's super annoying to have to write it, but I don't
+  // have the net right now to check what the heck is wrong between the Kotlin and Java
+  // impls of default interface methods.
+  @Override public void showSnackbar(@NotNull String message) { Snackbarable.DefaultImpls.showSnackbar(this, message); }
+  @Override public void showSnackbar(@NotNull String message, @Nullable String actionTitle, @Nullable View.OnClickListener callback) { Snackbarable.DefaultImpls.showSnackbar(this, message, actionTitle, callback); }
 }

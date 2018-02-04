@@ -11,7 +11,7 @@ import com.google.android.gms.location.LocationServices
 import com.j.jface.Const
 import com.j.jface.feed.Fences
 
-class SetupGeofenceAction : Action()
+class SetupGeofenceAction(val context : Context, val intent : PendingIntent) : Action()
 {
   private fun getGeofence(params : Fences.Params) : Geofence
   {
@@ -24,7 +24,7 @@ class SetupGeofenceAction : Action()
      .build()
   }
 
-  fun run(context : Context, intent : PendingIntent)
+  override fun run()
   {
     val client = LocationServices.getGeofencingClient(context)
 
@@ -42,7 +42,8 @@ class SetupGeofenceAction : Action()
 
     val hasPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
     if (PackageManager.PERMISSION_GRANTED == hasPermission)
-      client.addGeofences(request, intent)
-       .setResultCallback(this)
+      client.addGeofences(request, intent).addOnCompleteListener { task -> if (task.isSuccessful) InformUserAction(context, "Geofences added.").enqueue() else InformUserAction(context, "Geofences can't be added :\n" + task.exception).enqueue() }
+    else
+      InformUserAction(context, "Can't add geofences for lack of location permission.").enqueue()
   }
 }

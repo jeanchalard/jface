@@ -18,6 +18,8 @@ public class Const
   public static final long UPDATE_DELAY_MILLIS = 7 * 24 * 60 * 60 * 1000; // One week in millis
   public static final int DISPLAYED_DEPARTURES_PER_LINE = 3;
 
+  @NonNull public static final String INTERNAL_PERSISTED_VALUES_FILES = "SystemValues";
+
   @NonNull public static final String[] WEEKDAYS = { "日", "月", "火", "水", "木", "金", "土", "日" };
   @NonNull public static final String DATA_PATH = "/jwatch/Data";
   @NonNull public static final String CONFIG_PATH = "/jwatch/Conf";
