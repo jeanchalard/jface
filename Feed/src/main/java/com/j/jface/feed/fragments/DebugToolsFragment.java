@@ -22,7 +22,6 @@ import com.j.jface.feed.views.Snackbarable;
 import com.j.jface.lifecycle.WrappedFragment;
 import com.j.jface.org.todo.TodoProvider;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.FileNotFoundException;
@@ -189,15 +188,5 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
     updateOffset(GRACE_FOR_UPDATE);
   }
 
-  @NonNull @Override public View getSnackbarParent()
-  {
-    return mView;
-  }
-
-  // TODO : DELETE ME. There should be no need for these 2 methods as Java 8 has default
-  // interface impls already and it's super annoying to have to write it, but I don't
-  // have the net right now to check what the heck is wrong between the Kotlin and Java
-  // impls of default interface methods.
-  @Override public void showSnackbar(@NotNull String message) { Snackbarable.DefaultImpls.showSnackbar(this, message); }
-  @Override public void showSnackbar(@NotNull String message, @Nullable String actionTitle, @Nullable View.OnClickListener callback) { Snackbarable.DefaultImpls.showSnackbar(this, message, actionTitle, callback); }
+  @Nullable @Override public View getSnackbarParent() { return mFragment.isResumed() ? mView : null; }
 }

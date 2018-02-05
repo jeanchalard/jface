@@ -28,8 +28,6 @@ import com.j.jface.org.sound.SoundSource;
 import com.j.jface.org.todo.Todo;
 import com.j.jface.org.todo.TodoListView;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -136,15 +134,8 @@ public class JOrg extends WrappedActivity implements Snackbarable
     new RecursiveBackupAction(mClient, null, mTopLayout).enqueue();
   }
 
-  @NonNull @Override public View getSnackbarParent()
+  @Nullable @Override public View getSnackbarParent()
   {
-    return mTopLayout;
+    return isResumed() ? mTopLayout : null;
   }
-
-  // TODO : DELETE ME. There should be no need for these 2 methods as Java 8 has default
-  // interface impls already and it's super annoying to have to write it, but I don't
-  // have the net right now to check what the heck is wrong between the Kotlin and Java
-  // impls of default interface methods.
-  @Override public void showSnackbar(@NotNull String message) { Snackbarable.DefaultImpls.showSnackbar(this, message); }
-  @Override public void showSnackbar(@NotNull String message, @org.jetbrains.annotations.Nullable String actionTitle, @org.jetbrains.annotations.Nullable View.OnClickListener callback) { Snackbarable.DefaultImpls.showSnackbar(this, message, actionTitle, callback); }
 }

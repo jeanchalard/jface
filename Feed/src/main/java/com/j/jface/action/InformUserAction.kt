@@ -6,12 +6,13 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.drawable.BitmapDrawable
+import android.support.design.widget.Snackbar
 import android.view.View
 import com.j.jface.Const
 import com.j.jface.R
 import com.j.jface.feed.views.Snackbarable
 
-class NotificationAction(val context : Context, val text : String) : Action()
+class InformUserAction(val context : Context, val text : String, val actionMessage : String? = null, val callback : View.OnClickListener? = null) : Action()
 {
   companion object
   {
@@ -48,20 +49,14 @@ class NotificationAction(val context : Context, val text : String) : Action()
     notificationManager.notify(notifId, notif.build())
   }
 
-  override fun run() = postNotification()
-}
-
-class SnackbarAction(val dude : Snackbarable, val text : String, val actionMessage : String? = null, val callback : View.OnClickListener? = null) : Action()
-{
-  fun showSnackbar()
+  override fun run()
   {
-    dude.showSnackbar(text, actionMessage, callback)
+    if (context !is Snackbarable) { postNotification(); return }
+    val snackbarParent = context.snackbarParent
+    if (null == snackbarParent) { postNotification(); return }
+    val sb = Snackbar.make(snackbarParent, text, Snackbar.LENGTH_SHORT)
+    if (null != actionMessage && null != callback)
+      sb.setAction(actionMessage, callback)
+    sb.show()
   }
-
-  override fun run() = showSnackbar()
-}
-
-fun InformUserAction(context : Context, text : String) : Action
-{
-  return if (context is Snackbarable) SnackbarAction(context, text) else NotificationAction(context, text)
 }

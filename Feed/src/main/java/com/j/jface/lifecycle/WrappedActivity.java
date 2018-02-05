@@ -8,6 +8,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.MenuItem;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 // A base class for a wrapped activity with a sane lifecycle
 public class WrappedActivity
 {
@@ -37,4 +40,13 @@ public class WrappedActivity
   protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {}
   public void onPause() {}
   public void onResume() {}
+  public boolean isResumed()
+  {
+    try
+    {
+      final Method method = Activity.class.getMethod("isResumed");
+      return (Boolean)method.invoke(mA);
+    } catch (NoSuchMethodException|IllegalAccessException|InvocationTargetException e) {}
+    return false;
+  }
 }
