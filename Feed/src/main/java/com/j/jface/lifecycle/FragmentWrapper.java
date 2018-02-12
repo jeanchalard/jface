@@ -9,14 +9,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import static com.j.jface.lifecycle.WrappedFragment.*;
+
 public class FragmentWrapper<T extends WrappedFragment> extends Fragment
 {
   @Nullable private T mW;
+  private final Class<T> wrappedClass;
   private final Object arg;
 
   @SuppressLint("ValidFragment")
-  public FragmentWrapper(final Object a)
+  public FragmentWrapper(final Class<T> wrapped, final Object a)
   {
+    wrappedClass = wrapped;
     arg = a;
   }
 
@@ -25,11 +29,11 @@ public class FragmentWrapper<T extends WrappedFragment> extends Fragment
     throw new RuntimeException("Nopes. Stop doing crap.");
   }
 
-  @Override public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle icicle)
+  @SuppressWarnings("unchecked") @Override public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle icicle)
   {
-    mW = ((T)WrapUtils.build(getClass(),
-     new Class[]{WrappedFragment.Args.class, arg.getClass()},
-     new Object[]{new WrappedFragment.Args(this, inflater, container, icicle), arg}));
+    mW = (T)WrapUtils.build(wrappedClass,
+     new Class[]{Args.class, arg.getClass()},
+     new Object[]{new Args(this, inflater, container, icicle), arg});
     return mW.getView();
   }
 

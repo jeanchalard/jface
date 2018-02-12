@@ -12,7 +12,7 @@ import com.j.jface.Const
 import com.j.jface.R
 import com.j.jface.feed.views.Snackbarable
 
-class InformUserAction(val context : Context, val text : String, val actionMessage : String? = null, val callback : View.OnClickListener? = null) : Action()
+class InformUserAction(val context : Context, val text : String, val actionMessage : String? = null, val callback : View.OnClickListener? = null) : Action
 {
   companion object
   {
@@ -29,7 +29,7 @@ class InformUserAction(val context : Context, val text : String, val actionMessa
     if (null != existing) return existing
     val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH)
     // Configure the notification channel.
-    channel.description = "Jormungand";
+    channel.description = "Jormungand"
     channel.enableLights(true)
     channel.lightColor = context.getColor(R.color.jormungand_color)
     channel.enableVibration(false)
@@ -40,6 +40,7 @@ class InformUserAction(val context : Context, val text : String, val actionMessa
   fun postNotification() {
     val channel = getChannel()
     val notif = Notification.Builder(context, channel.id)
+     .setSmallIcon(R.drawable.jormungand)
      .setLargeIcon((context.getDrawable(R.drawable.jormungand) as BitmapDrawable).bitmap)
      .setContentText(text)
      .setColor(context.getColor(R.color.jormungand_color))
@@ -57,6 +58,6 @@ class InformUserAction(val context : Context, val text : String, val actionMessa
     val sb = Snackbar.make(snackbarParent, text, Snackbar.LENGTH_SHORT)
     if (null != actionMessage && null != callback)
       sb.setAction(actionMessage, callback)
-    sb.show()
+    snackbarParent.post { sb.show() }
   }
 }

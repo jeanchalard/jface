@@ -15,7 +15,8 @@ import android.widget.TimePicker;
 
 import com.j.jface.Const;
 import com.j.jface.R;
-import com.j.jface.action.GetNodeNameAction;
+import com.j.jface.action.GThread;
+import com.j.jface.action.wear.GetNodeNameActionKt;
 import com.j.jface.client.Client;
 import com.j.jface.client.action.ui.ReportActionWithSnackbar;
 import com.j.jface.feed.views.Snackbarable;
@@ -35,7 +36,7 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
   private static final int MSG_UPDATE_TIME = 1;
   private static final int GRACE_FOR_UPDATE = 3000;
 
-  @NonNull private final Client mClient;
+  @NonNull private final GThread mGThread;
   @NonNull private final Fragment mFragment;
   private long mOffset = 0;
   private boolean mTicking = false;
@@ -62,10 +63,10 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
     }
   }
   private final Handler mHandler = new TabDebugToolsHandler(this);
-  public DebugToolsFragment(@NonNull final Args a, @NonNull final Client b)
+  public DebugToolsFragment(@NonNull final Args a, @NonNull final GThread b)
   {
     super(a.inflater.inflate(R.layout.fragment_debug_tools, a.container, false));
-    mClient = b;
+    mGThread = b;
     mFragment = a.fragment;
     mTime1 = new Time(); mTime2 = new Time();
     mView.findViewById(R.id.button_now).setOnClickListener(this);
@@ -95,7 +96,10 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
     if (Const.RIO_MODE) mFenceUIs[2].setText("六本木");
 
     final TextView nodeNameTextView = mView.findViewById(R.id.nodeId_textView);
-    new GetNodeNameAction(mFragment.getContext(), name -> { a.fragment.getActivity().runOnUiThread(() -> nodeNameTextView.setText("Node id : " + name)); return Unit.INSTANCE; }).enqueue();
+    mGThread.enqueue(GetNodeNameActionKt.GetNodeNameAction(mFragment.getContext(), nodeName -> {
+      a.fragment.getActivity().runOnUiThread(() -> nodeNameTextView.setText("Node id : " + nodeName));
+      return Unit.INSTANCE;
+     }));
 
     mView.findViewById(R.id.button_copy_todo_from_storage).setOnClickListener(v ->
     {
@@ -111,6 +115,7 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
     if (null == data) return;
     final Uri fileUri = data.getData();
     FileNotFoundException exception = null;
+    final Client client = new Client(mFragment.getContext());
     if (null != fileUri)
     {
       InputStream is = null;
@@ -118,12 +123,12 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
       catch (final FileNotFoundException e) { exception = e; }
       if (null == exception && null != is)
       {
-        TodoProvider.destroyDatabaseAndReplaceWithFileContentsAction(mClient, mFragment.getContext(), is,
-         new ReportActionWithSnackbar(mClient, null, mView, "Database dumped, restart JOrg", "Kill", v -> System.exit(0))).enqueue();
+        TodoProvider.destroyDatabaseAndReplaceWithFileContentsAction(client, mFragment.getContext(), is,
+         new ReportActionWithSnackbar(client, null, mView, "Database dumped, restart JOrg", "Kill", v -> System.exit(0))).enqueue();
         return;
       }
     }
-    new ReportActionWithSnackbar(mClient, null, mView, "File can't be opened." + (null == exception ? "" : " " + exception.toString())).enqueue();
+    new ReportActionWithSnackbar(client, null, mView, "File can't be opened." + (null == exception ? "" : " " + exception.toString())).enqueue();
   }
 
   private void tick()
@@ -152,7 +157,7 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
     mTime1.set(mTime1.toMillis(true) + dayOffset * 86400000 - grace);
     mOffset = mTime1.toMillis(true) - mTime2.toMillis(true);
     mHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, grace);
-    mClient.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_DEBUG_TIME_OFFSET, Const.DATA_KEY_DEBUG_TIME_OFFSET, mOffset);
+    mGThread.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_DEBUG_TIME_OFFSET, Const.DATA_KEY_DEBUG_TIME_OFFSET, mOffset);
   }
 
   private void updateFences()
@@ -160,7 +165,7 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
     int fences = 0;
     for (int i = 0; i < mFenceUIs.length; ++i)
       fences |= mFenceUIs[i].isChecked() ? 1 << i : 0;
-    mClient.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_DEBUG_FENCES, Const.DATA_KEY_DEBUG_FENCES, fences);
+    mGThread.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_DEBUG_FENCES, Const.DATA_KEY_DEBUG_FENCES, fences);
   }
 
   @Override public void onClick(final View v)

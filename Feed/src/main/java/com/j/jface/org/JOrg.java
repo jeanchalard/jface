@@ -70,7 +70,7 @@ public class JOrg extends WrappedActivity implements Snackbarable
     mTouchHelper = new ItemTouchHelper(new TodoMover(mAdapter, mTodoList));
     mTouchHelper.attachToRecyclerView(rv);
 
-    scheduleBackup();
+//    scheduleBackup();
   }
 
   public Context getContext()

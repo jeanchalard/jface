@@ -18,7 +18,7 @@ public abstract class ActivityWrapper<T extends WrappedActivity> extends Activit
   // Activity callbacks
   @Override protected void onCreate(@Nullable final Bundle icicle)
   {
-    mW = (T)WrapUtils.build(getClass(),
+    mW = WrapUtils.buildFromParent(getClass(),
      new Class[]{WrappedActivity.Args.class},
      new Object[]{new WrappedActivity.Args(this, icicle)});
     super.onCreate(null);

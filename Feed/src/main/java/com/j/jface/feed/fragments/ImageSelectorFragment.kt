@@ -1,29 +1,25 @@
 package com.j.jface.feed.fragments
 
-import android.app.Activity
 import android.app.Fragment
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.ShapeDrawable
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ProgressBar
-import android.widget.SeekBar
 import com.j.jface.Const
 import com.j.jface.R
-import com.j.jface.client.Client
+import com.j.jface.action.GThread
 import com.j.jface.lifecycle.FragmentWrapper
 import com.j.jface.lifecycle.WrappedFragment
 
-class ImageSelectorFragment(a : Args, client : Client) : WrappedFragment(a.inflater.inflate(R.layout.fragment_image_selector, a.container, false)), Client.GetBitmapCallback
+class ImageSelectorFragment(a : Args, gThread : GThread) : WrappedFragment(a.inflater.inflate(R.layout.fragment_image_selector, a.container, false))
 {
   companion object
   {
     const val CHOOSE_IMAGE_INTENT = 100
   }
-  private val mClient : Client = client
+  private val mGThread = gThread
   private val mFragment : Fragment = a.fragment
   private val mImageButton : ImageButton = mView.findViewById(R.id.select_image_button) as ImageButton
   private val mSpinner : ProgressBar = mView.findViewById(R.id.select_image_wait) as ProgressBar
@@ -36,7 +32,7 @@ class ImageSelectorFragment(a : Args, client : Client) : WrappedFragment(a.infla
     mSpinner.visibility = View.VISIBLE
     mSpinner.minimumWidth = Const.SCREEN_SIZE
     mSpinner.minimumHeight = Const.SCREEN_SIZE
-    mClient.getBitmap(Const.DATA_PATH + "/" + Const.CONFIG_KEY_BACKGROUND, Const.CONFIG_KEY_BACKGROUND, this)
+    mGThread.getBitmap(Const.DATA_PATH + "/" + Const.CONFIG_KEY_BACKGROUND, Const.CONFIG_KEY_BACKGROUND, ::setImage)
     (mView.findViewById(R.id.select_image_none) as Button).setOnClickListener { removeBackground() }
   }
 
@@ -51,14 +47,14 @@ class ImageSelectorFragment(a : Args, client : Client) : WrappedFragment(a.infla
   override fun onActivityResult(requestCode : Int, resultCode : Int, data : Intent?)
   {
     if (null == data) return
-    val f = object : FragmentWrapper<ImageEditorFragment>(ImageEditorFragment.ImageEditorArgs(mClient, data)){}
+    val f = FragmentWrapper<ImageEditorFragment>(ImageEditorFragment::class.java, ImageEditorFragment.ImageEditorArgs(mGThread, data))
     mFragment.fragmentManager.beginTransaction()
      .addToBackStack("ImageEditor")
      .replace(R.id.dataFeedContents, f)
      .commit()
   }
 
-  override fun run(path : String, key : String, bitmap : Bitmap?)
+  fun setImage(path : String, key : String, bitmap : Bitmap?)
   {
     mFragment.activity?.runOnUiThread {
       mImageButton.visibility = View.VISIBLE
@@ -72,7 +68,7 @@ class ImageSelectorFragment(a : Args, client : Client) : WrappedFragment(a.infla
 
   fun removeBackground()
   {
-    mClient.deleteData(Const.DATA_PATH + "/" + Const.CONFIG_KEY_BACKGROUND)
+    mGThread.deleteData(Const.DATA_PATH + "/" + Const.CONFIG_KEY_BACKGROUND)
     mImageButton.setImageDrawable(mFragment.resources.getDrawable(R.drawable.black_box, mFragment.activity.theme))
   }
 }

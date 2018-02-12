@@ -20,7 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.j.jface.R;
-import com.j.jface.client.Client;
+import com.j.jface.action.GThread;
 import com.j.jface.feed.fragments.ActivityLogFragment;
 import com.j.jface.feed.fragments.DebugToolsFragment;
 import com.j.jface.feed.fragments.ImageSelectorFragment;
@@ -33,7 +33,7 @@ public class JFaceDataFeed extends WrappedActivity
 {
   @NonNull private final String LAST_OPEN_FRAGMENT_INDEX = "last_open_fragment_index";
   @NonNull private final ActionBarDrawerToggle mDrawerToggle;
-  @NonNull private final Client mClient;
+  @NonNull private final GThread mGThread;
 
   // State
   private int mCurrentlyDisplayedFragmentIndex = 0;
@@ -42,14 +42,14 @@ public class JFaceDataFeed extends WrappedActivity
   {
     super(args);
     mA.setContentView(R.layout.data_feed_drawer);
-    mClient = new Client(mA);
-    final DrawerLayout drawer = (DrawerLayout)mA.findViewById(R.id.dataFeedDrawer);
+    mGThread = new GThread(mA);
+    final DrawerLayout drawer = mA.findViewById(R.id.dataFeedDrawer);
 
-    final ListView list = (ListView)mA.findViewById(R.id.dataFeedDrawerContents);
+    final ListView list = mA.findViewById(R.id.dataFeedDrawerContents);
     list.setAdapter(new ArrayAdapter<>(mA, R.layout.data_feed_drawer_item, new String[] { "Messages", "Settings", "Activity log", "Logs & data", "Debug tools" }));
     final AdapterView.OnItemClickListener listener = (parent, view, position, id) ->
     {
-      final Fragment f = getFragmentForPosition(position, mClient);
+      final Fragment f = getFragmentForPosition(position, mGThread);
       mA.getFragmentManager().beginTransaction()
                             .replace(R.id.dataFeedContents, f)
                             .commit();
@@ -98,15 +98,15 @@ public class JFaceDataFeed extends WrappedActivity
     ActivityCompat.requestPermissions(mA, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
   }
 
-  @Nullable private static FragmentWrapper<?> getFragmentForPosition(final int position, final Client client)
+  @Nullable private static FragmentWrapper<?> getFragmentForPosition(final int position, final GThread gThread)
   {
     switch (position)
     {
-      case 0 : return new FragmentWrapper<MessagesFragment>(client){};
-      case 1 : return new FragmentWrapper<ImageSelectorFragment>(client){};
-      case 2 : return new FragmentWrapper<ActivityLogFragment>(client){};
-      case 3 : return new FragmentWrapper<LogsAndDataFragment>(client){};
-      case 4 : return new FragmentWrapper<DebugToolsFragment>(client){};
+      case 0 : return new FragmentWrapper<>(MessagesFragment.class, gThread);
+      case 1 : return new FragmentWrapper<>(ImageSelectorFragment.class, gThread);
+      case 2 : return new FragmentWrapper<>(ActivityLogFragment.class, gThread);
+      case 3 : return new FragmentWrapper<>(LogsAndDataFragment.class, gThread);
+      case 4 : return new FragmentWrapper<>(DebugToolsFragment.class, gThread);
     }
     return null;
   }

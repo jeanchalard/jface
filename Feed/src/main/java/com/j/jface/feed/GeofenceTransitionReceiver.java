@@ -8,8 +8,8 @@ import android.support.annotation.NonNull;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 import com.j.jface.Const;
+import com.j.jface.action.GThread;
 import com.j.jface.action.SetupGeofenceAction;
-import com.j.jface.client.Client;
 
 import java.util.List;
 
@@ -19,21 +19,23 @@ public class GeofenceTransitionReceiver
   public static final String ACTION_GEOFENCE = "com.j.jface.feed.action.GEOFENCE";
 
   @NonNull private final Service service;
-  @NonNull private final Client mClient;
+  @NonNull private final GThread mGThread;
 
   public GeofenceTransitionReceiver(@NonNull final Service s)
   {
     service = s;
-    mClient = new Client(service);
+    mGThread = new GThread(service);
   }
 
   void onHandleIntent(@NonNull final Intent intent)
   {
     final String action = intent.getAction();
     if (Intent.ACTION_BOOT_COMPLETED.equals(action) || ACTION_MANUAL_START.equals(action))
-      new SetupGeofenceAction(service, getNotificationIntent()).enqueue();
+    {
+      mGThread.enqueue(new SetupGeofenceAction(service, getNotificationIntent()));
+    }
     if (ACTION_GEOFENCE.equals(action)) handleGeofenceTransitions(intent);
-    FeedLoader.startAllLoads(mClient);
+    FeedLoader.startAllLoads(mGThread);
   }
 
   private PendingIntent getNotificationIntent()
@@ -59,8 +61,8 @@ public class GeofenceTransitionReceiver
     final Fences.Params params = Fences.paramsFromName(fence.getRequestId());
     if (null == params) return; // Unknown fence
     if (Geofence.GEOFENCE_TRANSITION_ENTER == transitionType)
-      mClient.putData(Const.LOCATION_PATH + "/" + params.name, Const.DATA_KEY_INSIDE, true);
+      mGThread.putData(Const.LOCATION_PATH + "/" + params.name, Const.DATA_KEY_INSIDE, true);
     else if (Geofence.GEOFENCE_TRANSITION_EXIT == transitionType)
-      mClient.putData(Const.LOCATION_PATH + "/" + params.name, Const.DATA_KEY_INSIDE, false);
+      mGThread.putData(Const.LOCATION_PATH + "/" + params.name, Const.DATA_KEY_INSIDE, false);
   }
 }

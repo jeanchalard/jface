@@ -19,7 +19,7 @@ public abstract class AppCompatActivityWrapper<T extends WrappedActivity> extend
   @Override protected void onCreate(@Nullable final Bundle icicle)
   {
     super.onCreate(null);
-    mW = (T)WrapUtils.build(getClass(),
+    mW = WrapUtils.buildFromParent(getClass(),
      new Class[]{WrappedActivity.Args.class},
      new Object[]{new WrappedActivity.Args(this, icicle)});
   }

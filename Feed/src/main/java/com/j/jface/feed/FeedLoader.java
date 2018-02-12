@@ -4,11 +4,10 @@ import android.support.annotation.NonNull;
 
 import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
-import com.j.jface.client.Client;
+import com.j.jface.action.GThread;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -17,33 +16,28 @@ import java.util.concurrent.TimeUnit;
 
 public class FeedLoader
 {
-  private static final ThreadPoolExecutor executor = new ThreadPoolExecutor(4, 4, 500, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+  private static final ThreadPoolExecutor executor =
+   new ThreadPoolExecutor(4, 4, 500, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
 
-  public static void startAllLoads(@NonNull final Client client)
+  public static void startAllLoads(@NonNull final GThread GThread)
   {
     for (final DataSource ds : DataSource.ALL_SOURCES)
-      startLoadDataSource(ds, client);
+      startLoadDataSource(ds, GThread);
   }
 
-  private static DataMap getStatusData(@NonNull final Client client, @NonNull final String path)
-  {
-    final DataMap data = client.getData(path);
-    return null == data ? new DataMap() : data;
-  }
-
-  private static void startLoadDataSource(@NonNull final DataSource ds, @NonNull final Client client)
+  private static void startLoadDataSource(@NonNull final DataSource ds, @NonNull final GThread GThread)
   {
     executor.execute(() ->
     {
       final String dataPath = Const.DATA_PATH + "/" + ds.name;
       final String statusDataPath = dataPath + Const.DATA_PATH_SUFFIX_STATUS;
-      final DataMap statusData = getStatusData(client, statusDataPath);
+      final DataMap statusData = GThread.getDataSynchronously(statusDataPath);
       final long lastSuccessfulUpdateDate = statusData.getLong(Const.DATA_KEY_SUCCESSFUL_UPDATE_DATE);
       final long now = System.currentTimeMillis();
       if (lastSuccessfulUpdateDate + Const.UPDATE_DELAY_MILLIS > now)
       {
         statusData.putLong(Const.DATA_KEY_STATUS_UPDATE_DATE, System.currentTimeMillis());
-        client.putData(statusDataPath, statusData);
+        GThread.putData(statusDataPath, statusData);
         return;
       }
       try
@@ -55,7 +49,7 @@ public class FeedLoader
         final BufferedInputStream in = new BufferedInputStream(urlConnection.getInputStream());
         final FeedParser parser = ds.parser.newInstance();
         final DataMap data = parser.parseStream(ds.name, in);
-        client.putData(dataPath, data);
+        GThread.putData(dataPath, data);
         statusData.putLong(Const.DATA_KEY_SUCCESSFUL_UPDATE_DATE, System.currentTimeMillis());
         statusData.putString(Const.DATA_KEY_LAST_STATUS, "Success");
       }
@@ -64,7 +58,7 @@ public class FeedLoader
         statusData.putString(Const.DATA_KEY_LAST_STATUS, "Failure ; " + e.getMessage());
       }
       statusData.putLong(Const.DATA_KEY_STATUS_UPDATE_DATE, System.currentTimeMillis());
-      client.putData(statusDataPath, statusData);
+      GThread.putData(statusDataPath, statusData);
     });
   }
 }

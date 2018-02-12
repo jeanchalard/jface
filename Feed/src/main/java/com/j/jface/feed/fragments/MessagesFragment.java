@@ -10,21 +10,19 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
-import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageView;
 
 import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
 import com.j.jface.R;
-import com.j.jface.client.Client;
+import com.j.jface.action.GThread;
 import com.j.jface.feed.views.PaletteView;
 import com.j.jface.lifecycle.WrappedFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+
+import kotlin.Unit;
 
 /**
  * A fragment for showing and managing arbitrary messages.
@@ -32,41 +30,44 @@ import java.util.List;
 public class MessagesFragment extends WrappedFragment implements TextWatcher, PaletteView.OnColorSetListener
 {
   @NonNull private final Fragment mF;
-  @NonNull private final Client mClient;
+  @NonNull private final GThread mGThread;
   @NonNull private final EditText mTopicDataEdit;
   @NonNull private final PaletteView mPalette;
   private boolean mDataFetched; // Replace this if this class or the use of this member ever become any more than elementary
 
-  public MessagesFragment(@NonNull final WrappedFragment.Args a, @NonNull final Client b)
+  public MessagesFragment(@NonNull final WrappedFragment.Args a, @NonNull final GThread b)
   {
     super(a.inflater.inflate(R.layout.fragment_messages, a.container, false));
     mF = a.fragment;
-    mClient = b;
-    mTopicDataEdit = (EditText)mView.findViewById(R.id.messagesFragment_topicDataEdit);
+    mGThread = b;
+    mTopicDataEdit = mView.findViewById(R.id.messagesFragment_topicDataEdit);
     mTopicDataEdit.addTextChangedListener(this);
     mTopicDataEdit.setTextColor(Const.TOPIC_DEFAULT_COLOR);
-    mPalette = (PaletteView)mView.findViewById(R.id.messagesFragment_palette);
+    mPalette = mView.findViewById(R.id.messagesFragment_palette);
     mPalette.addOnColorSetListener(this);
     mDataFetched = false;
     final Activity activity = a.fragment.getActivity();
     b.getData(Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC, (path, dataMap) ->
-     activity.runOnUiThread(() ->
     {
-      mDataFetched = true;
-      final String topic = dataMap.getString(Const.DATA_KEY_TOPIC);
-      if (null == topic) return;
-      final int[] starts = getLineStartOffsets(topic);
-      final SpannableString text = new SpannableString(topic);
-      final ArrayList<Integer> colors = dataMap.getIntegerArrayList(Const.DATA_KEY_TOPIC_COLORS);
-      if (null != colors && starts.length == colors.size())
-        for (int i = 0; i < colors.size(); ++i)
-        {
-          final int start = starts[i];
-          final int end = Math.max(start, i + 1 >= starts.length ? topic.length() : starts[i + 1]);
-          text.setSpan(new ForegroundColorSpan(colors.get(i)), start, end, Spanned.SPAN_PARAGRAPH);
-        }
-      mTopicDataEdit.setText(text);
-    }));
+      activity.runOnUiThread(() ->
+      {
+        mDataFetched = true;
+        final String topic = dataMap.getString(Const.DATA_KEY_TOPIC);
+        if (null == topic) return;
+        final int[] starts = getLineStartOffsets(topic);
+        final SpannableString text = new SpannableString(topic);
+        final ArrayList<Integer> colors = dataMap.getIntegerArrayList(Const.DATA_KEY_TOPIC_COLORS);
+        if (null != colors && starts.length == colors.size())
+          for (int i = 0; i < colors.size(); ++i)
+          {
+            final int start = starts[i];
+            final int end = Math.max(start, i + 1 >= starts.length ? topic.length() : starts[i + 1]);
+            text.setSpan(new ForegroundColorSpan(colors.get(i)), start, end, Spanned.SPAN_PARAGRAPH);
+          }
+        mTopicDataEdit.setText(text);
+      });
+      return Unit.INSTANCE;
+    });
   }
 
   @Override public void afterTextChanged(@NonNull final Editable s)
@@ -97,7 +98,7 @@ public class MessagesFragment extends WrappedFragment implements TextWatcher, Pa
       final DataMap dataMap = new DataMap();
       dataMap.putString(Const.DATA_KEY_TOPIC, mTopicDataEdit.getText().toString());
       dataMap.putIntegerArrayList(Const.DATA_KEY_TOPIC_COLORS, colors);
-      mClient.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC, dataMap);
+      mGThread.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC, dataMap);
     }
     catch (Exception e) { removeAllSpans(); }
   }

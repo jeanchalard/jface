@@ -10,9 +10,8 @@ import com.google.android.gms.wearable.DataItemBuffer;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
-import com.j.jface.FutureValue;
-import com.j.jface.client.action.Action;
 import com.j.jface.client.Client;
+import com.j.jface.client.action.Action;
 import com.j.jface.client.action.ResultAction;
 
 public class GetDataAction extends ResultAction<DataMap> implements ResultCallback<DataItemBuffer>

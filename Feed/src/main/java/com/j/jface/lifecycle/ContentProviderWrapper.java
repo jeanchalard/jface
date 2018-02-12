@@ -16,10 +16,10 @@ public class ContentProviderWrapper<T extends WrappedContentProvider> extends Co
 
   @Override public boolean onCreate()
   {
-    mW = (T)WrapUtils.build(getClass(),
+    mW = WrapUtils.buildFromParent(getClass(),
      new Class[]{WrappedContentProvider.Args.class},
      new Object[]{new WrappedContentProvider.Args(this)});
-    return null != mW;
+    return true;
   }
 
   @Nullable @Override public Cursor query(@Nullable final Uri uri, @Nullable final String[] projection, @Nullable final String selection, @Nullable final String[] selectionArgs, @Nullable final String sortOrder)
