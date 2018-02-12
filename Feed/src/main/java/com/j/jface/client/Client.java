@@ -3,8 +3,6 @@ package com.j.jface.client;
 import android.app.Activity;
 import android.content.Context;
 import android.content.IntentSender;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -12,34 +10,19 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.drive.Drive;
-import com.google.android.gms.wearable.Asset;
-import com.google.android.gms.wearable.DataMap;
-import com.google.android.gms.wearable.PutDataMapRequest;
-import com.google.android.gms.wearable.Wearable;
 import com.j.jface.client.action.Action;
-import com.j.jface.client.action.wear.DeleteAllDataAction;
-import com.j.jface.client.action.wear.DeleteDataAction;
-import com.j.jface.client.action.wear.GetBitmapAction;
-import com.j.jface.client.action.wear.GetDataAction;
-import com.j.jface.client.action.wear.PutDataAction;
 
-import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Client extends Handler implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
 {
-  public interface GetDataCallback { void run(@NonNull final String path, @NonNull final DataMap data); }
-  public interface GetBitmapCallback { void run(@NonNull final String path, @NonNull final String key, @Nullable final Bitmap bitmap); }
-
   private static final boolean DEBUG_CLIENT = false;
   private static final int MSG_PROCESS_QUEUE = 1;
   private static final int MSG_CONNECT = 2;
@@ -61,7 +44,6 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
      .setHandler(this)
      .addConnectionCallbacks(this)
      .addOnConnectionFailedListener(this)
-     .addApiIfAvailable(Wearable.API)
      .addApi(Auth.GOOGLE_SIGN_IN_API, new GoogleSignInOptions.Builder().requestScopes(Drive.SCOPE_FILE).build())
      .addApiIfAvailable(Drive.API)
      .build();
@@ -140,16 +122,6 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
     sendEmptyMessageDelayed(what, delay);
   }
 
-  private void signInHelper(final GoogleSignInResult res)
-  {
-    if (res.isSuccess())
-    {
-      proceed();
-      return;
-    }
-    final Context context = mClient.getContext();
-  }
-
   public void enqueue(@NonNull final Action action)
   {
     mUpdates.add(action);
@@ -189,73 +161,5 @@ public class Client extends Handler implements GoogleApiClient.ConnectionCallbac
     }
     else if (CONNECTION_FAILURES_BACKOFF.length > ++mConnectionFailures)
       sendEmptyMessageDelayed(MSG_PROCESS_QUEUE, CONNECTION_FAILURES_BACKOFF[mConnectionFailures]);
-  }
-
-
-  /**
-   * Data API convenience methods.
-   */
-  @Nullable public DataMap getData(@NonNull final String path)
-  {
-    final GetDataAction action = new GetDataAction(this, null, path);
-    enqueue(action);
-    return action.get();
-  }
-
-  public void getData(@NonNull final String path, @NonNull final GetDataCallback callback)
-  {
-    enqueue(new GetDataAction(this, null, path, callback));
-  }
-
-  public void getBitmap(@NonNull final String path, @NonNull final String key, @Nullable final GetBitmapCallback callback)
-  {
-    enqueue(new GetBitmapAction(this, path, key, null, callback));
-  }
-
-  // Helper methods to put data and forget about it
-  public void putData(@NonNull final String path, @NonNull final String key, @NonNull final String value)
-  {
-    enqueue(new PutDataAction(this, path, key, value));
-  }
-
-  public void putData(@NonNull final String path, @NonNull final String key, final boolean value)
-  {
-    enqueue(new PutDataAction(this, path, key, value));
-  }
-
-  public void putData(@NonNull final String path, @NonNull final String key, final long value)
-  {
-    enqueue(new PutDataAction(this, path, key, value));
-  }
-
-  public void putData(@NonNull final String path, @NonNull final String key, final Asset value)
-  {
-    enqueue(new PutDataAction(this, path, key, value));
-  }
-
-  public void putData(@NonNull final String path, @NonNull final String key, final ArrayList<Integer> value)
-  {
-    enqueue(new PutDataAction(this, path, key, value));
-  }
-
-  public void putData(@NonNull final String path, @NonNull final DataMap map)
-  {
-    enqueue(new PutDataAction(this, path, map));
-  }
-
-  public void deleteData(@NonNull final Uri uri)
-  {
-    enqueue(new DeleteDataAction(this, uri));
-  }
-
-  public void deleteData(@NonNull final String path)
-  {
-    final PutDataMapRequest dmRequest = PutDataMapRequest.create(path);
-    enqueue(new DeleteDataAction(this, dmRequest.getUri()));
-  }
-
-  public void clearAllData()
-  {
-    enqueue(new DeleteAllDataAction(this));
   }
 }
