@@ -27,8 +27,8 @@ public class Draw
       new BitmapCache(0, 0, 0, 1, null, new Paint()) };
   }
 
-  final StringBuilder mTmpSb = new StringBuilder(256);
-  final char[] mTmpChr = new char[256];
+  private final StringBuilder mTmpSb = new StringBuilder(256);
+  private final char[] mTmpChr = new char[256];
   public boolean draw(@NonNull final DrawTools drawTools, final int modeFlags,
                       @NonNull final Canvas canvas, @NonNull final Rect bounds,
                       @Nullable final Bitmap background,

@@ -67,7 +67,7 @@ public class DataStore
     return findClosestDeparture(key, time.hour * 3600 + time.minute * 60);
   }
 
-  @Nullable public Departure findClosestDeparture(@NonNull final String key, final int time)
+  @Nullable private Departure findClosestDeparture(@NonNull final String key, final int time)
   {
     final int secsSinceRealMidnight = time % 86400;
     final int secsSinceLogicalMidnight =

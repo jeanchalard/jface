@@ -19,14 +19,14 @@ package com.j.jface.face;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.wearable.DataClient;
 import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataItemBuffer;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.PutDataMapRequest;
-import com.google.android.gms.wearable.Wearable;
 import com.j.jface.Const;
 
 public final class DigitalWatchFaceUtil
@@ -50,40 +50,41 @@ public final class DigitalWatchFaceUtil
    * If the current config {@link DataItem} doesn't exist, it isn't created and the callback
    * receives an empty DataMap.
    */
-  public static void fetchData(final GoogleApiClient client,
+  public static void fetchData(final DataClient client,
                                final String path,
                                final FetchConfigDataMapCallback callback)
   {
     final Uri uri = new Uri.Builder().scheme("wear")
      .path(path)
      .build();
-    Wearable.DataApi.getDataItems(client, uri).setResultCallback(new DataItemResultCallback(callback));
+    client.getDataItems(uri).addOnCompleteListener(new DataItemResultCallback(callback));
   }
 
   /**
    * Overwrites the current config {@link DataItem}'s {@link DataMap} with {@code newConfig}.
    * If the config DataItem doesn't exist, it's created.
    */
-  public static void putConfigDataItem(GoogleApiClient googleApiClient, DataMap newConfig)
+  public static void putConfigDataItem(DataClient client, DataMap newConfig)
   {
     PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(Const.CONFIG_PATH);
     DataMap configToPut = putDataMapRequest.getDataMap();
     configToPut.putAll(newConfig);
-    Wearable.DataApi.putDataItem(googleApiClient, putDataMapRequest.asPutDataRequest());
+    client.putDataItem(putDataMapRequest.asPutDataRequest());
   }
 
-  private static class DataItemResultCallback implements ResultCallback<DataItemBuffer>
+  private static class DataItemResultCallback implements OnCompleteListener<DataItemBuffer>
   {
     private final FetchConfigDataMapCallback mCallback;
 
-    public DataItemResultCallback(FetchConfigDataMapCallback callback)
+    private DataItemResultCallback(FetchConfigDataMapCallback callback)
     {
       mCallback = callback;
     }
 
-    @Override
-    public void onResult(@NonNull DataItemBuffer result)
+    @Override public void onComplete(@NonNull final Task<DataItemBuffer> task)
     {
+      if (!task.isSuccessful()) return;
+      final DataItemBuffer result = task.getResult();
       if (result.getCount() == 1)
       {
         final DataItem item = result.get(0);

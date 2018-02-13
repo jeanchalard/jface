@@ -20,7 +20,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -34,14 +33,10 @@ import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.text.format.Time;
-import android.util.Log;
 import android.view.SurfaceHolder;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.Asset;
-import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataClient;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataItem;
@@ -58,8 +53,6 @@ import java.util.concurrent.TimeUnit;
 
 public class DigitalWatchFaceService extends CanvasWatchFaceService
 {
-  private static final String TAG = "J";
-
   private static final long NORMAL_UPDATE_RATE_MS = 1000;
   private static final long MUTE_UPDATE_RATE_MS = TimeUnit.MINUTES.toMillis(1);
 
@@ -81,7 +74,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
         mEngine = engine;
       }
 
-      @Override public void handleMessage(@NonNull Message message)
+      @Override public void handleMessage(@NonNull final Message message)
       {
         switch (message.what)
         {
@@ -95,18 +88,15 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       }
     }
 
-  private class Engine extends CanvasWatchFaceService.Engine implements DataApi.DataListener,
-   GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
+  private class Engine extends CanvasWatchFaceService.Engine implements DataClient.OnDataChangedListener
   {
     private long mInteractiveUpdateRateMs = NORMAL_UPDATE_RATE_MS;
 
     private final Handler mUpdateTimeHandler = new UpdateTimeHandler(this);
+    private final DataClient mDataClient = Wearable.getDataClient(DigitalWatchFaceService.this,
+     new Wearable.WearableOptions.Builder().setLooper(DigitalWatchFaceService.this.getMainLooper()).build()
+    );
 
-    private GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(DigitalWatchFaceService.this)
-     .addConnectionCallbacks(this)
-     .addOnConnectionFailedListener(this)
-     .addApi(Wearable.API)
-     .build();
 
     private final TimezoneBroadcastReceiver mTimeZoneReceiver = new TimezoneBroadcastReceiver();
     private final class TimezoneBroadcastReceiver extends BroadcastReceiver
@@ -124,7 +114,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
         catch (IllegalArgumentException e) {} // Non mais
       }
       @Override
-      public void onReceive(Context context, @NonNull Intent intent)
+      public void onReceive(final Context context, @NonNull final Intent intent)
       {
         mTime.clear(intent.getStringExtra("time-zone"));
         mTime.setToNow();
@@ -163,11 +153,14 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       mDataStore.mBackground = ((BitmapDrawable)getResources().getDrawable(R.drawable.bg)).getBitmap();
 //      mSensors = new Sensors(DigitalWatchFaceService.this);
       mTime.setToNow();
+      mDataClient.addListener(this);
+      updateConfigAndData();
     }
 
     @Override
     public void onDestroy()
     {
+      mDataClient.removeListener(this);
       mUpdateTimeHandler.removeMessages(MSG_UPDATE_TIME);
       super.onDestroy();
     }
@@ -179,21 +172,13 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
 
       if (visible)
       {
-        mGoogleApiClient.connect();
         mTimeZoneReceiver.register();
         // Update time zone in case it changed while we weren't visible.
         mTime.clear(TimeZone.getDefault().getID());
         mTime.setToNow();
       }
       else
-      {
         mTimeZoneReceiver.unregister();
-        if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
-        {
-          Wearable.DataApi.removeListener(mGoogleApiClient, this);
-          mGoogleApiClient.disconnect();
-        }
-      }
 
       // Whether the timer should be running depends on whether we're visible (as well as
       // whether we're in ambient mode), so we may need to start or stop the timer.
@@ -201,7 +186,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     }
 
     @Override
-    public void onPropertiesChanged(@NonNull Bundle properties)
+    public void onPropertiesChanged(@NonNull final Bundle properties)
     {
       super.onPropertiesChanged(properties);
       mLowBitAmbient = properties.getBoolean(PROPERTY_LOW_BIT_AMBIENT, false);
@@ -225,7 +210,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     }
 
     @Override
-    public void onInterruptionFilterChanged(int interruptionFilter)
+    public void onInterruptionFilterChanged(final int interruptionFilter)
     {
       super.onInterruptionFilterChanged(interruptionFilter);
       boolean inMuteMode = interruptionFilter == WatchFaceService.INTERRUPTION_FILTER_NONE;
@@ -242,7 +227,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       }
     }
 
-    public void setInteractiveUpdateRateMs(long updateRateMs)
+    private void setInteractiveUpdateRateMs(final long updateRateMs)
     {
       if (updateRateMs == mInteractiveUpdateRateMs) return;
       mInteractiveUpdateRateMs = updateRateMs;
@@ -400,10 +385,10 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
               mDataStore.mBackground = ((BitmapDrawable)getResources().getDrawable(R.drawable.bg)).getBitmap();
               return;
             }
-            Wearable.DataApi.getFdForAsset(mGoogleApiClient, asset).setResultCallback(result ->
+            mDataClient.getFdForAsset(asset).addOnCompleteListener(task ->
              {
-               if (!result.getStatus().isSuccess()) return;
-               mDataStore.mBackground = BitmapFactory.decodeStream(result.getInputStream());
+               if (!task.isSuccessful()) return;
+               mDataStore.mBackground = BitmapFactory.decodeStream(task.getResult().getInputStream());
              }
             );
           }
@@ -422,24 +407,24 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
 
     private void updateConfigAndData()
     {
-      DigitalWatchFaceUtil.fetchData(mGoogleApiClient, Const.CONFIG_PATH,
+      DigitalWatchFaceUtil.fetchData(mDataClient, Const.CONFIG_PATH,
        (path, startupConfig) ->
        {
          setDefaultValuesForMissingConfigKeys(startupConfig);
-         DigitalWatchFaceUtil.putConfigDataItem(mGoogleApiClient, startupConfig);
+         DigitalWatchFaceUtil.putConfigDataItem(mDataClient, startupConfig);
        }
       );
       final DigitalWatchFaceUtil.FetchConfigDataMapCallback dataHandler;
-      dataHandler = (path, data) -> updateDataItem(path, data);
+      dataHandler = this::updateDataItem;
       for (final String path : Const.ALL_DEPLIST_DATA_PATHS)
-        DigitalWatchFaceUtil.fetchData(mGoogleApiClient, Const.DATA_PATH + "/" + path, dataHandler);
+        DigitalWatchFaceUtil.fetchData(mDataClient, Const.DATA_PATH + "/" + path, dataHandler);
       for (final String path : Const.ALL_FENCE_NAMES)
-        DigitalWatchFaceUtil.fetchData(mGoogleApiClient, Const.LOCATION_PATH + "/" + path, dataHandler);
-      DigitalWatchFaceUtil.fetchData(mGoogleApiClient, Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC, dataHandler);
-      DigitalWatchFaceUtil.fetchData(mGoogleApiClient, Const.DATA_PATH + "/" + Const.DATA_KEY_BACKGROUND, dataHandler);
+        DigitalWatchFaceUtil.fetchData(mDataClient, Const.LOCATION_PATH + "/" + path, dataHandler);
+      DigitalWatchFaceUtil.fetchData(mDataClient, Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC, dataHandler);
+      DigitalWatchFaceUtil.fetchData(mDataClient, Const.DATA_PATH + "/" + Const.DATA_KEY_BACKGROUND, dataHandler);
     }
 
-    @Override // DataApi.DataListener
+    @Override // DataClient.OnDataChangedListener
     public void onDataChanged(@NonNull final DataEventBuffer dataEvents)
     {
       try
@@ -460,18 +445,5 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       }
       updateTimer();
     }
-
-    @Override  // GoogleApiClient.ConnectionCallbacks
-    public void onConnected(final Bundle connectionHint)
-    {
-      Wearable.DataApi.addListener(mGoogleApiClient, Engine.this);
-      updateConfigAndData();
-    }
-
-    @Override  // GoogleApiClient.ConnectionCallbacks
-    public void onConnectionSuspended(final int cause) {}
-
-    @Override  // GoogleApiClient.OnConnectionFailedListener
-    public void onConnectionFailed(@NonNull final ConnectionResult result) {}
   }
 }

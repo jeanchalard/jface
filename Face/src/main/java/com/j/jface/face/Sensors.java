@@ -5,18 +5,21 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.support.annotation.NonNull;
 
 public class Sensors implements SensorEventListener
 {
-  final SensorManager mSensorManager;
-  final Sensor mBarometer;
-  final Sensor mVector;
+  @NonNull private final SensorManager mSensorManager;
+  @NonNull private final Sensor mBarometer;
+  @NonNull private final Sensor mVector;
 
   public float mPressure = 0;
   public float mNormal = 0;
 
-  public Sensors(final Context ctx) {
-    mSensorManager = (SensorManager)ctx.getSystemService(Context.SENSOR_SERVICE);
+  public Sensors(@NonNull final Context ctx) {
+    final SensorManager sm = (SensorManager)ctx.getSystemService(Context.SENSOR_SERVICE);
+    if (null == sm) throw new RuntimeException("Null sensor manager from the framework... argh.");
+    mSensorManager = sm;
     mBarometer = mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
     mVector = mSensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR);
   }
