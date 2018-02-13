@@ -5,7 +5,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.SharedPreferences
-import android.graphics.drawable.BitmapDrawable
 import android.support.design.widget.Snackbar
 import android.view.View
 import com.j.jface.Const
@@ -27,7 +26,7 @@ class InformUserAction(val context : Context, val text : String, val actionMessa
   {
     val existing = notificationManager.getNotificationChannel(CHANNEL_ID)
     if (null != existing) return existing
-    val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH)
+    val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT)
     // Configure the notification channel.
     channel.description = "Jormungand"
     channel.enableLights(true)
@@ -37,13 +36,22 @@ class InformUserAction(val context : Context, val text : String, val actionMessa
     return notificationManager.getNotificationChannel(CHANNEL_ID)
   }
 
-  fun postNotification() {
+  private fun postNotification() {
     val channel = getChannel()
     val notif = Notification.Builder(context, channel.id)
      .setSmallIcon(R.drawable.jormungand)
-     .setLargeIcon((context.getDrawable(R.drawable.jormungand) as BitmapDrawable).bitmap)
-     .setContentText(text)
      .setColor(context.getColor(R.color.jormungand_color))
+     .setTimeoutAfter(10_000)
+
+    val index = text.indexOf('\n')
+    if (index < 0)
+      notif.setContentText(text)
+    else
+    {
+      notif.setContentTitle(text.subSequence(0, index - 1))
+      notif.setStyle(Notification.BigTextStyle().bigText(text.subSequence(index, text.length)))
+    }
+
     val persist: SharedPreferences = context.getSharedPreferences(Const.INTERNAL_PERSISTED_VALUES_FILES, Context.MODE_PRIVATE)
     val notifId = persist.getInt(LAST_NOTIF_ID, 1)
     persist.edit().putInt(LAST_NOTIF_ID, notifId + 1).apply()

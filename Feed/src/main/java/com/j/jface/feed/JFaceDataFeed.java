@@ -66,9 +66,6 @@ public class JFaceDataFeed extends WrappedActivity
     final Toolbar toolbar = (Toolbar)mA.findViewById(R.id.dataFeedToolbar);
     toolbar.setTitle(R.string.data_feed_title);
     mDrawerToggle = new ActionBarDrawerToggle(mA, drawer, toolbar, R.string.drawer_open_desc, R.string.drawer_closed_desc);
-
-    if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(mA, Manifest.permission.ACCESS_FINE_LOCATION))
-      startGeofenceService(mA);
   }
 
   public void onSaveInstanceState(@NonNull Bundle instanceState)
@@ -95,7 +92,10 @@ public class JFaceDataFeed extends WrappedActivity
   public void onPostCreate(final Bundle b)
   {
     mDrawerToggle.syncState();
-    ActivityCompat.requestPermissions(mA, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+    if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(mA, Manifest.permission.ACCESS_FINE_LOCATION))
+      startGeofenceService(mA);
+    else
+      ActivityCompat.requestPermissions(mA, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
   }
 
   @Nullable private static FragmentWrapper<?> getFragmentForPosition(final int position, final GThread gThread)
