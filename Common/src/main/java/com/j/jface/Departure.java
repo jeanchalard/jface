@@ -13,7 +13,8 @@ public class Departure implements Comparable<Departure>
   public final String headSign;
   @Nullable public final Departure next;
 
-  public Departure(final int time, final String extra, final String key, @Nullable final Departure next) {
+  public Departure(final int time, final String extra, final String key, @Nullable final Departure next)
+  {
     this.time = time;
     this.dTime = time < 3 * 3600 ? time + 86400 : time;
     this.extra = extra;
@@ -22,7 +23,8 @@ public class Departure implements Comparable<Departure>
     this.headSign = Const.HEADSIGNS.get(key);
   }
 
-  public String toString() {
+  public String toString()
+  {
     return String.format(Locale.ROOT, "%02d:%02d", time / 3600, (time % 3600) / 60) + extra;
   }
 
