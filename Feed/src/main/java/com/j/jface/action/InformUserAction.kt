@@ -11,7 +11,7 @@ import com.j.jface.Const
 import com.j.jface.R
 import com.j.jface.feed.views.Snackbarable
 
-class InformUserAction(val context : Context, val text : String, val actionMessage : String? = null, val callback : View.OnClickListener? = null) : Action
+class InformUserAction(val context : Context, val text : String, val actionMessage : String? = null, val callback : View.OnClickListener? = null) : () -> Unit
 {
   companion object
   {
@@ -20,7 +20,7 @@ class InformUserAction(val context : Context, val text : String, val actionMessa
     const val LAST_NOTIF_ID = "lastNotifId"
   }
 
-  val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+  private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
   private fun getChannel() : NotificationChannel
   {
@@ -58,7 +58,7 @@ class InformUserAction(val context : Context, val text : String, val actionMessa
     notificationManager.notify(notifId, notif.build())
   }
 
-  override fun run()
+  override fun invoke()
   {
     if (context !is Snackbarable) { postNotification(); return }
     val snackbarParent = context.snackbarParent

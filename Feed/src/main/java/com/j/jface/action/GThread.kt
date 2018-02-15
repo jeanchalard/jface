@@ -2,10 +2,7 @@ package com.j.jface.action
 
 import android.content.Context
 import android.graphics.Bitmap
-import com.google.android.gms.tasks.Continuation
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.Tasks
+import com.google.android.gms.tasks.*
 import com.google.android.gms.wearable.Asset
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.DataMap
@@ -16,13 +13,12 @@ import java.util.concurrent.Executors
 
 infix fun <A, B, C> ((A) -> B).then(g : (B) -> C) : (A) -> C { return { a -> g(this(a)) } }
 inline fun <T, U> Task<T>.addOnCompleteListener(e : Executor, crossinline l : (Task<T>) -> U) : Task<T> = addOnCompleteListener(e, OnCompleteListener<T> { l(it) })
-inline fun <T, U> Task<T>.continueWith(e : Executor, crossinline l : (Task<T>) -> U) : Task<U> = continueWith(e, Continuation<T, U> { l(it) })
+inline fun <T, U> Task<T>.continueWith(e : Executor, crossinline l : (T) -> U) : Task<U> = continueWith(e, Continuation<T, U> { l(it.result) })
+inline fun <T, U> Task<T>.continueWith(e : Executor, crossinline l : () -> U) : Task<U> = continueWith(e, Continuation<T, U> { l() })
 inline fun <T, U> Task<T>.continueWithTask(e : Executor, crossinline l : (Task<T>) -> Task<U>) : Task<U> = continueWithTask(e, Continuation<T, Task<U>> { l(it) })
 
-interface Action : Runnable
-{
-  fun enqueue(t : GThread) = t.enqueue(this)
-}
+fun <T> (() -> T).enqueue(t : GThread) = t.enqueue(this)
+fun Runnable.enqueue(t : GThread) = t.enqueue(this)
 
 /**
  * A handler thread tuned for using Google APIs.
@@ -41,11 +37,23 @@ class GThread(context : Context)
   private val dataClient = Wearable.getDataClient(context, Wearable.WearableOptions.Builder().setLooper(context.mainLooper).build())!!
 
   fun enqueue(a : Runnable) = ex.execute(a)
-  fun enqueue(a : Action) = ex.execute(a)
-  fun <T> enqueue(a : () -> T) = ex.execute { a() }
-  fun <T> enqueue(a : (DataClient) -> T) = ex.execute { a(dataClient) }
+  fun <T> enqueue(a : () -> T) : Task<T>
+  {
+    val source = TaskCompletionSource<T>()
+    ex.execute { val r = a.invoke(); source.setResult(r) }
+    return source.task
+  }
+  fun <T> enqueue(a : (DataClient) -> T) : Task<T>
+  {
+    val source = TaskCompletionSource<T>()
+    ex.execute { val r = a.invoke(dataClient); source.setResult(r) }
+    return source.task
+  }
+  // For calling from Java
+  fun <T, R> executeInOrder(a : () -> T, b : (T) -> R) = enqueue(a).continueWith(ex, b)
+  fun <T, R> executeInOrder(a : () -> T, b : () -> R) = enqueue(a).continueWith(ex, b)
 
-  fun getDataSynchronously(path : String) = Tasks.await(GetDataAction(dataClient, ex, path))
+  fun getDataSynchronously(path : String) : DataMap? = Tasks.await(GetDataAction(dataClient, ex, path))
   fun getData(path : String, callback : (String, DataMap) -> Unit) = enqueue(GetDataAction(ex, path, callback))
   fun getBitmap(path : String, key : String, callback : (String, String, Bitmap?) -> Unit) = enqueue(GetBitmapAction(ex, path, key, callback))
   fun deleteData(path : String) = enqueue(DeleteDataAction(path))

@@ -3,6 +3,7 @@ package com.j.jface.action.wear
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.wearable.*
@@ -23,7 +24,7 @@ fun DeleteAllDataAction(e : Executor) =
 
 fun GetDataAction(client : DataClient, e : Executor, path : String) : Task<DataMap>
 {
-  return client.getDataItems(path.toWearUri()).continueWith(e)
+  return client.getDataItems(path.toWearUri()).continueWith(e, Continuation
   {
     val result : DataMap
     if (it.isSuccessful)
@@ -35,7 +36,7 @@ fun GetDataAction(client : DataClient, e : Executor, path : String) : Task<DataM
     else
       result = DataMap()
     result
-  }
+  })
 }
 
 fun GetDataAction(e : Executor, path : String, callback : (String, DataMap) -> Unit) =
@@ -51,8 +52,8 @@ fun GetBitmapAction(client : DataClient, e : Executor, path : String, key : Stri
     client.getFdForAsset(asset)
   }
   .continueWith(e)
-  {
-    BitmapFactory.decodeStream(it.result.inputStream)
+  { it : DataClient.GetFdForAssetResponse ->
+    BitmapFactory.decodeStream(it.inputStream)
   }
 }
 

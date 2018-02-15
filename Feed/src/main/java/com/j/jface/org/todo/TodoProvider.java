@@ -13,10 +13,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.j.jface.action.FileCopyAction;
 import com.j.jface.client.Client;
-import com.j.jface.client.action.Action;
 import com.j.jface.client.action.drive.WriteFileAction;
-import com.j.jface.client.action.fileops.CopyAction;
 import com.j.jface.lifecycle.WrappedContentProvider;
 
 import java.io.File;
@@ -180,10 +179,8 @@ public class TodoProvider extends WrappedContentProvider implements Handler.Call
 
   // A most dangerous method. It will take the specified file, and overwrite the current database
   // with its contents. It will destroy everything. So use it wisely.
-  @NonNull
-  public static Action destroyDatabaseAndReplaceWithFileContentsAction(@NonNull final Client client, @NonNull final Context context,
-                                                                       @NonNull final InputStream inputStream, @Nullable Action dependency)
+  @NonNull public static FileCopyAction destroyDatabaseAndReplaceWithFileContentsAction(@NonNull final Context context, @NonNull final InputStream inputStream)
   {
-    return new CopyAction(client, dependency, inputStream, context.getDatabasePath(DB_NAME).getAbsoluteFile());
+    return new FileCopyAction(inputStream, context.getDatabasePath(DB_NAME).getAbsoluteFile());
   }
 }

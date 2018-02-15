@@ -16,6 +16,7 @@ import android.widget.TimePicker;
 import com.j.jface.Const;
 import com.j.jface.R;
 import com.j.jface.action.GThread;
+import com.j.jface.action.InformUserAction;
 import com.j.jface.action.wear.GetNodeNameActionKt;
 import com.j.jface.client.Client;
 import com.j.jface.client.action.ui.ReportActionWithSnackbar;
@@ -123,8 +124,9 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
       catch (final FileNotFoundException e) { exception = e; }
       if (null == exception && null != is)
       {
-        TodoProvider.destroyDatabaseAndReplaceWithFileContentsAction(client, mFragment.getContext(), is,
-         new ReportActionWithSnackbar(client, null, mView, "Database dumped, restart JOrg", "Kill", v -> System.exit(0))).enqueue();
+        mGThread.executeInOrder(
+         TodoProvider.destroyDatabaseAndReplaceWithFileContentsAction(mFragment.getContext(), is),
+         new InformUserAction(mFragment.getContext(), "Database dumped, restart JOrg", "Kill", v -> System.exit(0)));
         return;
       }
     }

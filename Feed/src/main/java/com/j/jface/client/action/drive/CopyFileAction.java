@@ -53,7 +53,7 @@ class CopyFileAction extends ResultAction<Integer> implements ResultCallback<Res
     final DriveContents source = mSource.get();
     final DriveContents destination = mDestination.get();
 
-    if (null == source || null == destination) { fail("Resolved stream is null"); return; };
+    if (null == source || null == destination) { fail("Resolved stream is null"); return; }
 
     final InputStream sourceStream = source.getInputStream();
     final OutputStream destinationStream = destination.getOutputStream();

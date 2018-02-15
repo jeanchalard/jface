@@ -9,7 +9,7 @@ import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 import com.j.jface.Const;
 import com.j.jface.action.GThread;
-import com.j.jface.action.SetupGeofenceAction;
+import com.j.jface.action.SetupGeofenceActionKt;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ public class GeofenceTransitionReceiver
     final String action = intent.getAction();
     if (Intent.ACTION_BOOT_COMPLETED.equals(action) || ACTION_MANUAL_START.equals(action))
     {
-      mGThread.enqueue(new SetupGeofenceAction(service, getNotificationIntent()));
+      mGThread.enqueue(SetupGeofenceActionKt.SetupGeofenceAction(mGThread, service, getNotificationIntent()));
     }
     if (ACTION_GEOFENCE.equals(action)) handleGeofenceTransitions(intent);
     FeedLoader.startAllLoads(mGThread);
