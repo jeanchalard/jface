@@ -47,7 +47,7 @@ public class GeofenceTransitionReceiver
 
   private void handleGeofenceTransitions(final Intent intent)
   {
-    GeofencingEvent event = GeofencingEvent.fromIntent(intent);
+    final GeofencingEvent event = GeofencingEvent.fromIntent(intent);
     if (event.hasError()) return;
 
     final List<Geofence> fences = event.getTriggeringGeofences();

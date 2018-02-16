@@ -22,6 +22,7 @@ public enum Status
 
   @NonNull public final String description;
 
+  // Negative values are used by overrides.
   private static final int DUNNO = 0;
   private static final int 千住大橋 = 1;
   private static final int 六本木 = 2;
@@ -29,9 +30,31 @@ public enum Status
   private static final int 稲城 = 4;
   private static final int 本蓮沼 = 5;
   private static final int 東京 = 6;
-  private static final int TRAVEL = 7;
+  private static final int SOMEWHERE = 7;
 
   Status(@NonNull final String d) { description = d; }
+
+  public static int getNextLocationOverride(final int currentOverride, @NonNull final DataStore dataStore)
+  {
+    final int last = currentOverride < 0 ? getSymbolicLocation(dataStore) : currentOverride;
+    if (Const.RIO_MODE) switch(last) {
+      case DUNNO :
+      case 東京 :
+      case SOMEWHERE :
+      default : return 六本木;
+      case 六本木 : return 稲城;
+      case 稲城 : return 本蓮沼;
+      case 本蓮沼 : return SOMEWHERE;
+    } else switch (last) {
+      case DUNNO :
+      case 東京 :
+      case SOMEWHERE :
+      default : return 千住大橋;
+      case 千住大橋 : return 六本木;
+      case 六本木 : return 日暮里;
+      case 日暮里 : return SOMEWHERE;
+    }
+  }
 
   private static int getSymbolicLocation(@NonNull final DataStore dataStore)
   {
@@ -62,26 +85,27 @@ public enum Status
     final Boolean in東京 = dataStore.isWithinFence(Const.東京_FENCE_NAME);
     if (null == in東京) return DUNNO;
     if (in東京) return 東京;
-    return TRAVEL;
+    return SOMEWHERE;
   }
 
-  public static String getSymbolicLocationName(@NonNull final DataStore dataStore)
+  public static String getSymbolicLocationName(@NonNull final DataStore dataStore, final int override)
   {
-    switch (getSymbolicLocation(dataStore))
+    final int location = override < 0 ? getSymbolicLocation(dataStore) : override;
+    switch (location)
     {
       case 日暮里 : return "日暮里";
       case 千住大橋 :
-      case 稲城 : return "Home";
+      case 稲城 : return "家";
       case 六本木 : return "六本木";
       case 本蓮沼   : return "本蓮沼";
       case 東京   : return "東京";
-      default    : return "Somewhere";
+      default    : return "--";
     }
   }
 
   public static Status getStatus_J(@NonNull final Time time, final int symbolicLocation)
   {
-    if (TRAVEL == symbolicLocation) return OTHER;
+    if (SOMEWHERE == symbolicLocation) return OTHER;
 
     final boolean workDay;
     // TODO : figure out national holidays
@@ -105,7 +129,7 @@ public enum Status
 
   public static Status getStatus_Rio(@NonNull final Time time, final int symbolicLocation)
   {
-    if (TRAVEL == symbolicLocation) return OTHER;
+    if (SOMEWHERE == symbolicLocation) return OTHER;
 
     final boolean workDay;
     // TODO : figure out national holidays
@@ -130,11 +154,13 @@ public enum Status
     return OTHER;
   }
 
-  public static Status getStatus(@NonNull final Time time, @NonNull final DataStore dataStore)
+  public static Status getStatus(@NonNull final Time time, @NonNull final DataStore dataStore, @NonNull TapControl control)
   {
+    final int override = control.getSymbolicLocationOverride();
+    final int location = override < 0 ? getSymbolicLocation(dataStore) : override;
     if (Const.RIO_MODE)
-      return getStatus_Rio(time, getSymbolicLocation(dataStore));
+      return getStatus_Rio(time, location);
     else
-      return getStatus_J(time, getSymbolicLocation(dataStore));
+      return getStatus_J(time, location);
   }
 }

@@ -122,6 +122,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     }
 
     private final DataStore mDataStore = new DataStore();
+    private final TapControl mTapControl = new TapControl();
 //    private Sensors mSensors;
     private Draw mDraw = new Draw();
     private DrawTools mDrawTools = new DrawTools(null);
@@ -259,59 +260,68 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       invalidate();
     }
 
+    private final Time mDepartureTimeOverrideTmp = new Time();
     @Override
     public void onDraw(@NonNull final Canvas canvas, @NonNull final Rect bounds)
     {
+      final Time departureTime;
       mTime.setToNow();
       final long timeOffset = mDataStore.mTimeOffset;
       if (0 != timeOffset)
         mTime.set(mTime.toMillis(true) + timeOffset);
-      final Status status = Status.getStatus(mTime, mDataStore);
+      final long departureTimeOverride = mTapControl.getDepartureTimeOverride();
+      if (departureTimeOverride > 0)
+      {
+        mDepartureTimeOverrideTmp.set(departureTimeOverride);
+        departureTime = mDepartureTimeOverrideTmp;
+      }
+      else departureTime = mTime;
+      final Status status = Status.getStatus(mTime, mDataStore, mTapControl);
       final Departure departure1;
       final Departure departure2;
       switch (status) {
         case COMMUTE_MORNING_平日_J :
-          departure1 = mDataStore.findClosestDeparture(Const.日比谷線_北千住_平日, mTime);
-          departure2 = mDataStore.findClosestDeparture(Const.京成線_千住大橋_上野方面_平日, mTime);
+          departure1 = mDataStore.findClosestDeparture(Const.日比谷線_北千住_平日, departureTime);
+          departure2 = mDataStore.findClosestDeparture(Const.京成線_千住大橋_上野方面_平日, departureTime);
           break;
         case COMMUTE_EVENING_平日_J :
-          departure1 = mDataStore.findClosestDeparture(Const.日比谷線_六本木_平日, mTime);
+          departure1 = mDataStore.findClosestDeparture(Const.日比谷線_六本木_平日, departureTime);
           departure2 = null;
           break;
         case HOME_平日_J :
-          departure1 = mDataStore.findClosestDeparture(Const.京成線_千住大橋_上野方面_平日, mTime);
-          departure2 = mDataStore.findClosestDeparture(Const.京成線_千住大橋_成田方面_平日, mTime);
+          departure1 = mDataStore.findClosestDeparture(Const.京成線_千住大橋_上野方面_平日, departureTime);
+          departure2 = mDataStore.findClosestDeparture(Const.京成線_千住大橋_成田方面_平日, departureTime);
           break;
         case HOME_休日_J :
-          departure1 = mDataStore.findClosestDeparture(Const.京成線_千住大橋_上野方面_休日, mTime);
-          departure2 = mDataStore.findClosestDeparture(Const.京成線_千住大橋_成田方面_休日, mTime);
+          departure1 = mDataStore.findClosestDeparture(Const.京成線_千住大橋_上野方面_休日, departureTime);
+          departure2 = mDataStore.findClosestDeparture(Const.京成線_千住大橋_成田方面_休日, departureTime);
           break;
         case 日暮里_平日_J :
-          departure1 = mDataStore.findClosestDeparture(Const.京成線_日暮里_千住大橋方面_平日, mTime);
+          departure1 = mDataStore.findClosestDeparture(Const.京成線_日暮里_千住大橋方面_平日, departureTime);
           departure2 = null;
           break;
         case 日暮里_休日_J :
-          departure1 = mDataStore.findClosestDeparture(Const.京成線_日暮里_千住大橋方面_休日, mTime);
+          departure1 = mDataStore.findClosestDeparture(Const.京成線_日暮里_千住大橋方面_休日, departureTime);
           departure2 = null;
           break;
         case HOME_平日_RIO :
-          departure1 = mDataStore.findClosestDeparture(Const.京王線_稲城駅_新宿方面_平日, mTime);
+          departure1 = mDataStore.findClosestDeparture(Const.京王線_稲城駅_新宿方面_平日, departureTime);
           departure2 = null;
           break;
         case HOME_休日_RIO :
-          departure1 = mDataStore.findClosestDeparture(Const.京王線_稲城駅_新宿方面_休日, mTime);
+          departure1 = mDataStore.findClosestDeparture(Const.京王線_稲城駅_新宿方面_休日, departureTime);
           departure2 = null;
           break;
         case WORK_平日_RIO:
-          departure1 = mDataStore.findClosestDeparture(Const.都営三田線_本蓮沼_目黒方面_平日, mTime);
+          departure1 = mDataStore.findClosestDeparture(Const.都営三田線_本蓮沼_目黒方面_平日, departureTime);
           departure2 = null;
           break;
         case WORK_休日_RIO :
-          departure1 = mDataStore.findClosestDeparture(Const.都営三田線_本蓮沼_目黒方面_休日, mTime);
+          departure1 = mDataStore.findClosestDeparture(Const.都営三田線_本蓮沼_目黒方面_休日, departureTime);
           departure2 = null;
           break;
         case JUGGLING_月曜_RIO :
-          departure1 = mDataStore.findClosestDeparture(Const.大江戸線_六本木_新宿方面_平日, mTime);
+          departure1 = mDataStore.findClosestDeparture(Const.大江戸線_六本木_新宿方面_平日, departureTime);
           departure2 = null;
           break;
         default:
@@ -321,8 +331,8 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
 
       final int ambientFlag = isInAmbientMode() ? Draw.AMBIENT_MODE : 0;
       if (mDraw.draw(mDrawTools, mModeFlags | ambientFlag, canvas, bounds, mDataStore.mBackground,
-       departure1, departure2, status, mTime, /*mSensors,*/ Status.getSymbolicLocationName(mDataStore),
-       mDataStore.mTopic, mDataStore.mTopicColors))
+       departure1, departure2, status, mTime, /*mSensors,*/ Status.getSymbolicLocationName(mDataStore, mTapControl.getSymbolicLocationOverride()),
+       mTapControl.showTopic() ? mDataStore.mTopic : "", mDataStore.mTopicColors))
         invalidate();
 
       if (null == departure1)
@@ -337,6 +347,16 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
     {
       if (WatchFaceService.TAP_TYPE_TAP == tapType)
       {
+        // Determine quadrant. Top quadrant : change location ; bottom quadrant : show/hide message ; left/right : backward/forward departures
+        if (x < y) // bottom left triangle
+          if (x < Const.SCREEN_SIZE - y) // top left triangle
+            left(); // Left
+          else
+            mTapControl.toggleTopic(); // Bottom
+        else if (x < Const.SCREEN_SIZE - y)
+          mTapControl.nextLocation(mDataStore); // Top
+        else
+          mTapControl.nextDeparture(mNextDeparture); // Right
       }
       else super.onTapCommand(tapType, x, y, eventTime);
     }

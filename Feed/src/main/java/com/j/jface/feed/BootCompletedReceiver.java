@@ -9,7 +9,7 @@ public class BootCompletedReceiver extends BroadcastReceiver
   @Override public void onReceive(final Context context, final Intent intent)
   {
     final Intent i = new Intent(context, GeofenceTransitionReceiverService.class);
-    i.setAction(GeofenceTransitionReceiver.ACTION_MANUAL_START);
+    i.setAction(Intent.ACTION_BOOT_COMPLETED);
     context.startService(i);
   }
 }

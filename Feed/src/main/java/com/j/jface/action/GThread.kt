@@ -53,7 +53,7 @@ class GThread(context : Context)
   fun <T, R> executeInOrder(a : () -> T, b : (T) -> R) = enqueue(a).continueWith(ex, b)
   fun <T, R> executeInOrder(a : () -> T, b : () -> R) = enqueue(a).continueWith(ex, b)
 
-  fun getDataSynchronously(path : String) : DataMap? = Tasks.await(GetDataAction(dataClient, ex, path))
+  fun getDataSynchronously(path : String) : DataMap = Tasks.await(GetDataAction(dataClient, ex, path))
   fun getData(path : String, callback : (String, DataMap) -> Unit) = enqueue(GetDataAction(ex, path, callback))
   fun getBitmap(path : String, key : String, callback : (String, String, Bitmap?) -> Unit) = enqueue(GetBitmapAction(ex, path, key, callback))
   fun deleteData(path : String) = enqueue(DeleteDataAction(path))
