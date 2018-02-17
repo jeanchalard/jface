@@ -53,6 +53,7 @@ public class Const
   @NonNull public static final String 日比谷線_六本木_平日 = "日比谷線・六本木・平日";
   @NonNull public static final String 日比谷線_六本木_休日 = "日比谷線・六本木・休日";
   @NonNull public static final String 大江戸線_六本木_新宿方面_平日 = "大江戸線・六本木・新宿方面・平日";
+  @NonNull public static final String 大江戸線_六本木_新宿方面_休日 = "大江戸線・六本木・新宿方面・休日";
   @NonNull public static final String 京王線_稲城駅_新宿方面_平日 = "京王線・稲城駅・新宿方面・平日";
   @NonNull public static final String 京王線_稲城駅_新宿方面_休日 = "京王線・稲城駅・新宿方面・休日";
   @NonNull public static final String 都営三田線_本蓮沼_目黒方面_平日 = "都営三田線・本蓮沼・目黒方面・平日";
@@ -72,6 +73,7 @@ public class Const
     HEADSIGNS.put(日比谷線_六本木_平日, "六本木 ▶ 北千住");
     HEADSIGNS.put(日比谷線_六本木_休日, "六本木 ▶ 北千住");
     HEADSIGNS.put(大江戸線_六本木_新宿方面_平日, "六本木 ▶ 新宿");
+    HEADSIGNS.put(大江戸線_六本木_新宿方面_休日, "六本木 ▶ 新宿");
     HEADSIGNS.put(京王線_稲城駅_新宿方面_平日, "稲城 ▶ 新宿");
     HEADSIGNS.put(京王線_稲城駅_新宿方面_休日, "稲城 ▶ 新宿");
     HEADSIGNS.put(都営三田線_本蓮沼_目黒方面_平日, "本蓮沼 ▶ 巣鴨");
@@ -95,7 +97,7 @@ public class Const
    {
     京王線_稲城駅_新宿方面_平日, 京王線_稲城駅_新宿方面_休日,
     都営三田線_本蓮沼_目黒方面_平日, 都営三田線_本蓮沼_目黒方面_休日,
-    大江戸線_六本木_新宿方面_平日
+    大江戸線_六本木_新宿方面_平日, 大江戸線_六本木_新宿方面_休日
    };
   @NonNull public static final String[] ALL_DEPLIST_DATA_PATHS = RIO_MODE ? RIO_DEPLIST_DATA_PATHS : J_DEPLIST_DATA_PATHS;
 

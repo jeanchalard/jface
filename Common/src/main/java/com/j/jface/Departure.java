@@ -6,7 +6,9 @@ import java.util.Locale;
 
 public class Departure implements Comparable<Departure>
 {
+  // Seconds since real midnight in local time.
   public final int time;
+  // Seconds since logical midnight in local time (that is, it's between 3 * 3_600 and 27 * 3600)
   public final int dTime;
   public final String extra;
   public final String key;

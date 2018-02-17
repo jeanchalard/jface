@@ -3,7 +3,9 @@ package com.j.jface.face;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.format.Time;
 
+import com.j.jface.Const;
 import com.j.jface.Departure;
 
 /**
@@ -16,15 +18,15 @@ public class TapControl
   private long RESET_TIME_MILLIS = 5 * 60_000;
 
   private long lastChangeTime = 0;
-  private int symbolicLocationOverride = NO_OVERRIDE;
+  private Status statusOverride = null;
   private long departureTimeOverride = NO_OVERRIDE;
   private boolean showTopic = true;
 
-  public int getSymbolicLocationOverride()
+  @Nullable public Status getStatusOverride()
   {
-    if (NO_OVERRIDE == symbolicLocationOverride) return symbolicLocationOverride;
-    if (SystemClock.elapsedRealtime() > lastChangeTime + RESET_TIME_MILLIS) symbolicLocationOverride = NO_OVERRIDE;
-    return symbolicLocationOverride;
+    if (null == statusOverride) return null;
+    if (SystemClock.elapsedRealtime() > lastChangeTime + RESET_TIME_MILLIS) statusOverride = null;
+    return statusOverride;
   }
 
   public long getDepartureTimeOverride()
@@ -39,21 +41,37 @@ public class TapControl
     return showTopic;
   }
 
-  public void nextLocation(@NonNull final DataStore dataStore)
+  public void nextStatus(@NonNull final DataStore dataStore, @NonNull final Time now)
   {
-    symbolicLocationOverride = Status.getNextLocationOverride(symbolicLocationOverride, dataStore);
+    statusOverride = Status.getNextStatusOverride(now, dataStore, this);
     lastChangeTime = SystemClock.elapsedRealtime();
   }
 
-  public void nextDeparture(@Nullable final Departure dep)
+  private long makeTime(final int time)
   {
-    if (null == dep) return;
-    Non, là y'a un problème
-    departureTimeOverride = dep.time;
+    final long now = System.currentTimeMillis() + Const.MILLISECONDS_TO_UTC;
+    return 1000 * time + now - now % 86_400_000 - Const.MILLISECONDS_TO_UTC;
+  }
+
+  public void prevDeparture(@NonNull final DataStore dataStore, @Nullable final Departure nextDeparture)
+  {
+    if (null == nextDeparture) return;
+    final Departure prevDeparture = dataStore.findPrevDeparture(nextDeparture);
+    if (null == prevDeparture) return;
+    departureTimeOverride = makeTime(prevDeparture.time);
+    lastChangeTime = SystemClock.elapsedRealtime();
+  }
+
+  public void nextDeparture(@NonNull final DataStore dataStore, @Nullable final Departure nextDeparture)
+  {
+    if (null == nextDeparture || null == nextDeparture.next) return;
+    departureTimeOverride = makeTime(nextDeparture.time + 60);
+    lastChangeTime = SystemClock.elapsedRealtime();
   }
 
   public void toggleTopic()
   {
+    lastChangeTime = 1;
     showTopic = !showTopic;
   }
 }

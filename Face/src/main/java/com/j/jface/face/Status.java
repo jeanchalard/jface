@@ -1,6 +1,7 @@
 package com.j.jface.face;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.format.Time;
 
 import com.j.jface.Const;
@@ -18,6 +19,8 @@ public enum Status
   WORK_平日_RIO("Rio : At work (workday)"),
   WORK_休日_RIO("Rio : Commute (holiday)"),
   JUGGLING_月曜_RIO("Rio : Juggling ▶ Home"),
+  ROPPONGI_休日_J("J : Roppongi (holiday)"),
+  ROPPONGI_休日_RIO("Rio : Roppongi (holiday)"),
   OTHER("Somewhere");
 
   @NonNull public final String description;
@@ -34,25 +37,33 @@ public enum Status
 
   Status(@NonNull final String d) { description = d; }
 
-  public static int getNextLocationOverride(final int currentOverride, @NonNull final DataStore dataStore)
+  @NonNull public static Status getNextStatusOverride(@NonNull final Time time, @NonNull final DataStore dataStore, @NonNull final TapControl control)
   {
-    final int last = currentOverride < 0 ? getSymbolicLocation(dataStore) : currentOverride;
-    if (Const.RIO_MODE) switch(last) {
-      case DUNNO :
-      case 東京 :
-      case SOMEWHERE :
-      default : return 六本木;
-      case 六本木 : return 稲城;
-      case 稲城 : return 本蓮沼;
-      case 本蓮沼 : return SOMEWHERE;
-    } else switch (last) {
-      case DUNNO :
-      case 東京 :
-      case SOMEWHERE :
-      default : return 千住大橋;
-      case 千住大橋 : return 六本木;
-      case 六本木 : return 日暮里;
-      case 日暮里 : return SOMEWHERE;
+    final Status status = getStatus(time, dataStore, control);
+    switch (status)
+    {
+      case COMMUTE_MORNING_平日_J : return COMMUTE_EVENING_平日_J;
+      case COMMUTE_EVENING_平日_J : return HOME_平日_J;
+      case HOME_平日_J : return 日暮里_平日_J;
+      case 日暮里_平日_J : return OTHER;
+
+      case HOME_休日_J : return 日暮里_休日_J;
+      case 日暮里_休日_J : return ROPPONGI_休日_J;
+      case ROPPONGI_休日_J : return OTHER;
+
+      case HOME_平日_RIO : return WORK_平日_RIO;
+      case WORK_平日_RIO : return JUGGLING_月曜_RIO;
+      case JUGGLING_月曜_RIO : return OTHER;
+
+      case HOME_休日_RIO : return WORK_休日_RIO;
+      case WORK_休日_RIO : return ROPPONGI_休日_RIO;
+      case ROPPONGI_休日_RIO : return OTHER;
+
+      default:
+      case OTHER :
+        final boolean workDay = (time.weekDay >= Time.MONDAY && time.weekDay <= Time.FRIDAY);
+        if (Const.RIO_MODE) return workDay ? HOME_平日_RIO : HOME_休日_RIO;
+        else return workDay ? COMMUTE_MORNING_平日_J : HOME_休日_J;
     }
   }
 
@@ -88,18 +99,34 @@ public enum Status
     return SOMEWHERE;
   }
 
-  public static String getSymbolicLocationName(@NonNull final DataStore dataStore, final int override)
+  public static String getSymbolicLocationName(@NonNull final Status status)
   {
-    final int location = override < 0 ? getSymbolicLocation(dataStore) : override;
-    switch (location)
+    switch (status)
     {
-      case 日暮里 : return "日暮里";
-      case 千住大橋 :
-      case 稲城 : return "家";
-      case 六本木 : return "六本木";
-      case 本蓮沼   : return "本蓮沼";
-      case 東京   : return "東京";
-      default    : return "--";
+      case COMMUTE_MORNING_平日_J :
+      case HOME_平日_J :
+      case HOME_休日_J :
+      case HOME_平日_RIO :
+      case HOME_休日_RIO :
+        return "家";
+
+      case 日暮里_平日_J :
+      case 日暮里_休日_J :
+        return "日暮里";
+
+      case COMMUTE_EVENING_平日_J :
+      case JUGGLING_月曜_RIO :
+      case ROPPONGI_休日_J:
+      case ROPPONGI_休日_RIO:
+        return "六本木";
+
+      case WORK_平日_RIO :
+      case WORK_休日_RIO :
+        return "本蓮沼";
+
+      default:
+      case OTHER :
+        return "--";
     }
   }
 
@@ -107,9 +134,8 @@ public enum Status
   {
     if (SOMEWHERE == symbolicLocation) return OTHER;
 
-    final boolean workDay;
     // TODO : figure out national holidays
-    workDay = (time.weekDay >= Time.MONDAY && time.weekDay <= Time.FRIDAY);
+    final boolean workDay = (time.weekDay >= Time.MONDAY && time.weekDay <= Time.FRIDAY);
 
     if (日暮里 == symbolicLocation) return workDay ? 日暮里_平日_J : 日暮里_休日_J;
 
@@ -120,6 +146,8 @@ public enum Status
     if (workDay
      && ((time.hour >= 18 && time.hour <= 23) || time.hour <= 0)
      && (DUNNO == symbolicLocation || 六本木 == symbolicLocation)) return COMMUTE_EVENING_平日_J;
+
+    if (!workDay && 六本木 == symbolicLocation) return ROPPONGI_休日_J;
 
     if (DUNNO == symbolicLocation || 千住大橋 == symbolicLocation)
       return workDay ? HOME_平日_J : HOME_休日_J;
@@ -145,6 +173,8 @@ public enum Status
      && (DUNNO == symbolicLocation || 六本木 == symbolicLocation))
       return JUGGLING_月曜_RIO;
 
+    if (!workDay && 六本木 == symbolicLocation) return ROPPONGI_休日_RIO;
+
     if (DUNNO == symbolicLocation && workDay)
     {
       if (time.hour >= 4 && time.hour <= 12) return HOME_平日_RIO;
@@ -156,11 +186,11 @@ public enum Status
 
   public static Status getStatus(@NonNull final Time time, @NonNull final DataStore dataStore, @NonNull TapControl control)
   {
-    final int override = control.getSymbolicLocationOverride();
-    final int location = override < 0 ? getSymbolicLocation(dataStore) : override;
+    final Status override = control.getStatusOverride();
+    if (null != override) return override;
     if (Const.RIO_MODE)
-      return getStatus_Rio(time, location);
+      return getStatus_Rio(time, getSymbolicLocation(dataStore));
     else
-      return getStatus_J(time, location);
+      return getStatus_J(time, getSymbolicLocation(dataStore));
   }
 }

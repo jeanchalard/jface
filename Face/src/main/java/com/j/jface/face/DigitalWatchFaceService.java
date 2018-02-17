@@ -304,6 +304,10 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
           departure1 = mDataStore.findClosestDeparture(Const.京成線_日暮里_千住大橋方面_休日, departureTime);
           departure2 = null;
           break;
+        case ROPPONGI_休日_J :
+          departure1 = mDataStore.findClosestDeparture(Const.日比谷線_六本木_平日, departureTime);
+          departure2 = null;
+          break;
         case HOME_平日_RIO :
           departure1 = mDataStore.findClosestDeparture(Const.京王線_稲城駅_新宿方面_平日, departureTime);
           departure2 = null;
@@ -324,6 +328,10 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
           departure1 = mDataStore.findClosestDeparture(Const.大江戸線_六本木_新宿方面_平日, departureTime);
           departure2 = null;
           break;
+        case ROPPONGI_休日_RIO :
+          departure1 = mDataStore.findClosestDeparture(Const.大江戸線_六本木_新宿方面_平日, departureTime);
+          departure2 = null;
+          break;
         default:
           departure1 = null;
           departure2 = null;
@@ -331,7 +339,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
 
       final int ambientFlag = isInAmbientMode() ? Draw.AMBIENT_MODE : 0;
       if (mDraw.draw(mDrawTools, mModeFlags | ambientFlag, canvas, bounds, mDataStore.mBackground,
-       departure1, departure2, status, mTime, /*mSensors,*/ Status.getSymbolicLocationName(mDataStore, mTapControl.getSymbolicLocationOverride()),
+       departure1, departure2, status, mTime, /*mSensors,*/ Status.getSymbolicLocationName(status),
        mTapControl.showTopic() ? mDataStore.mTopic : "", mDataStore.mTopicColors))
         invalidate();
 
@@ -350,15 +358,16 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
         // Determine quadrant. Top quadrant : change location ; bottom quadrant : show/hide message ; left/right : backward/forward departures
         if (x < y) // bottom left triangle
           if (x < Const.SCREEN_SIZE - y) // top left triangle
-            left(); // Left
+            mTapControl.prevDeparture(mDataStore, mNextDeparture); // Left
           else
             mTapControl.toggleTopic(); // Bottom
         else if (x < Const.SCREEN_SIZE - y)
-          mTapControl.nextLocation(mDataStore); // Top
+          mTapControl.nextStatus(mDataStore, mTime); // Top
         else
-          mTapControl.nextDeparture(mNextDeparture); // Right
+          mTapControl.nextDeparture(mDataStore, mNextDeparture); // Right
       }
       else super.onTapCommand(tapType, x, y, eventTime);
+      invalidate();
     }
 
     /**

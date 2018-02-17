@@ -50,6 +50,8 @@ public class DataSource
 
    new DataSource(Const.大江戸線_六本木_新宿方面_平日,
     "https://timetable.ekitan.com/railway/line-station/225-35?d=2&view=list", EkitanParser.class),
+   new DataSource(Const.大江戸線_六本木_新宿方面_休日,
+    "https://timetable.ekitan.com/railway/line-station/225-35?d=2&dw=2&view=list", EkitanParser.class),
   };
   public static final DataSource[] ALL_SOURCES = Const.RIO_MODE ? RIO_SOURCES : J_SOURCES;
 }

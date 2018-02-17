@@ -91,6 +91,15 @@ public class DataStore
     return nextDeparture;
   }
 
+  @Nullable public Departure findPrevDeparture(@NonNull final Departure dep)
+  {
+    final ArrayList<Departure> deps = mDepartures.get(dep.key);
+    final int len = deps.size();
+    for (int i = 0; i < len; ++i)
+      if (deps.get(i) == dep) return i <= 0 ? null : deps.get(i - 1);
+    return null; // This should never happen
+  }
+
   public Boolean isWithinFence(@NonNull final String fenceName)
   {
     if (0 == mDebugFences)
