@@ -17,6 +17,7 @@ import com.j.jface.Const;
 import com.j.jface.R;
 import com.j.jface.action.GThread;
 import com.j.jface.feed.views.PaletteView;
+import com.j.jface.feed.views.SnackbarRegistry;
 import com.j.jface.lifecycle.WrappedFragment;
 
 import java.util.ArrayList;
@@ -68,6 +69,16 @@ public class MessagesFragment extends WrappedFragment implements TextWatcher, Pa
       });
       return Unit.INSTANCE;
     });
+  }
+
+  @Override protected void onResume()
+  {
+    SnackbarRegistry.INSTANCE.setSnackbarParent(mView);
+  }
+
+  @Override protected void onPause()
+  {
+    SnackbarRegistry.INSTANCE.unsetSnackbarParent(mView);
   }
 
   @Override public void afterTextChanged(@NonNull final Editable s)

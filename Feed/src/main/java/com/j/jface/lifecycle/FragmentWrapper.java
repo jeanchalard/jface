@@ -43,4 +43,18 @@ public class FragmentWrapper<T extends WrappedFragment> extends Fragment
     assert mW != null;
     mW.onActivityResult(requestCode, resultCode, data);
   }
+
+  @Override public void onResume()
+  {
+    super.onResume();
+    assert mW != null;
+    mW.onResume();
+  }
+
+  @Override public void onPause()
+  {
+    super.onPause();
+    assert mW != null;
+    mW.onPause();
+  }
 }

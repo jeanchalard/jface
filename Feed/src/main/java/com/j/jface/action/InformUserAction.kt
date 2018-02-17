@@ -9,7 +9,7 @@ import android.support.design.widget.Snackbar
 import android.view.View
 import com.j.jface.Const
 import com.j.jface.R
-import com.j.jface.feed.views.Snackbarable
+import com.j.jface.feed.views.SnackbarRegistry
 
 class InformUserAction(val context : Context, val text : String, val actionMessage : String? = null, val callback : View.OnClickListener? = null) : () -> Unit
 {
@@ -60,10 +60,9 @@ class InformUserAction(val context : Context, val text : String, val actionMessa
 
   override fun invoke()
   {
-    if (context !is Snackbarable) { postNotification(); return }
-    val snackbarParent = context.snackbarParent
+    val snackbarParent = SnackbarRegistry.getSnackbarParent()
     if (null == snackbarParent) { postNotification(); return }
-    val sb = Snackbar.make(snackbarParent, text, Snackbar.LENGTH_SHORT)
+    val sb = Snackbar.make(snackbarParent, text, Snackbar.LENGTH_LONG)
     if (null != actionMessage && null != callback)
       sb.setAction(actionMessage, callback)
     snackbarParent.post { sb.show() }

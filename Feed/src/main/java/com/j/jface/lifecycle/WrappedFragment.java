@@ -34,5 +34,7 @@ public abstract class WrappedFragment
 //    ...where T is whatever is passed to the constructor or the wrapper, or suffer a runtime crash.
 
   @NonNull public View getView() { return mView; }
-  protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {};
+  protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {}
+  protected void onResume() {}
+  protected void onPause() {}
 }

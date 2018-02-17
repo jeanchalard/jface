@@ -20,7 +20,7 @@ import com.j.jface.action.InformUserAction;
 import com.j.jface.action.wear.GetNodeNameActionKt;
 import com.j.jface.client.Client;
 import com.j.jface.client.action.ui.ReportActionWithSnackbar;
-import com.j.jface.feed.views.Snackbarable;
+import com.j.jface.feed.views.SnackbarRegistry;
 import com.j.jface.lifecycle.WrappedFragment;
 import com.j.jface.org.todo.TodoProvider;
 
@@ -28,10 +28,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 
 import kotlin.Unit;
 
-public class DebugToolsFragment extends WrappedFragment implements View.OnClickListener, NumberPicker.OnValueChangeListener, TimePicker.OnTimeChangedListener, Snackbarable
+public class DebugToolsFragment extends WrappedFragment implements View.OnClickListener, NumberPicker.OnValueChangeListener, TimePicker.OnTimeChangedListener
 {
   public static final int DESTROY_DATABASE_AND_REPLACE_WITH_FILE_CONTENTS = 200;
   private static final int MSG_UPDATE_TIME = 1;
@@ -111,6 +112,16 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
     });
   }
 
+  @Override protected void onResume()
+  {
+    SnackbarRegistry.INSTANCE.setSnackbarParent(mView);
+  }
+
+  @Override protected void onPause()
+  {
+    SnackbarRegistry.INSTANCE.unsetSnackbarParent(mView);
+  }
+
   protected void onActivityResult(final int requestCode, final int resultCode, final Intent data)
   {
     if (null == data) return;
@@ -126,7 +137,7 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
       {
         mGThread.executeInOrder(
          TodoProvider.destroyDatabaseAndReplaceWithFileContentsAction(mFragment.getContext(), is),
-         new InformUserAction(mFragment.getContext(), "Database dumped, restart JOrg", "Kill", v -> System.exit(0)));
+         new InformUserAction(mFragment.getActivity(), "Database dumped, restart JOrg", "Kill", v -> System.exit(0)));
         return;
       }
     }
@@ -194,6 +205,4 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
   {
     updateOffset(GRACE_FOR_UPDATE);
   }
-
-  @Nullable @Override public View getSnackbarParent() { return mFragment.isResumed() ? mView : null; }
 }

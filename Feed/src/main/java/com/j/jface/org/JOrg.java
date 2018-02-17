@@ -13,14 +13,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
-import android.view.View;
 import android.widget.TextView;
 
 import com.j.jface.Const;
 import com.j.jface.R;
 import com.j.jface.client.Client;
 import com.j.jface.client.action.drive.RecursiveBackupAction;
-import com.j.jface.feed.views.Snackbarable;
+import com.j.jface.feed.views.SnackbarRegistry;
 import com.j.jface.lifecycle.TodoEditorBoot;
 import com.j.jface.lifecycle.WrappedActivity;
 import com.j.jface.org.sound.EditTextSoundRouter;
@@ -36,7 +35,7 @@ import java.util.Locale;
 /**
  * Main activity class for JOrg.
  */
-public class JOrg extends WrappedActivity implements Snackbarable
+public class JOrg extends WrappedActivity
 {
   @NonNull private final Client mClient;
   @NonNull private final SoundSource mSoundSource;
@@ -82,7 +81,9 @@ public class JOrg extends WrappedActivity implements Snackbarable
   {
     mSoundSource.onPause();
     mTodoList.onPauseApplication();
+    SnackbarRegistry.INSTANCE.unsetSnackbarParent(mTopLayout);
   }
+
   public void onResume()
   {
     mSoundSource.onResume();
@@ -90,6 +91,7 @@ public class JOrg extends WrappedActivity implements Snackbarable
     final String title = String.format(Locale.JAPAN, "%02d-%02d %s",
      c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH), Const.WEEKDAYS[c.get(Calendar.DAY_OF_WEEK) - 1]);
     ((TextView)mA.findViewById(R.id.title_today)).setText(title);
+    SnackbarRegistry.INSTANCE.setSnackbarParent(mTopLayout);
   }
 
   // Null parent means top level, as always
@@ -132,10 +134,5 @@ public class JOrg extends WrappedActivity implements Snackbarable
   private void scheduleBackup()
   {
     new RecursiveBackupAction(mClient, null, mTopLayout).enqueue();
-  }
-
-  @Nullable @Override public View getSnackbarParent()
-  {
-    return isResumed() ? mTopLayout : null;
   }
 }
