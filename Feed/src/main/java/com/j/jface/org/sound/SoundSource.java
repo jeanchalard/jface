@@ -53,7 +53,6 @@ public class SoundSource implements View.OnClickListener, RecognitionListener
     mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(activity);
     mSpeechRecognizer.setRecognitionListener(this);
     mNoSound = soundSource.findViewById(R.id.no_sound);
-    mNoSound.setVisibility(View.INVISIBLE);
     mActive = mNoSound.getVisibility() == View.INVISIBLE;
     soundSource.setOnClickListener(this);
   }

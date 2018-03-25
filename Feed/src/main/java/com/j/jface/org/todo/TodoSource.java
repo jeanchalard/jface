@@ -8,6 +8,9 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.j.jface.action.GThread;
+import com.j.jface.action.firebase.TodoSourceTest;
+
 import java.util.ArrayList;
 
 // Get Todo from the provider. This bridges the awful content provider interface
@@ -16,7 +19,7 @@ public class TodoSource
 {
   @NonNull final ContentResolver mResolver;
 
-  public TodoSource(@NonNull final Context context)
+  public TodoSource(@NonNull final GThread gThread, @NonNull final Context context)
   {
     mResolver = context.getContentResolver();
   }

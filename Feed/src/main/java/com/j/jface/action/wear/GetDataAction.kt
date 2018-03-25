@@ -10,6 +10,7 @@ import com.google.android.gms.wearable.*
 import com.j.jface.action.addOnCompleteListener
 import com.j.jface.action.continueWith
 import com.j.jface.action.continueWithTask
+import com.j.jface.action.then
 import java.util.concurrent.Executor
 
 private fun String.toWearUri() : Uri = PutDataMapRequest.create(this).uri
@@ -17,10 +18,7 @@ private fun String.toWearUri() : Uri = PutDataMapRequest.create(this).uri
 fun DeleteDataAction(uri : Uri) = { client : DataClient -> client.deleteDataItems(uri) }
 fun DeleteDataAction(path : String) = DeleteDataAction(path.toWearUri())
 
-fun DeleteAllDataAction(e : Executor) =
-{ client : DataClient ->
-  client.dataItems.addOnSuccessListener(e, OnSuccessListener { for (item in it) client.deleteDataItems(item.uri) })
-}
+fun DeleteAllDataAction(client : DataClient) = { client.dataItems }.then { for (item in it.result) client.deleteDataItems(item.uri) }
 
 fun GetDataAction(client : DataClient, e : Executor, path : String) : Task<DataMap>
 {

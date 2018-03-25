@@ -1,6 +1,5 @@
 package com.j.jface.org.editor;
 
-import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,9 +14,10 @@ import android.widget.TextView;
 
 import com.j.jface.Const;
 import com.j.jface.R;
+import com.j.jface.action.GThread;
 import com.j.jface.lifecycle.WrappedActivity;
-import com.j.jface.org.todo.TodoUpdaterProxy;
 import com.j.jface.org.todo.Todo;
+import com.j.jface.org.todo.TodoUpdaterProxy;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -26,26 +26,29 @@ import java.util.Locale;
 // An activity that provides detailed editing for a single Todo.
 public class TodoEditor extends WrappedActivity
 {
+  @NonNull private final GThread mGThread;
   @NonNull private final TodoDetails mDetails;
   protected TodoEditor(@NonNull final Args a)
   {
     super(a);
+    mGThread = new GThread(mA);
     mA.requestWindowFeature(Window.FEATURE_NO_TITLE);
     mA.setContentView(R.layout.todo_editor);
-    final TextView title = (TextView)mA.findViewById(R.id.todoEditor_title);
+    final TextView title = mA.findViewById(R.id.todoEditor_title);
 
     final Intent intent = mA.getIntent();
     final String todoId = null == intent ? null : intent.getStringExtra(Const.EXTRA_TODO_ID);
-    final TodoUpdaterProxy updaterProxy = new TodoUpdaterProxy(mA.getApplicationContext());
-    final Todo todo = updaterProxy.getFromId(todoId);
+    final TodoUpdaterProxy updaterProxy = TodoUpdaterProxy.getInstance(mGThread, mA);
+    final Todo t = null == todoId ? Todo.NULL_TODO : updaterProxy.getFromId(todoId);
+    final Todo todo = null == t ? Todo.NULL_TODO : t;
 
     title.setText(todo.text);
-    mDetails = new TodoDetails(mA.getApplicationContext(), todo, (ViewGroup)mA.findViewById(R.id.todoEditor_details));
+    mDetails = new TodoDetails(updaterProxy, todo, mA.findViewById(R.id.todoEditor_details));
   }
 
   public static class TodoDetails implements CalendarView.DateChangeListener, View.OnClickListener, AdapterView.OnItemSelectedListener, NumericPicker.OnValueChangeListener
   {
-    @NonNull private final TodoUpdaterProxy mUpdaterProxy;
+    @NonNull private final TodoUpdaterProxy mUpdater;
     @NonNull private Todo mTodo;
     @NonNull private final ViewGroup mRootView;
     @NonNull private final TextView mLifeline;
@@ -56,26 +59,26 @@ public class TodoEditor extends WrappedActivity
     @NonNull private final NumericPicker mEstimatedTime;
     @Nullable private TextView mEditing;
 
-    public TodoDetails(@NonNull final Context context, @NonNull final Todo todo, @NonNull final ViewGroup rootView)
+    public TodoDetails(@NonNull final TodoUpdaterProxy updaterProxy, @NonNull final Todo todo, @NonNull final ViewGroup rootView)
     {
-      mUpdaterProxy = new TodoUpdaterProxy(context);
+      mUpdater = updaterProxy;
       mTodo = todo;
       mRootView = rootView;
-      mLifeline = (TextView)rootView.findViewById(R.id.todoDetails_lifeline_text);
-      mDeadline = (TextView)rootView.findViewById(R.id.todoDetails_deadline_text);
-      mHardness = (Spinner)rootView.findViewById(R.id.todoDetails_hardness);
-      mConstraint = (Spinner)rootView.findViewById(R.id.todoDetails_constraint);
-      mEstimatedTime = (NumericPicker)rootView.findViewById(R.id.todoDetails_estimatedTime);
+      mLifeline = rootView.findViewById(R.id.todoDetails_lifeline_text);
+      mDeadline = rootView.findViewById(R.id.todoDetails_deadline_text);
+      mHardness = rootView.findViewById(R.id.todoDetails_hardness);
+      mConstraint = rootView.findViewById(R.id.todoDetails_constraint);
+      mEstimatedTime = rootView.findViewById(R.id.todoDetails_estimatedTime);
 
       cleanupSpinner(mHardness); cleanupSpinner(mConstraint);
 
       mLifeline.setOnClickListener(this);
       mDeadline.setOnClickListener(this);
-      mCalendarView = (CalendarView)rootView.findViewById(R.id.todoDetails_calendarView);
+      mCalendarView = rootView.findViewById(R.id.todoDetails_calendarView);
       mCalendarView.addDateChangeListener(this);
 
       mHardness.setOnItemSelectedListener(this);
-      final ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(context, android.R.layout.simple_spinner_item, Todo.CONSTRAINT_NAMES);
+      final ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(rootView.getContext(), android.R.layout.simple_spinner_item, Todo.CONSTRAINT_NAMES);
       adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
       mConstraint.setAdapter(adapter);
       mConstraint.setOnItemSelectedListener(this);
@@ -107,7 +110,7 @@ public class TodoEditor extends WrappedActivity
     }
 
     @NonNull private static GregorianCalendar sRenderCalendar = new GregorianCalendar();
-    public static String renderDate(final long date)
+    private static String renderDate(final long date)
     {
       if (0 == date) return "—";
       if (-1 == date) return "?";
@@ -139,7 +142,7 @@ public class TodoEditor extends WrappedActivity
       if (mLifeline == mEditing) b.setLifeline(newDate);
       else b.setDeadline(newDate);
       mTodo = b.build();
-      mUpdaterProxy.scheduleUpdateTodo(mTodo);
+      mUpdater.scheduleUpdateTodo(mTodo);
       if (0 == newDate)
       {
         TransitionManager.beginDelayedTransition(mRootView);
@@ -181,7 +184,7 @@ public class TodoEditor extends WrappedActivity
         b.setConstraint(position);
       }
       mTodo = b.build();
-      mUpdaterProxy.scheduleUpdateTodo(mTodo);
+      mUpdater.scheduleUpdateTodo(mTodo);
     }
 
     @Override public void onNothingSelected(AdapterView<?> parent)
@@ -192,7 +195,7 @@ public class TodoEditor extends WrappedActivity
     @Override public void onValueChange(@NonNull final NumericPicker picker, final int oldVal, final int newVal)
     {
       mTodo = new Todo.Builder(mTodo).setEstimatedTime(newVal < 0 ? newVal : newVal * 5).build();
-      mUpdaterProxy.scheduleUpdateTodo(mTodo);
+      mUpdater.scheduleUpdateTodo(mTodo);
     }
   }
 }

@@ -15,10 +15,6 @@ import com.j.jface.lifecycle.WrappedFragment
 
 class ImageSelectorFragment(a : Args, gThread : GThread) : WrappedFragment(a.inflater.inflate(R.layout.fragment_image_selector, a.container, false))
 {
-  companion object
-  {
-    const val CHOOSE_IMAGE_INTENT = 100
-  }
   private val mGThread = gThread
   private val mFragment : Fragment = a.fragment
   private val mImageButton : ImageButton = mView.findViewById(R.id.select_image_button) as ImageButton
@@ -41,12 +37,12 @@ class ImageSelectorFragment(a : Args, gThread : GThread) : WrappedFragment(a.inf
     val intent = Intent()
     intent.type = "image/*"
     intent.action = Intent.ACTION_GET_CONTENT
-    mFragment.startActivityForResult(intent, CHOOSE_IMAGE_INTENT)
+    mFragment.startActivityForResult(intent, Const.CHOOSE_IMAGE_RESULT_CODE)
   }
 
   override fun onActivityResult(requestCode : Int, resultCode : Int, data : Intent?)
   {
-    if (null == data) return
+    if (null == data || resultCode != Const.CHOOSE_IMAGE_RESULT_CODE) return
     val f = FragmentWrapper<ImageEditorFragment>(ImageEditorFragment::class.java, ImageEditorFragment.ImageEditorArgs(mGThread, data))
     mFragment.fragmentManager.beginTransaction()
      .addToBackStack("ImageEditor")

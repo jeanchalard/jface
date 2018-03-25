@@ -34,7 +34,6 @@ import kotlin.Unit;
 
 public class DebugToolsFragment extends WrappedFragment implements View.OnClickListener, NumberPicker.OnValueChangeListener, TimePicker.OnTimeChangedListener
 {
-  public static final int DESTROY_DATABASE_AND_REPLACE_WITH_FILE_CONTENTS = 200;
   private static final int MSG_UPDATE_TIME = 1;
   private static final int GRACE_FOR_UPDATE = 3000;
 
@@ -108,7 +107,7 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
       final Intent intent = new Intent();
       intent.setType("*/*");
       intent.setAction(Intent.ACTION_GET_CONTENT);
-      a.fragment.startActivityForResult(intent, DESTROY_DATABASE_AND_REPLACE_WITH_FILE_CONTENTS);
+      a.fragment.startActivityForResult(intent, Const.DESTROY_DATABASE_AND_REPLACE_WITH_FILE_CONTENTS_RESULT_CODE);
     });
   }
 
@@ -137,7 +136,7 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
       {
         mGThread.executeInOrder(
          TodoProvider.destroyDatabaseAndReplaceWithFileContentsAction(mFragment.getContext(), is),
-         new InformUserAction(mFragment.getActivity(), "Database dumped, restart JOrg", "Kill", v -> System.exit(0)));
+         new InformUserAction(mFragment.getActivity(), "Database dumped, restart JOrg", "Kill", v -> System.exit(0), null));
         return;
       }
     }

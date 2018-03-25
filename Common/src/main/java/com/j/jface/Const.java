@@ -18,6 +18,10 @@ public class Const
   public static final long UPDATE_DELAY_MILLIS = 7 * 24 * 60 * 60 * 1000; // One week in millis
   public static final int DISPLAYED_DEPARTURES_PER_LINE = 3;
 
+  public static final int CHOOSE_IMAGE_RESULT_CODE = 100;
+  public static final int DESTROY_DATABASE_AND_REPLACE_WITH_FILE_CONTENTS_RESULT_CODE = 200;
+  public static final int GOOGLE_SIGN_IN_RESULT_CODE = 300;
+
   @NonNull public static final String INTERNAL_PERSISTED_VALUES_FILES = "SystemValues";
 
   @NonNull public static final String[] WEEKDAYS = { "日", "月", "火", "水", "木", "金", "土", "日" };

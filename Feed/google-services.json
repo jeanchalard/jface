@@ -15,13 +15,21 @@
       },
       "oauth_client": [
         {
-          "client_id": "519981656006-sufkn5a5mo129evj1q3ps7817648n85u.apps.googleusercontent.com",
+          "client_id": "519981656006-i63ajrkq8d23dngts3ds954thdjqjaq0.apps.googleusercontent.com",
           "client_type": 3
+        },
+        {
+          "client_id": "519981656006-objsr192dfbc5rkedup5kggur5a5u86r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.j.jface",
+            "certificate_hash": "c9deef4b9552b08a85ebf647f9ee26c065cd7494"
+          }
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyD34Jd8KdCEkRIIkqwC1E-uvAAgMltYKuY"
+          "current_key": "AIzaSyA2xdecOxNJ386d23RTaRJ4LTD-s95lfm8"
         }
       ],
       "services": {
@@ -29,8 +37,13 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "519981656006-i63ajrkq8d23dngts3ds954thdjqjaq0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2

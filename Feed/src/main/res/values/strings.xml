@@ -55,4 +55,5 @@
     <item>@string/hard</item>
   </string-array>
 
+  <string name="firebase_client_id">519981656006-i63ajrkq8d23dngts3ds954thdjqjaq0.apps.googleusercontent.com</string>
 </resources>

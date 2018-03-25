@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.j.jface.action.GThread;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -14,16 +16,16 @@ import java.util.HashSet;
  * A view of a TodoList. Accesses to the TodoList should generally go
  * through a view.
  */
-public class TodoListView implements ListChangeObserver
+public class TodoListView implements ListChangeObserver, TodoUpdaterProxy
 {
   private static final boolean DEBUG_VIEW = false;
 
   @NonNull private final TodoList mList;
   @NonNull private ArrayList<Integer> mView;
 
-  public TodoListView(@NonNull final Context context)
+  public TodoListView(@NonNull final GThread gThread, @NonNull final Context context)
   {
-    this(TodoList.getInstance(context));
+    this(TodoList.getInstance(gThread, context));
   }
 
   public TodoListView(@NonNull final TodoList sourceList)
@@ -44,6 +46,11 @@ public class TodoListView implements ListChangeObserver
   {
     final int deref = mView.get(index);
     return mList.get(deref);
+  }
+
+  @Nullable public Todo getFromId(@NonNull final String todoId)
+  {
+    return mList.getFromId(todoId);
   }
 
   public int findByOrd(final String ord) // Used for testing. Returns the index.

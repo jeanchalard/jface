@@ -3,6 +3,7 @@ package com.j.jface.action
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.SharedPreferences
 import android.support.design.widget.Snackbar
@@ -11,7 +12,7 @@ import com.j.jface.Const
 import com.j.jface.R
 import com.j.jface.feed.views.SnackbarRegistry
 
-class InformUserAction(val context : Context, val text : String, val actionMessage : String? = null, val callback : View.OnClickListener? = null) : () -> Unit
+class InformUserAction(val context : Context, val text : String, val actionMessage : String? = null, val callback : View.OnClickListener? = null, val pendingIntent : PendingIntent? = null) : () -> Unit
 {
   companion object
   {
@@ -42,6 +43,7 @@ class InformUserAction(val context : Context, val text : String, val actionMessa
      .setSmallIcon(R.drawable.jormungand)
      .setColor(context.getColor(R.color.jormungand_color))
      .setTimeoutAfter(10_000)
+    if (null != pendingIntent) notif.setContentIntent(pendingIntent)
 
     val index = text.indexOf('\n')
     if (index < 0)
@@ -66,5 +68,6 @@ class InformUserAction(val context : Context, val text : String, val actionMessa
     if (null != actionMessage && null != callback)
       sb.setAction(actionMessage, callback)
     snackbarParent.post { sb.show() }
+    pendingIntent?.send()
   }
 }

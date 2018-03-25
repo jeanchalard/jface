@@ -64,25 +64,25 @@ public class TodoViewHolder extends RecyclerView.ViewHolder implements View.OnCl
     mList = list;
     mList.addObserver(this);
     mRecyclerView = recyclerView;
-    mExpander = (ExpanderView)itemView.findViewById(R.id.expander);
+    mExpander = itemView.findViewById(R.id.expander);
     mExpander.setOnClickListener(this);
     mExpander.setOnLongClickListener(this);
-    mEditText = (SelReportEditText)itemView.findViewById(R.id.todoText);
+    mEditText = itemView.findViewById(R.id.todoText);
     mEditText.setOnFocusChangeListener(router);
     mEditText.mListener = router;
     mEditText.addTextChangedListener(this);
     mExpansion = itemView.findViewById(R.id.todoExpanded);
     mCurrentTodo = NULL_TODO;
-    mTodoActionButtons = (LinearLayout)itemView.findViewById(R.id.todoActionButtons);
-    mAddSubTodoButton = (ImageButton)itemView.findViewById(R.id.todoAddButton);
+    mTodoActionButtons = itemView.findViewById(R.id.todoActionButtons);
+    mAddSubTodoButton = itemView.findViewById(R.id.todoAddButton);
     mAddSubTodoButton.setOnClickListener(this);
     mAddSubTodoButton.setVisibility(View.GONE);
-    mClearTodoButton = (ImageButton)itemView.findViewById(R.id.todoClearButton);
+    mClearTodoButton = itemView.findViewById(R.id.todoClearButton);
     mClearTodoButton.setOnClickListener(this);
     mClearTodoButton.setVisibility(View.GONE);
-    mShowActionsButton = (ImageButton)itemView.findViewById(R.id.todoShowActionsButton);
+    mShowActionsButton = itemView.findViewById(R.id.todoShowActionsButton);
     mShowActionsButton.setOnClickListener(this);
-    mDetails = new TodoEditor.TodoDetails(mJorg.getContext(), mCurrentTodo, (ViewGroup)mExpansion);
+    mDetails = new TodoEditor.TodoDetails(mList, mCurrentTodo, (ViewGroup)mExpansion);
   }
 
   @NonNull public Todo todo()
@@ -202,7 +202,7 @@ public class TodoViewHolder extends RecyclerView.ViewHolder implements View.OnCl
   {
     mEditText.requestFocus();
     final InputMethodManager imm = (InputMethodManager)mEditText.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-    imm.showSoftInput(mEditText, 0);
+    if (null != imm) imm.showSoftInput(mEditText, 0);
   }
 
   private void setupExpander(@NonNull final Todo todo)

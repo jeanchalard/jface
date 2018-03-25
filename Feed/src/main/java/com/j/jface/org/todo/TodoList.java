@@ -6,6 +6,8 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.j.jface.action.GThread;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,14 +23,14 @@ import static junit.framework.Assert.assertEquals;
  * but provides indexation.
  */
 // Package private ; need a strong business use to use this instead of a view.
-class TodoList implements Iterable<Todo>, Handler.Callback
+class TodoList implements Iterable<Todo>, Handler.Callback, TodoUpdaterProxy
 {
   @NonNull private final ArrayList<Todo> mList;
   @NonNull private final TodoSource mSource;
   @NonNull private final Handler mHandler;
-  private TodoList(@NonNull final Context context)
+  private TodoList(@NonNull final GThread gThread, @NonNull final Context context)
   {
-    mSource = new TodoSource(context);
+    mSource = new TodoSource(gThread, context);
     mList = decorateForUI(mSource.fetchTodoList(), mSource);
     mHandler = new Handler(this);
     mTodosToPersist = new HashMap<>();
@@ -338,9 +340,9 @@ class TodoList implements Iterable<Todo>, Handler.Callback
    * Singleton behavior.
    *********************/
   @Nullable static TodoList sList;
-  synchronized static public TodoList getInstance(@NonNull final Context context)
+  synchronized static public TodoList getInstance(@NonNull final GThread gThread, @NonNull final Context context)
   {
-    if (null == sList) sList = new TodoList(context);
+    if (null == sList) sList = new TodoList(gThread, context);
     return sList;
   }
 

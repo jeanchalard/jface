@@ -13,12 +13,17 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
+import android.util.Log;
 import android.widget.TextView;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInApi;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.j.jface.Const;
 import com.j.jface.R;
-import com.j.jface.client.Client;
-import com.j.jface.client.action.drive.RecursiveBackupAction;
+import com.j.jface.action.GThread;
 import com.j.jface.feed.views.SnackbarRegistry;
 import com.j.jface.lifecycle.TodoEditorBoot;
 import com.j.jface.lifecycle.WrappedActivity;
@@ -37,7 +42,7 @@ import java.util.Locale;
  */
 public class JOrg extends WrappedActivity
 {
-  @NonNull private final Client mClient;
+  @NonNull private final GThread mGThread;
   @NonNull private final SoundSource mSoundSource;
   @NonNull private final EditTextSoundRouter mSoundRouter;
   @NonNull private final TodoAdapter mAdapter;
@@ -49,7 +54,7 @@ public class JOrg extends WrappedActivity
   public JOrg(@NonNull final Args args)
   {
     super(args);
-    mClient = new Client(mA);
+    mGThread = new GThread(mA);
 
     mA.setContentView(R.layout.org_top);
     ((AppCompatActivity)mA).setSupportActionBar(mA.findViewById(R.id.orgTopActionBar));
@@ -58,7 +63,7 @@ public class JOrg extends WrappedActivity
 
     mTopLayout = mA.findViewById(R.id.topLayout);
     final RecyclerView rv = mA.findViewById(R.id.todoList);
-    mTodoList = new TodoListView(mA.getApplicationContext());
+    mTodoList = new TodoListView(mGThread, mA.getApplicationContext());
     mAdapter = new TodoAdapter(this, mA, mSoundRouter, mTodoList, rv);
     rv.setAdapter(mAdapter);
     rv.addItemDecoration(new DividerItemDecoration(mA, ((LinearLayoutManager)rv.getLayoutManager()).getOrientation()));
@@ -69,7 +74,7 @@ public class JOrg extends WrappedActivity
     mTouchHelper = new ItemTouchHelper(new TodoMover(mAdapter, mTodoList));
     mTouchHelper.attachToRecyclerView(rv);
 
-//    scheduleBackup();
+    scheduleBackup();
   }
 
   public Context getContext()
@@ -126,6 +131,12 @@ public class JOrg extends WrappedActivity
     mA.startActivity(editorIntent);
   }
 
+  @Override protected void onActivityResult(final int requestCode, final int resultCode, final Intent data)
+  {
+    super.onActivityResult(requestCode, resultCode, data);
+    final GoogleSignInResult x = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+  }
+
   public void startDrag(@NonNull final TodoViewHolder holder)
   {
     mTouchHelper.startDrag(holder);
@@ -133,6 +144,11 @@ public class JOrg extends WrappedActivity
 
   private void scheduleBackup()
   {
-    new RecursiveBackupAction(mClient, null, mTopLayout).enqueue();
+    // TODO : write this
+    mGThread.enqueueF((final FirebaseFirestore db) -> {
+      final Todo todo = new Todo("test todo", "123");
+      db.collection("metadata").document("lastUse").set(todo).addOnCompleteListener((arg) -> Log.e("WRITE", "" + arg));
+      return null;
+    });
   }
 }
