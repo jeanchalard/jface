@@ -3,6 +3,8 @@ package com.j.jface.org.todo;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.firebase.firestore.Exclude;
+
 public class Todo extends TodoCore
 {
   @NonNull public static final Todo NULL_TODO = new Todo("", "");
@@ -49,7 +51,8 @@ public class Todo extends TodoCore
     }
   }
 
-  @NonNull public final TodoUI ui; // The members of this member are mutable.
+  // @Exclude : do not write to firestore.
+  @NonNull @Exclude public final TodoUI ui; // The members of this member are mutable.
   public Todo(@Nullable final String id,
               @NonNull final String ord,
               final long creationTime,

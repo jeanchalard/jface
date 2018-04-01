@@ -156,7 +156,7 @@ public class TodoProvider extends WrappedContentProvider implements Handler.Call
     switch (msg.what)
     {
       case SYNC:
-        syncUp();
+//        syncUp();
         return true;
     }
     return false;

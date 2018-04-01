@@ -142,7 +142,7 @@ public class TodoEditor extends WrappedActivity
       if (mLifeline == mEditing) b.setLifeline(newDate);
       else b.setDeadline(newDate);
       mTodo = b.build();
-      mUpdater.scheduleUpdateTodo(mTodo);
+      mUpdater.updateTodo(mTodo);
       if (0 == newDate)
       {
         TransitionManager.beginDelayedTransition(mRootView);
@@ -184,7 +184,7 @@ public class TodoEditor extends WrappedActivity
         b.setConstraint(position);
       }
       mTodo = b.build();
-      mUpdater.scheduleUpdateTodo(mTodo);
+      mUpdater.updateTodo(mTodo);
     }
 
     @Override public void onNothingSelected(AdapterView<?> parent)
@@ -195,7 +195,7 @@ public class TodoEditor extends WrappedActivity
     @Override public void onValueChange(@NonNull final NumericPicker picker, final int oldVal, final int newVal)
     {
       mTodo = new Todo.Builder(mTodo).setEstimatedTime(newVal < 0 ? newVal : newVal * 5).build();
-      mUpdater.scheduleUpdateTodo(mTodo);
+      mUpdater.updateTodo(mTodo);
     }
   }
 }

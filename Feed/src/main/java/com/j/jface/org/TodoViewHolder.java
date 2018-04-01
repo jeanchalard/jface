@@ -26,7 +26,7 @@ import com.j.jface.org.todo.TodoListView;
 
 import java.util.ArrayList;
 
-public class TodoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, TextWatcher, ListChangeObserver, View.OnLongClickListener
+public class TodoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, TextWatcher, ListChangeObserver
 {
   @NonNull final static TransitionSet expandCollapseTransition;
 
@@ -66,7 +66,6 @@ public class TodoViewHolder extends RecyclerView.ViewHolder implements View.OnCl
     mRecyclerView = recyclerView;
     mExpander = itemView.findViewById(R.id.expander);
     mExpander.setOnClickListener(this);
-    mExpander.setOnLongClickListener(this);
     mEditText = itemView.findViewById(R.id.todoText);
     mEditText.setOnFocusChangeListener(router);
     mEditText.mListener = router;
@@ -109,12 +108,6 @@ public class TodoViewHolder extends RecyclerView.ViewHolder implements View.OnCl
       mList.toggleOpen(mCurrentTodo);
       setupExpander(mCurrentTodo);
     }
-  }
-
-  @Override public boolean onLongClick(@NonNull final View v)
-  {
-    mJorg.startDrag(this);
-    return true;
   }
 
   private void toggleShowActions()
@@ -186,7 +179,7 @@ public class TodoViewHolder extends RecyclerView.ViewHolder implements View.OnCl
 
   public void bind(@NonNull final Todo todo)
   {
-    if (todo == mCurrentTodo) return;
+    if (todo.id.equals(mCurrentTodo.id)) return;
     mCurrentTodo = todo;
     mDetails.bind(todo);
     mExpander.setDepth(todo.depth);

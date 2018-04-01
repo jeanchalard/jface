@@ -9,19 +9,22 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.j.jface.action.GThread;
-import com.j.jface.action.firebase.TodoSourceTest;
 
 import java.util.ArrayList;
+import java.util.List;
 
 // Get Todo from the provider. This bridges the awful content provider interface
 // to an easy to use one.
 public class TodoSource
 {
+  private static final boolean FIRESTORE = true;
   @NonNull final ContentResolver mResolver;
+  @NonNull final GThread mGThread;
 
   public TodoSource(@NonNull final GThread gThread, @NonNull final Context context)
   {
     mResolver = context.getContentResolver();
+    mGThread = gThread;
   }
 
   // Returns null if no such Todo, or if multiple Todos with this ID (which is supposed to be impossible)
@@ -51,34 +54,44 @@ public class TodoSource
 
   @NonNull public ArrayList<TodoCore> fetchTodoList()
   {
-    final String condition = "completionTime = 0";
-    final Cursor c = mResolver.query(TodoProviderContract.BASE_URI_TODO, null, condition, null, "ord");
-    if (null == c || !c.moveToFirst()) return new ArrayList<>();
-    final ArrayList<TodoCore> todos = new ArrayList<>(c.getCount());
-    while (!c.isAfterLast())
+    if (FIRESTORE)
     {
-      final TodoCore t = new TodoCore(
-       c.getString(TodoProviderContract.COLUMNINDEX_id),
-       c.getString(TodoProviderContract.COLUMNINDEX_ord),
-       c.getLong(TodoProviderContract.COLUMNINDEX_creationTime),
-       c.getLong(TodoProviderContract.COLUMNINDEX_completionTime),
-       c.getString(TodoProviderContract.COLUMNINDEX_text),
-       c.getInt(TodoProviderContract.COLUMNINDEX_depth),
-       c.getInt(TodoProviderContract.COLUMNINDEX_lifeline),
-       c.getInt(TodoProviderContract.COLUMNINDEX_deadline),
-       c.getInt(TodoProviderContract.COLUMNINDEX_hardness),
-       c.getInt(TodoProviderContract.COLUMNINDEX_constraint),
-       c.getInt(TodoProviderContract.COLUMNINDEX_estimatedTime));
-      c.moveToNext();
-      todos.add(t);
+      final List<TodoCore> l = mGThread.todoList().await();
+      if (l instanceof ArrayList) return (ArrayList<TodoCore>)l;
+      return new ArrayList<>(l);
+    } else
+    {
+      final String condition = "completionTime = 0";
+      final Cursor c = mResolver.query(TodoProviderContract.BASE_URI_TODO, null, condition, null, "ord");
+      if (null == c || !c.moveToFirst()) return new ArrayList<>();
+      final ArrayList<TodoCore> todos = new ArrayList<>(c.getCount());
+      while (!c.isAfterLast())
+      {
+        final TodoCore t = new TodoCore(
+         c.getString(TodoProviderContract.COLUMNINDEX_id),
+         c.getString(TodoProviderContract.COLUMNINDEX_ord),
+         c.getLong(TodoProviderContract.COLUMNINDEX_creationTime),
+         c.getLong(TodoProviderContract.COLUMNINDEX_completionTime),
+         c.getString(TodoProviderContract.COLUMNINDEX_text),
+         c.getInt(TodoProviderContract.COLUMNINDEX_depth),
+         c.getInt(TodoProviderContract.COLUMNINDEX_lifeline),
+         c.getInt(TodoProviderContract.COLUMNINDEX_deadline),
+         c.getInt(TodoProviderContract.COLUMNINDEX_hardness),
+         c.getInt(TodoProviderContract.COLUMNINDEX_constraint),
+         c.getInt(TodoProviderContract.COLUMNINDEX_estimatedTime));
+        c.moveToNext();
+        todos.add(t);
+        // TodoDbOpsKt.updateTodo(mGThread, t);
+      }
+      c.close();
+      return todos;
     }
-    c.close();
-    return todos;
   }
 
   @NonNull public TodoCore updateTodo(@NonNull final TodoCore todo)
   {
     mResolver.insert(Uri.withAppendedPath(TodoProviderContract.BASE_URI_TODO, todo.id), contentValuesFromTodo(todo));
+    mGThread.updateTodo(todo);
     return todo;
   }
 

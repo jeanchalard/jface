@@ -10,5 +10,5 @@ public interface TodoUpdaterProxy
 {
   static TodoUpdaterProxy getInstance(@NonNull final GThread gThread, @NonNull final Context context) { return TodoList.getInstance(gThread, context); }
   @Nullable Todo getFromId(@NonNull final String todoId);
-  @NonNull Todo scheduleUpdateTodo(@NonNull final Todo todo);
+  @NonNull Todo updateTodo(@NonNull final Todo todo);
 }

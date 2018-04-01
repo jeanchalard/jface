@@ -1,8 +1,6 @@
 package com.j.jface.org.todo;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -10,7 +8,6 @@ import com.j.jface.action.GThread;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
@@ -23,17 +20,16 @@ import static junit.framework.Assert.assertEquals;
  * but provides indexation.
  */
 // Package private ; need a strong business use to use this instead of a view.
-class TodoList implements Iterable<Todo>, Handler.Callback, TodoUpdaterProxy
+class TodoList implements Iterable<Todo>, TodoUpdaterProxy
 {
   @NonNull private final ArrayList<Todo> mList;
   @NonNull private final TodoSource mSource;
-  @NonNull private final Handler mHandler;
+  @NonNull private final GThread mGThread;
   private TodoList(@NonNull final GThread gThread, @NonNull final Context context)
   {
+    mGThread = gThread;
     mSource = new TodoSource(gThread, context);
     mList = decorateForUI(mSource.fetchTodoList(), mSource);
-    mHandler = new Handler(this);
-    mTodosToPersist = new HashMap<>();
     mObservers = new ArrayList<>();
   }
 
@@ -114,7 +110,8 @@ class TodoList implements Iterable<Todo>, Handler.Callback, TodoUpdaterProxy
       builder.setOpen(source.isOpen(todoCore));
       if (!parents.isEmpty() && parents.peek().depth > todoCore.depth) parents.pop().ui.lastChild = true;
       while (!parents.isEmpty() && parents.peek().depth >= todoCore.depth) parents.pop();
-      if (!parents.isEmpty()) {
+      if (!parents.isEmpty())
+      {
         final Todo parent = parents.peek();
         parent.ui.leaf = false;
         builder.setParent(parent);
@@ -290,51 +287,12 @@ class TodoList implements Iterable<Todo>, Handler.Callback, TodoUpdaterProxy
   }
 
 
-  /**************************************************
-   * Handler for delayed persistence, and lifecycle.
-   **************************************************/
-  private static final int PERSIST_TODOS = 1;
-  @NonNull private final HashMap<String, Todo> mTodosToPersist;
-  @Override public boolean handleMessage(@NonNull final Message msg)
-  {
-    switch (msg.what)
-    {
-      case PERSIST_TODOS:
-        persistAllTodos();
-        break;
-    }
-    return true;
-  }
-
-  @NonNull public Todo scheduleUpdateTodo(@NonNull final Todo todo)
+  @NonNull public Todo updateTodo(@NonNull final Todo todo)
   {
     if ("!".equals(todo.ord)) throw new RuntimeException("Trying to update a null Todo");
-    synchronized(mTodosToPersist)
-    {
-      mTodosToPersist.put(todo.id, todo);
-    }
-    mHandler.removeMessages(PERSIST_TODOS);
-    mHandler.sendEmptyMessageDelayed(PERSIST_TODOS, 3000); // 3 sec before persistence
+    updateRawTodo(todo);
     return todo;
   }
-
-  public void persistAllTodos()
-  {
-    HashMap<String, Todo> todosToPersist = new HashMap<>();
-    synchronized (mTodosToPersist)
-    {
-      todosToPersist.putAll(mTodosToPersist);
-      mTodosToPersist.clear();
-    }
-    for (final Todo t : todosToPersist.values()) updateRawTodo(t);
-  }
-
-  public void onPauseApplication()
-  {
-    persistAllTodos();
-  }
-
-
 
   /*********************
    * Singleton behavior.
