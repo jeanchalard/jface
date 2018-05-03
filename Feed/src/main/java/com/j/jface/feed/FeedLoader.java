@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
-import com.j.jface.action.GThread;
+import com.j.jface.wear.Wear;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -19,25 +19,25 @@ public class FeedLoader
   private static final ThreadPoolExecutor executor =
    new ThreadPoolExecutor(4, 4, 500, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
 
-  public static void startAllLoads(@NonNull final GThread GThread)
+  public static void startAllLoads(@NonNull final Wear wear)
   {
     for (final DataSource ds : DataSource.ALL_SOURCES)
-      startLoadDataSource(ds, GThread);
+      startLoadDataSource(ds, wear);
   }
 
-  private static void startLoadDataSource(@NonNull final DataSource ds, @NonNull final GThread GThread)
+  private static void startLoadDataSource(@NonNull final DataSource ds, @NonNull final Wear wear)
   {
     executor.execute(() ->
     {
       final String dataPath = Const.DATA_PATH + "/" + ds.name;
       final String statusDataPath = dataPath + Const.DATA_PATH_SUFFIX_STATUS;
-      final DataMap statusData = GThread.getDataSynchronously(statusDataPath);
+      final DataMap statusData = wear.getDataSynchronously(statusDataPath);
       final long lastSuccessfulUpdateDate = statusData.getLong(Const.DATA_KEY_SUCCESSFUL_UPDATE_DATE);
       final long now = System.currentTimeMillis();
       if (lastSuccessfulUpdateDate + Const.UPDATE_DELAY_MILLIS > now)
       {
         statusData.putLong(Const.DATA_KEY_STATUS_UPDATE_DATE, System.currentTimeMillis());
-        GThread.putData(statusDataPath, statusData);
+        wear.putData(statusDataPath, statusData);
         return;
       }
       try
@@ -49,7 +49,7 @@ public class FeedLoader
         final BufferedInputStream in = new BufferedInputStream(urlConnection.getInputStream());
         final FeedParser parser = ds.parser.newInstance();
         final DataMap data = parser.parseStream(ds.name, in);
-        GThread.putData(dataPath, data);
+        wear.putData(dataPath, data);
         statusData.putLong(Const.DATA_KEY_SUCCESSFUL_UPDATE_DATE, System.currentTimeMillis());
         statusData.putString(Const.DATA_KEY_LAST_STATUS, "Success");
       }
@@ -58,7 +58,7 @@ public class FeedLoader
         statusData.putString(Const.DATA_KEY_LAST_STATUS, "Failure ; " + e.getMessage());
       }
       statusData.putLong(Const.DATA_KEY_STATUS_UPDATE_DATE, System.currentTimeMillis());
-      GThread.putData(statusDataPath, statusData);
+      wear.putData(statusDataPath, statusData);
     });
   }
 }

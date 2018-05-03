@@ -2,9 +2,9 @@ buildscript {
     ext.kotlin_version = '1.2.31'
     ext.gms_version = '11.8.0'
     dependencies {
-        classpath "com.android.tools.build:gradle:3.0.1"
+        classpath 'com.android.tools.build:gradle:3.1.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "com.google.gms:google-services:3.1.0"
+        classpath "com.google.gms:google-services:3.2.0"
     }
     repositories {
         maven {
@@ -12,6 +12,8 @@ buildscript {
             name 'Google'
         }
         mavenCentral()
+        jcenter()
+        google()
     }
 }
 

@@ -13,7 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.j.jface.action.FileCopyAction;
+import com.j.jface.Util;
 import com.j.jface.client.Client;
 import com.j.jface.client.action.drive.WriteFileAction;
 import com.j.jface.lifecycle.WrappedContentProvider;
@@ -21,6 +21,7 @@ import com.j.jface.lifecycle.WrappedContentProvider;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 
 // A provider of Todos.
@@ -179,8 +180,16 @@ public class TodoProvider extends WrappedContentProvider implements Handler.Call
 
   // A most dangerous method. It will take the specified file, and overwrite the current database
   // with its contents. It will destroy everything. So use it wisely.
-  @NonNull public static FileCopyAction destroyDatabaseAndReplaceWithFileContentsAction(@NonNull final Context context, @NonNull final InputStream inputStream)
+  public static boolean destroyDatabaseAndReplaceWithFileContents(@NonNull final Context context, @NonNull final InputStream inputStream)
   {
-    return new FileCopyAction(inputStream, context.getDatabasePath(DB_NAME).getAbsoluteFile());
+    try
+    {
+      Util.copy(inputStream, context.getDatabasePath(DB_NAME).getAbsoluteFile());
+      return true;
+    }
+    catch (IOException e)
+    {
+      return false;
+    }
   }
 }

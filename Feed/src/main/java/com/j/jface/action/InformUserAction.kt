@@ -50,7 +50,7 @@ class InformUserAction(val context : Context, val text : String, val actionMessa
       notif.setContentText(text)
     else
     {
-      notif.setContentTitle(text.subSequence(0, index - 1))
+      notif.setContentTitle(text.subSequence(0, index))
       notif.setStyle(Notification.BigTextStyle().bigText(text.subSequence(index, text.length)))
     }
 

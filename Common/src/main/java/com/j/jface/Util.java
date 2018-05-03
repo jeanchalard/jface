@@ -3,11 +3,16 @@ package com.j.jface;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 public class Util
 {
@@ -61,6 +66,13 @@ public class Util
     }
   }
 
+  public static File copy(@NonNull final InputStream in, @NonNull final File out) throws IOException
+  {
+    copy(in, new FileOutputStream(out));
+    return out;
+  }
+  public static File copy(@NonNull final File in, @NonNull final File out) throws IOException { return copy(new FileInputStream(in), out); }
+
   public static String getStackTrace(final int depth)
   {
     final StringBuilder b = new StringBuilder();
@@ -73,5 +85,11 @@ public class Util
       b.append("\n");
     }
     return b.toString();
+  }
+
+  private String nowStr()
+  {
+    final GregorianCalendar c = new GregorianCalendar();
+    return String.format("%02d:%02d:%02d", c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), c.get(Calendar.SECOND));
   }
 }

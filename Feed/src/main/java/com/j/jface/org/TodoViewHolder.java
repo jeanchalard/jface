@@ -179,7 +179,7 @@ public class TodoViewHolder extends RecyclerView.ViewHolder implements View.OnCl
 
   public void bind(@NonNull final Todo todo)
   {
-    if (todo.id.equals(mCurrentTodo.id)) return;
+    if (todo.equals(mCurrentTodo)) return;
     mCurrentTodo = todo;
     mDetails.bind(todo);
     mExpander.setDepth(todo.depth);
@@ -188,7 +188,8 @@ public class TodoViewHolder extends RecyclerView.ViewHolder implements View.OnCl
     mExpansion.setVisibility(View.GONE);
     mClearTodoButton.setVisibility(View.GONE);
     mAddSubTodoButton.setVisibility(View.GONE);
-    mEditText.setText(todo.text);
+    if (!todo.text.equals(mEditText.getText().toString()))
+      mEditText.setText(todo.text);
   }
 
   public void requestFocus()
@@ -229,7 +230,7 @@ public class TodoViewHolder extends RecyclerView.ViewHolder implements View.OnCl
 
   @Override public void notifyItemMoved(int from, int to, @NonNull Todo payload)
   {
-    notifyItemChanged(to, payload);
+    mJorg.runOnUiThread(() -> notifyItemChanged(to, payload));
   }
 
   @Override public void notifyItemInserted(final int position, @NonNull final Todo payload) {}

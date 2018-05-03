@@ -8,10 +8,10 @@ allprojects {
 }
 
 apply plugin: 'java'
-targetCompatibility = '1.7'
-sourceCompatibility = '1.7'
+targetCompatibility = '1.8'
+sourceCompatibility = '1.8'
 
 dependencies {
-    compile 'com.android.support:support-annotations:27.0.2'
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:support-annotations:27.0.2'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
 }

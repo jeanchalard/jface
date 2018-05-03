@@ -39,7 +39,8 @@ public enum Status
 
   @NonNull public static Status getNextStatusOverride(@NonNull final Time time, @NonNull final DataStore dataStore, @NonNull final TapControl control)
   {
-    final Status status = getStatus(time, dataStore, control);
+    final Status override = control.getStatusOverride();
+    final Status status = override != null ? override : getStatus(time, dataStore);
     switch (status)
     {
       case COMMUTE_MORNING_平日_J : return COMMUTE_EVENING_平日_J;
@@ -99,9 +100,28 @@ public enum Status
     return SOMEWHERE;
   }
 
-  public static String getSymbolicLocationName(@NonNull final Status status)
+  public static String getSymbolicLocationName(@Nullable final Status statusOverride, @NonNull final DataStore dataStore)
   {
-    switch (status)
+    if (null == statusOverride)
+      switch (getSymbolicLocation(dataStore))
+      {
+        case 稲城 :
+        case 千住大橋 :
+          return "家";
+        case 六本木 :
+          return "六本木";
+        case 日暮里 :
+          return "日暮里";
+        case 本蓮沼 :
+          return "本蓮沼";
+        case 東京 :
+          return "東京";
+        case SOMEWHERE :
+        case DUNNO :
+        default:
+          return "--";
+      }
+    switch (statusOverride)
     {
       case COMMUTE_MORNING_平日_J :
       case HOME_平日_J :
@@ -184,10 +204,8 @@ public enum Status
     return OTHER;
   }
 
-  public static Status getStatus(@NonNull final Time time, @NonNull final DataStore dataStore, @NonNull TapControl control)
+  public static Status getStatus(@NonNull final Time time, @NonNull final DataStore dataStore)
   {
-    final Status override = control.getStatusOverride();
-    if (null != override) return override;
     if (Const.RIO_MODE)
       return getStatus_Rio(time, getSymbolicLocation(dataStore));
     else

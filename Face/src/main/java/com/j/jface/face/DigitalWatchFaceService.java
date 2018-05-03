@@ -276,7 +276,8 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
         departureTime = mDepartureTimeOverrideTmp;
       }
       else departureTime = mTime;
-      final Status status = Status.getStatus(mTime, mDataStore, mTapControl);
+      final Status statusOverride = mTapControl.getStatusOverride();
+      final Status status = statusOverride != null ? statusOverride : Status.getStatus(mTime, mDataStore);
       final Departure departure1;
       final Departure departure2;
       switch (status) {
@@ -339,7 +340,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
 
       final int ambientFlag = isInAmbientMode() ? Draw.AMBIENT_MODE : 0;
       if (mDraw.draw(mDrawTools, mModeFlags | ambientFlag, canvas, bounds, mDataStore.mBackground,
-       departure1, departure2, status, mTime, /*mSensors,*/ Status.getSymbolicLocationName(status),
+       departure1, departure2, status, mTime, /*mSensors,*/ Status.getSymbolicLocationName(statusOverride, mDataStore),
        mTapControl.showTopic() ? mDataStore.mTopic : "", mDataStore.mTopicColors))
         invalidate();
 

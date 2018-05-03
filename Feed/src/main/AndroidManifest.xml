@@ -45,15 +45,23 @@
     </activity>
 
     <activity
+     android:name=".lifecycle.AuthTrampolineBoot"
+     android:label="@string/orgtool_name"
+     android:icon="@drawable/jormungand"
+     android:windowSoftInputMode="stateHidden"
+     android:taskAffinity="com.j.jface.org.JOrg">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
+
+    <activity
       android:name=".lifecycle.JOrgBoot"
       android:label="@string/orgtool_name"
       android:icon="@drawable/jormungand"
       android:windowSoftInputMode="stateHidden"
       android:taskAffinity="com.j.jface.org.JOrg">
-      <intent-filter>
-        <action android:name="android.intent.action.MAIN" />
-        <category android:name="android.intent.category.LAUNCHER" />
-      </intent-filter>
     </activity>
 
     <activity
@@ -71,7 +79,7 @@
 
     <service
       android:name=".feed.GeofenceTransitionReceiverService"
-      android:exported="false">
+      android:exported="true">
     </service>
 
     <receiver android:name=".feed.BootCompletedReceiver">

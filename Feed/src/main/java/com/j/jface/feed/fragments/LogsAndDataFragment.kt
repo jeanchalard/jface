@@ -8,12 +8,12 @@ import com.google.android.gms.wearable.DataMap
 import com.j.jface.Const
 import com.j.jface.Departure
 import com.j.jface.R
-import com.j.jface.action.GThread
 import com.j.jface.feed.DataSource
 import com.j.jface.feed.FeedLoader
 import com.j.jface.lifecycle.WrappedFragment
+import com.j.jface.wear.Wear
 
-class LogsAndDataFragment(a : WrappedFragment.Args, private val mGThread : GThread) : WrappedFragment(a.inflater.inflate(R.layout.fragment_logs_and_data, a.container, false)), View.OnClickListener
+class LogsAndDataFragment(a : WrappedFragment.Args, private val mWear : Wear) : WrappedFragment(a.inflater.inflate(R.layout.fragment_logs_and_data, a.container, false)), View.OnClickListener
 {
   private val mF : Fragment = a.fragment
   private val mLog : TextView = mView.findViewById(R.id.log)
@@ -58,12 +58,12 @@ class LogsAndDataFragment(a : WrappedFragment.Args, private val mGThread : GThre
     })
   }
 
-  private fun retrieveStatus(gThread : GThread)
+  private fun retrieveStatus(wear : Wear)
   {
     for (ds in DataSource.ALL_SOURCES)
     {
-      gThread.getData(Const.DATA_PATH + "/" + ds.name + Const.DATA_PATH_SUFFIX_STATUS, ::showDataCallback)
-      gThread.getData(Const.DATA_PATH + "/" + ds.name, ::showDataCallback)
+      wear.getData(Const.DATA_PATH + "/" + ds.name + Const.DATA_PATH_SUFFIX_STATUS, ::showDataCallback)
+      wear.getData(Const.DATA_PATH + "/" + ds.name, ::showDataCallback)
     }
   }
 
@@ -74,10 +74,10 @@ class LogsAndDataFragment(a : WrappedFragment.Args, private val mGThread : GThre
       R.id.button_refresh ->
       {
         mLog.text = ""
-        retrieveStatus(mGThread)
+        retrieveStatus(mWear)
       }
-      R.id.button_load -> FeedLoader.startAllLoads(mGThread)
-      R.id.button_clear -> mGThread.deleteAllData()
+      R.id.button_load -> FeedLoader.startAllLoads(mWear)
+      R.id.button_clear -> mWear.deleteAllData()
     }
   }
 }

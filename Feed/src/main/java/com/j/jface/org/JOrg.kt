@@ -19,7 +19,6 @@ import android.widget.TextView
 import com.google.android.gms.auth.api.Auth
 import com.j.jface.Const
 import com.j.jface.R
-import com.j.jface.action.GThread
 import com.j.jface.feed.views.SnackbarRegistry
 import com.j.jface.lifecycle.TodoEditorBoot
 import com.j.jface.lifecycle.WrappedActivity
@@ -36,7 +35,6 @@ import java.util.concurrent.Executors
  */
 class JOrg(args : WrappedActivity.Args) : WrappedActivity(args)
 {
-  private val mGThread = GThread(mA)
   private val mSoundSource : SoundSource
   private val mSoundRouter : EditTextSoundRouter
   private val mTopLayout : CoordinatorLayout
@@ -61,7 +59,7 @@ class JOrg(args : WrappedActivity.Args) : WrappedActivity(args)
     val executor = Executors.newSingleThreadExecutor()
     executor.submit(Callable {
       executor.shutdown()
-      val tlv = TodoListView(mGThread, mA.getApplicationContext())
+      val tlv = TodoListView(mA.getApplicationContext())
       val adapter = TodoAdapter(this, mA, mSoundRouter, tlv, mRecyclerView)
       val touchHelper = ItemTouchHelper(TodoMover(adapter, tlv))
       mA.runOnUiThread {
@@ -137,6 +135,11 @@ class JOrg(args : WrappedActivity.Args) : WrappedActivity(args)
     super.onActivityResult(requestCode, resultCode, data)
     val x = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
     Log.e("Google sign in result", "" + resultCode + " : " + x.status)
+  }
+
+  fun runOnUiThread(r : Runnable)
+  {
+    mA.runOnUiThread(r)
   }
 
   private fun scheduleBackup()

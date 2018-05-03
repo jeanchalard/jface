@@ -9,13 +9,12 @@ import android.widget.ImageButton
 import android.widget.ProgressBar
 import com.j.jface.Const
 import com.j.jface.R
-import com.j.jface.action.GThread
 import com.j.jface.lifecycle.FragmentWrapper
 import com.j.jface.lifecycle.WrappedFragment
+import com.j.jface.wear.Wear
 
-class ImageSelectorFragment(a : Args, gThread : GThread) : WrappedFragment(a.inflater.inflate(R.layout.fragment_image_selector, a.container, false))
+class ImageSelectorFragment(a : Args, val mWear : Wear) : WrappedFragment(a.inflater.inflate(R.layout.fragment_image_selector, a.container, false))
 {
-  private val mGThread = gThread
   private val mFragment : Fragment = a.fragment
   private val mImageButton : ImageButton = mView.findViewById(R.id.select_image_button) as ImageButton
   private val mSpinner : ProgressBar = mView.findViewById(R.id.select_image_wait) as ProgressBar
@@ -28,7 +27,7 @@ class ImageSelectorFragment(a : Args, gThread : GThread) : WrappedFragment(a.inf
     mSpinner.visibility = View.VISIBLE
     mSpinner.minimumWidth = Const.SCREEN_SIZE
     mSpinner.minimumHeight = Const.SCREEN_SIZE
-    mGThread.getBitmap(Const.DATA_PATH + "/" + Const.CONFIG_KEY_BACKGROUND, Const.CONFIG_KEY_BACKGROUND, ::setImage)
+    mWear.getBitmap(Const.DATA_PATH + "/" + Const.CONFIG_KEY_BACKGROUND, Const.CONFIG_KEY_BACKGROUND, ::setImage)
     (mView.findViewById(R.id.select_image_none) as Button).setOnClickListener { removeBackground() }
   }
 
@@ -43,7 +42,7 @@ class ImageSelectorFragment(a : Args, gThread : GThread) : WrappedFragment(a.inf
   override fun onActivityResult(requestCode : Int, resultCode : Int, data : Intent?)
   {
     if (null == data || resultCode != Const.CHOOSE_IMAGE_RESULT_CODE) return
-    val f = FragmentWrapper<ImageEditorFragment>(ImageEditorFragment::class.java, ImageEditorFragment.ImageEditorArgs(mGThread, data))
+    val f = FragmentWrapper<ImageEditorFragment>(ImageEditorFragment::class.java, ImageEditorFragment.ImageEditorArgs(mWear, data))
     mFragment.fragmentManager.beginTransaction()
      .addToBackStack("ImageEditor")
      .replace(R.id.dataFeedContents, f)
@@ -64,7 +63,7 @@ class ImageSelectorFragment(a : Args, gThread : GThread) : WrappedFragment(a.inf
 
   fun removeBackground()
   {
-    mGThread.deleteData(Const.DATA_PATH + "/" + Const.CONFIG_KEY_BACKGROUND)
+    mWear.deleteData(Const.DATA_PATH + "/" + Const.CONFIG_KEY_BACKGROUND)
     mImageButton.setImageDrawable(mFragment.resources.getDrawable(R.drawable.black_box, mFragment.activity.theme))
   }
 }

@@ -6,60 +6,61 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.util.Log;
 
-import com.j.jface.action.GThread;
+import com.google.firebase.firestore.DocumentChange;
+import com.j.jface.firebase.Firebase;
 
 import java.util.ArrayList;
 import java.util.List;
 
 // Get Todo from the provider. This bridges the awful content provider interface
 // to an easy to use one.
-public class TodoSource
+public class TodoSource implements Firebase.Listener
 {
-  private static final boolean FIRESTORE = true;
-  @NonNull final ContentResolver mResolver;
-  @NonNull final GThread mGThread;
-
-  public TodoSource(@NonNull final GThread gThread, @NonNull final Context context)
+  public interface ListChangeListener
   {
-    mResolver = context.getContentResolver();
-    mGThread = gThread;
+    void onTodoUpdated(@NonNull final TodoCore todo);
   }
 
-  // Returns null if no such Todo, or if multiple Todos with this ID (which is supposed to be impossible)
-  // Does not perform the expensive lookup for parent and children ; any mClient needing that should
-  // just look up the entire tree.
-  @Nullable public TodoCore getTodoFromIdWithoutHierarchy(@NonNull final String id)
+  private static final boolean FIRESTORE = true;
+  @NonNull private final ContentResolver mResolver;
+
+  public TodoSource(@NonNull final Context context)
   {
-    final Uri uri = Uri.withAppendedPath(TodoProviderContract.BASE_URI_TODO, id);
-    final Cursor c = mResolver.query(uri, null, null, null, null);
-    if (null == c || c.getCount() != 1) return null;
-    c.moveToFirst();
-    final TodoCore t = new TodoCore(
-     c.getString(TodoProviderContract.COLUMNINDEX_id),
-     c.getString(TodoProviderContract.COLUMNINDEX_ord),
-     c.getLong(TodoProviderContract.COLUMNINDEX_creationTime),
-     c.getLong(TodoProviderContract.COLUMNINDEX_completionTime),
-     c.getString(TodoProviderContract.COLUMNINDEX_text),
-     c.getInt(TodoProviderContract.COLUMNINDEX_depth),
-     c.getInt(TodoProviderContract.COLUMNINDEX_lifeline),
-     c.getInt(TodoProviderContract.COLUMNINDEX_deadline),
-     c.getInt(TodoProviderContract.COLUMNINDEX_hardness),
-     c.getInt(TodoProviderContract.COLUMNINDEX_constraint),
-     c.getInt(TodoProviderContract.COLUMNINDEX_estimatedTime));
-    c.close();
-    return t;
+    mResolver = context.getContentResolver();
+  }
+
+  private final Object mLock = new Object();
+  private final ArrayList<ListChangeListener> listeners = new ArrayList<>();
+  @Override public void onTodoUpdated(@NonNull final DocumentChange.Type type, @NonNull final TodoCore todo)
+  {
+    synchronized (mLock)
+    {
+      Log.e("Update", "" + type + " : " + todo);
+      for (ListChangeListener l : listeners) l.onTodoUpdated(todo);
+    }
+  }
+  public void addListChangeListener(@NonNull final ListChangeListener l)
+  {
+    synchronized (mLock) { listeners.add(l); }
+  }
+  public void removeListChangeListener(@NonNull final ListChangeListener l)
+  {
+    synchronized (mLock) { listeners.remove(l); }
   }
 
   @NonNull public ArrayList<TodoCore> fetchTodoList()
   {
     if (FIRESTORE)
-    {
-      final List<TodoCore> l = mGThread.todoList().await();
-      if (l instanceof ArrayList) return (ArrayList<TodoCore>)l;
-      return new ArrayList<>(l);
-    } else
+      synchronized (mLock)
+      {
+        Firebase.INSTANCE.addListener(this);
+        final List<TodoCore> l = Firebase.INSTANCE.getTodoList();
+        if (l instanceof ArrayList) return (ArrayList<TodoCore>)l;
+        return new ArrayList<>(l);
+      }
+    else
     {
       final String condition = "completionTime = 0";
       final Cursor c = mResolver.query(TodoProviderContract.BASE_URI_TODO, null, condition, null, "ord");
@@ -91,7 +92,7 @@ public class TodoSource
   @NonNull public TodoCore updateTodo(@NonNull final TodoCore todo)
   {
     mResolver.insert(Uri.withAppendedPath(TodoProviderContract.BASE_URI_TODO, todo.id), contentValuesFromTodo(todo));
-    mGThread.updateTodo(todo);
+    Firebase.INSTANCE.updateTodo(todo);
     return todo;
   }
 

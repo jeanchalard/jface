@@ -4,8 +4,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.j.jface.action.GThread;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -20,15 +18,14 @@ import static junit.framework.Assert.assertEquals;
  * but provides indexation.
  */
 // Package private ; need a strong business use to use this instead of a view.
-class TodoList implements Iterable<Todo>, TodoUpdaterProxy
+class TodoList implements Iterable<Todo>, TodoUpdaterProxy, TodoSource.ListChangeListener
 {
   @NonNull private final ArrayList<Todo> mList;
   @NonNull private final TodoSource mSource;
-  @NonNull private final GThread mGThread;
-  private TodoList(@NonNull final GThread gThread, @NonNull final Context context)
+  private TodoList(@NonNull final Context context)
   {
-    mGThread = gThread;
-    mSource = new TodoSource(gThread, context);
+    mSource = new TodoSource(context);
+    mSource.addListChangeListener(this);
     mList = decorateForUI(mSource.fetchTodoList(), mSource);
     mObservers = new ArrayList<>();
   }
@@ -176,6 +173,17 @@ class TodoList implements Iterable<Todo>, TodoUpdaterProxy
   {
     if ("!".equals(todo.ord)) throw new RuntimeException("Trying to update a null Todo");
     mSource.updateTodo(todo);
+    return updateLocalTodo(todo);
+  }
+
+  // Implementation of TodoSource.ListChangeListener
+  @Override public void onTodoUpdated(@NonNull final TodoCore todo)
+  {
+    updateLocalTodo(todo);
+  }
+
+  private TodoCore updateLocalTodo(@NonNull final TodoCore todo)
+  {
     final int index = rindex(todo);
     if (index >= 0)
     {
@@ -298,9 +306,9 @@ class TodoList implements Iterable<Todo>, TodoUpdaterProxy
    * Singleton behavior.
    *********************/
   @Nullable static TodoList sList;
-  synchronized static public TodoList getInstance(@NonNull final GThread gThread, @NonNull final Context context)
+  synchronized static public TodoList getInstance(@NonNull final Context context)
   {
-    if (null == sList) sList = new TodoList(gThread, context);
+    if (null == sList) sList = new TodoList(context);
     return sList;
   }
 

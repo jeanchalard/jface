@@ -20,7 +20,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.j.jface.R;
-import com.j.jface.action.GThread;
 import com.j.jface.feed.fragments.ActivityLogFragment;
 import com.j.jface.feed.fragments.DebugToolsFragment;
 import com.j.jface.feed.fragments.ImageSelectorFragment;
@@ -28,12 +27,13 @@ import com.j.jface.feed.fragments.LogsAndDataFragment;
 import com.j.jface.feed.fragments.MessagesFragment;
 import com.j.jface.lifecycle.FragmentWrapper;
 import com.j.jface.lifecycle.WrappedActivity;
+import com.j.jface.wear.Wear;
 
 public class JFaceDataFeed extends WrappedActivity
 {
   @NonNull private final String LAST_OPEN_FRAGMENT_INDEX = "last_open_fragment_index";
   @NonNull private final ActionBarDrawerToggle mDrawerToggle;
-  @NonNull private final GThread mGThread;
+  @NonNull private final Wear mWear;
 
   // State
   private int mCurrentlyDisplayedFragmentIndex = 0;
@@ -42,14 +42,14 @@ public class JFaceDataFeed extends WrappedActivity
   {
     super(args);
     mA.setContentView(R.layout.data_feed_drawer);
-    mGThread = new GThread(mA);
+    mWear = new Wear(mA);
     final DrawerLayout drawer = mA.findViewById(R.id.dataFeedDrawer);
 
     final ListView list = mA.findViewById(R.id.dataFeedDrawerContents);
     list.setAdapter(new ArrayAdapter<>(mA, R.layout.data_feed_drawer_item, new String[] { "Messages", "Settings", "Activity log", "Logs & data", "Debug tools" }));
     final AdapterView.OnItemClickListener listener = (parent, view, position, id) ->
     {
-      final Fragment f = getFragmentForPosition(position, mGThread);
+      final Fragment f = getFragmentForPosition(position, mWear);
       mA.getFragmentManager().beginTransaction()
                             .replace(R.id.dataFeedContents, f)
                             .commit();
@@ -98,15 +98,15 @@ public class JFaceDataFeed extends WrappedActivity
       ActivityCompat.requestPermissions(mA, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
   }
 
-  @Nullable private static FragmentWrapper<?> getFragmentForPosition(final int position, final GThread gThread)
+  @Nullable private static FragmentWrapper<?> getFragmentForPosition(final int position, final Wear wear)
   {
     switch (position)
     {
-      case 0 : return new FragmentWrapper<>(MessagesFragment.class, gThread);
-      case 1 : return new FragmentWrapper<>(ImageSelectorFragment.class, gThread);
-      case 2 : return new FragmentWrapper<>(ActivityLogFragment.class, gThread);
-      case 3 : return new FragmentWrapper<>(LogsAndDataFragment.class, gThread);
-      case 4 : return new FragmentWrapper<>(DebugToolsFragment.class, gThread);
+      case 0 : return new FragmentWrapper<>(MessagesFragment.class, wear);
+      case 1 : return new FragmentWrapper<>(ImageSelectorFragment.class, wear);
+      case 2 : return new FragmentWrapper<>(ActivityLogFragment.class, wear);
+      case 3 : return new FragmentWrapper<>(LogsAndDataFragment.class, wear);
+      case 4 : return new FragmentWrapper<>(DebugToolsFragment.class, wear);
     }
     return null;
   }
@@ -114,7 +114,7 @@ public class JFaceDataFeed extends WrappedActivity
   private void startGeofenceService(final Activity activity)
   {
     final Intent i = new Intent(activity, GeofenceTransitionReceiverService.class);
-    i.setAction(GeofenceTransitionReceiver.ACTION_MANUAL_START);
+    i.setAction(GeofenceTransitionReceiver.Companion.getACTION_MANUAL_START());
     activity.startService(i);
   }
 }

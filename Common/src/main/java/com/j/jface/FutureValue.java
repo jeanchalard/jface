@@ -3,8 +3,6 @@ package com.j.jface;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.omg.CORBA.UNKNOWN;
-
 import java.util.concurrent.Semaphore;
 
 public class FutureValue<T> implements Future<T>

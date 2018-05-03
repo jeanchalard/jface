@@ -15,20 +15,14 @@ import android.widget.TimePicker;
 
 import com.j.jface.Const;
 import com.j.jface.R;
-import com.j.jface.action.GThread;
 import com.j.jface.action.InformUserAction;
-import com.j.jface.action.wear.GetNodeNameActionKt;
-import com.j.jface.client.Client;
-import com.j.jface.client.action.ui.ReportActionWithSnackbar;
 import com.j.jface.feed.views.SnackbarRegistry;
 import com.j.jface.lifecycle.WrappedFragment;
 import com.j.jface.org.todo.TodoProvider;
-
-import org.jetbrains.annotations.Nullable;
+import com.j.jface.wear.Wear;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.lang.ref.WeakReference;
 
 import kotlin.Unit;
 
@@ -37,7 +31,7 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
   private static final int MSG_UPDATE_TIME = 1;
   private static final int GRACE_FOR_UPDATE = 3000;
 
-  @NonNull private final GThread mGThread;
+  @NonNull private final Wear mWear;
   @NonNull private final Fragment mFragment;
   private long mOffset = 0;
   private boolean mTicking = false;
@@ -64,10 +58,10 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
     }
   }
   private final Handler mHandler = new TabDebugToolsHandler(this);
-  public DebugToolsFragment(@NonNull final Args a, @NonNull final GThread b)
+  public DebugToolsFragment(@NonNull final Args a, @NonNull final Wear b)
   {
     super(a.inflater.inflate(R.layout.fragment_debug_tools, a.container, false));
-    mGThread = b;
+    mWear = b;
     mFragment = a.fragment;
     mTime1 = new Time(); mTime2 = new Time();
     mView.findViewById(R.id.button_now).setOnClickListener(this);
@@ -97,10 +91,10 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
     if (Const.RIO_MODE) mFenceUIs[2].setText("六本木");
 
     final TextView nodeNameTextView = mView.findViewById(R.id.nodeId_textView);
-    mGThread.enqueue(GetNodeNameActionKt.GetNodeNameAction(mFragment.getContext(), nodeName -> {
-      a.fragment.getActivity().runOnUiThread(() -> nodeNameTextView.setText("Node id : " + nodeName));
-      return Unit.INSTANCE;
-     }));
+      mWear.getNodeName(mFragment.getContext(), nodeName -> {
+        a.fragment.getActivity().runOnUiThread(() -> nodeNameTextView.setText("Node id : " + nodeName));
+        return Unit.INSTANCE;
+     });
 
     mView.findViewById(R.id.button_copy_todo_from_storage).setOnClickListener(v ->
     {
@@ -123,24 +117,23 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
 
   protected void onActivityResult(final int requestCode, final int resultCode, final Intent data)
   {
-    if (null == data) return;
+    if (null == data || Const.DESTROY_DATABASE_AND_REPLACE_WITH_FILE_CONTENTS_RESULT_CODE != requestCode) return;
     final Uri fileUri = data.getData();
     FileNotFoundException exception = null;
-    final Client client = new Client(mFragment.getContext());
     if (null != fileUri)
     {
       InputStream is = null;
       try { is = mFragment.getContext().getContentResolver().openInputStream(fileUri); }
       catch (final FileNotFoundException e) { exception = e; }
       if (null == exception && null != is)
-      {
-        mGThread.executeInOrder(
-         TodoProvider.destroyDatabaseAndReplaceWithFileContentsAction(mFragment.getContext(), is),
-         new InformUserAction(mFragment.getActivity(), "Database dumped, restart JOrg", "Kill", v -> System.exit(0), null));
-        return;
-      }
+        // Do this on the UI thread because YOLO. This is only for debug so we don't care.
+        if (TodoProvider.destroyDatabaseAndReplaceWithFileContents(mFragment.getContext(), is))
+        {
+          new InformUserAction(mFragment.getActivity(), "Database dumped, restart JOrg", "Kill", v -> System.exit(0), null).invoke();
+          return;
+        }
     }
-    new ReportActionWithSnackbar(client, null, mView, "File can't be opened." + (null == exception ? "" : " " + exception.toString())).enqueue();
+    new InformUserAction(mFragment.getActivity(), "File can't be opened." + (null == exception ? "" : " " + exception.toString()), null, null, null).invoke();
   }
 
   private void tick()
@@ -169,7 +162,7 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
     mTime1.set(mTime1.toMillis(true) + dayOffset * 86400000 - grace);
     mOffset = mTime1.toMillis(true) - mTime2.toMillis(true);
     mHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, grace);
-    mGThread.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_DEBUG_TIME_OFFSET, Const.DATA_KEY_DEBUG_TIME_OFFSET, mOffset);
+    mWear.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_DEBUG_TIME_OFFSET, Const.DATA_KEY_DEBUG_TIME_OFFSET, mOffset);
   }
 
   private void updateFences()
@@ -177,7 +170,7 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
     int fences = 0;
     for (int i = 0; i < mFenceUIs.length; ++i)
       fences |= mFenceUIs[i].isChecked() ? 1 << i : 0;
-    mGThread.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_DEBUG_FENCES, Const.DATA_KEY_DEBUG_FENCES, fences);
+    mWear.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_DEBUG_FENCES, Const.DATA_KEY_DEBUG_FENCES, fences);
   }
 
   @Override public void onClick(final View v)

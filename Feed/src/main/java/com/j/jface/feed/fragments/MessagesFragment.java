@@ -15,10 +15,10 @@ import android.widget.EditText;
 import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
 import com.j.jface.R;
-import com.j.jface.action.GThread;
 import com.j.jface.feed.views.PaletteView;
 import com.j.jface.feed.views.SnackbarRegistry;
 import com.j.jface.lifecycle.WrappedFragment;
+import com.j.jface.wear.Wear;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,16 +31,16 @@ import kotlin.Unit;
 public class MessagesFragment extends WrappedFragment implements TextWatcher, PaletteView.OnColorSetListener
 {
   @NonNull private final Fragment mF;
-  @NonNull private final GThread mGThread;
+  @NonNull private final Wear mWear;
   @NonNull private final EditText mTopicDataEdit;
   @NonNull private final PaletteView mPalette;
   private boolean mDataFetched; // Replace this if this class or the use of this member ever become any more than elementary
 
-  public MessagesFragment(@NonNull final WrappedFragment.Args a, @NonNull final GThread b)
+  public MessagesFragment(@NonNull final WrappedFragment.Args a, @NonNull final Wear b)
   {
     super(a.inflater.inflate(R.layout.fragment_messages, a.container, false));
     mF = a.fragment;
-    mGThread = b;
+    mWear = b;
     mTopicDataEdit = mView.findViewById(R.id.messagesFragment_topicDataEdit);
     mTopicDataEdit.addTextChangedListener(this);
     mTopicDataEdit.setTextColor(Const.TOPIC_DEFAULT_COLOR);
@@ -109,7 +109,7 @@ public class MessagesFragment extends WrappedFragment implements TextWatcher, Pa
       final DataMap dataMap = new DataMap();
       dataMap.putString(Const.DATA_KEY_TOPIC, mTopicDataEdit.getText().toString());
       dataMap.putIntegerArrayList(Const.DATA_KEY_TOPIC_COLORS, colors);
-      mGThread.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC, dataMap);
+      mWear.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC, dataMap);
     }
     catch (Exception e) { removeAllSpans(); }
   }

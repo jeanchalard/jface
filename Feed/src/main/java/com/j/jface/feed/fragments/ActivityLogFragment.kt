@@ -5,14 +5,14 @@ import android.widget.TextView
 import com.google.android.gms.wearable.DataMap
 import com.j.jface.Const
 import com.j.jface.R
-import com.j.jface.action.GThread
 import com.j.jface.lifecycle.WrappedFragment
+import com.j.jface.wear.Wear
 import java.util.*
 
 /**
  * A fragment for showing and managing the activity log.
  */
-class ActivityLogFragment(a : WrappedFragment.Args, gThread : GThread) : WrappedFragment(a.inflater.inflate(R.layout.fragment_activity_log, a.container, false))
+class ActivityLogFragment(a : WrappedFragment.Args, wear : Wear) : WrappedFragment(a.inflater.inflate(R.layout.fragment_activity_log, a.container, false))
 {
   private val mF : Fragment = a.fragment
   private val mLastActivityMnemonic : TextView = mView.findViewById(R.id.last_activity_mnemonic)
@@ -20,7 +20,7 @@ class ActivityLogFragment(a : WrappedFragment.Args, gThread : GThread) : Wrapped
 
   init
   {
-    gThread.getData(Const.ACTIVITY_PATH, ::showData)
+    wear.getData(Const.ACTIVITY_PATH, ::showData)
   }
 
   private fun showData(path : String, dataMap : DataMap)

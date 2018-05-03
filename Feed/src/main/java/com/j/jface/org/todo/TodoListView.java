@@ -5,11 +5,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.j.jface.action.GThread;
-
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 
 /**
@@ -23,9 +20,9 @@ public class TodoListView implements ListChangeObserver, TodoUpdaterProxy
   @NonNull private final TodoList mList;
   @NonNull private ArrayList<Integer> mView;
 
-  public TodoListView(@NonNull final GThread gThread, @NonNull final Context context)
+  public TodoListView(@NonNull final Context context)
   {
-    this(TodoList.getInstance(gThread, context));
+    this(TodoList.getInstance(context));
   }
 
   public TodoListView(@NonNull final TodoList sourceList)
@@ -297,12 +294,7 @@ public class TodoListView implements ListChangeObserver, TodoUpdaterProxy
     }
     if (null == closedParents) return false;
     final ArrayList<Todo> closedParentsList = new ArrayList<>(closedParents);
-    Collections.sort(closedParentsList, new Comparator<Todo>() {
-      @Override public int compare(@NonNull final Todo o1, @NonNull final Todo o2)
-      {
-        return Integer.compare(o1.depth, o2.depth);
-      }
-    });
+    Collections.sort(closedParentsList, (o1, o2) -> Integer.compare(o1.depth, o2.depth));
     for (final Todo t : closedParents) toggleOpen(t);
     return true;
   }

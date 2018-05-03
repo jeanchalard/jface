@@ -24,6 +24,13 @@ public abstract class AppCompatActivityWrapper<T extends WrappedActivity> extend
      new Object[]{new WrappedActivity.Args(this, icicle)});
   }
 
+  @Override protected void onDestroy()
+  {
+    super.onDestroy();
+    assert mW != null;
+    mW.onDestroy();
+  }
+
   @Override public void onSaveInstanceState(@NonNull final Bundle savedInstanceState)
   {
     super.onSaveInstanceState(savedInstanceState);

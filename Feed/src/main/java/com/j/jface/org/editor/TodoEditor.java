@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import com.j.jface.Const;
 import com.j.jface.R;
-import com.j.jface.action.GThread;
 import com.j.jface.lifecycle.WrappedActivity;
 import com.j.jface.org.todo.Todo;
 import com.j.jface.org.todo.TodoUpdaterProxy;
@@ -26,19 +25,17 @@ import java.util.Locale;
 // An activity that provides detailed editing for a single Todo.
 public class TodoEditor extends WrappedActivity
 {
-  @NonNull private final GThread mGThread;
   @NonNull private final TodoDetails mDetails;
   protected TodoEditor(@NonNull final Args a)
   {
     super(a);
-    mGThread = new GThread(mA);
     mA.requestWindowFeature(Window.FEATURE_NO_TITLE);
     mA.setContentView(R.layout.todo_editor);
     final TextView title = mA.findViewById(R.id.todoEditor_title);
 
     final Intent intent = mA.getIntent();
     final String todoId = null == intent ? null : intent.getStringExtra(Const.EXTRA_TODO_ID);
-    final TodoUpdaterProxy updaterProxy = TodoUpdaterProxy.getInstance(mGThread, mA);
+    final TodoUpdaterProxy updaterProxy = TodoUpdaterProxy.getInstance(mA);
     final Todo t = null == todoId ? Todo.NULL_TODO : updaterProxy.getFromId(todoId);
     final Todo todo = null == t ? Todo.NULL_TODO : t;
 

@@ -22,12 +22,11 @@ private fun getGeofence(params : Fences.Params) : Geofence
    .build()
 }
 
-fun SetupGeofenceAction(gThread : GThread, context : Context, intent : PendingIntent) =
+fun setupGeofence(context : Context, intent : PendingIntent)
 {
-  val client = LocationServices.getGeofencingClient(context)
+  val client = LocationServices.getGeofencingClient(context.applicationContext)
 
-  val builder = GeofencingRequest.Builder()
-   .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER or GeofencingRequest.INITIAL_TRIGGER_EXIT)
+  val builder = GeofencingRequest.Builder().setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER or GeofencingRequest.INITIAL_TRIGGER_EXIT)
   for (fence in Const.ALL_FENCE_NAMES)
   {
     val params = Fences.paramsFromName(fence)
@@ -41,9 +40,9 @@ fun SetupGeofenceAction(gThread : GThread, context : Context, intent : PendingIn
   val hasPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
   if (PackageManager.PERMISSION_GRANTED == hasPermission)
     client.addGeofences(request, intent).addOnCompleteListener {
-      if (it.isSuccessful) gThread.enqueue(InformUserAction(context, "Geofences added."))
-      else gThread.enqueue(InformUserAction(context, "Geofences can't be added :\n" + it.exception))
+      if (it.isSuccessful) InformUserAction(context, "Geofences added.").invoke()
+      else InformUserAction(context, "Geofences can't be added :\n" + it.exception).invoke()
     }
   else
-    gThread.enqueue(InformUserAction(context, "Can't add geofences for lack of location permission."))
+    InformUserAction(context, "Can't add geofences for lack of location permission.").invoke()
 }

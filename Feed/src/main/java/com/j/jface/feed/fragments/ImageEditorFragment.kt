@@ -9,16 +9,16 @@ import android.widget.SeekBar
 import com.google.android.gms.wearable.Asset
 import com.j.jface.Const
 import com.j.jface.R
-import com.j.jface.action.GThread
 import com.j.jface.lifecycle.WrappedFragment
+import com.j.jface.wear.Wear
 import com.ortiz.touch.TouchImageView
 import java.io.ByteArrayOutputStream
 
 class ImageEditorFragment(a : Args, iea : ImageEditorArgs) : WrappedFragment(a.inflater.inflate(R.layout.fragment_image_editor, a.container, false)), SeekBar.OnSeekBarChangeListener
 {
-  data class ImageEditorArgs(val gThread : GThread, val receivedData : Intent)
+  data class ImageEditorArgs(val wear : Wear, val receivedData : Intent)
+  private val mWear = iea.wear
   private val mFragment = a.fragment
-  private val mGThread = iea.gThread
   private val mViewFinder : View = mView.findViewById(R.id.view_finder)
   private val mBlackener : View = mView.findViewById(R.id.blackener)
   private val mBrightnessBar : SeekBar = mView.findViewById(R.id.select_image_brightness) as SeekBar
@@ -75,10 +75,10 @@ class ImageEditorFragment(a : Args, iea : ImageEditorArgs) : WrappedFragment(a.i
     c.drawBitmap(src, 0f, 0f, paint)
     c.setBitmap(null)
 
-    val data = ByteArrayOutputStream();
+    val data = ByteArrayOutputStream()
     background.compress(Bitmap.CompressFormat.PNG, 100, data)
     val asset = Asset.createFromBytes(data.toByteArray())
-    mGThread.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_BACKGROUND, Const.DATA_KEY_BACKGROUND, asset)
+    mWear.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_BACKGROUND, Const.DATA_KEY_BACKGROUND, asset)
     mFragment.fragmentManager.popBackStack()
   }
 

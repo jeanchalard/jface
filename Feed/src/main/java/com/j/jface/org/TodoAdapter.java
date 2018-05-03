@@ -71,22 +71,25 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder>
    ****************************************/
   private class TodoListChangeObserver implements ListChangeObserver
   {
-    @Override public void notifyItemChanged(final int position, @NonNull final Todo payload) {}
+    @Override public void notifyItemChanged(final int position, @NonNull final Todo payload)
+    {
+       mJorg.runOnUiThread(() -> TodoAdapter.this.notifyItemChanged(position, payload));
+    }
     @Override public void notifyItemInserted(final int position, @NonNull final Todo payload)
     {
-      TodoAdapter.this.notifyItemInserted(position);
+      mJorg.runOnUiThread(() -> TodoAdapter.this.notifyItemInserted(position));
     }
     @Override public void notifyItemMoved(final int from, final int to, @NonNull final Todo payload)
     {
-      if (!mTodoList.get(to).id.equals(payload.id)) TodoAdapter.this.notifyItemMoved(from, to);
+      mJorg.runOnUiThread(() -> { if (!mTodoList.get(to).id.equals(payload.id)) TodoAdapter.this.notifyItemMoved(from, to); });
     }
     @Override public void notifyItemRangeInserted(final int from, @NonNull final ArrayList<Todo> payload)
     {
-      TodoAdapter.this.notifyItemRangeInserted(from, payload.size());
+      mJorg.runOnUiThread(() -> TodoAdapter.this.notifyItemRangeInserted(from, payload.size()));
     }
     @Override public void notifyItemRangeRemoved(final int from, @NonNull final ArrayList<Todo> payload)
     {
-      TodoAdapter.this.notifyItemRangeRemoved(from, payload.size());
+      mJorg.runOnUiThread(() -> TodoAdapter.this.notifyItemRangeRemoved(from, payload.size()));
     }
   }
 }

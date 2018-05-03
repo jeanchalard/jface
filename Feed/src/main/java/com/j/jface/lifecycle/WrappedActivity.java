@@ -38,6 +38,7 @@ public class WrappedActivity
   public void onPostCreate(final Bundle b) {}
   public void onRequestPermissionsResult(final int requestCode, final String[] permissions, final int[] results) {}
   protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {}
+  public void onDestroy() {}
   public void onPause() {}
   public void onResume() {}
   public boolean isResumed()
