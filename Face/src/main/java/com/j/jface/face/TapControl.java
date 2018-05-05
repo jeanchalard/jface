@@ -20,7 +20,7 @@ public class TapControl
   private long lastChangeTime = 0;
   private Status statusOverride = null;
   private long departureTimeOverride = NO_OVERRIDE;
-  private boolean showTopic = true;
+  private boolean showUserMessage = true;
 
   @Nullable public Status getStatusOverride()
   {
@@ -36,9 +36,9 @@ public class TapControl
     return departureTimeOverride;
   }
 
-  public boolean showTopic()
+  public boolean showUserMessage()
   {
-    return showTopic;
+    return showUserMessage;
   }
 
   public void nextStatus(@NonNull final DataStore dataStore, @NonNull final Time now)
@@ -69,9 +69,9 @@ public class TapControl
     lastChangeTime = SystemClock.elapsedRealtime();
   }
 
-  public void toggleTopic()
+  public void toggleUserMessage()
   {
     lastChangeTime = 1;
-    showTopic = !showTopic;
+    showUserMessage = !showUserMessage;
   }
 }

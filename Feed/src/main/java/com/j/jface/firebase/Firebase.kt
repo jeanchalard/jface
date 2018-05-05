@@ -5,6 +5,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
+import com.google.android.gms.wearable.DataMap
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -18,6 +19,12 @@ import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executors
 
 fun <T> Task<T>.await() : T = Tasks.await(this) // Guaranteed to return non-null
+fun DataMap.toMap() : Map<String, Object>
+{
+  val m = HashMap<String, Object>()
+  this.keySet().forEach { m[it] = this[it] }
+  return m
+}
 
 class JOrgAuthException(s : String) : RuntimeException(s)
 
@@ -128,10 +135,8 @@ object Firebase : EventListener<QuerySnapshot>
     }
   }
 
-  fun updateTodo(todo : TodoCore)
-  {
-    db.document("JOrg").collection("todo").document(todo.id).set(todo)
-  }
+  fun updateTodo(todo : TodoCore) = db.document("JOrg").collection("todo").document(todo.id).set(todo)
+  fun updateWearData(path : String, d : DataMap) = db.document("JOrg").collection("wear").document(path).set(d.toMap())
 }
 
 fun DocumentSnapshot.toTodoCore() = TodoCore(this.getString("id"),

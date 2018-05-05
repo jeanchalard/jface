@@ -82,7 +82,8 @@ public class TodoSource implements Firebase.Listener
          c.getInt(TodoProviderContract.COLUMNINDEX_estimatedTime));
         c.moveToNext();
         todos.add(t);
-        // TodoDbOpsKt.updateTodo(mGThread, t);
+        // Uncomment to write the local DB to remote
+        // Firebase.INSTANCE.updateTodo(t);
       }
       c.close();
       return todos;

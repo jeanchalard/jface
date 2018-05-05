@@ -32,7 +32,7 @@ public class MessagesFragment extends WrappedFragment implements TextWatcher, Pa
 {
   @NonNull private final Fragment mF;
   @NonNull private final Wear mWear;
-  @NonNull private final EditText mTopicDataEdit;
+  @NonNull private final EditText mUserMessageDataEdit;
   @NonNull private final PaletteView mPalette;
   private boolean mDataFetched; // Replace this if this class or the use of this member ever become any more than elementary
 
@@ -41,31 +41,31 @@ public class MessagesFragment extends WrappedFragment implements TextWatcher, Pa
     super(a.inflater.inflate(R.layout.fragment_messages, a.container, false));
     mF = a.fragment;
     mWear = b;
-    mTopicDataEdit = mView.findViewById(R.id.messagesFragment_topicDataEdit);
-    mTopicDataEdit.addTextChangedListener(this);
-    mTopicDataEdit.setTextColor(Const.TOPIC_DEFAULT_COLOR);
+    mUserMessageDataEdit = mView.findViewById(R.id.messagesFragment_userMessageDataEdit);
+    mUserMessageDataEdit.addTextChangedListener(this);
+    mUserMessageDataEdit.setTextColor(Const.USER_MESSAGE_DEFAULT_COLOR);
     mPalette = mView.findViewById(R.id.messagesFragment_palette);
     mPalette.addOnColorSetListener(this);
     mDataFetched = false;
     final Activity activity = a.fragment.getActivity();
-    b.getData(Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC, (path, dataMap) ->
+    b.getData(Const.DATA_PATH + "/" + Const.DATA_KEY_USER_MESSAGE, (path, dataMap) ->
     {
       activity.runOnUiThread(() ->
       {
         mDataFetched = true;
-        final String topic = dataMap.getString(Const.DATA_KEY_TOPIC);
-        if (null == topic) return;
-        final int[] starts = getLineStartOffsets(topic);
-        final SpannableString text = new SpannableString(topic);
-        final ArrayList<Integer> colors = dataMap.getIntegerArrayList(Const.DATA_KEY_TOPIC_COLORS);
+        final String userMessage = dataMap.getString(Const.DATA_KEY_USER_MESSAGE);
+        if (null == userMessage) return;
+        final int[] starts = getLineStartOffsets(userMessage);
+        final SpannableString text = new SpannableString(userMessage);
+        final ArrayList<Integer> colors = dataMap.getIntegerArrayList(Const.DATA_KEY_USER_MESSAGE_COLORS);
         if (null != colors && starts.length == colors.size())
           for (int i = 0; i < colors.size(); ++i)
           {
             final int start = starts[i];
-            final int end = Math.max(start, i + 1 >= starts.length ? topic.length() : starts[i + 1]);
+            final int end = Math.max(start, i + 1 >= starts.length ? userMessage.length() : starts[i + 1]);
             text.setSpan(new ForegroundColorSpan(colors.get(i)), start, end, Spanned.SPAN_PARAGRAPH);
           }
-        mTopicDataEdit.setText(text);
+        mUserMessageDataEdit.setText(text);
       });
       return Unit.INSTANCE;
     });
@@ -88,7 +88,7 @@ public class MessagesFragment extends WrappedFragment implements TextWatcher, Pa
     {
       final int[] starts = getLineStartOffsets(s.toString());
       final ArrayList<Integer> colors = new ArrayList<>(starts.length);
-      for (int i = 0; i < starts.length; ++i) colors.add(Const.TOPIC_DEFAULT_COLOR);
+      for (int i = 0; i < starts.length; ++i) colors.add(Const.USER_MESSAGE_DEFAULT_COLOR);
       for (final ForegroundColorSpan span : s.getSpans(0, s.length() - 1, ForegroundColorSpan.class))
       {
         final int spanStart = s.getSpanStart(span);
@@ -107,9 +107,9 @@ public class MessagesFragment extends WrappedFragment implements TextWatcher, Pa
           s.removeSpan(span); // Removed the new line on which this was anchored
       }
       final DataMap dataMap = new DataMap();
-      dataMap.putString(Const.DATA_KEY_TOPIC, mTopicDataEdit.getText().toString());
-      dataMap.putIntegerArrayList(Const.DATA_KEY_TOPIC_COLORS, colors);
-      mWear.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC, dataMap);
+      dataMap.putString(Const.DATA_KEY_USER_MESSAGE, mUserMessageDataEdit.getText().toString());
+      dataMap.putIntegerArrayList(Const.DATA_KEY_USER_MESSAGE_COLORS, colors);
+      mWear.putDataToCloud(Const.DATA_PATH + "/" + Const.DATA_KEY_USER_MESSAGE, dataMap);
     }
     catch (Exception e) { removeAllSpans(); }
   }
@@ -135,7 +135,7 @@ public class MessagesFragment extends WrappedFragment implements TextWatcher, Pa
   {
     try
     {
-      final Editable text = mTopicDataEdit.getText();
+      final Editable text = mUserMessageDataEdit.getText();
       final int cursorStart = Selection.getSelectionStart(text);
       final int cursorEnd = Selection.getSelectionEnd(text);
 
@@ -160,7 +160,7 @@ public class MessagesFragment extends WrappedFragment implements TextWatcher, Pa
 
   private void removeAllSpans()
   {
-    final Editable text = mTopicDataEdit.getText();
+    final Editable text = mUserMessageDataEdit.getText();
     for (final ForegroundColorSpan span : text.getSpans(0, text.length() - 1, ForegroundColorSpan.class)) text.removeSpan(span);
   }
 }

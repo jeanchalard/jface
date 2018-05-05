@@ -37,7 +37,7 @@ public class FeedLoader
       if (lastSuccessfulUpdateDate + Const.UPDATE_DELAY_MILLIS > now)
       {
         statusData.putLong(Const.DATA_KEY_STATUS_UPDATE_DATE, System.currentTimeMillis());
-        wear.putData(statusDataPath, statusData);
+        wear.putDataLocally(statusDataPath, statusData);
         return;
       }
       try
@@ -49,7 +49,7 @@ public class FeedLoader
         final BufferedInputStream in = new BufferedInputStream(urlConnection.getInputStream());
         final FeedParser parser = ds.parser.newInstance();
         final DataMap data = parser.parseStream(ds.name, in);
-        wear.putData(dataPath, data);
+        wear.putDataLocally(dataPath, data);
         statusData.putLong(Const.DATA_KEY_SUCCESSFUL_UPDATE_DATE, System.currentTimeMillis());
         statusData.putString(Const.DATA_KEY_LAST_STATUS, "Success");
       }
@@ -58,7 +58,7 @@ public class FeedLoader
         statusData.putString(Const.DATA_KEY_LAST_STATUS, "Failure ; " + e.getMessage());
       }
       statusData.putLong(Const.DATA_KEY_STATUS_UPDATE_DATE, System.currentTimeMillis());
-      wear.putData(statusDataPath, statusData);
+      wear.putDataLocally(statusDataPath, statusData);
     });
   }
 }

@@ -25,17 +25,17 @@ public class Const
   @NonNull public static final String INTERNAL_PERSISTED_VALUES_FILES = "SystemValues";
 
   @NonNull public static final String[] WEEKDAYS = { "日", "月", "火", "水", "木", "金", "土", "日" };
-  @NonNull public static final String DATA_PATH = "/jwatch/Data";
-  @NonNull public static final String CONFIG_PATH = "/jwatch/Conf";
-  @NonNull public static final String LOCATION_PATH = "/jwatch/Location";
-  @NonNull public static final String ACTIVITY_PATH = "/jwatch/Activity";
+  @NonNull public static final String DATA_PATH = "/jface/Data";
+  @NonNull public static final String CONFIG_PATH = "/jface/Conf";
+  @NonNull public static final String LOCATION_PATH = "/jface/Location";
+  @NonNull public static final String ACTIVITY_PATH = "/jface/Activity";
   @NonNull public static final String DATA_PATH_SUFFIX_STATUS = "_status";
 
   @NonNull public static final String DATA_KEY_DEPTIME = "depTime";
   @NonNull public static final String DATA_KEY_EXTRA = "extra";
   @NonNull public static final String DATA_KEY_DEPLIST = "depList";
-  @NonNull public static final String DATA_KEY_TOPIC = "topic";
-  @NonNull public static final String DATA_KEY_TOPIC_COLORS = "topicColors";
+  @NonNull public static final String DATA_KEY_USER_MESSAGE = "userMessage";
+  @NonNull public static final String DATA_KEY_USER_MESSAGE_COLORS = "userMessageColors";
   @NonNull public static final String DATA_KEY_ADHOC = "adHoc";
   @NonNull public static final String DATA_KEY_INSIDE = "inside";
   @NonNull public static final String DATA_KEY_SUCCESSFUL_UPDATE_DATE = "updateTime";
@@ -47,7 +47,7 @@ public class Const
   @NonNull public static final String DATA_KEY_LAST_ACTIVITY_START_TIME = "lastActivityStartTime";
   @NonNull public static final String DATA_KEY_BACKGROUND = "background";
   @NonNull public static final String CONFIG_KEY_BACKGROUND = "background";
-  public static final int TOPIC_DEFAULT_COLOR = 0xFFAACCAA;
+  public static final int USER_MESSAGE_DEFAULT_COLOR = 0xFFAACCAA;
 
   @NonNull public static final String EXTRA_TODO_ID = "todoId";
   @NonNull public static final String EXTRA_FONT_SIZE = "fontSize";

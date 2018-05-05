@@ -64,8 +64,8 @@ class GeofenceTransitionReceiver(private val service : Service)
     val params = Fences.paramsFromName(fence.requestId)
     if (null == params) return // Unknown fence
     if (Geofence.GEOFENCE_TRANSITION_ENTER == transitionType)
-      wear.putData(Const.LOCATION_PATH + "/" + params.name, Const.DATA_KEY_INSIDE, true)
+      wear.putDataLocally(Const.LOCATION_PATH + "/" + params.name, Const.DATA_KEY_INSIDE, true)
     else if (Geofence.GEOFENCE_TRANSITION_EXIT == transitionType)
-      wear.putData(Const.LOCATION_PATH + "/" + params.name, Const.DATA_KEY_INSIDE, false)
+      wear.putDataLocally(Const.LOCATION_PATH + "/" + params.name, Const.DATA_KEY_INSIDE, false)
   }
 }

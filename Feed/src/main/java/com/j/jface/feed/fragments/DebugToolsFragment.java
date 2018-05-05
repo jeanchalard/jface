@@ -162,7 +162,7 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
     mTime1.set(mTime1.toMillis(true) + dayOffset * 86400000 - grace);
     mOffset = mTime1.toMillis(true) - mTime2.toMillis(true);
     mHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, grace);
-    mWear.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_DEBUG_TIME_OFFSET, Const.DATA_KEY_DEBUG_TIME_OFFSET, mOffset);
+    mWear.putDataToCloud(Const.DATA_PATH + "/" + Const.DATA_KEY_DEBUG_TIME_OFFSET, Const.DATA_KEY_DEBUG_TIME_OFFSET, mOffset);
   }
 
   private void updateFences()
@@ -170,7 +170,7 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
     int fences = 0;
     for (int i = 0; i < mFenceUIs.length; ++i)
       fences |= mFenceUIs[i].isChecked() ? 1 << i : 0;
-    mWear.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_DEBUG_FENCES, Const.DATA_KEY_DEBUG_FENCES, fences);
+    mWear.putDataToCloud(Const.DATA_PATH + "/" + Const.DATA_KEY_DEBUG_FENCES, Const.DATA_KEY_DEBUG_FENCES, fences);
   }
 
   @Override public void onClick(final View v)

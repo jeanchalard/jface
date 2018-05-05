@@ -6,8 +6,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -28,7 +26,7 @@ public class DrawTools
   public final Paint secondsPaint;
   public final Paint departurePaint;
   public final Paint statusPaint;
-  public final Paint topicPaint;
+  public final Paint userMessagePaint;
 
   public final Path watchContourPath;
 
@@ -47,8 +45,8 @@ public class DrawTools
     statusPaint = createTextPaint(0xFFCCCCCC, NORMAL_TYPEFACE);
     statusPaint.setTextAlign(Paint.Align.CENTER);
     departurePaint.setTextAlign(Paint.Align.CENTER);
-    topicPaint = createTextPaint(Const.TOPIC_DEFAULT_COLOR, NORMAL_TYPEFACE);
-    topicPaint.setTextAlign(Paint.Align.CENTER);
+    userMessagePaint = createTextPaint(Const.USER_MESSAGE_DEFAULT_COLOR, NORMAL_TYPEFACE);
+    userMessagePaint.setTextAlign(Paint.Align.CENTER);
 
     final int statusFontSize = 18;
     final int contourPadding = 2;
@@ -78,7 +76,7 @@ public class DrawTools
     secondsPaint.setTextSize(timeSize);
     departurePaint.setTextSize(timeSize);
     statusPaint.setTextSize(statusFontSize);
-    topicPaint.setTextSize(28);
+    userMessagePaint.setTextSize(28);
 
     timePosY = Const.ROUND_SCREEN ? 85 : 75;
     departurePosY = timePosY + 36;

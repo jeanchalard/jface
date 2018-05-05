@@ -18,7 +18,7 @@ public class Draw
   public static final int MUTE_MODE = 4;
 
   private static final int SCHEDULE_ONLY = 1;
-  private static final int TOPIC_ONLY = 2;
+  private static final int USER_MESSAGE_ONLY = 2;
   private static final int BOTH = 3;
 
   private BitmapCache[] mCache;
@@ -35,7 +35,7 @@ public class Draw
                       @Nullable final Departure departureLine1, @Nullable final Departure departureLine2,
                       @NonNull final Status status, @NonNull final Time time, /*@NonNull final Sensors sensors,*/
                       @NonNull final String locationDescriptor,
-                      @NonNull final String topic, @NonNull final int[] topicColors)
+                      @NonNull final String userMessage, @NonNull final int[] userMessageColors)
   {
     long start = System.currentTimeMillis();
 
@@ -44,24 +44,24 @@ public class Draw
     final Departure departure2 = null == departureLine1 ? null : departureLine2;
 
     final int mode;
-    final float topicPosY;
-    final String[] topicLines = topic.split("\n");
+    final float userMessagePosY;
+    final String[] userMessageLines = userMessage.split("\n");
     if (null == departure1)
     {
-      mode = TOPIC_ONLY;
-      topicPosY = drawTools.departurePosY;
+      mode = USER_MESSAGE_ONLY;
+      userMessagePosY = drawTools.departurePosY;
     }
-    else if (TextUtils.isEmpty(topic))
+    else if (TextUtils.isEmpty(userMessage))
     {
       mode = BOTH;
-      topicPosY = 0;
+      userMessagePosY = 0;
     }
     else
     {
-      final float topicH = drawTools.topicPaint.getTextSize() * topicLines.length;
+      final float userMessageH = drawTools.userMessagePaint.getTextSize() * userMessageLines.length;
       final float lineHeight = drawTools.departurePaint.getTextSize() + 2;
       final float departuresH = lineHeight * (null == departure2 ? 2 : 4);
-      topicPosY = drawTools.departurePosY + departuresH + lineHeight / 2;
+      userMessagePosY = drawTools.departurePosY + departuresH + lineHeight / 2;
       mode = BOTH;
     }
 
@@ -115,14 +115,14 @@ public class Draw
       }
     }
 
-    float ty = topicPosY;
-    for (int i = 0; i < topicLines.length; ++i)
+    float ty = userMessagePosY;
+    for (int i = 0; i < userMessageLines.length; ++i)
     {
-      final String s = topicLines[i];
-      final int color = i < topicColors.length ? topicColors[i] : Const.TOPIC_DEFAULT_COLOR;
-      drawTools.topicPaint.setColor(color);
-      canvas.drawText(s, center, ty, drawTools.topicPaint);
-      ty += drawTools.topicPaint.getTextSize() + 2;
+      final String s = userMessageLines[i];
+      final int color = i < userMessageColors.length ? userMessageColors[i] : Const.USER_MESSAGE_DEFAULT_COLOR;
+      drawTools.userMessagePaint.setColor(color);
+      canvas.drawText(s, center, ty, drawTools.userMessagePaint);
+      ty += drawTools.userMessagePaint.getTextSize() + 2;
     }
 
     final int borderTextLength = Formatter.formatBorder(mTmpChr, time, drawFull ? locationDescriptor : null);

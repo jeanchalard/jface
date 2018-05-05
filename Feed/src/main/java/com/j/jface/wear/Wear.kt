@@ -4,10 +4,12 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Log
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.wearable.*
+import com.j.jface.firebase.Firebase
 import com.j.jface.firebase.await
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
@@ -55,13 +57,26 @@ class Wear(val context : Context)
   }
 
   // Puts
-  private inline fun put(path : String, f : (DataMap) -> Unit) = dataClient.putDataItem(PutDataMapRequest.create(path).apply{f(dataMap)}.asPutDataRequest())
-  fun putData(path : String,               v : DataMap)        = put(path) { map -> map.putAll(v) }
-  fun putData(path : String, key : String, v : String)         = put(path) { map -> map.putString(key, v) }
-  fun putData(path : String, key : String, v : Boolean)        = put(path) { map -> map.putBoolean(key, v) }
-  fun putData(path : String, key : String, v : Long)           = put(path) { map -> map.putLong(key, v) }
-  fun putData(path : String, key : String, v : Asset)          = put(path) { map -> map.putAsset(key, v) }
-  fun putData(path : String, key : String, v : ArrayList<Int>) = put(path) { map -> map.putIntegerArrayList(key, v) }
+  private inline fun put(path : String, toCloud : Boolean, f : (DataMap) -> Unit)
+  {
+    val data = PutDataMapRequest.create(path).apply { f(dataMap) }
+    dataClient.putDataItem(data.asPutDataRequest())
+    if (!toCloud or !Firebase.isLoggedIn()) return
+    Firebase.updateWearData(path, data.dataMap)
+  }
+
+  fun putDataToCloud(path : String,               v : DataMap)        = put(path, true) { map -> map.putAll(v) }
+  fun putDataToCloud(path : String, key : String, v : String)         = put(path, true) { map -> map.putString(key, v) }
+  fun putDataToCloud(path : String, key : String, v : Boolean)        = put(path, true) { map -> map.putBoolean(key, v) }
+  fun putDataToCloud(path : String, key : String, v : Long)           = put(path, true) { map -> map.putLong(key, v) }
+  fun putDataToCloud(path : String, key : String, v : Asset)          = put(path, true) { map -> map.putAsset(key, v) }
+  fun putDataToCloud(path : String, key : String, v : ArrayList<Int>) = put(path, true) { map -> map.putIntegerArrayList(key, v) }
+  fun putDataLocally(path : String,               v : DataMap)        = put(path, false) { map -> map.putAll(v) }
+  fun putDataLocally(path : String, key : String, v : String)         = put(path, false) { map -> map.putString(key, v) }
+  fun putDataLocally(path : String, key : String, v : Boolean)        = put(path, false) { map -> map.putBoolean(key, v) }
+  fun putDataLocally(path : String, key : String, v : Long)           = put(path, false) { map -> map.putLong(key, v) }
+  fun putDataLocally(path : String, key : String, v : Asset)          = put(path, false) { map -> map.putAsset(key, v) }
+  fun putDataLocally(path : String, key : String, v : ArrayList<Int>) = put(path, false) { map -> map.putIntegerArrayList(key, v) }
 
   // Deletes
   fun deleteData(uri : Uri) = dataClient.deleteDataItems(uri)

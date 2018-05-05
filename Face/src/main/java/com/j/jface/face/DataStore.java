@@ -17,8 +17,8 @@ public class DataStore
 {
   @NonNull private final HashMap<String, ArrayList<Departure>> mDepartures = new HashMap<>();
   @NonNull private final HashMap<String, Boolean> mLocationStatuses = new HashMap<>();
-  @NonNull public String mTopic = "";
-  @NonNull public int[] mTopicColors = new int[0];
+  @NonNull public String mUserMessage = "";
+  @NonNull public int[] mUserMessageColors = new int[0];
   @Nullable public Bitmap mBackground;
   public long mTimeOffset;
   public long mDebugFences;
@@ -50,7 +50,8 @@ public class DataStore
     return dst;
   }
 
-  public void putDepartureList(final String dataName, final ArrayList<DataMap> departureList)
+  public void
+  putDepartureList(final String dataName, final ArrayList<DataMap> departureList)
   {
     final ArrayList<Departure> tmpDeps = new ArrayList<>();
     for (final DataMap map : departureList)

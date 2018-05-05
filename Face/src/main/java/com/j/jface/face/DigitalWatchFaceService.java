@@ -341,7 +341,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
       final int ambientFlag = isInAmbientMode() ? Draw.AMBIENT_MODE : 0;
       if (mDraw.draw(mDrawTools, mModeFlags | ambientFlag, canvas, bounds, mDataStore.mBackground,
        departure1, departure2, status, mTime, /*mSensors,*/ Status.getSymbolicLocationName(statusOverride, mDataStore),
-       mTapControl.showTopic() ? mDataStore.mTopic : "", mDataStore.mTopicColors))
+       mTapControl.showUserMessage() ? mDataStore.mUserMessage : "", mDataStore.mUserMessageColors))
         invalidate();
 
       if (null == departure1)
@@ -361,7 +361,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
           if (x < Const.SCREEN_SIZE - y) // top left triangle
             mTapControl.prevDeparture(mDataStore, mNextDeparture); // Left
           else
-            mTapControl.toggleTopic(); // Bottom
+            mTapControl.toggleUserMessage(); // Bottom
         else if (x < Const.SCREEN_SIZE - y)
           mTapControl.nextStatus(mDataStore, mTime); // Top
         else
@@ -422,10 +422,10 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
              }
             );
           }
-          else if (Const.DATA_KEY_TOPIC.equals(key))
+          else if (Const.DATA_KEY_USER_MESSAGE.equals(key))
           {
-            mDataStore.mTopic = Util.NonNullString(data.getString(Const.DATA_KEY_TOPIC));
-            mDataStore.mTopicColors = Util.intArrayFromNullableArrayList(data.getIntegerArrayList(Const.DATA_KEY_TOPIC_COLORS));
+            mDataStore.mUserMessage = Util.NonNullString(data.getString(Const.DATA_KEY_USER_MESSAGE));
+            mDataStore.mUserMessageColors = Util.intArrayFromNullableArrayList(data.getIntegerArrayList(Const.DATA_KEY_USER_MESSAGE_COLORS));
           }
       }
       else if (path.startsWith(Const.LOCATION_PATH))
@@ -450,7 +450,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
         DigitalWatchFaceUtil.fetchData(mDataClient, Const.DATA_PATH + "/" + path, dataHandler);
       for (final String path : Const.ALL_FENCE_NAMES)
         DigitalWatchFaceUtil.fetchData(mDataClient, Const.LOCATION_PATH + "/" + path, dataHandler);
-      DigitalWatchFaceUtil.fetchData(mDataClient, Const.DATA_PATH + "/" + Const.DATA_KEY_TOPIC, dataHandler);
+      DigitalWatchFaceUtil.fetchData(mDataClient, Const.DATA_PATH + "/" + Const.DATA_KEY_USER_MESSAGE, dataHandler);
       DigitalWatchFaceUtil.fetchData(mDataClient, Const.DATA_PATH + "/" + Const.DATA_KEY_BACKGROUND, dataHandler);
     }
 

@@ -78,7 +78,7 @@ class ImageEditorFragment(a : Args, iea : ImageEditorArgs) : WrappedFragment(a.i
     val data = ByteArrayOutputStream()
     background.compress(Bitmap.CompressFormat.PNG, 100, data)
     val asset = Asset.createFromBytes(data.toByteArray())
-    mWear.putData(Const.DATA_PATH + "/" + Const.DATA_KEY_BACKGROUND, Const.DATA_KEY_BACKGROUND, asset)
+    mWear.putDataToCloud(Const.DATA_PATH + "/" + Const.DATA_KEY_BACKGROUND, Const.DATA_KEY_BACKGROUND, asset)
     mFragment.fragmentManager.popBackStack()
   }
 
