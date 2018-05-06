@@ -31,6 +31,10 @@ public class Const
   @NonNull public static final String ACTIVITY_PATH = "/jface/Activity";
   @NonNull public static final String DATA_PATH_SUFFIX_STATUS = "_status";
 
+  @NonNull public static final String DB_APP_TOP_PATH = "JOrg";
+  @NonNull public static final String DB_ORG_TOP = "todo";
+  @NonNull public static final String DB_WEAR_TOP = "wear";
+
   @NonNull public static final String DATA_KEY_DEPTIME = "depTime";
   @NonNull public static final String DATA_KEY_EXTRA = "extra";
   @NonNull public static final String DATA_KEY_DEPLIST = "depList";

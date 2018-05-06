@@ -28,13 +28,8 @@ fun DataMap.toMap() : Map<String, Object>
 
 class JOrgAuthException(s : String) : RuntimeException(s)
 
-object Firebase : EventListener<QuerySnapshot>
+object Firebase
 {
-  interface Listener
-  {
-    fun onTodoUpdated(type : DocumentChange.Type, todo : TodoCore)
-  }
-
   private val executor = Executors.newSingleThreadExecutor()
   private lateinit var firebaseUser : FirebaseUser
   private lateinit var db : CollectionReference
@@ -79,7 +74,8 @@ object Firebase : EventListener<QuerySnapshot>
   {
     firebaseUser = user
     db = FirebaseFirestore.getInstance().collection(user.uid)
-    db.document("JOrg").collection("todo").whereEqualTo("completionTime", 0).orderBy("ord").addSnapshotListener(executor, this)
+    db.document(Const.DB_APP_TOP_PATH).collection(Const.DB_ORG_TOP).orderBy("ord").addSnapshotListener(executor, TodoUpdateListener)
+    db.document(Const.DB_APP_TOP_PATH).collection(Const.DB_WEAR_TOP).addSnapshotListener(executor, TodoUpdateListener)
   }
 
   private val condVar = Object()
@@ -98,45 +94,68 @@ object Firebase : EventListener<QuerySnapshot>
     }
   }
 
-  private val listeners = ArrayList<Listener>()
-  fun addListener(l : Listener) = listeners.add(l)
-  fun removeListener(l : Listener) = listeners.remove(l)
+  fun updateTodo(todo : TodoCore) = db.document(Const.DB_APP_TOP_PATH).collection(Const.DB_ORG_TOP).document(todo.id).set(todo)
+  fun updateWearData(path : String, d : DataMap) = db.document(Const.DB_APP_TOP_PATH).collection(Const.DB_WEAR_TOP).document(path).set(d.toMap())
 
-  override fun onEvent(snapshot : QuerySnapshot?, exception : FirebaseFirestoreException?)
+  object WearUpdateListener : EventListener<QuerySnapshot>
   {
-    if (null == snapshot) return // TODO : handle failures
-    // Note that these events all happen on the same single-thread executor, so they are serialized.
-    // This is absolutely essential for synchronization when getting the first instance of the todo list.
-    val tl = todoList
-    if (null == tl)
+    interface Listener
     {
-      val l = ArrayList<TodoCore>()
-      todoList = snapshot.documents.mapTo(l, DocumentSnapshot::toTodoCore)
-      synchronized(condVar) { condVar.notifyAll() }
+      fun onDataUpdated()
     }
-    else
+    private val listeners = ArrayList<Listener>()
+    fun addListener(l : Listener) = listeners.add(l)
+    fun removeListener(l : Listener) = listeners.remove(l)
+    override fun onEvent(snapshot : QuerySnapshot?, exception : FirebaseFirestoreException?)
     {
-      if (snapshot.metadata.hasPendingWrites()) return // This was a local update.
-      synchronized(condVar)
-      {
-        for (doc in snapshot.documentChanges)
-        {
-          val updatedTodo = doc.document.toTodoCore()
-          for (l in listeners)
-            l.onTodoUpdated(doc.type, updatedTodo)
-          val index = tl.binarySearch(updatedTodo, Comparator.comparing(TodoCore::ord))
-          if (index > 0)
-            tl[index] = updatedTodo
-          else // It's an insertion of a new todo.
-            tl.add(-index - 1, updatedTodo)
-        }
-      }
-      todoList = tl
+      if (null == snapshot) return // TODO : handle failures
+      // Note that these events all happen on the same single-thread executor, so they are serialized.
     }
   }
 
-  fun updateTodo(todo : TodoCore) = db.document("JOrg").collection("todo").document(todo.id).set(todo)
-  fun updateWearData(path : String, d : DataMap) = db.document("JOrg").collection("wear").document(path).set(d.toMap())
+  object TodoUpdateListener : EventListener<QuerySnapshot>
+  {
+    interface Listener
+    {
+      fun onTodoUpdated(type : DocumentChange.Type, todo : TodoCore)
+    }
+    private val listeners = ArrayList<Listener>()
+    fun addListener(l : Listener) = listeners.add(l)
+    fun removeListener(l : Listener) = listeners.remove(l)
+
+    override fun onEvent(snapshot : QuerySnapshot?, exception : FirebaseFirestoreException?)
+    {
+      if (null == snapshot) return // TODO : handle failures
+      // Note that these events all happen on the same single-thread executor, so they are serialized.
+      // This is absolutely essential for synchronization when getting the first instance of the todo list.
+      val tl = todoList
+      if (null == tl)
+      {
+        val l = ArrayList<TodoCore>()
+        todoList = snapshot.documents.mapTo(l, DocumentSnapshot::toTodoCore)
+        synchronized(condVar) { condVar.notifyAll() }
+      }
+      else
+      {
+        if (snapshot.metadata.hasPendingWrites()) return // This was a local update.
+        synchronized(condVar)
+        {
+          for (doc in snapshot.documentChanges)
+          {
+            val updatedTodo = doc.document.toTodoCore()
+            for (l in listeners)
+              l.onTodoUpdated(doc.type, updatedTodo)
+            val index = tl.binarySearch(updatedTodo, Comparator.comparing(TodoCore::ord))
+            if (index > 0)
+              tl[index] = updatedTodo
+            else // It's an insertion of a new todo.
+              tl.add(-index - 1, updatedTodo)
+          }
+        }
+        todoList = tl
+      }
+    }
+  }
 }
 
 fun DocumentSnapshot.toTodoCore() = TodoCore(this.getString("id"),

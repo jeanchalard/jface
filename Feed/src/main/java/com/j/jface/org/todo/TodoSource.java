@@ -16,7 +16,7 @@ import java.util.List;
 
 // Get Todo from the provider. This bridges the awful content provider interface
 // to an easy to use one.
-public class TodoSource implements Firebase.Listener
+public class TodoSource implements Firebase.TodoUpdateListener.Listener
 {
   public interface ListChangeListener
   {
@@ -55,7 +55,7 @@ public class TodoSource implements Firebase.Listener
     if (FIRESTORE)
       synchronized (mLock)
       {
-        Firebase.INSTANCE.addListener(this);
+        Firebase.TodoUpdateListener.INSTANCE.addListener(this);
         final List<TodoCore> l = Firebase.INSTANCE.getTodoList();
         if (l instanceof ArrayList) return (ArrayList<TodoCore>)l;
         return new ArrayList<>(l);

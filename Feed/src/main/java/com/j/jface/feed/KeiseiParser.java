@@ -19,7 +19,7 @@ public class KeiseiParser extends FeedParser
   public DataMap parseStream(@NonNull final String dataName, @NonNull final BufferedInputStream srcStream) throws IOException
   {
     final DataMap result = new DataMap();
-    final BufferedReader src = new BufferedReader(new InputStreamReader(srcStream));
+    final BufferedReader src = new BufferedReader(new InputStreamReader(new BufferedInputStream(srcStream), "Shift_JIS"));
 
     if (null == find(src, "class=\"name\">") || null == find(src, "</tr>"))
       return result;
