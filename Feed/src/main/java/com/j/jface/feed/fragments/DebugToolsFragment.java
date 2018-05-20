@@ -7,12 +7,14 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.text.format.Time;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.j.jface.Const;
 import com.j.jface.R;
 import com.j.jface.action.InformUserAction;
@@ -22,6 +24,7 @@ import com.j.jface.org.todo.TodoProvider;
 import com.j.jface.wear.Wear;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 
 import kotlin.Unit;
@@ -102,6 +105,15 @@ public class DebugToolsFragment extends WrappedFragment implements View.OnClickL
       intent.setType("*/*");
       intent.setAction(Intent.ACTION_GET_CONTENT);
       a.fragment.startActivityForResult(intent, Const.DESTROY_DATABASE_AND_REPLACE_WITH_FILE_CONTENTS_RESULT_CODE);
+    });
+
+    mView.findViewById(R.id.button_delete_FCM_token).setOnClickListener(v ->
+    {
+      new Thread(() ->
+      {
+        try { FirebaseInstanceId.getInstance().deleteInstanceId(); } catch (IOException e) { Log.e("Can't delete token", "" + e); }
+        FirebaseInstanceId.getInstance().getToken(); // Force token generation
+      }).start();
     });
   }
 

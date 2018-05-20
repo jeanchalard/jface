@@ -20,7 +20,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.j.jface.R;
-import com.j.jface.feed.fragments.ActivityLogFragment;
 import com.j.jface.feed.fragments.DebugToolsFragment;
 import com.j.jface.feed.fragments.ImageSelectorFragment;
 import com.j.jface.feed.fragments.LogsAndDataFragment;
@@ -46,7 +45,7 @@ public class JFaceDataFeed extends WrappedActivity
     final DrawerLayout drawer = mA.findViewById(R.id.dataFeedDrawer);
 
     final ListView list = mA.findViewById(R.id.dataFeedDrawerContents);
-    list.setAdapter(new ArrayAdapter<>(mA, R.layout.data_feed_drawer_item, new String[] { "Messages", "Settings", "Activity log", "Logs & data", "Debug tools" }));
+    list.setAdapter(new ArrayAdapter<>(mA, R.layout.data_feed_drawer_item, new String[] { "Messages", "Settings", "Logs & data", "Debug tools" }));
     final AdapterView.OnItemClickListener listener = (parent, view, position, id) ->
     {
       final Fragment f = getFragmentForPosition(position, mWear);
@@ -63,7 +62,7 @@ public class JFaceDataFeed extends WrappedActivity
     mCurrentlyDisplayedFragmentIndex = null == icicle ? 0 : icicle.getInt(LAST_OPEN_FRAGMENT_INDEX);
     listener.onItemClick(null, null, mCurrentlyDisplayedFragmentIndex, 0); // Switch to the initial fragment
 
-    final Toolbar toolbar = (Toolbar)mA.findViewById(R.id.dataFeedToolbar);
+    final Toolbar toolbar = mA.findViewById(R.id.dataFeedToolbar);
     toolbar.setTitle(R.string.data_feed_title);
     mDrawerToggle = new ActionBarDrawerToggle(mA, drawer, toolbar, R.string.drawer_open_desc, R.string.drawer_closed_desc);
   }
@@ -104,9 +103,8 @@ public class JFaceDataFeed extends WrappedActivity
     {
       case 0 : return new FragmentWrapper<>(MessagesFragment.class, wear);
       case 1 : return new FragmentWrapper<>(ImageSelectorFragment.class, wear);
-      case 2 : return new FragmentWrapper<>(ActivityLogFragment.class, wear);
-      case 3 : return new FragmentWrapper<>(LogsAndDataFragment.class, wear);
-      case 4 : return new FragmentWrapper<>(DebugToolsFragment.class, wear);
+      case 2 : return new FragmentWrapper<>(LogsAndDataFragment.class, wear);
+      case 3 : return new FragmentWrapper<>(DebugToolsFragment.class, wear);
     }
     return null;
   }

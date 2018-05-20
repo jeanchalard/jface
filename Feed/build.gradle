@@ -45,7 +45,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "com.google.firebase:firebase-firestore:$gms_version"
     implementation "com.google.firebase:firebase-auth:$gms_version"
-    implementation "com.google.android.gms:play-services-auth:$gms_version"
+    implementation "com.google.firebase:firebase-messaging:$gms_version"
     implementation "com.google.android.gms:play-services-auth:$gms_version"
     implementation "com.google.android.support:wearable:2.0.0"
     implementation "com.google.android.gms:play-services-wearable:$gms_version"

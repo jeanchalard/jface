@@ -9,6 +9,7 @@ import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.wearable.*
+import com.j.jface.feed.FCMHandler
 import com.j.jface.firebase.Firebase
 import com.j.jface.firebase.await
 import java.util.concurrent.Executor
@@ -63,6 +64,7 @@ class Wear(val context : Context)
     dataClient.putDataItem(data.asPutDataRequest())
     if (!toCloud or !Firebase.isLoggedIn()) return
     Firebase.updateWearData(path, data.dataMap)
+    ex.execute { FCMHandler.sendMessageSynchronously(path) }
   }
 
   fun putDataToCloud(path : String,               v : DataMap)        = put(path, true) { map -> map.putAll(v) }

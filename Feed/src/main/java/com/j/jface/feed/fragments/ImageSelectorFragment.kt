@@ -41,7 +41,7 @@ class ImageSelectorFragment(a : Args, val mWear : Wear) : WrappedFragment(a.infl
 
   override fun onActivityResult(requestCode : Int, resultCode : Int, data : Intent?)
   {
-    if (null == data || resultCode != Const.CHOOSE_IMAGE_RESULT_CODE) return
+    if (null == data || requestCode != Const.CHOOSE_IMAGE_RESULT_CODE) return
     val f = FragmentWrapper<ImageEditorFragment>(ImageEditorFragment::class.java, ImageEditorFragment.ImageEditorArgs(mWear, data))
     mFragment.fragmentManager.beginTransaction()
      .addToBackStack("ImageEditor")

@@ -5,6 +5,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
+import com.google.android.gms.wearable.Asset
 import com.google.android.gms.wearable.DataMap
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
@@ -19,10 +20,15 @@ import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executors
 
 fun <T> Task<T>.await() : T = Tasks.await(this) // Guaranteed to return non-null
-fun DataMap.toMap() : Map<String, Object>
+private fun firestoreStoreableObject(it : Any) : Any = when (it)
 {
-  val m = HashMap<String, Object>()
-  this.keySet().forEach { m[it] = this[it] }
+  is Asset -> "image" // TODO : send the image data, like base64 encoded or something
+  else -> it
+}
+private fun DataMap.toMap() : Map<String, Any>
+{
+  val m = HashMap<String, Any>()
+  this.keySet().forEach { m[it] = firestoreStoreableObject(this[it]) }
   return m
 }
 
@@ -94,25 +100,10 @@ object Firebase
     }
   }
 
+  /**************
+   * TODOs
+   **************/
   fun updateTodo(todo : TodoCore) = db.document(Const.DB_APP_TOP_PATH).collection(Const.DB_ORG_TOP).document(todo.id).set(todo)
-  fun updateWearData(path : String, d : DataMap) = db.document(Const.DB_APP_TOP_PATH).collection(Const.DB_WEAR_TOP).document(path).set(d.toMap())
-
-  object WearUpdateListener : EventListener<QuerySnapshot>
-  {
-    interface Listener
-    {
-      fun onDataUpdated()
-    }
-    private val listeners = ArrayList<Listener>()
-    fun addListener(l : Listener) = listeners.add(l)
-    fun removeListener(l : Listener) = listeners.remove(l)
-    override fun onEvent(snapshot : QuerySnapshot?, exception : FirebaseFirestoreException?)
-    {
-      if (null == snapshot) return // TODO : handle failures
-      // Note that these events all happen on the same single-thread executor, so they are serialized.
-    }
-  }
-
   object TodoUpdateListener : EventListener<QuerySnapshot>
   {
     interface Listener
@@ -154,6 +145,73 @@ object Firebase
         }
         todoList = tl
       }
+    }
+  }
+
+  /**************
+   * Wear
+   **************/
+  enum class PathType { DOCUMENT, COLLECTION }
+  private fun wearPathToFirebasePath(wearPath : String, pathType : PathType = PathType.DOCUMENT) : String
+  {
+    val wearComponents = wearPath.split('/')
+    val firebaseComponents = ArrayList<String>()
+    if (PathType.DOCUMENT == pathType) firebaseComponents.add(Const.DB_APP_TOP_PATH)
+    var collectionComponent = false
+    wearComponents.forEach {
+      if (it.isEmpty()) return@forEach
+      firebaseComponents.add(it)
+      if (collectionComponent) firebaseComponents.add(it)
+      collectionComponent = !collectionComponent
+    }
+    return firebaseComponents.joinToString("/")
+  }
+  private fun firebasePathToWearPath(firebasePath : String) : String
+  {
+    val firebaseComponents = firebasePath.split('/')
+    if (firebaseUser.uid != firebaseComponents[0] || Const.DB_APP_TOP_PATH != firebaseComponents[1])
+      throw RuntimeException("Not a valid firebase path representing a wear path, ")
+    val wearComponents = ArrayList<String>()
+    for (i in 2..firebaseComponents.size)
+    {
+      val it = firebaseComponents[i]
+      if (0 != (i + 1) % 3)
+        wearComponents.add(it)
+      else
+      // Duplicated component
+        if (it != wearComponents.last()) throw RuntimeException("Not a valid firebase path representing a wear path")
+    }
+    return wearComponents.joinToString("/")
+  }
+
+  fun updateWearData(path : String, d : DataMap) = db.document(wearPathToFirebasePath(path)).set(d.toMap())
+  fun getAccessKeyAndWearListenersSynchronously() : Pair<String, List<String>>
+  {
+    val config = db.document(Const.DB_APP_TOP_PATH).collection(wearPathToFirebasePath("${Const.CONFIG_PATH}", PathType.COLLECTION)).get()
+    Tasks.await(config)
+    var key : String = ""; var listeners = ArrayList<String>()
+    config.result.documents.forEach {
+      if (null != it[Const.CONFIG_KEY_SERVER_KEY])
+        key = it.getString(Const.CONFIG_KEY_SERVER_KEY)
+      else
+        listeners.add(it.getString(Const.CONFIG_KEY_WEAR_LISTENER_ID))
+    }
+    return Pair(key, listeners)
+  }
+
+  object WearUpdateListener : EventListener<QuerySnapshot>
+  {
+    interface Listener
+    {
+      fun onDataUpdated()
+    }
+    private val listeners = ArrayList<Listener>()
+    fun addListener(l : Listener) = listeners.add(l)
+    fun removeListener(l : Listener) = listeners.remove(l)
+    override fun onEvent(snapshot : QuerySnapshot?, exception : FirebaseFirestoreException?)
+    {
+      if (null == snapshot) return // TODO : handle failures
+      // Note that these events all happen on the same single-thread executor, so they are serialized.
     }
   }
 }

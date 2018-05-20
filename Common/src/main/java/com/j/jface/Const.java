@@ -25,15 +25,17 @@ public class Const
   @NonNull public static final String INTERNAL_PERSISTED_VALUES_FILES = "SystemValues";
 
   @NonNull public static final String[] WEEKDAYS = { "日", "月", "火", "水", "木", "金", "土", "日" };
-  @NonNull public static final String DATA_PATH = "/jface/Data";
-  @NonNull public static final String CONFIG_PATH = "/jface/Conf";
-  @NonNull public static final String LOCATION_PATH = "/jface/Location";
-  @NonNull public static final String ACTIVITY_PATH = "/jface/Activity";
+  @NonNull public static final String JFACE_TOP = "jface";
+
+  // Must contain JFACE_TOP as it's also used as DB_WEAR_TOP
+  @NonNull public static final String DATA_PATH = "/" + JFACE_TOP + "/Data";
+  @NonNull public static final String CONFIG_PATH = "/" + JFACE_TOP + "/Conf";
+  @NonNull public static final String LOCATION_PATH = "/" + JFACE_TOP + "/Location";
   @NonNull public static final String DATA_PATH_SUFFIX_STATUS = "_status";
 
   @NonNull public static final String DB_APP_TOP_PATH = "JOrg";
   @NonNull public static final String DB_ORG_TOP = "todo";
-  @NonNull public static final String DB_WEAR_TOP = "wear";
+  @NonNull public static final String DB_WEAR_TOP = JFACE_TOP;
 
   @NonNull public static final String DATA_KEY_DEPTIME = "depTime";
   @NonNull public static final String DATA_KEY_EXTRA = "extra";
@@ -47,10 +49,11 @@ public class Const
   @NonNull public static final String DATA_KEY_STATUS_UPDATE_DATE = "lastStatusDate";
   @NonNull public static final String DATA_KEY_DEBUG_TIME_OFFSET = "debugTimeOffset";
   @NonNull public static final String DATA_KEY_DEBUG_FENCES = "debugFences";
-  @NonNull public static final String DATA_KEY_LAST_ACTIVITY_MNEMONIC = "lastActivityMnemonic";
-  @NonNull public static final String DATA_KEY_LAST_ACTIVITY_START_TIME = "lastActivityStartTime";
   @NonNull public static final String DATA_KEY_BACKGROUND = "background";
   @NonNull public static final String CONFIG_KEY_BACKGROUND = "background";
+  @NonNull public static final String CONFIG_KEY_SERVER_KEY = "key";
+  @NonNull public static final String CONFIG_KEY_WEAR_LISTENER_PREFIX = "wearListener_";
+  @NonNull public static final String CONFIG_KEY_WEAR_LISTENER_ID = "id";
   public static final int USER_MESSAGE_DEFAULT_COLOR = 0xFFAACCAA;
 
   @NonNull public static final String EXTRA_TODO_ID = "todoId";

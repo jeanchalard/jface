@@ -82,6 +82,20 @@
       android:exported="true">
     </service>
 
+    <service
+      android:name=".feed.FCMReceiverService"
+      android:exported="true">
+      <intent-filter>
+        <action android:name="com.google.firebase.MESSAGING_EVENT" />
+      </intent-filter>
+    </service>
+    <service
+     android:name=".feed.FCMHandler">
+      <intent-filter>
+        <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+      </intent-filter>
+    </service>
+
     <receiver android:name=".feed.BootCompletedReceiver">
       <intent-filter>
         <action android:name="android.intent.action.BOOT_COMPLETED" />
