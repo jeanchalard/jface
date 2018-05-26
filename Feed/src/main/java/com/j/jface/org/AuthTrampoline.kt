@@ -55,7 +55,7 @@ class AuthTrampoline(args : WrappedActivity.Args) : WrappedActivity(args)
       log("Google sign in successful.\nSigning in to Firebase...")
       trySignIn()
     }
-    else log("Google sign in failed : " + signInResult.status.statusMessage)
+    else log("Google sign in failed : " + signInResult.status + " : " + signInResult.status.statusMessage)
   }
 
   private var signIns : Int = 0

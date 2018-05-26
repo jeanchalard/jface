@@ -81,7 +81,6 @@ object Firebase
     firebaseUser = user
     db = FirebaseFirestore.getInstance().collection(user.uid)
     db.document(Const.DB_APP_TOP_PATH).collection(Const.DB_ORG_TOP).orderBy("ord").addSnapshotListener(executor, TodoUpdateListener)
-    db.document(Const.DB_APP_TOP_PATH).collection(Const.DB_WEAR_TOP).addSnapshotListener(executor, TodoUpdateListener)
   }
 
   private val condVar = Object()
@@ -106,14 +105,10 @@ object Firebase
   fun updateTodo(todo : TodoCore) = db.document(Const.DB_APP_TOP_PATH).collection(Const.DB_ORG_TOP).document(todo.id).set(todo)
   object TodoUpdateListener : EventListener<QuerySnapshot>
   {
-    interface Listener
-    {
-      fun onTodoUpdated(type : DocumentChange.Type, todo : TodoCore)
-    }
+    interface Listener { fun onTodoUpdated(type : DocumentChange.Type, todo : TodoCore) }
     private val listeners = ArrayList<Listener>()
     fun addListener(l : Listener) = listeners.add(l)
     fun removeListener(l : Listener) = listeners.remove(l)
-
     override fun onEvent(snapshot : QuerySnapshot?, exception : FirebaseFirestoreException?)
     {
       if (null == snapshot) return // TODO : handle failures
@@ -146,12 +141,13 @@ object Firebase
         todoList = tl
       }
     }
-  }
 
+  }
   /**************
    * Wear
    **************/
   enum class PathType { DOCUMENT, COLLECTION }
+
   private fun wearPathToFirebasePath(wearPath : String, pathType : PathType = PathType.DOCUMENT) : String
   {
     val wearComponents = wearPath.split('/')
@@ -170,12 +166,13 @@ object Firebase
   {
     val firebaseComponents = firebasePath.split('/')
     if (firebaseUser.uid != firebaseComponents[0] || Const.DB_APP_TOP_PATH != firebaseComponents[1])
-      throw RuntimeException("Not a valid firebase path representing a wear path, ")
+      throw RuntimeException("Not a valid firebase path representing a wear path")
     val wearComponents = ArrayList<String>()
-    for (i in 2..firebaseComponents.size)
+    wearComponents.add("") // Simplest way to add a / in front
+    for (i in 2..firebaseComponents.size - 1)
     {
       val it = firebaseComponents[i]
-      if (0 != (i + 1) % 3)
+      if (0 != (i + 2) % 3)
         wearComponents.add(it)
       else
       // Duplicated component
@@ -185,11 +182,17 @@ object Firebase
   }
 
   fun updateWearData(path : String, d : DataMap) = db.document(wearPathToFirebasePath(path)).set(d.toMap())
+  fun getWearData(path : String) : Task<DataMap>
+  {
+    val p = wearPathToFirebasePath(path)
+    return db.document(p).get().continueWith { it: Task<DocumentSnapshot> -> it.result.toDataMap() }
+  }
   fun getAccessKeyAndWearListenersSynchronously() : Pair<String, List<String>>
   {
-    val config = db.document(Const.DB_APP_TOP_PATH).collection(wearPathToFirebasePath("${Const.CONFIG_PATH}", PathType.COLLECTION)).get()
+    val config = db.document(Const.DB_APP_TOP_PATH).collection(wearPathToFirebasePath(Const.CONFIG_PATH, PathType.COLLECTION)).get()
     Tasks.await(config)
-    var key : String = ""; var listeners = ArrayList<String>()
+    var key = ""
+    var listeners = ArrayList<String>()
     config.result.documents.forEach {
       if (null != it[Const.CONFIG_KEY_SERVER_KEY])
         key = it.getString(Const.CONFIG_KEY_SERVER_KEY)
@@ -199,20 +202,28 @@ object Firebase
     return Pair(key, listeners)
   }
 
-  object WearUpdateListener : EventListener<QuerySnapshot>
+  abstract class WearDataUpdateListener : EventListener<QuerySnapshot>
   {
-    interface Listener
+    val registrationTokens : ArrayList<ListenerRegistration> = ArrayList()
+    fun resume()
     {
-      fun onDataUpdated()
+      registrationTokens.add(db.document(Const.DB_APP_TOP_PATH).collection(wearPathToFirebasePath(Const.CONFIG_PATH, PathType.COLLECTION)).addSnapshotListener(executor, this))
+      registrationTokens.add(db.document(Const.DB_APP_TOP_PATH).collection(wearPathToFirebasePath(Const.DATA_PATH, PathType.COLLECTION)).addSnapshotListener(executor, this))
     }
-    private val listeners = ArrayList<Listener>()
-    fun addListener(l : Listener) = listeners.add(l)
-    fun removeListener(l : Listener) = listeners.remove(l)
+    fun pause()
+    {
+      while (!registrationTokens.isEmpty())
+        registrationTokens.removeAt(0).remove()
+    }
     override fun onEvent(snapshot : QuerySnapshot?, exception : FirebaseFirestoreException?)
     {
       if (null == snapshot) return // TODO : handle failures
-      // Note that these events all happen on the same single-thread executor, so they are serialized.
+      if (snapshot.metadata.hasPendingWrites()) return // This was a local update.
+      snapshot.documents.forEach { doc ->
+        onWearDataUpdated(firebasePathToWearPath(doc.reference.path), doc.toDataMap())
+      }
     }
+    abstract fun onWearDataUpdated(path : String, data : DataMap)
   }
 }
 
@@ -227,3 +238,18 @@ fun DocumentSnapshot.toTodoCore() = TodoCore(this.getString("id"),
    this.getLong("hardness").toInt(),
    this.getLong("constraint").toInt(),
    this.getLong("estimatedTime").toInt())
+
+fun DocumentSnapshot.toDataMap() = DataMap().apply {
+  this@toDataMap.data.forEach {
+    key, value -> when(value) {
+      is String -> this.putString(key, value)
+      is Boolean -> this.putBoolean(key, value)
+      is Long -> this.putLong(key, value)
+      // Note our own Wear API only tolerates arrays of ints, and FireStore converts that to Longs
+      is ArrayList<*> -> this.putIntegerArrayList(key, value.map { (it as Long).toInt() }.toCollection(ArrayList<Int>()))
+      is Array<*> -> this.putIntegerArrayList(key, value.map { (it as Long).toInt() }.toCollection(ArrayList<Int>()))
+      else -> throw RuntimeException("Unknown type in document for wear path : " + value.javaClass)
+      // TODO : assets ; for the time being they are represented by a string "image". See at the top of this file.
+    }
+  }
+}

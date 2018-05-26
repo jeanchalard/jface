@@ -10,8 +10,10 @@ public class Todo extends TodoCore
   @NonNull public static final Todo NULL_TODO = new Todo("", "");
 
   /**
-   * A class to store UI-related Todo stuff. It encapsulates the mutable part of Todo, the parts that Todo adds over TodoCore.
-   * This stores data that is either not persisted but kept for performance reasons, or local to this device.
+   * A class to store UI-related Todo stuff. It encapsulates the mutable
+   * part of Todo, the parts that Todo adds over TodoCore.
+   * This stores data that is either not persisted but kept for
+   * performance reasons, or local to this device.
    */
   public static class TodoUI
   {

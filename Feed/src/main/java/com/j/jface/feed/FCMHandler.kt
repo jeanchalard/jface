@@ -27,7 +27,7 @@ class FCMHandler : FirebaseInstanceIdService()
       if (key.isEmpty() || listeners.isEmpty()) return
       val payload = JSONObject().apply {
         put("to", listeners[0])
-        put("data", JSONObject().apply { put("message", path) })
+        put("data", JSONObject().apply { put(Const.FIREBASE_MESSAGE_WEAR_PATH, path) })
       }.toString()
 
       val url = URL(FCMURL)
@@ -41,8 +41,8 @@ class FCMHandler : FirebaseInstanceIdService()
       OutputStreamWriter(cx.outputStream).use { it.write(payload) }
 
       cx.connect()
-      Log.e("Firebase messaging → code : ", "" + cx.responseCode)
-      InputStreamReader(cx.inputStream).use { Log.e("RESP", it.readText()) }
+      Log.i("Firebase messaging → code : ", "" + cx.responseCode)
+      InputStreamReader(cx.inputStream).use { Log.i("FCM server response", it.readText()) }
     }
   }
 

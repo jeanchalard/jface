@@ -54,6 +54,7 @@ public class Const
   @NonNull public static final String CONFIG_KEY_SERVER_KEY = "key";
   @NonNull public static final String CONFIG_KEY_WEAR_LISTENER_PREFIX = "wearListener_";
   @NonNull public static final String CONFIG_KEY_WEAR_LISTENER_ID = "id";
+  @NonNull public static final String FIREBASE_MESSAGE_WEAR_PATH = "wear_path";
   public static final int USER_MESSAGE_DEFAULT_COLOR = 0xFFAACCAA;
 
   @NonNull public static final String EXTRA_TODO_ID = "todoId";
