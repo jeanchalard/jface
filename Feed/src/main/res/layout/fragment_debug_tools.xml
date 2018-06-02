@@ -134,6 +134,24 @@
    android:layout_height="1px"
    android:layout_weight="0"/>
 
+  <LinearLayout
+      android:orientation="horizontal"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      >
+    <Button
+        android:id="@+id/button_fetch_data_state"
+        android:layout_width="0px"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Fetch data state"/>
+    <TextView
+        android:id="@+id/text_data_state"
+        android:layout_width="0px"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
+  </LinearLayout>
+
   <Button
    android:id="@+id/button_copy_todo_from_storage"
    android:layout_width="match_parent"

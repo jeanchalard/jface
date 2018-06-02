@@ -29,7 +29,7 @@ class MessagesFragment(a : WrappedFragment.Args, private val mWear : Wear) : Wra
   private val expectedUpdatesCount = Semaphore(0)
   private val mPalette : PaletteView
   private val mWearUpdateListener = object : Firebase.WearDataUpdateListener() {
-    override fun onWearDataUpdated(path: String, data: DataMap) = this@MessagesFragment.onWearDataUpdated(path, data)
+    override fun onWearDataUpdated(path : String, data : DataMap) = this@MessagesFragment.onWearDataUpdated(path, data)
   }
 
   init

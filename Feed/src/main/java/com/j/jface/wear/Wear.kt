@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.util.Log
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
@@ -21,6 +20,7 @@ class Wear(val context : Context)
 {
   companion object { private val ex = Executors.newSingleThreadExecutor() }
   private val dataClient = Wearable.getDataClient(context)
+  private val hasConnectedNodes : Task<Boolean> = Wearable.getNodeClient(context).connectedNodes.continueWith { it.isSuccessful && null != it.result && !it.result.isEmpty() }
 
   // Util
   private inline fun String.toWearUri() : Uri = PutDataMapRequest.create(this).uri
@@ -64,7 +64,13 @@ class Wear(val context : Context)
     dataClient.putDataItem(data.asPutDataRequest())
     if (!toCloud or !Firebase.isLoggedIn()) return
     Firebase.updateWearData(path, data.dataMap)
-    ex.execute { FCMHandler.sendMessageSynchronously(path) }
+    // If this device is the master node, there is no point in sending an FCM message anyway.
+    // hasConnectedNodes is a Task that almost certainly completed by now, but if not well
+    // this will just send the message anyway which is harmless. The reason to test for isComplete
+    // here is to guarantee result() will not block, not that it would be problematic but this
+    // will crash if called on the main thread and is would block.
+    if (hasConnectedNodes.isComplete && hasConnectedNodes.result) return
+    ex.execute { FCMHandler.sendFCMMessageForWearPath(context, path) }
   }
 
   fun putDataToCloud(path : String,               v : DataMap)        = put(path, true) { map -> map.putAll(v) }

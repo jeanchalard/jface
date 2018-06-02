@@ -46,6 +46,9 @@ object Firebase
     if (null != user) start(user)
   }
 
+  /**************
+   * Login
+   **************/
   fun isLoggedIn() : Boolean = ::firebaseUser.isInitialized
 
   fun signIn(host : AuthTrampoline)
@@ -83,6 +86,15 @@ object Firebase
     db.document(Const.DB_APP_TOP_PATH).collection(Const.DB_ORG_TOP).orderBy("ord").addSnapshotListener(executor, TodoUpdateListener)
   }
 
+  /**************
+   * Util
+   **************/
+  // Very raw and unencapsulated and kind of unsafe but for the time being I don't care
+  fun <R> transaction(what : (CollectionReference, Transaction) -> R) = FirebaseFirestore.getInstance().runTransaction { t -> what(db, t) }
+
+  /**************
+   * TODOs
+   **************/
   private val condVar = Object()
   @Volatile @JvmField var todoList : MutableList<TodoCore>? = null
 
@@ -99,9 +111,6 @@ object Firebase
     }
   }
 
-  /**************
-   * TODOs
-   **************/
   fun updateTodo(todo : TodoCore) = db.document(Const.DB_APP_TOP_PATH).collection(Const.DB_ORG_TOP).document(todo.id).set(todo)
   object TodoUpdateListener : EventListener<QuerySnapshot>
   {
@@ -220,7 +229,9 @@ object Firebase
       if (null == snapshot) return // TODO : handle failures
       if (snapshot.metadata.hasPendingWrites()) return // This was a local update.
       snapshot.documents.forEach { doc ->
-        onWearDataUpdated(firebasePathToWearPath(doc.reference.path), doc.toDataMap())
+        val wearPath = firebasePathToWearPath(doc.reference.path)
+        val data = doc.toDataMap()
+        onWearDataUpdated(wearPath, data)
       }
     }
     abstract fun onWearDataUpdated(path : String, data : DataMap)
