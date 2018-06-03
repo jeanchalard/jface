@@ -13,8 +13,8 @@ class GeofenceTransitionReceiver(private val service : Service)
 {
   companion object
   {
-    val ACTION_MANUAL_START = "com.j.jface.feed.action.MANUAL_START"
-    val ACTION_GEOFENCE = "com.j.jface.feed.action.GEOFENCE"
+    const val ACTION_MANUAL_START = "com.j.jface.feed.action.MANUAL_START"
+    const val ACTION_GEOFENCE = "com.j.jface.feed.action.GEOFENCE"
     private var serial = 0
   }
   private val wear : Wear by lazy { Wear(service) }

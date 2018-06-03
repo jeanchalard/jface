@@ -14,7 +14,8 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.*
 import com.j.jface.Const
 import com.j.jface.R
-import com.j.jface.org.AuthTrampoline
+import com.j.jface.feed.FCMReceiverService
+import com.j.jface.lifecycle.AuthTrampoline
 import com.j.jface.org.todo.TodoCore
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executors
@@ -213,7 +214,7 @@ object Firebase
 
   abstract class WearDataUpdateListener : EventListener<QuerySnapshot>
   {
-    val registrationTokens : ArrayList<ListenerRegistration> = ArrayList()
+    private val registrationTokens : ArrayList<ListenerRegistration> = ArrayList()
     fun resume()
     {
       registrationTokens.add(db.document(Const.DB_APP_TOP_PATH).collection(wearPathToFirebasePath(Const.CONFIG_PATH, PathType.COLLECTION)).addSnapshotListener(executor, this))

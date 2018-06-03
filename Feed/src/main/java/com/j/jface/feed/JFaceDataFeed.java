@@ -112,7 +112,7 @@ public class JFaceDataFeed extends WrappedActivity
   private void startGeofenceService(final Activity activity)
   {
     final Intent i = new Intent(activity, GeofenceTransitionReceiverService.class);
-    i.setAction(GeofenceTransitionReceiver.Companion.getACTION_MANUAL_START());
+    i.setAction(GeofenceTransitionReceiver.ACTION_MANUAL_START);
     activity.startService(i);
   }
 }

@@ -72,19 +72,21 @@ class FCMHandler : FirebaseInstanceIdService()
       val jobScheduler = c.getSystemService(JobScheduler::class.java)
       Log.e("SCHEDULE", "" + jobScheduler.schedule(job))
     }
-  }
 
-  override fun onTokenRefresh()
-  {
-    val token = FirebaseInstanceId.getInstance().token
-    Log.e("JOrg/Firebase", "Firebase decided to update its token : " + token)
-    val nodeClient = Wearable.getNodeClient(this)
-    nodeClient.connectedNodes.addOnSuccessListener {
-      if (null == it || it.isEmpty()) return@addOnSuccessListener
-      val d = DataMap().apply {
-        putString(Const.CONFIG_KEY_WEAR_LISTENER_ID, token)
+    fun registerTokenForWearData(context : Context)
+    {
+      val token = FirebaseInstanceId.getInstance().token
+      Log.e("JOrg/Firebase", "Firebase decided to update its token : " + token)
+      val nodeClient = Wearable.getNodeClient(context)
+      nodeClient.connectedNodes.addOnSuccessListener {
+        if (null == it || it.isEmpty()) return@addOnSuccessListener
+        val d = DataMap().apply {
+          putString(Const.CONFIG_KEY_WEAR_LISTENER_ID, token)
+        }
+        if (Firebase.isLoggedIn()) Firebase.updateWearData("${Const.CONFIG_PATH}/${Const.CONFIG_KEY_WEAR_LISTENER_PREFIX}${token}", d)
       }
-      Firebase.updateWearData("${Const.CONFIG_PATH}/${Const.CONFIG_KEY_WEAR_LISTENER_PREFIX}${token}", d)
     }
   }
+
+  override fun onTokenRefresh() = registerTokenForWearData(this)
 }

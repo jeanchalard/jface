@@ -109,8 +109,8 @@ class DebugToolsFragment(a : WrappedFragment.Args, private val mWear : Wear) : W
     }
 
     mView.findViewById<View>(R.id.button_fetch_data_state).setOnClickListener {
-      mWear.getData("${Const.DATA_PATH}/${Const.DATA_KEY_USER_MESSAGE}") { _, data ->
-        a.fragment.activity.runOnUiThread { mView.findViewById<TextView>(R.id.text_data_state).text = data.getString(Const.DATA_KEY_USER_MESSAGE) }
+      mWear.getData("${Const.LOCATION_PATH}/千住大橋") { _, data ->
+        a.fragment.activity.runOnUiThread { mView.findViewById<TextView>(R.id.text_data_state).text = data.getBoolean(Const.DATA_KEY_INSIDE).toString() }
       }
     }
   }
@@ -142,7 +142,7 @@ class DebugToolsFragment(a : WrappedFragment.Args, private val mWear : Wear) : W
     }
     finally
     {
-      removeListeners()
+      addListeners()
     }
   }
 

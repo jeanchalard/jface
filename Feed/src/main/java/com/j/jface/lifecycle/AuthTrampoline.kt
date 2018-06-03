@@ -1,4 +1,4 @@
-package com.j.jface.org
+package com.j.jface.lifecycle
 
 import android.content.Intent
 import android.os.Handler
@@ -6,14 +6,15 @@ import android.widget.TextView
 import com.google.android.gms.auth.api.Auth
 import com.google.firebase.iid.FirebaseInstanceId
 import com.j.jface.R
+import com.j.jface.feed.FCMHandler
 import com.j.jface.firebase.Firebase
-import com.j.jface.lifecycle.JOrgBoot
-import com.j.jface.lifecycle.WrappedActivity
 import java.util.concurrent.Executors
 
-class AuthTrampoline(args : WrappedActivity.Args) : WrappedActivity(args)
+abstract class AuthTrampoline(args : WrappedActivity.Args) : WrappedActivity(args)
 {
-  val context = mA
+  abstract val trampolineDestination : Class<*>
+
+  val context = args.activity
   private val executor = Executors.newSingleThreadExecutor()
   private val statusText : TextView by lazy { mA.findViewById<TextView>(R.id.auth_trampoline_status_text) }
   private val handler : Handler = Handler()
@@ -23,7 +24,7 @@ class AuthTrampoline(args : WrappedActivity.Args) : WrappedActivity(args)
     if (Firebase.isLoggedIn()) finish()
     else
     {
-      mA.setContentView(R.layout.auth_trampoline)
+      context.setContentView(R.layout.auth_trampoline)
       statusText.text = "Signing in with Google..."
       trySignIn()
     }
@@ -38,7 +39,7 @@ class AuthTrampoline(args : WrappedActivity.Args) : WrappedActivity(args)
   {
     if (Firebase.isLoggedIn())
     {
-      FirebaseInstanceId.getInstance().getToken() // Force token generation
+      FirebaseInstanceId.getInstance().token // Force token generation
       log("Login successful.")
       handler.postDelayed({ finish() }, 5000)
     }
@@ -70,7 +71,8 @@ class AuthTrampoline(args : WrappedActivity.Args) : WrappedActivity(args)
       } else log("Bailing, fix your code")
     }
     log("Login successful.")
-    FirebaseInstanceId.getInstance().getToken() // Force token generation
+    FirebaseInstanceId.getInstance().token // Force token generation
+    FCMHandler.registerTokenForWearData(context)
     handler.postDelayed({ finish() }, 5000)
   }
 
@@ -78,8 +80,8 @@ class AuthTrampoline(args : WrappedActivity.Args) : WrappedActivity(args)
 
   private fun finish()
   {
-    mA.startActivity(Intent().setClass(mA, JOrgBoot::class.java))
-    mA.finish()
+    context.startActivity(Intent().setClass(mA, trampolineDestination))
+    context.finish()
   }
   override fun onDestroy() = executor.shutdown()
 }
