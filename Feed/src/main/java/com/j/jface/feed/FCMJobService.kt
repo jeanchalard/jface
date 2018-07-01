@@ -7,23 +7,28 @@ import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.j.jface.Const
 import com.j.jface.firebase.Firebase
+import com.j.jface.toDataMap
+import com.j.jface.wear.Wear
+import com.j.jface.wear.addOnCompleteListener
+import java.util.concurrent.Executors
 import kotlin.concurrent.thread
-
-const val SENTINEL_PATH = "JOrg/jface/Conf/Conf/Sentinel"
-const val SENTINEL_KEY = "sentinelTimestamp"
 
 class FCMJobService : JobService()
 {
+  companion object { private val ex = Executors.newSingleThreadExecutor() }
+
   override fun onStartJob(params : JobParameters?) : Boolean
   {
     Log.e("START JOB", "" + params)
-    if (null == params) return true // true means work is finished
-    thread(name = "FCM job thread") {
-      val path = params.extras.getString(Const.EXTRA_PATH)
+    if (null == params)  return true // true means work is finished
+    ex.execute {
       val success = try
       {
-        Tasks.await(tryForceSyncDB())
-        FCMHandler.sendFCMMessageForWearPathNow(path)
+        val path = params.extras.getString(Const.EXTRA_PATH)
+        val dataMap = params.extras.getPersistableBundle(Const.EXTRA_WEAR_DATA).toDataMap()
+        val future = Firebase.updateWearData(path, dataMap)
+        future.addOnCompleteListener(ex) { FCMHandler.sendFCMMessageForWearPathNow(path) }
+        true // Success
       }
       catch(e : Exception)
       {
@@ -36,14 +41,4 @@ class FCMJobService : JobService()
   }
 
   override fun onStopJob(params : JobParameters?) : Boolean = false
-
-  private fun tryForceSyncDB() : Task<Unit>
-  {
-    return Firebase.transaction { db, transaction ->
-      val sentinel = db.document(SENTINEL_PATH)
-      val value = transaction.get(sentinel).getLong(SENTINEL_KEY) ?: 0L
-      transaction.update(db.document(), SENTINEL_KEY, value + 1)
-      Unit
-    }
-  }
 }

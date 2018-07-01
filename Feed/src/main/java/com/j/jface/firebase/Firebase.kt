@@ -191,7 +191,7 @@ object Firebase
     return wearComponents.joinToString("/")
   }
 
-  fun updateWearData(path : String, d : DataMap) = db.document(wearPathToFirebasePath(path)).set(d.toMap())
+  fun updateWearData(path : String, d : DataMap) = FirebaseFirestore.getInstance().batch().set(db.document(wearPathToFirebasePath(path)), d.toMap()).commit()
   fun getWearData(path : String) : Task<DataMap>
   {
     val p = wearPathToFirebasePath(path)

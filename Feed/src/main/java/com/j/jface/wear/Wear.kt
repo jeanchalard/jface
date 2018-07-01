@@ -1,16 +1,24 @@
 package com.j.jface.wear
 
+import android.app.job.JobInfo
+import android.app.job.JobScheduler
+import android.content.ComponentName
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.PersistableBundle
+import android.support.annotation.WorkerThread
+import android.util.Log
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.wearable.*
-import com.j.jface.feed.FCMHandler
+import com.j.jface.Const
+import com.j.jface.feed.FCMJobService
 import com.j.jface.firebase.Firebase
 import com.j.jface.firebase.await
+import com.j.jface.toPersistableBundle
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
@@ -63,14 +71,31 @@ class Wear(val context : Context)
     val data = PutDataMapRequest.create(path).apply { f(dataMap) }
     dataClient.putDataItem(data.asPutDataRequest())
     if (!toCloud or !Firebase.isLoggedIn()) return
-    Firebase.updateWearData(path, data.dataMap)
     // If this device is the master node, there is no point in sending an FCM message anyway.
     // hasConnectedNodes is a Task that almost certainly completed by now, but if not well
     // this will just send the message anyway which is harmless. The reason to test for isComplete
     // here is to guarantee result() will not block, not that it would be problematic but this
     // will crash if called on the main thread and is would block.
-    if (hasConnectedNodes.isComplete && hasConnectedNodes.result) return
-    ex.execute { FCMHandler.sendFCMMessageForWearPath(context, path) }
+    if (hasConnectedNodes.isComplete && hasConnectedNodes.result)
+      Firebase.updateWearData(path, data.dataMap)
+    else
+      startUpdateWearDataJob(context, path, data.dataMap)
+  }
+
+  @WorkerThread
+  private fun startUpdateWearDataJob(c : Context, path : String, dataMap : DataMap)
+  {
+    val job = JobInfo.Builder(path.hashCode(), ComponentName(c, FCMJobService::class.java))
+     .setExtras(PersistableBundle().apply {
+       putString(Const.EXTRA_PATH, path)
+       putPersistableBundle(Const.EXTRA_WEAR_DATA, dataMap.toPersistableBundle())
+     })
+     .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+     .setBackoffCriteria(5000, JobInfo.BACKOFF_POLICY_EXPONENTIAL) // retry after 5s on first failure, then exponential backoff
+     .setPersisted(true)
+     .build()
+    val jobScheduler = c.getSystemService(JobScheduler::class.java)
+    Log.e("SCHEDULE", "" + jobScheduler.schedule(job))
   }
 
   fun putDataToCloud(path : String,               v : DataMap)        = put(path, true) { map -> map.putAll(v) }

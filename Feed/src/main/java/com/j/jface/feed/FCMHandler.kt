@@ -1,10 +1,6 @@
 package com.j.jface.feed
 
-import android.app.job.JobInfo
-import android.app.job.JobScheduler
-import android.content.ComponentName
 import android.content.Context
-import android.os.PersistableBundle
 import android.support.annotation.WorkerThread
 import android.util.Log
 import com.google.android.gms.wearable.DataMap
@@ -32,6 +28,7 @@ class FCMHandler : FirebaseInstanceIdService()
       if (key.isEmpty() || listeners.isEmpty()) return null
       val payload = JSONObject().apply {
         put("to", listeners[0])
+        put("priority", "high")
         put("data", JSONObject().apply { put(Const.FIREBASE_MESSAGE_WEAR_PATH, path) })
       }.toString()
 
@@ -57,20 +54,6 @@ class FCMHandler : FirebaseInstanceIdService()
       } catch (e : IOException) {
         return false
       }
-    }
-
-    @WorkerThread fun sendFCMMessageForWearPath(c : Context, path : String)
-    {
-      if (sendFCMMessageForWearPathNow(path)) return // Success
-      // No network probably, or some other temporary failure
-      val job = JobInfo.Builder(path.hashCode(), ComponentName(c, FCMJobService::class.java))
-       .setExtras(PersistableBundle().apply { putString(Const.EXTRA_PATH, path) })
-       .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-       .setBackoffCriteria(5000, JobInfo.BACKOFF_POLICY_EXPONENTIAL) // retry after 5s on first failure, then exponential backoff
-       .setPersisted(true)
-       .build()
-      val jobScheduler = c.getSystemService(JobScheduler::class.java)
-      Log.e("SCHEDULE", "" + jobScheduler.schedule(job))
     }
 
     fun registerTokenForWearData(context : Context)

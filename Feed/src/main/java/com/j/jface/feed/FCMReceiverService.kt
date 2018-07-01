@@ -20,7 +20,6 @@ class FCMReceiverService : FirebaseMessagingService()
     val path = msg.data[Const.FIREBASE_MESSAGE_WEAR_PATH]
     if (null == path) { Log.e("...but", "Message is ill-formed, no ${Const.FIREBASE_MESSAGE_WEAR_PATH} field : " + msg); return }
     Firebase.getWearData(path).addOnCompleteListener {
-      InformUserAction(this, "msg\n" + it.result, null, null, null).invoke()
       wear.putDataLocally(path, it.result)
     }
   }
