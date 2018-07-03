@@ -21,6 +21,7 @@ public class Const
   public static final int CHOOSE_IMAGE_RESULT_CODE = 100;
   public static final int DESTROY_DATABASE_AND_REPLACE_WITH_FILE_CONTENTS_RESULT_CODE = 200;
   public static final int GOOGLE_SIGN_IN_RESULT_CODE = 300;
+  public static final int NOTIFICATION_RESULT_CODE = 400;
 
   @NonNull public static final String INTERNAL_PERSISTED_VALUES_FILES = "SystemValues";
 
@@ -61,6 +62,7 @@ public class Const
   @NonNull public static final String EXTRA_FONT_SIZE = "fontSize";
   @NonNull public static final String EXTRA_PATH = "path";
   @NonNull public static final String EXTRA_WEAR_DATA = "wearData";
+  @NonNull public static final String EXTRA_SPLIT_TODOS = "splitTodos";
 
   @NonNull public static final String 日比谷線_北千住_平日 = "日比谷線・北千住・平日";
   @NonNull public static final String 日比谷線_北千住_休日 = "日比谷線・北千住・休日";

@@ -31,9 +31,19 @@
     android:label="@string/app_name"
     android:theme="@style/Theme.Base"
     android:taskAffinity="com.j.jface.feed.Feed">
+
+    <activity
+     android:name=".lifecycle.DebugActivityBoot"
+     android:label="Debug activity">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+      </intent-filter>
+    </activity>
+
+
     <activity
      android:name=".lifecycle.AuthTrampolineJFaceDataFeedBoot"
-      android:label="@string/feed_name">
+     android:label="@string/feed_name">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />

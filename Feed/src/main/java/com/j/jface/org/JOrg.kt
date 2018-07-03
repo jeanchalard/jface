@@ -14,6 +14,7 @@ import android.util.Log
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.google.android.gms.auth.api.Auth
@@ -22,6 +23,7 @@ import com.j.jface.R
 import com.j.jface.feed.views.SnackbarRegistry
 import com.j.jface.lifecycle.TodoEditorBoot
 import com.j.jface.lifecycle.WrappedActivity
+import com.j.jface.org.notif.NotifEngine
 import com.j.jface.org.sound.EditTextSoundRouter
 import com.j.jface.org.sound.SoundSource
 import com.j.jface.org.todo.Todo
@@ -72,6 +74,11 @@ class JOrg(args : WrappedActivity.Args) : WrappedActivity(args)
       mTouchHelper = touchHelper
       mTodoList = tlv
     })
+
+    mA.findViewById<Button>(R.id.try_notif).setOnClickListener {
+      val list = mTodoList
+      if (null != list) NotifEngine(mA).splitNotification(list[0])
+    }
 
     scheduleBackup()
   }

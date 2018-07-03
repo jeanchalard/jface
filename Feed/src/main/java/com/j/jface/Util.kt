@@ -1,5 +1,7 @@
 package com.j.jface
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.PersistableBundle
 import com.google.android.gms.wearable.DataMap
 import com.j.jface.Util.arrayListFromIntArray
@@ -48,4 +50,12 @@ fun PersistableBundle.toDataMap() : DataMap
   val target = DataMap()
   for (key in this.keySet()) target[key] = this[key]
   return target
+}
+
+fun Context.nextNotifId(channel : String) : Int
+{
+  val persist : SharedPreferences = getSharedPreferences(Const.INTERNAL_PERSISTED_VALUES_FILES, Context.MODE_PRIVATE)
+  val notifId = persist.getInt(channel, 1)
+  persist.edit().putInt(channel, notifId + 1).apply()
+  return notifId
 }

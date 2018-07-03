@@ -5,28 +5,27 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
-import android.content.SharedPreferences
 import android.support.design.widget.Snackbar
 import android.view.View
-import com.j.jface.Const
 import com.j.jface.R
 import com.j.jface.feed.views.SnackbarRegistry
+import com.j.jface.nextNotifId
+
+const val CHANNEL_ID = "jorg_general"
+const val CHANNEL_NAME = "Jormungand : General"
+const val LAST_NOTIF_ID = "general_lastId"
 
 class NotificationAction(private val context : Context, private val text : String, private val pendingIntent : PendingIntent? = null) : () -> Unit
 {
   companion object
   {
-    const val CHANNEL_ID = "jorg"
-    const val CHANNEL_NAME = "Jormungand"
-    const val LAST_NOTIF_ID = "lastNotifId"
-
     private fun getChannel(context : Context, notificationManager : NotificationManager) : NotificationChannel
     {
       val existing = notificationManager.getNotificationChannel(CHANNEL_ID)
       if (null != existing) return existing
       val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT)
       // Configure the notification channel.
-      channel.description = "Jormungand"
+      channel.description = "Jormungand : debug and misc notifications"
       channel.enableLights(true)
       channel.lightColor = context.getColor(R.color.jormungand_color)
       channel.enableVibration(false)
@@ -41,6 +40,7 @@ class NotificationAction(private val context : Context, private val text : Strin
       val notif = Notification.Builder(context, channel.id)
        .setSmallIcon(R.drawable.jormungand)
        .setColor(context.getColor(R.color.jormungand_color))
+       .setVisibility(Notification.VISIBILITY_PUBLIC)
        .setTimeoutAfter(10_000)
       if (null != pendingIntent) notif.setContentIntent(pendingIntent)
 
@@ -52,9 +52,7 @@ class NotificationAction(private val context : Context, private val text : Strin
         notif.setContentTitle(text.subSequence(0, index))
         notif.setStyle(Notification.BigTextStyle().bigText(text.subSequence(index, text.length)))
       }
-      val persist : SharedPreferences = context.getSharedPreferences(Const.INTERNAL_PERSISTED_VALUES_FILES, Context.MODE_PRIVATE)
-      val notifId = persist.getInt(LAST_NOTIF_ID, 1)
-      persist.edit().putInt(LAST_NOTIF_ID, notifId + 1).apply()
+      val notifId = context.nextNotifId(LAST_NOTIF_ID)
       notificationManager.notify(notifId, notif.build())
     }
   }
