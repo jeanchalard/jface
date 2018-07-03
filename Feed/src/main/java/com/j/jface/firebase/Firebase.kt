@@ -14,7 +14,6 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.*
 import com.j.jface.Const
 import com.j.jface.R
-import com.j.jface.feed.FCMReceiverService
 import com.j.jface.lifecycle.AuthTrampoline
 import com.j.jface.org.todo.TodoCore
 import java.util.concurrent.ExecutionException

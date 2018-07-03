@@ -3,15 +3,11 @@ package com.j.jface.feed
 import android.app.job.JobParameters
 import android.app.job.JobService
 import android.util.Log
-import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.Tasks
 import com.j.jface.Const
 import com.j.jface.firebase.Firebase
 import com.j.jface.toDataMap
-import com.j.jface.wear.Wear
 import com.j.jface.wear.addOnCompleteListener
 import java.util.concurrent.Executors
-import kotlin.concurrent.thread
 
 class FCMJobService : JobService()
 {
