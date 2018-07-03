@@ -10,13 +10,11 @@ import android.net.Uri
 import android.os.Handler
 import android.os.Message
 import android.util.Log
-
 import com.j.jface.Util
 import com.j.jface.client.Client
 import com.j.jface.client.action.drive.WriteFileAction
+import com.j.jface.lifecycle.ContentProviderWrapper
 import com.j.jface.lifecycle.WrappedContentProvider
-
-import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -24,6 +22,7 @@ import java.io.InputStream
 
 // A provider of Todos.
 // Needs to be public to be accessed by the booter
+class TodoProviderBoot : ContentProviderWrapper<TodoProvider>()
 class TodoProvider(a : WrappedContentProvider.Args) : WrappedContentProvider(a), Handler.Callback
 {
   private val mClient : Client = Client(mC.context)

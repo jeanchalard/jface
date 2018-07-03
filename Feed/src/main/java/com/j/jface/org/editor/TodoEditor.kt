@@ -1,6 +1,5 @@
 package com.j.jface.org.editor
 
-import android.content.Intent
 import android.support.transition.TransitionManager
 import android.view.View
 import android.view.ViewGroup
@@ -9,18 +8,16 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.TextView
-
 import com.j.jface.Const
 import com.j.jface.R
+import com.j.jface.lifecycle.ActivityWrapper
 import com.j.jface.lifecycle.WrappedActivity
 import com.j.jface.org.todo.Todo
 import com.j.jface.org.todo.TodoUpdaterProxy
-
-import java.util.Calendar
-import java.util.GregorianCalendar
-import java.util.Locale
+import java.util.*
 
 // An activity that provides detailed editing for a single Todo.
+class TodoEditorBoot : ActivityWrapper<TodoEditor>()
 class TodoEditor protected constructor(a : WrappedActivity.Args) : WrappedActivity(a)
 {
   private val mDetails : TodoDetails

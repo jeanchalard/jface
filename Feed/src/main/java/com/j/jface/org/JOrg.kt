@@ -21,8 +21,11 @@ import com.google.android.gms.auth.api.Auth
 import com.j.jface.Const
 import com.j.jface.R
 import com.j.jface.feed.views.SnackbarRegistry
-import com.j.jface.lifecycle.TodoEditorBoot
+import com.j.jface.lifecycle.ActivityWrapper
+import com.j.jface.lifecycle.AppCompatActivityWrapper
+import com.j.jface.lifecycle.AuthTrampoline
 import com.j.jface.lifecycle.WrappedActivity
+import com.j.jface.org.editor.TodoEditorBoot
 import com.j.jface.org.notif.NotifEngine
 import com.j.jface.org.sound.EditTextSoundRouter
 import com.j.jface.org.sound.SoundSource
@@ -35,6 +38,9 @@ import java.util.concurrent.Executors
 /**
  * Main activity class for JOrg.
  */
+class AuthTrampolineJOrgBoot : ActivityWrapper<AuthTrampolineJOrg>()
+class AuthTrampolineJOrg(args : WrappedActivity.Args) : AuthTrampoline(args) { override val trampolineDestination get() = JOrgBoot::class.java }
+class JOrgBoot : AppCompatActivityWrapper<JOrg>()
 class JOrg(args : WrappedActivity.Args) : WrappedActivity(args)
 {
   private val mSoundSource : SoundSource

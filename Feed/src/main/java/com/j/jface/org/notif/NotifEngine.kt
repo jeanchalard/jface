@@ -6,9 +6,8 @@ import android.content.Intent
 import android.graphics.drawable.Icon
 import com.j.jface.Const
 import com.j.jface.R
-import com.j.jface.lifecycle.AuthTrampolineJOrgBoot
-import com.j.jface.lifecycle.JOrgBoot
 import com.j.jface.nextNotifId
+import com.j.jface.org.AuthTrampolineJOrgBoot
 import com.j.jface.org.todo.TodoCore
 
 const val CHANNEL_ID = "jorg_todo"

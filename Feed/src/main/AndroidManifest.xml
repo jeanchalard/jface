@@ -33,7 +33,7 @@
     android:taskAffinity="com.j.jface.feed.Feed">
 
     <activity
-     android:name=".lifecycle.DebugActivityBoot"
+     android:name=".org.DebugActivityBoot"
      android:label="Debug activity">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
@@ -42,7 +42,7 @@
 
 
     <activity
-     android:name=".lifecycle.AuthTrampolineJFaceDataFeedBoot"
+     android:name=".feed.AuthTrampolineJFaceDataFeedBoot"
      android:label="@string/feed_name">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
@@ -51,7 +51,7 @@
     </activity>
 
     <activity
-     android:name=".lifecycle.AuthTrampolineJOrgBoot"
+     android:name=".org.AuthTrampolineJOrgBoot"
      android:label="@string/orgtool_name"
      android:icon="@drawable/jormungand"
      android:windowSoftInputMode="stateHidden"
@@ -63,7 +63,7 @@
     </activity>
 
     <activity
-      android:name=".lifecycle.JFaceDataFeedBoot"
+      android:name=".feed.JFaceDataFeedBoot"
       android:allowBackup="true"
       android:icon="@drawable/ic_launcher"
       android:label="@string/app_name"
@@ -71,14 +71,14 @@
       android:taskAffinity="com.j.jface.feed.Feed" />
 
     <activity
-      android:name=".lifecycle.JOrgBoot"
+      android:name=".org.JOrgBoot"
       android:label="@string/orgtool_name"
       android:icon="@drawable/jormungand"
       android:windowSoftInputMode="stateHidden"
       android:taskAffinity="com.j.jface.org.JOrg" />
 
     <activity
-      android:name=".lifecycle.TodoEditorBoot"
+      android:name=".org.editor.TodoEditorBoot"
       android:label="Todo editor"
       android:theme="@style/Dialog">
     </activity>
@@ -87,7 +87,7 @@
       android:authorities="com.j.jface.provider"
       android:exported="false"
       android:label="JOrgTodoProvider"
-      android:name=".lifecycle.TodoProviderBoot">
+      android:name=".org.todo.TodoProviderBoot">
     </provider>
 
     <service

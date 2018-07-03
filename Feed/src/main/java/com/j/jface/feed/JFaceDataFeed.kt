@@ -2,7 +2,6 @@ package com.j.jface.feed
 
 import android.Manifest
 import android.app.Activity
-import android.app.Fragment
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -16,18 +15,22 @@ import android.view.MenuItem
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ListView
-
 import com.j.jface.R
 import com.j.jface.feed.fragments.DebugToolsFragment
 import com.j.jface.feed.fragments.ImageSelectorFragment
 import com.j.jface.feed.fragments.LogsAndDataFragment
 import com.j.jface.feed.fragments.MessagesFragment
+import com.j.jface.lifecycle.ActivityWrapper
+import com.j.jface.lifecycle.AuthTrampoline
 import com.j.jface.lifecycle.FragmentWrapper
 import com.j.jface.lifecycle.WrappedActivity
 import com.j.jface.wear.Wear
 
 const val LAST_OPEN_FRAGMENT_INDEX = "last_open_fragment_index"
 
+class AuthTrampolineJFaceDataFeedBoot : ActivityWrapper<AuthTrampolineJFaceDataFeed>()
+class AuthTrampolineJFaceDataFeed(args : WrappedActivity.Args) : AuthTrampoline(args) { override val trampolineDestination get() = JFaceDataFeedBoot::class.java }
+class JFaceDataFeedBoot : ActivityWrapper<JFaceDataFeed>()
 class JFaceDataFeed(args : WrappedActivity.Args) : WrappedActivity(args)
 {
   private val mDrawerToggle : ActionBarDrawerToggle

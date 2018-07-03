@@ -2,10 +2,12 @@ package com.j.jface.org
 
 import android.widget.Button
 import com.j.jface.R
+import com.j.jface.lifecycle.ActivityWrapper
 import com.j.jface.lifecycle.WrappedActivity
 import com.j.jface.org.notif.NotifEngine
 import com.j.jface.org.todo.TodoCore
 
+class DebugActivityBoot : ActivityWrapper<DebugActivity>()
 class DebugActivity(args : WrappedActivity.Args) : WrappedActivity(args)
 {
   init
