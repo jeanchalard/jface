@@ -1,7 +1,6 @@
 package com.j.jface.feed;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
@@ -9,27 +8,29 @@ import com.j.jface.Const;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class EkitanParser extends FeedParser
 {
   @Override @NonNull
-  public DataMap parseStream(@NonNull final String dataName, @NonNull final BufferedInputStream srcStream) throws IOException
+  public DataMap parseStream(@NonNull final String dataName, @NonNull final BufferedInputStream srcStream) throws IOException, ParseException
   {
     final DataMap result = new DataMap();
     final BufferedReader src = new BufferedReader(new InputStreamReader(srcStream));
 
-    // Warning. 駅情報 appears twice in the page, once for each direction. For now we only parse this
-    // page for 稲城 towards 新宿 and 本蓮沼 toward 目黒, and as it happens both of these have the relevant
-    // direction in first, so it's going to work for our purposes. However we'll need something more
-    // sophisticated if we ever need to disambiguate.
+    // Warning. 駅情報 appears twice in the page, once for each direction. For now the only relevant pages
+    // are for 稲城 towards 新宿 and 本蓮沼 toward 目黒, and as it happens both of these have the relevant
+    // direction in first, so it's going to work for these purposes. However something more sophisticated
+    // will be needed if other pages are read that don't happen have this order.
     find(src, "駅情報");
-    final Scanner srcTable = new Scanner(find(src, "駅情報"));
+    final String contents = find(src, "駅情報");
+    if (null == contents) throw new ParseException("EkitanParser : can't parse page " + dataName, 0);
+    final Scanner srcTable = new Scanner(contents);
     final ArrayList<DataMap> buildData = new ArrayList<>();
-    srcTable.useDelimiter("(<|>|:)+");
+    srcTable.useDelimiter("[<>:]+");
     int hour = -1;
     int minute = -1;
     while (srcTable.hasNext())

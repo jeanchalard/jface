@@ -33,7 +33,7 @@ public class TodoProvider extends WrappedContentProvider implements Handler.Call
 
   private class TodoOpenHelper extends SQLiteOpenHelper
   {
-    public TodoOpenHelper(@NonNull final ContentProvider mC)
+    private TodoOpenHelper(@NonNull final ContentProvider mC)
     {
       super(mC.getContext(), DB_NAME, null, DB_VERSION);
     }
@@ -174,7 +174,6 @@ public class TodoProvider extends WrappedContentProvider implements Handler.Call
     catch (final FileNotFoundException e)
     {
       Log.w("Jorg", "The todo DB in " + path.getPath() + " can't be found ; can't back it up in the cloud.");
-      return;
     }
   }
 

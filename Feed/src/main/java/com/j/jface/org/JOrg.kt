@@ -100,7 +100,7 @@ class JOrg(args : WrappedActivity.Args) : WrappedActivity(args)
   fun addNewSubTodo(parent : Todo?) : Todo?
   {
     val todo = mTodoList?.createAndInsertTodo("", parent) ?: return null
-    val adapter = mRecyclerView.adapter as TodoAdapter ?: return todo
+    val adapter = mRecyclerView.adapter as TodoAdapter? ?: return todo
     adapter.passFocusTo(todo)
     return todo
   }
@@ -111,7 +111,7 @@ class JOrg(args : WrappedActivity.Args) : WrappedActivity(args)
     val oldTree = todoList.markTodoCompleteAndReturnOldTree(todo)
     val undoChance = Snackbar.make(mTopLayout, "Marked done.", Snackbar.LENGTH_LONG)
     undoChance.duration = 8000 // 8 seconds, because LENGTH_LONG is punily short
-    undoChance.setAction("Undo") { v -> for (t in oldTree) todoList.updateRawTodo(t) }
+    undoChance.setAction("Undo") { _ -> for (t in oldTree) todoList.updateRawTodo(t) }
     undoChance.show()
   }
 

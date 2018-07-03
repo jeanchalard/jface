@@ -10,21 +10,7 @@ object SnackbarRegistry
 {
   private var snackbarParent : WeakReference<View>? = null
 
-  fun getSnackbarParent() : View?
-  {
-    return snackbarParent?.get()
-  }
-
-  fun setSnackbarParent(v : View)
-  {
-    synchronized(this) { snackbarParent = WeakReference(v) }
-  }
-  fun unsetSnackbarParent(v : View)
-  {
-    synchronized(this)
-    {
-      val parent = snackbarParent ?: return
-      if (parent.get() == v) snackbarParent = null
-    }
-  }
+  fun getSnackbarParent() : View? = snackbarParent?.get()
+  fun setSnackbarParent(v : View) = synchronized(this) { snackbarParent = WeakReference(v) }
+  fun unsetSnackbarParent(v : View) = synchronized(this) { if (snackbarParent?.get() == v) snackbarParent = null }
 }

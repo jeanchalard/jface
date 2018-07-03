@@ -12,7 +12,7 @@ class TodoProviderMatcher extends UriMatcher
   public static final int INDIVIDUAL_TODO = 2;
   public static final int INDIVIDUAL_TODO_METADATA = 3;
 
-  public TodoProviderMatcher() { super(UriMatcher.NO_MATCH); }
+  private TodoProviderMatcher() { super(UriMatcher.NO_MATCH); }
   static
   {
     Matcher.addURI(TodoProviderContract.BASE_URI_HOST, TodoProviderContract.TABLE_NAME, ALL_CONTENT);

@@ -2,7 +2,6 @@ package com.j.jface.feed;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.util.Log;
 
 import com.j.jface.Util;
 

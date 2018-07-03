@@ -305,7 +305,7 @@ class TodoList implements Iterable<Todo>, TodoUpdaterProxy, TodoSource.ListChang
   /*********************
    * Singleton behavior.
    *********************/
-  @Nullable static TodoList sList;
+  @Nullable static private TodoList sList;
   synchronized static public TodoList getInstance(@NonNull final Context context)
   {
     if (null == sList) sList = new TodoList(context);

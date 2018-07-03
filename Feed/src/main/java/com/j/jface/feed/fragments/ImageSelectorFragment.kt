@@ -13,7 +13,7 @@ import com.j.jface.lifecycle.FragmentWrapper
 import com.j.jface.lifecycle.WrappedFragment
 import com.j.jface.wear.Wear
 
-class ImageSelectorFragment(a : Args, val mWear : Wear) : WrappedFragment(a.inflater.inflate(R.layout.fragment_image_selector, a.container, false))
+class ImageSelectorFragment(a : Args, private val mWear : Wear) : WrappedFragment(a.inflater.inflate(R.layout.fragment_image_selector, a.container, false))
 {
   private val mFragment : Fragment = a.fragment
   private val mImageButton : ImageButton = mView.findViewById(R.id.select_image_button) as ImageButton
@@ -31,7 +31,7 @@ class ImageSelectorFragment(a : Args, val mWear : Wear) : WrappedFragment(a.infl
     (mView.findViewById(R.id.select_image_none) as Button).setOnClickListener { removeBackground() }
   }
 
-  fun onClickChangePicture()
+  private fun onClickChangePicture()
   {
     val intent = Intent()
     intent.type = "image/*"
@@ -49,7 +49,7 @@ class ImageSelectorFragment(a : Args, val mWear : Wear) : WrappedFragment(a.infl
      .commit()
   }
 
-  fun setImage(path : String, key : String, bitmap : Bitmap?)
+  private fun setImage(path : String, key : String, bitmap : Bitmap?)
   {
     mFragment.activity?.runOnUiThread {
       mImageButton.visibility = View.VISIBLE
@@ -61,7 +61,7 @@ class ImageSelectorFragment(a : Args, val mWear : Wear) : WrappedFragment(a.infl
     }
   }
 
-  fun removeBackground()
+  private fun removeBackground()
   {
     mWear.deleteData(Const.DATA_PATH + "/" + Const.CONFIG_KEY_BACKGROUND)
     mImageButton.setImageDrawable(mFragment.resources.getDrawable(R.drawable.black_box, mFragment.activity.theme))

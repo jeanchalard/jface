@@ -14,10 +14,8 @@ import com.j.jface.org.todo.TodoListView;
  */
 class TodoMover extends ItemTouchHelper.SimpleCallback
 {
-  @NonNull final TodoAdapter mAdapter;
-  @NonNull final TodoListView mList;
-
-  int mDestination = -1;
+  @NonNull private final TodoAdapter mAdapter;
+  @NonNull private final TodoListView mList;
 
   public TodoMover(@NonNull final TodoAdapter adapter, @NonNull final TodoListView list)
   {
@@ -31,7 +29,6 @@ class TodoMover extends ItemTouchHelper.SimpleCallback
     return true;
   }
 
-
   public void onMoved(@NonNull final RecyclerView recyclerView,
                       @NonNull final ViewHolder viewHolder, final int fromPos,
                       @NonNull final ViewHolder target, final int toPos,
@@ -40,9 +37,7 @@ class TodoMover extends ItemTouchHelper.SimpleCallback
     super.onMoved(recyclerView, viewHolder, fromPos, target, toPos, x, y);
     mList.moveTemporarily(fromPos, toPos);
     mAdapter.notifyItemMoved(fromPos, toPos);
-    mDestination = toPos;
   }
-
 
   @Override public boolean canDropOver(@NonNull final RecyclerView recyclerView, @NonNull final ViewHolder current, @NonNull final ViewHolder target)
   {
@@ -73,7 +68,7 @@ class TodoMover extends ItemTouchHelper.SimpleCallback
     final Todo todo = holder.todo();
     mList.startDragging(todo);
     holder.prepareViewForDrag();
-    mDestination = holder.getAdapterPosition();
+    holder.getAdapterPosition();
   }
 
   @Override public boolean isItemViewSwipeEnabled() { return false; }

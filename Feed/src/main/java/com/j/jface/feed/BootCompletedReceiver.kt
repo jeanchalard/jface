@@ -12,6 +12,8 @@ class BootCompletedReceiver : BroadcastReceiver()
 {
   override fun onReceive(context : Context, intent : Intent)
   {
+    if (intent.action != Intent.ACTION_BOOT_COMPLETED) return // Security suggestion from linter : spoofing countermeasure
+
 //    val job = JobInfo.Builder(path.hashCode(), ComponentName(context, FCMJobService::class.java))
 //     .setPersisted(true)
 //     .build()

@@ -7,6 +7,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 
 /**
@@ -217,8 +218,8 @@ public class TodoListView implements ListChangeObserver, TodoUpdaterProxy
   private static class RemovedRange
   {
     public final int start;
-    @NonNull public final ArrayList<Todo> todos;
-    public RemovedRange(final int start, @NonNull final Todo todo)
+    @NonNull private final ArrayList<Todo> todos;
+    private RemovedRange(final int start, @NonNull final Todo todo)
     {
       this.start = start;
       todos = new ArrayList<>();
@@ -294,7 +295,7 @@ public class TodoListView implements ListChangeObserver, TodoUpdaterProxy
     }
     if (null == closedParents) return false;
     final ArrayList<Todo> closedParentsList = new ArrayList<>(closedParents);
-    Collections.sort(closedParentsList, (o1, o2) -> Integer.compare(o1.depth, o2.depth));
+    closedParentsList.sort(Comparator.comparingInt(o -> o.depth));
     for (final Todo t : closedParents) toggleOpen(t);
     return true;
   }
@@ -310,23 +311,24 @@ public class TodoListView implements ListChangeObserver, TodoUpdaterProxy
       removeRange(index + 1, descendants, false);
     else
     {
-      final ArrayList<Todo> insertedDescendants = new ArrayList<Todo>();
+      final ArrayList<Todo> insertedDescendants = new ArrayList<>();
       for (final Todo t : descendants) if (isAllHierarchyOpen(t)) insertedDescendants.add(t);
       insertRange(index + 1, insertedDescendants, false);
     }
   }
 
-  public void dumpView(String tag)
+  private void dumpView(@NonNull final String tag)
   {
-    while (tag.length() < 20) tag += " ";
+    final StringBuilder tagg = new StringBuilder(tag);
+    while (tagg.length() < 20) tagg.append(" ");
     for (int i = 0; i < mView.size(); ++i)
     {
       final int l = mView.get(i);
       final Todo t = mList.get(l);
-      String s = "";
-      for (int k = t.depth; k > 0; --k) s = s + "  ";
-      s += t.text;
-      if (DEBUG_VIEW) Log.e(tag, String.format("> %02d %02d : %s", i, l, s));
+      final StringBuilder s = new StringBuilder();
+      for (int k = t.depth; k > 0; --k) s.append(" ");
+      s.append(t.text);
+      if (DEBUG_VIEW) Log.e(tagg.toString(), String.format("> %02d %02d : %s", i, l, s.toString()));
     }
   }
 
@@ -336,11 +338,11 @@ public class TodoListView implements ListChangeObserver, TodoUpdaterProxy
   private static class DragData
   {
     @NonNull final public Todo todo;
-    public final boolean openBeforeMove;
-    public final int indexInListBeforeMove;
-    public final int indexInViewBeforeMove;
-    public int currentIndexInView;
-    public DragData(@NonNull final Todo todo, final int indexInList, final int indexInView)
+    private final boolean openBeforeMove;
+    private final int indexInListBeforeMove;
+    private final int indexInViewBeforeMove;
+    private int currentIndexInView;
+    private DragData(@NonNull final Todo todo, final int indexInList, final int indexInView)
     {
       if (DEBUG_VIEW) Log.e("New DragData", todo.text + " = " + indexInView + ":" + indexInList);
       this.todo = todo;
@@ -411,7 +413,7 @@ public class TodoListView implements ListChangeObserver, TodoUpdaterProxy
     if (DEBUG_VIEW) dumpView("moved");
   }
 
-  public TodoCore moveTodoBetween(@NonNull final Todo todo, @Nullable final Todo prevTodo, @Nullable final Todo nextTodo)
+  private TodoCore moveTodoBetween(@NonNull final Todo todo, @Nullable final Todo prevTodo, @Nullable final Todo nextTodo)
   {
     if (DEBUG_VIEW) Log.e("Move todo between", todo.text + " → (" + (null == prevTodo ? "null" : prevTodo.text) + " ; " + (null == nextTodo ? "null" : nextTodo.text) + ")");
     final Todo parent;

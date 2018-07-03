@@ -30,7 +30,7 @@ public class PaletteView extends android.support.v7.widget.AppCompatImageView
 
   @NonNull final ArrayList<OnColorSetListener> mListeners = new ArrayList<>();
   public void addOnColorSetListener(@NonNull final OnColorSetListener listener) { mListeners.add(listener); }
-  public void removeOnSetColorSetListener(@NonNull final OnColorSetListener listener) { mListeners.remove(listener); }
+  public void removeOnColorSetListener(@NonNull final OnColorSetListener listener) { mListeners.remove(listener); }
 
   @Override public boolean onTouchEvent(@NonNull final MotionEvent event)
   {

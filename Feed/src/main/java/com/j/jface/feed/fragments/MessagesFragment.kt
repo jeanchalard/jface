@@ -48,7 +48,7 @@ class MessagesFragment(a : WrappedFragment.Args, private val mWear : Wear) : Wra
       val oldDistToEnd = (mUserMessageDataEdit.text?.length ?: 0) - mUserMessageDataEdit.selectionStart
       val userMessage = dataMap.getString(Const.DATA_KEY_USER_MESSAGE)
       if (null == userMessage) return@runOnUiThread
-      val starts = getLineStartOffsets(userMessage!!)
+      val starts = getLineStartOffsets(userMessage)
       val text = SpannableString(userMessage)
       val colors = dataMap.getIntegerArrayList(Const.DATA_KEY_USER_MESSAGE_COLORS)
       if (null != colors && starts.size == colors.size)

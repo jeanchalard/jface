@@ -9,7 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import static com.j.jface.lifecycle.WrappedFragment.*;
+import static com.j.jface.lifecycle.WrappedFragment.Args;
 
 public class FragmentWrapper<T extends WrappedFragment> extends Fragment
 {

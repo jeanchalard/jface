@@ -1,15 +1,14 @@
 package com.j.jface.lifecycle;
 
+import android.annotation.SuppressLint;
 import android.content.ContentProvider;
 import android.content.ContentValues;
-import android.content.Context;
-import android.content.pm.PathPermission;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 // The class that sanitizes the content provider lifecycle.
+@SuppressLint("Registered")
 public class ContentProviderWrapper<T extends WrappedContentProvider> extends ContentProvider
 {
   @Nullable private T mW;

@@ -4,12 +4,14 @@ import android.support.annotation.NonNull;
 
 import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
+import com.j.jface.action.NotificationAction;
 import com.j.jface.wear.Wear;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -53,12 +55,16 @@ public class FeedLoader
         statusData.putLong(Const.DATA_KEY_SUCCESSFUL_UPDATE_DATE, System.currentTimeMillis());
         statusData.putString(Const.DATA_KEY_LAST_STATUS, "Success");
       }
-      catch (@NonNull InstantiationException | IllegalAccessException | IOException | RuntimeException e)
+      catch (@NonNull InstantiationException | IllegalAccessException | IOException | ParseException | RuntimeException e)
       {
         statusData.putString(Const.DATA_KEY_LAST_STATUS, "Failure ; " + e.getMessage());
+        NotificationAction.Companion.postNotification(wear.getContext(), e.toString(), null);
       }
-      statusData.putLong(Const.DATA_KEY_STATUS_UPDATE_DATE, System.currentTimeMillis());
-      wear.putDataLocally(statusDataPath, statusData);
+      finally
+      {
+        statusData.putLong(Const.DATA_KEY_STATUS_UPDATE_DATE, System.currentTimeMillis());
+        wear.putDataLocally(statusDataPath, statusData);
+      }
     });
   }
 }

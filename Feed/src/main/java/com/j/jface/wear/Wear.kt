@@ -95,7 +95,7 @@ class Wear(val context : Context)
      .setPersisted(true)
      .build()
     val jobScheduler = c.getSystemService(JobScheduler::class.java)
-    Log.e("SCHEDULE", "" + jobScheduler.schedule(job))
+    Log.e("SCHEDULE", Integer.toString(jobScheduler.schedule(job)))
   }
 
   fun putDataToCloud(path : String,               v : DataMap)        = put(path, true) { map -> map.putAll(v) }

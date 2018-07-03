@@ -75,7 +75,7 @@ public class TodoEditor extends WrappedActivity
       mCalendarView.addDateChangeListener(this);
 
       mHardness.setOnItemSelectedListener(this);
-      final ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(rootView.getContext(), android.R.layout.simple_spinner_item, Todo.CONSTRAINT_NAMES);
+      final ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(rootView.getContext(), android.R.layout.simple_spinner_item, Todo.CONSTRAINT_NAMES);
       adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
       mConstraint.setAdapter(adapter);
       mConstraint.setOnItemSelectedListener(this);
@@ -106,7 +106,7 @@ public class TodoEditor extends WrappedActivity
       mCalendarView.setVisibility(View.GONE);
     }
 
-    @NonNull private static GregorianCalendar sRenderCalendar = new GregorianCalendar();
+    @NonNull private static final GregorianCalendar sRenderCalendar = new GregorianCalendar();
     private static String renderDate(final long date)
     {
       if (0 == date) return "—";
@@ -184,7 +184,7 @@ public class TodoEditor extends WrappedActivity
       mUpdater.updateTodo(mTodo);
     }
 
-    @Override public void onNothingSelected(AdapterView<?> parent)
+    @Override public void onNothingSelected(@NonNull final AdapterView<?> parent)
     {
       onItemSelected(parent, null, 0, 0);
     }

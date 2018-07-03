@@ -4,7 +4,6 @@ import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.j.jface.Const
-import com.j.jface.action.InformUserAction
 import com.j.jface.firebase.Firebase
 import com.j.jface.wear.Wear
 

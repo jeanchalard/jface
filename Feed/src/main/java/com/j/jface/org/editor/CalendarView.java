@@ -53,19 +53,19 @@ public class CalendarView extends LinearLayout implements NumericPicker.OnValueC
   public CalendarView(@NonNull final Context context, @Nullable final AttributeSet attrs)
   {
     super(context, attrs);
-    setOrientation(GridLayout.HORIZONTAL);
-    LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    setOrientation(LinearLayout.HORIZONTAL);
+    final LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     inflater.inflate(R.layout.calendar_view, this, true);
-    mMonthView = (TextView)findViewById(R.id.calendarView_monthName);
-    mDayTimeView = (TextView)findViewById(R.id.calendarView_dayTime);
-    mCalendarView = (CalendarGridView)findViewById(R.id.calendarView_gridView);
+    mMonthView = findViewById(R.id.calendarView_monthName);
+    mDayTimeView = findViewById(R.id.calendarView_dayTime);
+    mCalendarView = findViewById(R.id.calendarView_gridView);
     mCalendarView.mParent = this;
-    mDateView = (NumericPicker)findViewById(R.id.calendarView_date);
-    mHourView = (NumericPicker)findViewById(R.id.calendarView_hour);
-    mMinuteView = (NumericPicker)findViewById(R.id.calendarView_minute);
-    mResetDayButton = (TextView)findViewById(R.id.calendarView_resetDay);
-    mResetMinutesButton = (TextView)findViewById(R.id.calendarView_resetMinutes);
-    mClearButton = (Button)findViewById(R.id.calendarView_clear);
+    mDateView = findViewById(R.id.calendarView_date);
+    mHourView = findViewById(R.id.calendarView_hour);
+    mMinuteView = findViewById(R.id.calendarView_minute);
+    mResetDayButton = findViewById(R.id.calendarView_resetDay);
+    mResetMinutesButton = findViewById(R.id.calendarView_resetMinutes);
+    mClearButton = findViewById(R.id.calendarView_clear);
     mCalendar = new GregorianCalendar();
     mDateView.setMinValue(16000); mDateView.setMaxValue(Integer.MAX_VALUE);
     mHourView.setMinValue(0); mHourView.setMaxValue(23);
@@ -274,7 +274,7 @@ public class CalendarView extends LinearLayout implements NumericPicker.OnValueC
       setMeasuredDimension(7 * ((w - 1) / 7) + 1, 6 * ((h - 1) / 6) + 1);
     }
 
-    public boolean onTouchEvent(@NonNull final MotionEvent event)
+    @Override public boolean onTouchEvent(@NonNull final MotionEvent event)
     {
       if (MotionEvent.ACTION_UP != event.getAction()) return MotionEvent.ACTION_DOWN == event.getAction();
       final CalendarView parent = mParent;

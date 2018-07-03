@@ -28,7 +28,7 @@ import java.util.ArrayList;
 
 public class TodoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, TextWatcher, ListChangeObserver
 {
-  @NonNull final static TransitionSet expandCollapseTransition;
+  @NonNull private static final TransitionSet expandCollapseTransition;
 
   static
   {

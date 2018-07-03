@@ -8,14 +8,13 @@ import java.util.UUID;
 /**
  * A class representing a single TODO.
  */
-
 public class TodoCore implements Comparable<String>
 {
   public static final int UNKNOWN = 0;
 
   // Deadline hardnesses
-  public static final int SOFT_DEADLINE = 1; // Decided myself
-  public static final int SEMIHARD_DEADLINE = 2; // Important, but not the end of the world if missed
+  public static final int SOFT_DEADLINE = 1; // Decided myself but no practical reason for this specific date
+  public static final int SEMIHARD_DEADLINE = 2; // Significant but not crippling drawbacks if missed
   public static final int HARD_DEADLINE = 3; // Really needs to be done
 
   // Add other patterns here if ever necessary

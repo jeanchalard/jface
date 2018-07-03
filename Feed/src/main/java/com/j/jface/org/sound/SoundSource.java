@@ -36,7 +36,7 @@ public class SoundSource implements View.OnClickListener, RecognitionListener
   public SoundSource(@NonNull final Activity activity, @NonNull final ViewGroup soundSource)
   {
     mRouter = SoundRouter.Sink;
-    mSoundVisualizer = new SoundVisualizer(activity.getMainLooper(), (ViewGroup)soundSource.findViewById(R.id.sound_visualizer));
+    mSoundVisualizer = new SoundVisualizer(activity.getMainLooper(), soundSource.findViewById(R.id.sound_visualizer));
     mListeningIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
     mListeningIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "fr_FR");
     mListeningIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
@@ -61,6 +61,7 @@ public class SoundSource implements View.OnClickListener, RecognitionListener
   {
     mRouter = router;
   }
+
 
   // Core methods
 
