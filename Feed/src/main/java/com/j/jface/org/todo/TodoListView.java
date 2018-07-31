@@ -239,6 +239,11 @@ public class TodoListView implements ListChangeObserver, TodoUpdaterProxy
       Log.e("removeRange " + this, "" + position + " (" + (shiftExisting ? "shift" : "view") + ") : " + payload.size());
       for (final Todo t : payload) Log.e("removeRange " + this, t.text);
     }
+    // First : figure out what items in the view point to a element that was removed. To do this, iterate over all removed
+    // items in order and find their reference in the view ; if it's not referenced, the view isn't showing it and it should
+    // not be gathered, but if it is then take note. When taking note, look at whether the item that's being gathered is
+    // immediately at the end of the range that's being built : if it is, add it to that range, otherwise create a new
+    // range because it's not contiguous.
     final ArrayList<RemovedRange> ranges = new ArrayList<>();
     RemovedRange currentRange = null;
     int curPos = position;
@@ -254,12 +259,22 @@ public class TodoListView implements ListChangeObserver, TodoUpdaterProxy
       }
       else currentRange.add(t);
     }
+    // If shifting is necessary, then compute the index of the reference where the removed range (in the list, not the view) is
+    // starting. Because that range has been deleted, all the references after this should be updated because the index of their
+    // referent has been reduced by payload.size(), so shift by -payload.size(). The references of the items that have been
+    // removed are being shifted too from their old index (which at this time makes no sense, and points to some other item or
+    // to outside the list) to another index that makes no sense. It does not matter because they will be removed after the
+    // shift is complete.
     if (shiftExisting)
     {
       final int index = Collections.binarySearch(mView, position);
-      final int insertionPoint = index > 0 ? index : -index - 1;
+      final int insertionPoint = index >= 0 ? index : -index - 1;
       shiftView(insertionPoint, -payload.size());
     }
+    // Actually remove the references to the items that have been removed in the list. Iterate through the ranges that need to
+    // be removed from the view and remove the references the ranges refer to. For each range, recompute for the todo immediately
+    // before the removed item whether it's a leaf (all its children might have just been removed) and whether it's a last child
+    // (all its lower brethen may have just been removed).
     if (DEBUG_VIEW) dumpView("before removeRange " + this);
     for (final RemovedRange range : ranges)
     {
