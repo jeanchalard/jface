@@ -66,9 +66,10 @@ public class Todo extends TodoCore
               final int hardness,
               final int constraint,
               final int estimatedTime,
+              final long lastUpdateTime,
               @NonNull final TodoUI params)
   {
-    super(id, ord, creationTime, completionTime, text, depth, lifeline, deadline, hardness, constraint, estimatedTime);
+    super(id, ord, creationTime, completionTime, text, depth, lifeline, deadline, hardness, constraint, estimatedTime, lastUpdateTime);
     ui = params;
   }
 
@@ -99,6 +100,7 @@ public class Todo extends TodoCore
     private int hardness;
     private int constraint;
     private int estimatedTime;
+    private long lastUpdateTime;
     @Nullable public Todo parent;
     public boolean open;
     public boolean allHierarchyOpen;
@@ -119,6 +121,7 @@ public class Todo extends TodoCore
       hardness = todoCore.hardness;
       constraint = todoCore.constraint;
       estimatedTime = todoCore.estimatedTime;
+      lastUpdateTime = todoCore.lastUpdateTime;
       if (todoCore instanceof Todo)
       {
         final Todo todo = (Todo)todoCore;
@@ -146,6 +149,7 @@ public class Todo extends TodoCore
     public Builder setHardness(final int hardness) { this.hardness = hardness; return this; }
     public Builder setConstraint(final int constraint) { this.constraint = constraint; return this; }
     public Builder setEstimatedTime(final int estimatedTime) { this.estimatedTime = estimatedTime; return this; }
+    public Builder setLastUpdateTime(final long lastUpdateTime) { this.lastUpdateTime = lastUpdateTime; return this; }
     public Builder setParent(@Nullable final Todo parent) { this.parent = parent; return this; }
     public Builder setOpen(final boolean open) { this.open = open; return this; }
     public Builder setLeaf(final boolean leaf) { this.leaf = leaf; return this; }
@@ -155,7 +159,7 @@ public class Todo extends TodoCore
     {
       final TodoUI ui = new TodoUI(parent, open, lastChild);
       ui.leaf = leaf;
-      return new Todo(id, ord, creationTime, completionTime, text, depth, lifeline, deadline, hardness, constraint, estimatedTime, ui);
+      return new Todo(id, ord, creationTime, completionTime, text, depth, lifeline, deadline, hardness, constraint, estimatedTime, lastUpdateTime, ui);
     }
   }
 

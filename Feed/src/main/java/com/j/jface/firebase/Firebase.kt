@@ -239,16 +239,17 @@ object Firebase
 }
 
 fun DocumentSnapshot.toTodoCore() = TodoCore(this.getString("id"),
-   this.getString("ord"),
-   this.getLong("creationTime"),
-   this.getLong("completionTime"),
-   this.get("text") as String,
-   this.getLong("depth").toInt(),
-   this.getLong("lifeline"),
-   this.getLong("deadline"),
-   this.getLong("hardness").toInt(),
-   this.getLong("constraint").toInt(),
-   this.getLong("estimatedTime").toInt())
+ this.getString("ord"),
+ this.getLong("creationTime"),
+ this.getLong("completionTime"),
+ this.get("text") as String,
+ this.getLong("depth").toInt(),
+ this.getLong("lifeline"),
+ this.getLong("deadline"),
+ this.getLong("hardness").toInt(),
+ this.getLong("constraint").toInt(),
+ this.getLong("estimatedTime").toInt(),
+ this.getLong("lastUpdateTime").toLong()
 
 fun DocumentSnapshot.toDataMap() = DataMap().apply {
   this@toDataMap.data.forEach {

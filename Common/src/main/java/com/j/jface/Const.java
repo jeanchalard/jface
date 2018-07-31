@@ -62,7 +62,8 @@ public class Const
   @NonNull public static final String EXTRA_FONT_SIZE = "fontSize";
   @NonNull public static final String EXTRA_PATH = "path";
   @NonNull public static final String EXTRA_WEAR_DATA = "wearData";
-  @NonNull public static final String EXTRA_SPLIT_TODOS = "splitTodos";
+
+  @NonNull public static final String EXTRA_TODO_SUBITEMS = "todoSubitems";
 
   @NonNull public static final String 日比谷線_北千住_平日 = "日比谷線・北千住・平日";
   @NonNull public static final String 日比谷線_北千住_休日 = "日比谷線・北千住・休日";

@@ -79,7 +79,8 @@ public class TodoSource implements Firebase.TodoUpdateListener.Listener
          c.getInt(TodoProviderContract.COLUMNINDEX_deadline),
          c.getInt(TodoProviderContract.COLUMNINDEX_hardness),
          c.getInt(TodoProviderContract.COLUMNINDEX_constraint),
-         c.getInt(TodoProviderContract.COLUMNINDEX_estimatedTime));
+         c.getInt(TodoProviderContract.COLUMNINDEX_estimatedTime),
+         c.getLong(TodoProviderContract.COLUMNINDEX_updateTime));
         c.moveToNext();
         todos.add(t);
         // Uncomment to write the local DB to remote
@@ -103,7 +104,6 @@ public class TodoSource implements Firebase.TodoUpdateListener.Listener
     cv.put(TodoProviderContract.COLUMN_id, todo.id);
     cv.put(TodoProviderContract.COLUMN_ord, todo.ord);
     cv.put(TodoProviderContract.COLUMN_creationTime, todo.creationTime);
-    cv.put(TodoProviderContract.COLUMN_updateTime, System.currentTimeMillis());
     cv.put(TodoProviderContract.COLUMN_completionTime, todo.completionTime);
     cv.put(TodoProviderContract.COLUMN_text, todo.text);
     cv.put(TodoProviderContract.COLUMN_depth, todo.depth);
@@ -112,6 +112,7 @@ public class TodoSource implements Firebase.TodoUpdateListener.Listener
     cv.put(TodoProviderContract.COLUMN_hardness, todo.hardness);
     cv.put(TodoProviderContract.COLUMN_constraint, todo.constraint);
     cv.put(TodoProviderContract.COLUMN_estimatedTime, todo.estimatedTime);
+    cv.put(TodoProviderContract.COLUMN_updateTime, System.currentTimeMillis());
     return cv;
   }
 

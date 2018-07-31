@@ -1,13 +1,10 @@
 package com.j.jface.org.notif
 
-import android.app.*
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
-import android.content.Intent
-import android.graphics.drawable.Icon
-import com.j.jface.Const
 import com.j.jface.R
 import com.j.jface.nextNotifId
-import com.j.jface.org.AuthTrampolineJOrgBoot
 import com.j.jface.org.todo.TodoCore
 
 const val CHANNEL_ID = "jorg_todo"
@@ -26,7 +23,7 @@ class NotifEngine(val context : Context)
 
   companion object
   {
-    private fun getChannel(context : Context, notificationManager : NotificationManager) : NotificationChannel
+    internal fun getChannel(context : Context, notificationManager : NotificationManager) : NotificationChannel
     {
       val existing = notificationManager.getNotificationChannel(CHANNEL_ID)
       if (null != existing) return existing
@@ -41,43 +38,10 @@ class NotifEngine(val context : Context)
     }
   }
 
-  private fun PendingIntentForActivity(k : Class<*>, resultCode : Int) : PendingIntent
-   = PendingIntent.getActivity(context, resultCode, Intent(context, k), PendingIntent.FLAG_ONE_SHOT)
-
-  private fun buildSplitNotificationAction() : Notification.Action
-  {
-    val icon = Icon.createWithResource(context, R.drawable.ic_clear_white_24dp)
-    val intent = PendingIntentForActivity(AuthTrampolineJOrgBoot::class.java, Const.NOTIFICATION_RESULT_CODE)
-    return Notification.Action.Builder(icon, "Components", intent)
-     .addRemoteInput(RemoteInput.Builder(Const.EXTRA_SPLIT_TODOS)
-      .setAllowFreeFormInput(true)
-      .build())
-     .build()
-  }
-
-  private fun buildSplitNotification(todo : TodoCore, notificationManager : NotificationManager) : Notification
-  {
-    return Notification.Builder(context, getChannel(context, notificationManager).id)
-     .setShowWhen(true)
-     .setWhen(System.currentTimeMillis())
-     .setSmallIcon(R.drawable.jormungand)
-     .setColor(context.getColor(R.color.jormungand_color))
-     .setContentTitle("Split todo : " + todo.text)
-     .setOnlyAlertOnce(true)
-     .setCategory(Notification.CATEGORY_REMINDER)
-     .setVisibility(Notification.VISIBILITY_SECRET)
-     .addAction(buildSplitNotificationAction())
-    //.setContentIntent()
-    //.setDeleteIntent() // when dismissed
-    //.setCustomRemoveViews() // bazooka
-    //.extend(WearableExtender) // <a href="{@docRoot}wear/notifications/creating.html">Creating Notifications for Android Wear</a>
-     .build()
-  }
-
   fun splitNotification(todo : TodoCore)
   {
     val notificationManager = context.getSystemService(NotificationManager::class.java) as NotificationManager
-    val notification = buildSplitNotification(todo, notificationManager)
+    val notification = SplitNotification(context).buildSplitNotification(todo, notificationManager)
     val id = context.nextNotifId(LAST_NOTIF_ID)
     notificationManager.notify(id, notification)
   }

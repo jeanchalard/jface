@@ -11,14 +11,17 @@ import android.widget.TextView
 import com.j.jface.Const
 import com.j.jface.R
 import com.j.jface.lifecycle.ActivityWrapper
+import com.j.jface.lifecycle.AuthTrampoline
 import com.j.jface.lifecycle.WrappedActivity
 import com.j.jface.org.todo.Todo
 import com.j.jface.org.todo.TodoUpdaterProxy
 import java.util.*
 
 // An activity that provides detailed editing for a single Todo.
+class AuthTrampolineTodoEditorBoot : ActivityWrapper<AuthTrampolineTodoEditor>()
+class AuthTrampolineTodoEditor(args : WrappedActivity.Args) : AuthTrampoline(args) { override val trampolineDestination get() = TodoEditorBoot::class.java }
 class TodoEditorBoot : ActivityWrapper<TodoEditor>()
-class TodoEditor protected constructor(a : WrappedActivity.Args) : WrappedActivity(a)
+class TodoEditor(a : WrappedActivity.Args) : WrappedActivity(a)
 {
   private val mDetails : TodoDetails
 
@@ -36,6 +39,11 @@ class TodoEditor protected constructor(a : WrappedActivity.Args) : WrappedActivi
 
     title.text = todo.text
     mDetails = TodoDetails(updaterProxy, todo, mA.findViewById(R.id.todoEditor_details))
+  }
+
+  companion object
+  {
+    fun activityClass() = AuthTrampolineTodoEditorBoot::class.java
   }
 
   class TodoDetails(private val mUpdater : TodoUpdaterProxy, private var mTodo : Todo, private val mRootView : ViewGroup) : CalendarView.DateChangeListener, View.OnClickListener, AdapterView.OnItemSelectedListener, NumericPicker.OnValueChangeListener
@@ -171,7 +179,6 @@ class TodoEditor protected constructor(a : WrappedActivity.Args) : WrappedActivi
 
     companion object
     {
-
       private val sRenderCalendar = GregorianCalendar()
       private fun renderDate(date : Long) : String
       {

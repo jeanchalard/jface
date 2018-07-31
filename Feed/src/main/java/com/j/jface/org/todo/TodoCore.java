@@ -37,6 +37,7 @@ public class TodoCore implements Comparable<String>
   public final int hardness; // UNKNOWN or *_DEADLINE
   public final int constraint; // ANY or ON_*
   public final int estimatedTime;
+  public final long lastUpdateTime;
 
   public TodoCore(@Nullable final String id,
                   @NonNull final String ord,
@@ -48,7 +49,8 @@ public class TodoCore implements Comparable<String>
                   final long deadline,
                   final int hardness,
                   final int constraint,
-                  final int estimatedTime)
+                  final int estimatedTime,
+                  final long lastUpdateTime)
   {
     this.id = null == id ? UUID.randomUUID().toString() : id;
     this.ord = ord;
@@ -61,11 +63,12 @@ public class TodoCore implements Comparable<String>
     this.hardness = hardness;
     this.constraint = constraint;
     this.estimatedTime = estimatedTime;
+    this.lastUpdateTime = lastUpdateTime;
   }
 
   public TodoCore(@NonNull final String text, @NonNull final String ord)
   {
-    this(null, ord, System.currentTimeMillis(), 0, text, 0, 0, 0, UNKNOWN, UNKNOWN, -1);
+    this(null, ord, System.currentTimeMillis(), 0, text, 0, 0, 0, UNKNOWN, UNKNOWN, -1, System.currentTimeMillis());
   }
 
   public int compareTo(@NonNull final String otherOrd)
@@ -87,7 +90,8 @@ public class TodoCore implements Comparable<String>
      && other.deadline == deadline
      && other.hardness == hardness
      && other.constraint == constraint
-     && other.estimatedTime == estimatedTime;
+     && other.estimatedTime == estimatedTime
+     && other.lastUpdateTime == lastUpdateTime;
   }
 
   private static final char SEPARATOR_ORD = ' ';

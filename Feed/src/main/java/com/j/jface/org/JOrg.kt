@@ -1,5 +1,6 @@
 package com.j.jface.org
 
+import android.app.RemoteInput
 import android.content.Intent
 import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.FloatingActionButton
@@ -25,7 +26,7 @@ import com.j.jface.lifecycle.ActivityWrapper
 import com.j.jface.lifecycle.AppCompatActivityWrapper
 import com.j.jface.lifecycle.AuthTrampoline
 import com.j.jface.lifecycle.WrappedActivity
-import com.j.jface.org.editor.TodoEditorBoot
+import com.j.jface.org.editor.TodoEditor
 import com.j.jface.org.notif.NotifEngine
 import com.j.jface.org.sound.EditTextSoundRouter
 import com.j.jface.org.sound.SoundSource
@@ -63,6 +64,9 @@ class JOrg(args : WrappedActivity.Args) : WrappedActivity(args)
     mRecyclerView.addItemDecoration(DividerItemDecoration(mA, (mRecyclerView.layoutManager as LinearLayoutManager).orientation))
     val fab = mA.findViewById<FloatingActionButton>(R.id.addTodo)
     fab.setOnClickListener { _ -> addNewSubTodo(null) }
+
+    val editedTodoId = mA.intent.getStringExtra(Const.EXTRA_TODO_ID)
+    val editedTodoSubitems = RemoteInput.getResultsFromIntent(mA.intent)?.getString(Const.EXTRA_TODO_SUBITEMS)?.split(",")
 
     val executor = Executors.newSingleThreadExecutor()
     executor.submit(Callable {
@@ -138,7 +142,7 @@ class JOrg(args : WrappedActivity.Args) : WrappedActivity(args)
 
   fun startTodoEditor(todo : Todo)
   {
-    val editorIntent = Intent(mA, TodoEditorBoot::class.java)
+    val editorIntent = Intent(mA, TodoEditor.activityClass())
     editorIntent.putExtra(Const.EXTRA_TODO_ID, todo.id)
     mA.startActivity(editorIntent)
   }
@@ -158,5 +162,10 @@ class JOrg(args : WrappedActivity.Args) : WrappedActivity(args)
   private fun scheduleBackup()
   {
     // TODO : implement this
+  }
+
+  companion object
+  {
+    fun activityClass() = AuthTrampolineJOrgBoot::class.java
   }
 }

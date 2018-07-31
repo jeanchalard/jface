@@ -63,24 +63,33 @@
     </activity>
 
     <activity
-      android:name=".feed.JFaceDataFeedBoot"
-      android:allowBackup="true"
-      android:icon="@drawable/ic_launcher"
-      android:label="@string/app_name"
-      android:theme="@style/Theme.Base"
-      android:taskAffinity="com.j.jface.feed.Feed" />
+     android:name=".org.JOrgBoot"
+     android:label="@string/orgtool_name"
+     android:icon="@drawable/jormungand"
+     android:windowSoftInputMode="stateHidden"
+     android:taskAffinity="com.j.jface.org.JOrg" />
 
     <activity
-      android:name=".org.JOrgBoot"
-      android:label="@string/orgtool_name"
-      android:icon="@drawable/jormungand"
-      android:windowSoftInputMode="stateHidden"
-      android:taskAffinity="com.j.jface.org.JOrg" />
+     android:name=".feed.JFaceDataFeedBoot"
+     android:allowBackup="true"
+     android:icon="@drawable/ic_launcher"
+     android:label="@string/app_name"
+     android:theme="@style/Theme.Base"
+     android:taskAffinity="com.j.jface.feed.Feed" />
 
     <activity
-      android:name=".org.editor.TodoEditorBoot"
-      android:label="Todo editor"
-      android:theme="@style/Dialog">
+     android:name=".org.editor.AuthTrampolineTodoEditorBoot"
+     android:label="Todo editor"
+     android:windowSoftInputMode="stateHidden"
+     android:taskAffinity="com.j.jface.org.JOrg">
+    </activity>
+
+    <activity
+     android:name=".org.editor.TodoEditorBoot"
+     android:label="Todo editor"
+     android:theme="@style/Dialog"
+     android:windowSoftInputMode="stateHidden"
+     android:taskAffinity="com.j.jface.org.JOrg">
     </activity>
 
     <provider
