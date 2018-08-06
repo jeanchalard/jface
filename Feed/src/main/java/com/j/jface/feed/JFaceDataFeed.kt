@@ -88,7 +88,7 @@ class JFaceDataFeed(args : WrappedActivity.Args) : WrappedActivity(args)
     return mDrawerToggle.onOptionsItemSelected(i)
   }
 
-  override fun onPostCreate(b : Bundle)
+  override fun onPostCreate(b : Bundle?)
   {
     mDrawerToggle.syncState()
     if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(mA, Manifest.permission.ACCESS_FINE_LOCATION))

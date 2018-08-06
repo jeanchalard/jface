@@ -80,7 +80,9 @@ abstract class AuthTrampoline(args : WrappedActivity.Args) : WrappedActivity(arg
 
   private fun finish()
   {
-    context.startActivity(mA.intent.apply { setClass(mA, trampolineDestination) })
+    val intent = if (mA.intent.hasCategory(Intent.CATEGORY_LAUNCHER)) Intent() else mA.intent
+    intent.setClass(mA, trampolineDestination)
+    context.startActivity(intent)
     context.finish()
   }
   override fun onDestroy() = executor.shutdown()
