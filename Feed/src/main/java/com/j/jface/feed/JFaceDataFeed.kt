@@ -26,6 +26,8 @@ import com.j.jface.lifecycle.FragmentWrapper
 import com.j.jface.lifecycle.WrappedActivity
 import com.j.jface.wear.Wear
 
+@Suppress("UNUSED_ANONYMOUS_PARAMETER")
+
 const val LAST_OPEN_FRAGMENT_INDEX = "last_open_fragment_index"
 
 class AuthTrampolineJFaceDataFeedBoot : ActivityWrapper<AuthTrampolineJFaceDataFeed>()

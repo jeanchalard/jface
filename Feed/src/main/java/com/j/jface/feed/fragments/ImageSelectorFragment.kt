@@ -49,6 +49,7 @@ class ImageSelectorFragment(a : Args, private val mWear : Wear) : WrappedFragmen
      .commit()
   }
 
+  @Suppress("UNUSED_PARAMETER")
   private fun setImage(path : String, key : String, bitmap : Bitmap?)
   {
     mFragment.activity?.runOnUiThread {

@@ -62,7 +62,7 @@ class Wear(val context : Context)
   fun getDataSynchronously(path : String) : DataMap = getData(path).await()
   fun getBitmap(path : String, key :String, callback : (String, String, Bitmap?) -> Unit) = getBitmap(path, key).addOnCompleteListener(ex) { callback(path, key, it.orNull()) }
   fun getNodeName(context : Context, callback : (String) -> Unit) = Wearable.getNodeClient(context).localNode.addOnCompleteListener {
-      callback(if (null == it || !it.isSuccessful) "Error getting node name" else it.result.run { (id ?: "") + (displayName ?: "") })
+      callback(if (!it.isSuccessful) "Error getting node name" else it.result.run { (id ?: "") + (displayName ?: "") })
   }
 
   // Puts
