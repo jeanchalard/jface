@@ -249,7 +249,7 @@ fun DocumentSnapshot.toTodoCore() = TodoCore(this.getString("id"),
  this.getLong("hardness").toInt(),
  this.getLong("constraint").toInt(),
  this.getLong("estimatedTime").toInt(),
- this.getLong("lastUpdateTime").toLong()
+ this.getLong("lastUpdateTime").toLong())
 
 fun DocumentSnapshot.toDataMap() = DataMap().apply {
   this@toDataMap.data.forEach {
