@@ -25,6 +25,7 @@ class FCMHandler : FirebaseInstanceIdService()
     private fun getConnectionDataForPath(path : String) : Pair<HttpURLConnection, String>?
     {
       val (key, listeners) = Firebase.getAccessKeyAndWearListenersSynchronously()
+      Log.e("Sending to listeners", "${key} : " + listeners.joinToString(","))
       if (key.isEmpty() || listeners.isEmpty()) return null
       val payload = JSONObject().apply {
         put("to", listeners[0])
@@ -44,14 +45,18 @@ class FCMHandler : FirebaseInstanceIdService()
 
     @WorkerThread fun sendFCMMessageForWearPathNow(path : String) : Boolean
     {
-      try {
+      Log.e("sendFCMMessageNow", "path = " + path)
+      try
+      {
         val (cx, payload) = getConnectionDataForPath(path) ?: return false
         OutputStreamWriter(cx.outputStream).use { it.write(payload) }
         cx.connect()
-        Log.i("Firebase messaging → code : ", "" + cx.responseCode)
+        Log.e("Firebase messaging → code : ", "" + cx.responseCode)
         InputStreamReader(cx.inputStream).use { Log.i("FCM server response", it.readText()) }
         return true
-      } catch (e : IOException) {
+      }
+      catch (e : IOException)
+      {
         return false
       }
     }

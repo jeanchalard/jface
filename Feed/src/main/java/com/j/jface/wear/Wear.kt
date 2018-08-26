@@ -75,7 +75,7 @@ class Wear(val context : Context)
     // hasConnectedNodes is a Task that almost certainly completed by now, but if not well
     // this will just send the message anyway which is harmless. The reason to test for isComplete
     // here is to guarantee result() will not block, not that it would be problematic but this
-    // will crash if called on the main thread and is would block.
+    // will crash if called on the main thread and would block.
     if (hasConnectedNodes.isComplete && hasConnectedNodes.result)
       Firebase.updateWearData(path, data.dataMap)
     else

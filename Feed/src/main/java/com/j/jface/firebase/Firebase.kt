@@ -141,10 +141,21 @@ object Firebase
             for (l in listeners)
               l.onTodoUpdated(doc.type, updatedTodo)
             val index = tl.binarySearch(updatedTodo, Comparator.comparing(TodoCore::ord))
-            if (index > 0)
-              tl[index] = updatedTodo
+            if (index >= 0)
+            {
+              if (doc.type == DocumentChange.Type.REMOVED)
+                tl.removeAt(index) // Removal of an existing Todo
+              else
+              {
+                assert(doc.type == DocumentChange.Type.MODIFIED)
+                tl[index] = updatedTodo
+              }
+            }
             else // It's an insertion of a new todo.
+            {
+              assert(doc.type == DocumentChange.Type.ADDED)
               tl.add(-index - 1, updatedTodo)
+            }
           }
         }
         todoList = tl
