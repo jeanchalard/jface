@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import com.j.jface.Const
 import com.j.jface.R
+import com.j.jface.org.AutomaticEditorProcessor
 import com.j.jface.org.JOrg
 import com.j.jface.org.editor.TodoEditor
 import com.j.jface.org.todo.TodoCore
@@ -40,9 +41,9 @@ class SplitNotification(val context : Context)
 
   private fun buildSplitNotificationAction(todo : TodoCore) : Notification.Action
   {
-    val intent = Intent(context, JOrg.activityClass())
+    val intent = Intent(context, AutomaticEditorProcessor.Receiver::class.java)
     intent.putExtra(Const.EXTRA_TODO_ID, todo.id)
-    val pendingIntent = PendingIntent.getActivity(context, Const.NOTIFICATION_RESULT_CODE, intent, PendingIntent.FLAG_ONE_SHOT)
+    val pendingIntent = PendingIntent.getBroadcast(context, Const.NOTIFICATION_RESULT_CODE, intent, PendingIntent.FLAG_ONE_SHOT)
     return Notification.Action.Builder(null, "Subitems", pendingIntent)
      .addRemoteInput(RemoteInput.Builder(Const.EXTRA_TODO_SUBITEMS)
       .setAllowFreeFormInput(true)

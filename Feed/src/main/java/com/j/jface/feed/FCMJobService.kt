@@ -5,19 +5,17 @@ import android.app.job.JobService
 import android.util.Log
 import com.j.jface.Const
 import com.j.jface.firebase.Firebase
+import com.j.jface.lifecycle.CommonObjects
 import com.j.jface.toDataMap
 import com.j.jface.wear.addOnCompleteListener
-import java.util.concurrent.Executors
 
 class FCMJobService : JobService()
 {
-  companion object { private val ex = Executors.newSingleThreadExecutor() }
-
   override fun onStartJob(params : JobParameters?) : Boolean
   {
     Log.e("START JOB", "" + params)
     if (null == params) return true // true means work is finished
-    ex.execute {
+    CommonObjects.executor.execute {
       val success = try
       {
         val path = params.extras.getString(Const.EXTRA_PATH)
@@ -26,7 +24,7 @@ class FCMJobService : JobService()
         // If the message does not seem to arrive, do check the FCM server key is
         // correctly stored in /JOrg/jface/Conf/Conf/key. The value is in the
         // Firebase console, Gear icon > Settings > Cloud messaging > Server key
-        future.addOnCompleteListener(ex) { FCMHandler.sendFCMMessageForWearPathNow(path) }
+        future.addOnCompleteListener(CommonObjects.executor) { FCMHandler.sendFCMMessageForWearPathNow(path) }
         true // Success
       }
       catch (e : Exception)

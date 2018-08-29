@@ -88,6 +88,11 @@
      android:taskAffinity="com.j.jface.org.JOrg">
     </activity>
 
+    <receiver android:name=".org.AutomaticEditorProcessor$Receiver" />
+    <service
+     android:name=".org.AutomaticEditorProcessor"
+     android:permission="android.permission.BIND_JOB_SERVICE" />
+
     <provider
       android:authorities="com.j.jface.provider"
       android:exported="false"

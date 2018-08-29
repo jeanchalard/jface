@@ -15,7 +15,7 @@ class DebugActivity(args : WrappedActivity.Args) : WrappedActivity(args)
     val lv = TodoListReadonlyFullView(mA)
     mA.setContentView(R.layout.debug_activity)
     mA.findViewById<Button>(R.id.try_notif).setOnClickListener {
-      val todo = lv[4]
+      val todo = lv[0]
       NotifEngine(mA).splitNotification(todo)
     }
   }
