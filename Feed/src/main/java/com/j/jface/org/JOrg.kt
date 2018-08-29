@@ -67,7 +67,6 @@ class JOrg(args : WrappedActivity.Args) : WrappedActivity(args)
     fab.setOnClickListener { _ -> addNewSubTodo(null) }
 
     val editedTodoId : String? = mA.intent.getStringExtra(Const.EXTRA_TODO_ID)
-    val editedTodoSubitems = RemoteInput.getResultsFromIntent(mA.intent)?.getString(Const.EXTRA_TODO_SUBITEMS)?.split(",")
     if (null == editedTodoId) mA.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
 
     val executor = Executors.newSingleThreadExecutor()

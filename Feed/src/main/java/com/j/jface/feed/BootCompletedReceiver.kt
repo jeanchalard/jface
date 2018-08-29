@@ -1,12 +1,8 @@
 package com.j.jface.feed
 
-import android.app.job.JobInfo
-import android.app.job.JobScheduler
 import android.content.BroadcastReceiver
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 
 class BootCompletedReceiver : BroadcastReceiver()
 {
