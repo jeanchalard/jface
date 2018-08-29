@@ -78,17 +78,17 @@ public class TestMovesInView
     assertEquals(todoList, source.fetchTodoList());
   }
 
-  public void helperMoveXBeforeY(final TodoListView listView, final Todo tx, final Todo ty)
+  public void helperMoveXBeforeY(final TodoListFoldableView listView, final Todo tx, final Todo ty)
   {
     if (null != ty && ty.ord.startsWith(tx.ord) && tx != ty) return; // Don't try to order a todo after one if its children, it makes no sense
-    final int x = listView.findByOrd(tx.ord);
-    final int fy = null == ty ? listView.size() - 1 : listView.findByOrd(ty.ord);
+    final int x = listView.findIndexByOrd(tx.ord);
+    final int fy = null == ty ? listView.size() - 1 : listView.findIndexByOrd(ty.ord);
     if (x < 0 || fy < 0) return; // At least one of these Todos are not visible because a parent is closed
 //    Log.e("TESTING", "   " + x + " (" + tx.text + ") → " + fy + " (" + (null == ty ? "null" : ty.text) + ")");
     listView.startDragging(tx);
     // StartDragging may have changed indices. It can't have changed x (as it only collapses stuff under the dragged Todo and x is
     // that one) but if y is below x and x was not a leaf then the index for y will have changed. Find the new y.
-    final int y = null == ty ? listView.size() - 1 : listView.findByOrd(ty.ord);
+    final int y = null == ty ? listView.size() - 1 : listView.findIndexByOrd(ty.ord);
     final int dir = x < y ? 1 : -1;
     for (int cur = x; cur != y; cur += dir)
       listView.moveTemporarily(cur, cur + dir);
@@ -112,7 +112,7 @@ public class TestMovesInView
     Log.e("TESTING", "moving " + movedIndex + " → " + destination);
     resetDB();
     final TodoList l = TodoList.getInstance(mContext);
-    final TodoListView listView = new TodoListView(l);
+    final TodoListFoldableView listView = new TodoListFoldableView(l);
     // Apply openables. The openablesState array is already in large to small order.
     for (int index : openablesState)
       if (index < 0)
@@ -158,7 +158,7 @@ public class TestMovesInView
   {
     final long startTime = System.currentTimeMillis();
     final TodoList list = TodoList.getInstance(mContext);
-    final TodoListView listView = new TodoListView(list);
+    final TodoListView listView = new TodoListFoldableView(list);
     final ArrayList<Integer> openablesIndices = new ArrayList<>();
     final int size = listView.size();
     for (int i = size - 1 ; i >= 0; --i)

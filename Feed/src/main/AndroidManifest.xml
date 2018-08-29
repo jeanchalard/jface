@@ -54,7 +54,6 @@
      android:name=".org.AuthTrampolineJOrgBoot"
      android:label="@string/orgtool_name"
      android:icon="@drawable/jormungand"
-     android:windowSoftInputMode="stateHidden"
      android:taskAffinity="com.j.jface.org.JOrg">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
@@ -66,7 +65,6 @@
      android:name=".org.JOrgBoot"
      android:label="@string/orgtool_name"
      android:icon="@drawable/jormungand"
-     android:windowSoftInputMode="stateHidden"
      android:taskAffinity="com.j.jface.org.JOrg" />
 
     <activity
@@ -80,7 +78,6 @@
     <activity
      android:name=".org.editor.AuthTrampolineTodoEditorBoot"
      android:label="Todo editor"
-     android:windowSoftInputMode="stateHidden"
      android:taskAffinity="com.j.jface.org.JOrg">
     </activity>
 
@@ -88,7 +85,6 @@
      android:name=".org.editor.TodoEditorBoot"
      android:label="Todo editor"
      android:theme="@style/Dialog"
-     android:windowSoftInputMode="stateHidden"
      android:taskAffinity="com.j.jface.org.JOrg">
     </activity>
 

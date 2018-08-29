@@ -7,7 +7,7 @@ import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
 import com.j.jface.org.todo.Todo;
-import com.j.jface.org.todo.TodoListView;
+import com.j.jface.org.todo.TodoListFoldableView;
 
 /**
  * An implementation of the item touch helper to move Todos in the list.
@@ -15,9 +15,9 @@ import com.j.jface.org.todo.TodoListView;
 class TodoMover extends ItemTouchHelper.SimpleCallback
 {
   @NonNull private final TodoAdapter mAdapter;
-  @NonNull private final TodoListView mList;
+  @NonNull private final TodoListFoldableView mList;
 
-  public TodoMover(@NonNull final TodoAdapter adapter, @NonNull final TodoListView list)
+  public TodoMover(@NonNull final TodoAdapter adapter, @NonNull final TodoListFoldableView list)
   {
     super(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0);
     mAdapter = adapter;

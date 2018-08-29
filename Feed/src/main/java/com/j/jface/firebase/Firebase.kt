@@ -1,5 +1,6 @@
 package com.j.jface.firebase
 
+import android.util.Log
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -14,6 +15,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.*
 import com.j.jface.Const
 import com.j.jface.R
+import com.j.jface.Util
 import com.j.jface.lifecycle.AuthTrampoline
 import com.j.jface.org.todo.TodoCore
 import java.util.concurrent.ExecutionException
@@ -111,7 +113,11 @@ object Firebase
     }
   }
 
-  fun updateTodo(todo : TodoCore) = db.document(Const.DB_APP_TOP_PATH).collection(Const.DB_ORG_TOP).document(todo.id).set(todo)
+  fun updateTodo(todo : TodoCore)
+  {
+    Log.e("UPDATED TODO ${todo.text}", Util.getStackTrace(30))
+    db.document(Const.DB_APP_TOP_PATH).collection(Const.DB_ORG_TOP).document(todo.id).set(todo)
+  }
   object TodoUpdateListener : EventListener<QuerySnapshot>
   {
     interface Listener { fun onTodoUpdated(type : DocumentChange.Type, todo : TodoCore) }

@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import com.j.jface.org.sound.EditTextSoundRouter;
 import com.j.jface.org.todo.ListChangeObserver;
 import com.j.jface.org.todo.Todo;
-import com.j.jface.org.todo.TodoListView;
+import com.j.jface.org.todo.TodoListFoldableView;
 
 import java.util.ArrayList;
 
@@ -22,13 +22,13 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder>
   @NonNull private final JOrg mJorg;
   @NonNull private final EditTextSoundRouter mRouter;
   @NonNull private final LayoutInflater mInflater;
-  @NonNull private final TodoListView mTodoList;
+  @NonNull private final TodoListFoldableView mTodoList;
   @NonNull private final RecyclerView mRecyclerView;
   @Nullable private Todo mExpectFocus;
   public TodoAdapter(@NonNull final JOrg jorg,
                      @NonNull final Context context,
                      @NonNull final EditTextSoundRouter router,
-                     @NonNull final TodoListView todoList,
+                     @NonNull final TodoListFoldableView todoList,
                      @NonNull final RecyclerView recyclerView)
   {
     mJorg = jorg;

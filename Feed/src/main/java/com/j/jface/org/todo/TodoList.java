@@ -139,14 +139,14 @@ class TodoList implements Iterable<Todo>, TodoUpdaterProxy, TodoSource.ListChang
     return size - 1;
   }
 
-  @Nullable public Todo getFromOrd(@NonNull final String todoOrd)
+  @Nullable public Todo findByOrd(@NonNull final String todoOrd)
   {
     final int index = binarySearch(mList, todoOrd);
     if (index >= 0) return mList.get(index);
     return null;
   }
 
-  @Nullable public Todo getFromId(@NonNull final String todoId)
+  @Nullable public Todo findById(@NonNull final String todoId)
   {
     for (final Todo t : mList) if (t.id.equals(todoId)) return t;
     return null;
@@ -195,7 +195,7 @@ class TodoList implements Iterable<Todo>, TodoUpdaterProxy, TodoSource.ListChang
     else
     {
       // BinarySearch returns -(insertion point) - 1 when the item is not in the list.
-      final Todo oldTodo = getFromId(todo.id);
+      final Todo oldTodo = findById(todo.id);
       if (null == oldTodo)
         internalUpdateAddTodo(todo, -index - 1);
       else

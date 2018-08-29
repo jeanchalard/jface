@@ -72,9 +72,4 @@
 
   </FrameLayout>
 
-  <Button
-      android:id="@+id/try_notif"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:text="Try notif" />
 </LinearLayout>

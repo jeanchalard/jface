@@ -22,7 +22,7 @@ import com.j.jface.org.sound.EditTextSoundRouter;
 import com.j.jface.org.sound.SelReportEditText;
 import com.j.jface.org.todo.ListChangeObserver;
 import com.j.jface.org.todo.Todo;
-import com.j.jface.org.todo.TodoListView;
+import com.j.jface.org.todo.TodoListFoldableView;
 
 import java.util.ArrayList;
 
@@ -47,7 +47,7 @@ public class TodoViewHolder extends RecyclerView.ViewHolder implements View.OnCl
   @NonNull final private ExpanderView mExpander;
   @NonNull final private SelReportEditText mEditText;
   @NonNull final private View mExpansion;
-  @NonNull final private TodoListView mList;
+  @NonNull final private TodoListFoldableView mList;
   @NonNull final private TodoEditor.TodoDetails mDetails;
   @NonNull final private LinearLayout mTodoActionButtons;
   @NonNull final private ImageButton mAddSubTodoButton, mClearTodoButton, mShowActionsButton;
@@ -56,7 +56,7 @@ public class TodoViewHolder extends RecyclerView.ViewHolder implements View.OnCl
                         @NonNull final JOrg jorg,
                         @NonNull final EditTextSoundRouter router,
                         @NonNull final RecyclerView recyclerView,
-                        @NonNull final TodoListView list)
+                        @NonNull final TodoListFoldableView list)
   {
     super(itemView);
     itemView.setElevation(60);
@@ -110,26 +110,30 @@ public class TodoViewHolder extends RecyclerView.ViewHolder implements View.OnCl
     }
   }
 
-  private void toggleShowActions()
+  public void toggleShowActions()
+  {
+    showActions(mExpansion.getVisibility() != View.VISIBLE);
+  }
+
+  public void showActions(final boolean show)
   {
 //      mJorg.startTodoEditor(mCurrentTodo);
     /* Pour expand la ligne vers le bas et révéler les détails */
     TransitionManager.beginDelayedTransition(mRecyclerView, expandCollapseTransition);
-    if (mExpansion.getVisibility() == View.VISIBLE)
-    {
-      mExpansion.setVisibility(View.GONE);
-      mClearTodoButton.setVisibility(View.GONE);
-      mAddSubTodoButton.setVisibility(View.GONE);
-      ObjectAnimator.ofFloat(mShowActionsButton, "rotation", 0f).start();
-    }
-    else
+    if (show)
     {
       mExpansion.setVisibility(View.VISIBLE);
       mClearTodoButton.setVisibility(View.VISIBLE);
       mAddSubTodoButton.setVisibility(View.VISIBLE);
       ObjectAnimator.ofFloat(mShowActionsButton, "rotation", 180f).start();
     }
-
+    else
+    {
+      mExpansion.setVisibility(View.GONE);
+      mClearTodoButton.setVisibility(View.GONE);
+      mAddSubTodoButton.setVisibility(View.GONE);
+      ObjectAnimator.ofFloat(mShowActionsButton, "rotation", 0f).start();
+    }
 
     /* Pour afficher la palette de boutons
     TransitionManager.beginDelayedTransition(mTodoActionButtons, expandCollapseTransition);

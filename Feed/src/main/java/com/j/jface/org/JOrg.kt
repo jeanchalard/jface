@@ -15,7 +15,8 @@ import android.util.Log
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.widget.Button
+import android.view.ViewTreeObserver
+import android.view.WindowManager
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.google.android.gms.auth.api.Auth
@@ -27,11 +28,11 @@ import com.j.jface.lifecycle.AppCompatActivityWrapper
 import com.j.jface.lifecycle.AuthTrampoline
 import com.j.jface.lifecycle.WrappedActivity
 import com.j.jface.org.editor.TodoEditor
-import com.j.jface.org.notif.NotifEngine
 import com.j.jface.org.sound.EditTextSoundRouter
+import com.j.jface.org.sound.SelReportEditText
 import com.j.jface.org.sound.SoundSource
 import com.j.jface.org.todo.Todo
-import com.j.jface.org.todo.TodoListView
+import com.j.jface.org.todo.TodoListFoldableView
 import java.util.*
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
@@ -48,7 +49,7 @@ class JOrg(args : WrappedActivity.Args) : WrappedActivity(args)
   private val mSoundRouter : EditTextSoundRouter
   private val mTopLayout : CoordinatorLayout
   private val mRecyclerView : RecyclerView
-  private var mTodoList : TodoListView? = null
+  private var mTodoList : TodoListFoldableView? = null
   private var mTouchHelper : ItemTouchHelper? = null
 
   init
@@ -65,32 +66,53 @@ class JOrg(args : WrappedActivity.Args) : WrappedActivity(args)
     val fab = mA.findViewById<FloatingActionButton>(R.id.addTodo)
     fab.setOnClickListener { _ -> addNewSubTodo(null) }
 
-    val editedTodoId = mA.intent.getStringExtra(Const.EXTRA_TODO_ID)
+    val editedTodoId : String? = mA.intent.getStringExtra(Const.EXTRA_TODO_ID)
     val editedTodoSubitems = RemoteInput.getResultsFromIntent(mA.intent)?.getString(Const.EXTRA_TODO_SUBITEMS)?.split(",")
+    if (null == editedTodoId) mA.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
 
     val executor = Executors.newSingleThreadExecutor()
     executor.submit(Callable {
       executor.shutdown()
-      val tlv = TodoListView(mA.getApplicationContext())
+      val tlv = TodoListFoldableView(mA.getApplicationContext())
       val adapter = TodoAdapter(this, mA, mSoundRouter, tlv, mRecyclerView)
       val touchHelper = ItemTouchHelper(TodoMover(adapter, tlv))
+      val editedTodoIndexInView = ensureOpenAndReturnIndex(editedTodoId, tlv)
       mA.runOnUiThread {
         touchHelper.attachToRecyclerView(mRecyclerView)
         mRecyclerView.adapter = adapter
         loadingSpinner.visibility = GONE
         mTopLayout.visibility = VISIBLE
+        if (editedTodoIndexInView >= 0)
+        {
+          mRecyclerView.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener
+          {
+            override fun onGlobalLayout()
+            {
+              mRecyclerView.scrollToPosition(editedTodoIndexInView)
+              val textView = mRecyclerView.getChildAt(editedTodoIndexInView).findViewById<SelReportEditText>(R.id.todoText)
+              textView.requestFocus()
+              textView.setSelection(textView.length())
+              val holder = mRecyclerView.findViewHolderForAdapterPosition(editedTodoIndexInView) as TodoViewHolder
+              holder.showActions(true)
+              mRecyclerView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+            }
+          })
+        }
       }
 
       mTouchHelper = touchHelper
       mTodoList = tlv
     })
 
-    mA.findViewById<Button>(R.id.try_notif).setOnClickListener {
-      val list = mTodoList
-      if (null != list) NotifEngine(mA).splitNotification(list[0])
-    }
-
     scheduleBackup()
+  }
+
+  private fun ensureOpenAndReturnIndex(id : String?, tlv : TodoListFoldableView) : Int
+  {
+    if (null == id) return -1
+    val todo = tlv.findById(id) ?: return -1
+    tlv.ensureVisible(todo)
+    return tlv.findIndexById(id)
   }
 
   override fun onPause()

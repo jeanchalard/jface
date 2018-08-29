@@ -34,7 +34,7 @@ class TodoEditor(a : WrappedActivity.Args) : WrappedActivity(a)
     val intent = mA.intent
     val todoId = intent?.getStringExtra(Const.EXTRA_TODO_ID)
     val updaterProxy = TodoUpdaterProxy.getInstance(mA)
-    val t = if (null == todoId) Todo.NULL_TODO else updaterProxy.getFromId(todoId)
+    val t = if (null == todoId) Todo.NULL_TODO else updaterProxy.findById(todoId)
     val todo = t ?: Todo.NULL_TODO
 
     title.text = todo.text
