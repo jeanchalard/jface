@@ -59,6 +59,7 @@ public class Const
   public static final int USER_MESSAGE_DEFAULT_COLOR = 0xFFAACCAA;
 
   @NonNull public static final String EXTRA_TODO_ID = "todoId";
+  @NonNull public static final String EXTRA_NOTIF_ID = "notifId";
   @NonNull public static final String EXTRA_FONT_SIZE = "fontSize";
   @NonNull public static final String EXTRA_PATH = "path";
   @NonNull public static final String EXTRA_WEAR_DATA = "wearData";

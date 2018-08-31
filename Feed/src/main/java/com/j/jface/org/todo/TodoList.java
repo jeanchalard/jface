@@ -282,7 +282,7 @@ class TodoList implements Iterable<Todo>, TodoUpdaterProxy, TodoSource.ListChang
   }
 
   // Pass null to get an ord for the end of the list.
-  private String ordForNewChild(@Nullable Todo parent)
+  private String ordForNewChild(@Nullable TodoCore parent)
   {
     final int parentIndex = mList.indexOf(parent);
     if (parentIndex < 0) parent = null;

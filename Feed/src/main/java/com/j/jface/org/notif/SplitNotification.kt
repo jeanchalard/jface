@@ -10,7 +10,6 @@ import com.j.jface.Const
 import com.j.jface.R
 import com.j.jface.org.AutomaticEditorProcessor
 import com.j.jface.org.JOrg
-import com.j.jface.org.editor.TodoEditor
 import com.j.jface.org.todo.TodoCore
 
 /**
@@ -39,10 +38,11 @@ class SplitNotification(val context : Context)
       "in the last two hours"
   }
 
-  private fun buildSplitNotificationAction(todo : TodoCore) : Notification.Action
+  private fun buildSplitNotificationAction(id : Int, todo : TodoCore) : Notification.Action
   {
     val intent = Intent(context, AutomaticEditorProcessor.Receiver::class.java)
     intent.putExtra(Const.EXTRA_TODO_ID, todo.id)
+    intent.putExtra(Const.EXTRA_NOTIF_ID, id)
     val pendingIntent = PendingIntent.getBroadcast(context, Const.NOTIFICATION_RESULT_CODE, intent, PendingIntent.FLAG_ONE_SHOT)
     return Notification.Action.Builder(null, "Subitems", pendingIntent)
      .addRemoteInput(RemoteInput.Builder(Const.EXTRA_TODO_SUBITEMS)
@@ -51,10 +51,11 @@ class SplitNotification(val context : Context)
      .build()
   }
 
-  internal fun buildSplitNotification(todo : TodoCore, notificationManager : NotificationManager) : Notification
+  internal fun buildSplitNotification(id : Int, todo : TodoCore, notificationManager : NotificationManager) : Notification
   {
     val intent = Intent(context, JOrg.activityClass())
     intent.putExtra(Const.EXTRA_TODO_ID, todo.id)
+    intent.putExtra(Const.EXTRA_NOTIF_ID, id)
     val pendingIntent = PendingIntent.getActivity(context, Const.NOTIFICATION_RESULT_CODE, intent, PendingIntent.FLAG_ONE_SHOT)
 
     val title = "Split todo : " + todo.text
@@ -72,7 +73,7 @@ class SplitNotification(val context : Context)
      .setOnlyAlertOnce(true)
      .setCategory(Notification.CATEGORY_REMINDER)
      .setVisibility(Notification.VISIBILITY_SECRET)
-     .addAction(buildSplitNotificationAction(todo))
+     .addAction(buildSplitNotificationAction(id, todo))
      //.setContentIntent()
      //.setDeleteIntent() // when dismissed
      //.setCustomRemoveViews() // bazooka
@@ -80,4 +81,17 @@ class SplitNotification(val context : Context)
      .build()
   }
 
+  fun buildAckNotification(id : Int, parent : TodoCore, children : ArrayList<TodoCore>, notificationManager : NotificationManager) : Notification
+  {
+    val s = children.map(TodoCore::text).joinToString("\n　├ ")
+    val style = Notification.BigTextStyle()
+     .setBigContentTitle(parent.text)
+     .bigText("　├ " + children.map(TodoCore::text).joinToString("\n　├ ").replace("├([^├]*)\\Z".toRegex(), "└$1"))
+    return Notification.Builder(context, NotifEngine.getChannel(context, notificationManager).id)
+     .setSmallIcon(R.drawable.ic_done)
+//     .setContentTitle(parent.text)
+     .setStyle(style)
+     .setTimeoutAfter(10_000)
+     .build()
+ }
 }

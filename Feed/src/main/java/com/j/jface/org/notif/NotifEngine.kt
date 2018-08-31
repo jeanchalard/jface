@@ -41,8 +41,8 @@ class NotifEngine(val context : Context)
   fun splitNotification(todo : TodoCore)
   {
     val notificationManager = context.getSystemService(NotificationManager::class.java) as NotificationManager
-    val notification = SplitNotification(context).buildSplitNotification(todo, notificationManager)
     val id = context.nextNotifId(LAST_NOTIF_ID)
+    val notification = SplitNotification(context).buildSplitNotification(id, todo, notificationManager)
     notificationManager.notify(id, notification)
   }
 }
