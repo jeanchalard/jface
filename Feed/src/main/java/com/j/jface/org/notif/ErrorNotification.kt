@@ -5,9 +5,9 @@ import android.app.NotificationManager
 import android.content.Context
 import com.j.jface.R
 
-fun errorNotification(text : String, context : Context, notificationManager : NotificationManager) : Notification
+fun errorNotification(text : String, context : Context) : Notification
 {
-  return Notification.Builder(context, NotifEngine.getChannel(context, notificationManager).id)
+  return Notification.Builder(context, NotifEngine.getChannel(context).id)
    .setSmallIcon(R.drawable.ic_error)
    .setContentText(text)
    .build()

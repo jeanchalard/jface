@@ -1,5 +1,6 @@
 package com.j.jface
 
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -61,3 +62,6 @@ fun Context.nextNotifId(channel : String) : Int
   persist.edit().putInt(channel, notifId + 1).apply()
   return notifId
 }
+
+val Context.notifManager : NotificationManager
+  get() = getSystemService(NotificationManager::class.java)

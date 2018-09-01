@@ -1,7 +1,6 @@
 package com.j.jface.org.notif
 
 import android.app.Notification
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.RemoteInput
 import android.content.Context
@@ -51,7 +50,7 @@ class SplitNotification(val context : Context)
      .build()
   }
 
-  internal fun buildSplitNotification(id : Int, todo : TodoCore, notificationManager : NotificationManager) : Notification
+  internal fun buildSplitNotification(id : Int, todo : TodoCore) : Notification
   {
     val intent = Intent(context, JOrg.activityClass())
     intent.putExtra(Const.EXTRA_TODO_ID, todo.id)
@@ -60,36 +59,34 @@ class SplitNotification(val context : Context)
 
     val title = "Split todo : " + todo.text
     val description = "This todo has last been updated " + todo.timeAgo() + " ; do something and split it up"
-    return Notification.Builder(context, NotifEngine.getChannel(context, notificationManager).id)
-     .setShowWhen(true)
-     .setWhen(System.currentTimeMillis())
-     .setSmallIcon(R.drawable.jormungand)
-     .setColor(context.getColor(R.color.jormungand_color))
-     .setContentIntent(pendingIntent)
-     .setContentTitle(title)
-     .setContentText(description)
-     .setStyle(Notification.BigTextStyle().bigText(description))
-     .setAutoCancel(true)
-     .setOnlyAlertOnce(true)
-     .setCategory(Notification.CATEGORY_REMINDER)
-     .setVisibility(Notification.VISIBILITY_SECRET)
-     .addAction(buildSplitNotificationAction(id, todo))
-     //.setContentIntent()
-     //.setDeleteIntent() // when dismissed
-     //.setCustomRemoveViews() // bazooka
-     //.extend(WearableExtender) // <a href="{@docRoot}wear/notifications/creating.html">Creating Notifications for Android Wear</a>
-     .build()
+    return Notification.Builder(context, NotifEngine.getChannel(context).id).apply {
+      setShowWhen(true)
+      setWhen(System.currentTimeMillis())
+      setSmallIcon(R.drawable.jormungand)
+      setColor(context.getColor(R.color.jormungand_color))
+      setContentIntent(pendingIntent)
+      setContentTitle(title)
+      setContentText(description)
+      setStyle(Notification.BigTextStyle().bigText(description))
+      setAutoCancel(true)
+      setOnlyAlertOnce(true)
+      setCategory(Notification.CATEGORY_REMINDER)
+      setVisibility(Notification.VISIBILITY_SECRET)
+      addAction(buildSplitNotificationAction(id, todo))
+      // setContentIntent()
+      // setDeleteIntent() // when dismissed
+      // setCustomRemoveViews() // bazooka
+      // extend(WearableExtender) // <a href="{@docRoot}wear/notifications/creating.html">Creating Notifications for Android Wear</a>
+    }.build()
   }
 
-  fun buildAckNotification(id : Int, parent : TodoCore, children : ArrayList<TodoCore>, notificationManager : NotificationManager) : Notification
+  fun buildAckNotification(parent : TodoCore, children : ArrayList<TodoCore>) : Notification
   {
-    val s = children.map(TodoCore::text).joinToString("\n　├ ")
     val style = Notification.BigTextStyle()
      .setBigContentTitle(parent.text)
      .bigText("　├ " + children.map(TodoCore::text).joinToString("\n　├ ").replace("├([^├]*)\\Z".toRegex(), "└$1"))
-    return Notification.Builder(context, NotifEngine.getChannel(context, notificationManager).id)
+    return Notification.Builder(context, NotifEngine.getChannel(context).id)
      .setSmallIcon(R.drawable.ic_done)
-//     .setContentTitle(parent.text)
      .setStyle(style)
      .setTimeoutAfter(10_000)
      .build()

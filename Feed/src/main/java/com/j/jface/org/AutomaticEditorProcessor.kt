@@ -15,6 +15,7 @@ import android.util.Log
 import com.j.jface.Const
 import com.j.jface.firebase.Firebase
 import com.j.jface.lifecycle.CommonObjects
+import com.j.jface.notifManager
 import com.j.jface.org.notif.SplitNotification
 import com.j.jface.org.notif.errorNotification
 import com.j.jface.org.todo.Todo
@@ -56,15 +57,14 @@ class AutomaticEditorProcessor : JobService()
     if (null == todoId || null == notifId || 0 == notifId || null == subitems) { Log.e("JOrg", "Split todo but some param is null"); return false }
     if (!Firebase.isLoggedIn()) { Log.e("JOrg", "Split todo, but Firebase is not logged in >.>"); return false }
     CommonObjects.executor.execute {
-      val notificationManager = getSystemService(NotificationManager::class.java) as NotificationManager
       val tl = TodoListReadonlyFullView(this)
       val parent : Todo? = tl.findById(todoId)
-      if (null == parent) return@execute notificationManager.notify(notifId, errorNotification("Somehow can't find todo with ID ${todoId}", this, notificationManager))
+      if (null == parent) return@execute notifManager.notify(notifId, errorNotification("Somehow can't find todo with ID ${todoId}", this))
       val children = ArrayList<TodoCore>()
       for (subitem in subitems)
         children.add(tl.createAndInsertTodo(subitem.trim(), parent))
-      val notif = SplitNotification(this).buildAckNotification(notifId, parent, children, notificationManager)
-      notificationManager.notify(notifId, notif)
+      val notif = SplitNotification(this).buildAckNotification(parent, children)
+      notifManager.notify(notifId, notif)
       jobFinished(params, false)
     }
     return true

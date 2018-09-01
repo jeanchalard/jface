@@ -4,6 +4,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import com.j.jface.R
+import com.j.jface.notifManager
 import com.j.jface.nextNotifId
 import com.j.jface.org.todo.TodoCore
 
@@ -23,9 +24,10 @@ class NotifEngine(val context : Context)
 
   companion object
   {
-    internal fun getChannel(context : Context, notificationManager : NotificationManager) : NotificationChannel
+    internal fun getChannel(context : Context) : NotificationChannel
     {
-      val existing = notificationManager.getNotificationChannel(CHANNEL_ID)
+      val notifManager = context.notifManager
+      val existing = notifManager.getNotificationChannel(CHANNEL_ID)
       if (null != existing) return existing
       val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT)
       // Configure the notification channel.
@@ -33,16 +35,15 @@ class NotifEngine(val context : Context)
       channel.enableLights(true)
       channel.lightColor = context.getColor(R.color.jormungand_color)
       channel.vibrationPattern = longArrayOf(0L, 30L, 30L, 60L) // First number is delay to vibrator on
-      notificationManager.createNotificationChannel(channel)
-      return notificationManager.getNotificationChannel(CHANNEL_ID)
+      notifManager.createNotificationChannel(channel)
+      return notifManager.getNotificationChannel(CHANNEL_ID)
     }
   }
 
   fun splitNotification(todo : TodoCore)
   {
-    val notificationManager = context.getSystemService(NotificationManager::class.java) as NotificationManager
     val id = context.nextNotifId(LAST_NOTIF_ID)
-    val notification = SplitNotification(context).buildSplitNotification(id, todo, notificationManager)
-    notificationManager.notify(id, notification)
+    val notification = SplitNotification(context).buildSplitNotification(id, todo)
+    context.notifManager.notify(id, notification)
   }
 }

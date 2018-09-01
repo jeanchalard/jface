@@ -101,11 +101,10 @@ public class Todo extends TodoCore
     private int constraint;
     private int estimatedTime;
     private long lastUpdateTime;
-    @Nullable public Todo parent;
-    public boolean open;
-    public boolean allHierarchyOpen;
-    public boolean leaf;
-    public boolean lastChild;
+    @Nullable private Todo parent;
+    private boolean open;
+    private boolean leaf;
+    private boolean lastChild;
 
     public Builder(@NonNull final String text, @NonNull final String ord) { creationTime = System.currentTimeMillis(); this.text = text; this.ord = ord; this.estimatedTime = -1; }
     public Builder(@NonNull final TodoCore todoCore)
@@ -134,7 +133,6 @@ public class Todo extends TodoCore
       {
         parent = null;
         open = true;
-        allHierarchyOpen = true;
         leaf = true;
         lastChild = false;
       }
