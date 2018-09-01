@@ -110,7 +110,7 @@ public class TodoViewHolder extends RecyclerView.ViewHolder implements View.OnCl
     }
   }
 
-  public void toggleShowActions()
+  private void toggleShowActions()
   {
     showActions(mExpansion.getVisibility() != View.VISIBLE);
   }
