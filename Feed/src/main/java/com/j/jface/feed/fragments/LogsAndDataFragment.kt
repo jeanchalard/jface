@@ -1,7 +1,6 @@
 package com.j.jface.feed.fragments
 
 import android.app.Fragment
-import android.text.format.Time
 import android.view.View
 import android.widget.TextView
 import com.google.android.gms.wearable.DataMap
@@ -12,6 +11,8 @@ import com.j.jface.feed.DataSource
 import com.j.jface.feed.FeedLoader
 import com.j.jface.lifecycle.WrappedFragment
 import com.j.jface.wear.Wear
+import java.time.*
+import java.time.format.DateTimeFormatter
 
 class LogsAndDataFragment(a : WrappedFragment.Args, private val mWear : Wear) : WrappedFragment(a.inflater.inflate(R.layout.fragment_logs_and_data, a.container, false)), View.OnClickListener
 {
@@ -38,15 +39,14 @@ class LogsAndDataFragment(a : WrappedFragment.Args, private val mWear : Wear) : 
           mLog.append(" Never updated\n")
           return@Runnable
         }
-        val t = Time()
-        t.set(lastUpdate)
         val status = dataMap.getString(Const.DATA_KEY_LAST_STATUS)
-        mLog.append(" Updated on " + t.format("%Y/%m/%d %H:%M:%S"))
+        mLog.append(" Updated on " + OffsetDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
         mLog.append("\n")
         mLog.append(" Status : " + status)
         mLog.append("\n")
-        t.set(dataMap.getLong(Const.DATA_KEY_SUCCESSFUL_UPDATE_DATE))
-        mLog.append(" Data last updated " + t.format("%Y/%m/%d %H:%M:%S\n"))
+        mLog.append(" Data last updated ")
+        val updateDate = OffsetDateTime.ofInstant(Instant.ofEpochMilli(dataMap.getLong(Const.DATA_KEY_SUCCESSFUL_UPDATE_DATE)), ZoneId.systemDefault())
+        mLog.append(updateDate.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
       } else
       {
         val departureList = dataMap.getDataMapArrayList(Const.DATA_KEY_DEPLIST) ?: return@Runnable

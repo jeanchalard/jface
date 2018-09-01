@@ -57,4 +57,11 @@ public class FragmentWrapper<T extends WrappedFragment> extends Fragment
     assert mW != null;
     mW.onPause();
   }
+
+  @Override public void onDestroy()
+  {
+    super.onDestroy();
+    assert mW != null;
+    mW.onDestroy();
+  }
 }

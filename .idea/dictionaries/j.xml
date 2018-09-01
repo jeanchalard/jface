@@ -2,7 +2,10 @@
   <dictionary name="j">
     <words>
       <w>coord</w>
+      <w>firebase</w>
       <w>firestore</w>
+      <w>geofence</w>
+      <w>geofences</w>
       <w>hardnesses</w>
       <w>jface</w>
       <w>jormungand</w>
@@ -12,6 +15,7 @@
       <w>orgtool</w>
       <w>semihard</w>
       <w>senju</w>
+      <w>snackbar</w>
       <w>subitem</w>
       <w>subitems</w>
       <w>todos</w>

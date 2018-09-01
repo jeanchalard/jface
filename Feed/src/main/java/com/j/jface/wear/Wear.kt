@@ -1,3 +1,5 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package com.j.jface.wear
 
 import android.app.job.JobInfo
@@ -32,7 +34,6 @@ class Wear(val context : Context)
 
   // Util
   private inline fun String.toWearUri() : Uri = PutDataMapRequest.create(this).uri
-  private inline infix fun <T, R> Task<T>.then(crossinline d : (T) -> R) : Task<R> { return this.continueWith(ex, Continuation<T, R> { d(it.result) }) }
   private inline fun <T> Task<T>.orNull() : T? = if (this.isSuccessful) this.result else null
 
   // Gets

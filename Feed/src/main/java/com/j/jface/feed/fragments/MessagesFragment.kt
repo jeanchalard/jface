@@ -76,6 +76,11 @@ class MessagesFragment(a : WrappedFragment.Args, private val mWear : Wear) : Wra
     mWearUpdateListener.pause()
   }
 
+  override fun onDestroy()
+  {
+    mPalette.removeOnColorSetListener(this)
+  }
+
   override fun afterTextChanged(s : Editable)
   {
     if (expectedUpdatesCount.tryAcquire()) return // We were expecting an update.
@@ -137,11 +142,10 @@ class MessagesFragment(a : WrappedFragment.Args, private val mWear : Wear) : Wra
       val cursorEnd = Selection.getSelectionEnd(text)
 
       var start = 0
-      var end = 0
       val lines = text.toString().split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
       for (line in lines)
       {
-        end = start + line.length + 1
+        val end = start + line.length + 1
         if (cursorStart < end && cursorEnd >= start)
         {
           for (span in text.getSpans(0, text.length - 1, ForegroundColorSpan::class.java))

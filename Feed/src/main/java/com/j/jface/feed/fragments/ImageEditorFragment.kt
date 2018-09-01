@@ -33,16 +33,7 @@ class ImageEditorFragment(a : Args, iea : ImageEditorArgs) : WrappedFragment(a.i
     mBrightnessBar.setOnSeekBarChangeListener(this)
   }
 
-  fun makeSquare(r : Rect)
-  {
-    val offset = Math.abs(r.width() - r.height()) / 2
-    if (r.width() > r.height())
-    { r.left += offset ; r.right -= offset }
-    else
-    { r.top += offset ; r.bottom -= offset }
-  }
-
-  fun imageChosen(imageView : TouchImageView)
+  private fun imageChosen(imageView : TouchImageView)
   {
     val src = (imageView.drawable as BitmapDrawable).bitmap
     val portion = imageView.zoomedRect

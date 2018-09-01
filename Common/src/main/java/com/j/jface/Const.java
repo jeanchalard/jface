@@ -26,7 +26,7 @@ public class Const
   @NonNull public static final String INTERNAL_PERSISTED_VALUES_FILES = "SystemValues";
 
   @NonNull public static final String[] WEEKDAYS = { "日", "月", "火", "水", "木", "金", "土", "日" };
-  @NonNull public static final String JFACE_TOP = "jface";
+  @NonNull private static final String JFACE_TOP = "jface";
 
   // Must contain JFACE_TOP as it's also used as DB_WEAR_TOP
   @NonNull public static final String DATA_PATH = "/" + JFACE_TOP + "/Data";
@@ -36,14 +36,13 @@ public class Const
 
   @NonNull public static final String DB_APP_TOP_PATH = "JOrg";
   @NonNull public static final String DB_ORG_TOP = "todo";
-  @NonNull public static final String DB_WEAR_TOP = JFACE_TOP;
 
   @NonNull public static final String DATA_KEY_DEPTIME = "depTime";
   @NonNull public static final String DATA_KEY_EXTRA = "extra";
   @NonNull public static final String DATA_KEY_DEPLIST = "depList";
   @NonNull public static final String DATA_KEY_USER_MESSAGE = "userMessage";
   @NonNull public static final String DATA_KEY_USER_MESSAGE_COLORS = "userMessageColors";
-  @NonNull public static final String DATA_KEY_ADHOC = "adHoc";
+  @SuppressWarnings("unused") @NonNull public static final String DATA_KEY_ADHOC = "adHoc";
   @NonNull public static final String DATA_KEY_INSIDE = "inside";
   @NonNull public static final String DATA_KEY_SUCCESSFUL_UPDATE_DATE = "updateTime";
   @NonNull public static final String DATA_KEY_LAST_STATUS = "lastStatus";
@@ -60,7 +59,6 @@ public class Const
 
   @NonNull public static final String EXTRA_TODO_ID = "todoId";
   @NonNull public static final String EXTRA_NOTIF_ID = "notifId";
-  @NonNull public static final String EXTRA_FONT_SIZE = "fontSize";
   @NonNull public static final String EXTRA_PATH = "path";
   @NonNull public static final String EXTRA_WEAR_DATA = "wearData";
 
@@ -104,14 +102,14 @@ public class Const
     HEADSIGNS.put(京成線_日暮里_千住大橋方面_休日, "日暮里 ▶ 千住大橋");
   }
 
-  @NonNull public static final String[] J_DEPLIST_DATA_PATHS =
+  @NonNull private static final String[] J_DEPLIST_DATA_PATHS =
    {
     日比谷線_北千住_平日, 日比谷線_北千住_休日,
     日比谷線_六本木_平日, 日比谷線_六本木_休日,
     京成線_千住大橋_上野方面_平日, 京成線_千住大橋_上野方面_休日,
     京成線_千住大橋_成田方面_平日, 京成線_千住大橋_成田方面_休日,
     京成線_日暮里_千住大橋方面_平日, 京成線_日暮里_千住大橋方面_休日 };
-  @NonNull public static final String[] RIO_DEPLIST_DATA_PATHS =
+  @NonNull private static final String[] RIO_DEPLIST_DATA_PATHS =
    {
     京王線_稲城駅_新宿方面_平日, 京王線_稲城駅_新宿方面_休日,
     都営三田線_本蓮沼_目黒方面_平日, 都営三田線_本蓮沼_目黒方面_休日,
@@ -125,9 +123,7 @@ public class Const
   @NonNull public static final String 東京_FENCE_NAME = "東京";
   @NonNull public static final String 稲城_FENCE_NAME = "稲城";
   @NonNull public static final String 本蓮沼_FENCE_NAME = "本蓮沼";
-  @NonNull public static final String[] J_FENCE_NAMES =
-   { 千住大橋_FENCE_NAME, 六本木_FENCE_NAME, 日暮里_FENCE_NAME, 東京_FENCE_NAME };
-  @NonNull public static final String[] RIO_FENCE_NAMES =
-   { 稲城_FENCE_NAME, 本蓮沼_FENCE_NAME, 六本木_FENCE_NAME, 東京_FENCE_NAME };
+  @NonNull private static final String[] J_FENCE_NAMES = { 千住大橋_FENCE_NAME, 六本木_FENCE_NAME, 日暮里_FENCE_NAME, 東京_FENCE_NAME };
+  @NonNull private static final String[] RIO_FENCE_NAMES = { 稲城_FENCE_NAME, 本蓮沼_FENCE_NAME, 六本木_FENCE_NAME, 東京_FENCE_NAME };
   @NonNull public static final String[] ALL_FENCE_NAMES = RIO_MODE ? RIO_FENCE_NAMES : J_FENCE_NAMES;
 }

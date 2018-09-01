@@ -63,7 +63,7 @@ public class TodoSource implements Firebase.TodoUpdateListener.Listener
     else
     {
       final String condition = "completionTime = 0";
-      final Cursor c = mResolver.query(TodoProviderContract.BASE_URI_TODO, null, condition, null, "ord");
+      final Cursor c = mResolver.query(TodoProviderContract.INSTANCE.getBASE_URI_TODO(), null, condition, null, "ord");
       if (null == c || !c.moveToFirst()) return new ArrayList<>();
       final ArrayList<TodoCore> todos = new ArrayList<>(c.getCount());
       while (!c.isAfterLast())
@@ -93,7 +93,7 @@ public class TodoSource implements Firebase.TodoUpdateListener.Listener
 
   @NonNull public TodoCore updateTodo(@NonNull final TodoCore todo)
   {
-    mResolver.insert(Uri.withAppendedPath(TodoProviderContract.BASE_URI_TODO, todo.id), contentValuesFromTodo(todo));
+    mResolver.insert(Uri.withAppendedPath(TodoProviderContract.INSTANCE.getBASE_URI_TODO(), todo.id), contentValuesFromTodo(todo));
     Firebase.INSTANCE.updateTodo(todo);
     return todo;
   }
@@ -121,14 +121,14 @@ public class TodoSource implements Firebase.TodoUpdateListener.Listener
     final ContentValues cv = new ContentValues();
     cv.put(TodoProviderContract.COLUMN_id, todo.id);
     cv.put(TodoProviderContract.COLUMN_open, todo.ui.open);
-    final Uri uri = Uri.withAppendedPath(TodoProviderContract.BASE_URI_METADATA, todo.id);
+    final Uri uri = Uri.withAppendedPath(TodoProviderContract.INSTANCE.getBASE_URI_METADATA(), todo.id);
     mResolver.insert(uri, cv);
     return todo.ui.open;
   }
 
   public boolean isOpen(@NonNull final TodoCore todo)
   {
-    final Uri uri = Uri.withAppendedPath(TodoProviderContract.BASE_URI_METADATA, todo.id);
+    final Uri uri = Uri.withAppendedPath(TodoProviderContract.INSTANCE.getBASE_URI_METADATA(), todo.id);
     final Cursor c = mResolver.query(uri, null, null, null, null);
     if (null == c || c.getCount() != 1) return true;
     c.moveToFirst();

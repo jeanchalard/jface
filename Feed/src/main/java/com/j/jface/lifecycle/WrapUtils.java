@@ -16,6 +16,7 @@ public class WrapUtils
   {
     final ParameterizedType pt = (ParameterizedType)c.getGenericSuperclass();
     final Type t = pt.getActualTypeArguments()[0];
+    //noinspection unchecked
     return (Class<T>)t;
   }
 

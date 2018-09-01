@@ -8,8 +8,8 @@ android {
     buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "com.j.jface"
-        minSdkVersion 25
-        targetSdkVersion 25
+        minSdkVersion 26 // STOPSHIP : somehow work around geofences service being broken, or send this down to 25
+        targetSdkVersion 26 // STOPSHIP : likewise
         versionCode 1
         versionName "1.0"
         multiDexEnabled true

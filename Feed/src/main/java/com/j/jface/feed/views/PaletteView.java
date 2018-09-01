@@ -7,9 +7,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
-import android.widget.ImageView;
 
 import java.util.ArrayList;
 
@@ -39,6 +37,12 @@ public class PaletteView extends android.support.v7.widget.AppCompatImageView
     if (pts[0] < 0 || pts[1] < 0 || pts[0] >= mPaletteBitmap.getWidth() || pts[1] >= mPaletteBitmap.getHeight()) return true;
     final int color = mPaletteBitmap.getPixel((int)pts[0], (int)pts[1]);
     for (final OnColorSetListener listener : mListeners) listener.onColorSet(color);
+    performClick();
     return true;
+  }
+
+  @Override public boolean performClick()
+  {
+    return super.performClick();
   }
 }

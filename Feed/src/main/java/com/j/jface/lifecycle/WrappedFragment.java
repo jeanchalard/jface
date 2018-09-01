@@ -37,4 +37,5 @@ public abstract class WrappedFragment
   protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {}
   protected void onResume() {}
   protected void onPause() {}
+  protected void onDestroy() {}
 }
