@@ -1,6 +1,5 @@
 package com.j.jface.org
 
-import android.app.NotificationManager
 import android.app.RemoteInput
 import android.app.job.JobInfo
 import android.app.job.JobParameters

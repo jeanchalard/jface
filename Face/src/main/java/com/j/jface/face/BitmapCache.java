@@ -7,7 +7,6 @@ import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.j.jface.Const;
 import com.j.jface.Departure;
 
 public class BitmapCache

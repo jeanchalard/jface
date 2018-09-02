@@ -4,15 +4,12 @@ import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
-
+import com.j.jface.R.layout.todo
 import com.j.jface.org.sound.EditTextSoundRouter
 import com.j.jface.org.todo.ListChangeObserver
 import com.j.jface.org.todo.Todo
 import com.j.jface.org.todo.TodoListFoldableView
-
-import java.util.ArrayList
-
-import com.j.jface.R.layout.todo
+import java.util.*
 
 // Adapter for Todo Recycler view.
 class TodoAdapter(private val mJorg : JOrg,

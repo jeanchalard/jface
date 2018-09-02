@@ -4,8 +4,8 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import com.j.jface.R
-import com.j.jface.notifManager
 import com.j.jface.nextNotifId
+import com.j.jface.notifManager
 import com.j.jface.org.todo.TodoCore
 
 const val CHANNEL_ID = "jorg_todo"

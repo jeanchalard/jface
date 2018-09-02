@@ -9,10 +9,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.util.Locale;
 
 public class Util
 {
@@ -89,7 +89,7 @@ public class Util
 
   private String nowStr()
   {
-    final GregorianCalendar c = new GregorianCalendar();
-    return String.format("%02d:%02d:%02d", c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), c.get(Calendar.SECOND));
+    final LocalTime now = LocalTime.now();
+    return String.format(Locale.JAPAN, "%02d:%02d:%02d", now.getHour(), now.getMinute(), now.getSecond());
   }
 }

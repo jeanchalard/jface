@@ -124,7 +124,7 @@ class JOrg(args : WrappedActivity.Args) : WrappedActivity(args)
   {
     mSoundSource.onResume()
     val c = LocalDate.now()
-    val title = String.format(Locale.JAPAN, "%02d-%02d %s", c.month.value, c.dayOfMonth, Const.WEEKDAYS[c.dayOfWeek.value])
+    val title = String.format(Locale.JAPAN, "%02d-%02d %s", c.monthValue, c.dayOfMonth, Const.WEEKDAYS[c.dayOfWeek.value])
     (mA.findViewById<View>(R.id.title_today) as TextView).text = title
     SnackbarRegistry.setSnackbarParent(mTopLayout)
   }

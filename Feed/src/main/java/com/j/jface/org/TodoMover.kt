@@ -4,8 +4,6 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.RecyclerView.ViewHolder
 import android.support.v7.widget.helper.ItemTouchHelper
 import com.j.jface.clamp
-
-import com.j.jface.org.todo.Todo
 import com.j.jface.org.todo.TodoListFoldableView
 
 /**

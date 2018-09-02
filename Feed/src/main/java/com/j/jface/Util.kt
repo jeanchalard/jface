@@ -1,9 +1,7 @@
 package com.j.jface
 
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.os.PersistableBundle
 import com.google.android.gms.wearable.DataMap

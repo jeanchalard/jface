@@ -11,7 +11,9 @@ import com.j.jface.feed.DataSource
 import com.j.jface.feed.FeedLoader
 import com.j.jface.lifecycle.WrappedFragment
 import com.j.jface.wear.Wear
-import java.time.*
+import java.time.Instant
+import java.time.OffsetDateTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 class LogsAndDataFragment(a : WrappedFragment.Args, private val mWear : Wear) : WrappedFragment(a.inflater.inflate(R.layout.fragment_logs_and_data, a.container, false)), View.OnClickListener

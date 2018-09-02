@@ -12,16 +12,15 @@ import com.google.android.gms.drive.query.SortableField;
 import com.j.jface.client.Client;
 import com.j.jface.client.action.Action;
 import com.j.jface.client.action.ResultAction;
-import com.j.jface.client.action.drive.ResolveDriveResourcesAction;
 import com.j.jface.client.action.drive.ResolveDriveResourcesAction.ResolveFirstFileAction;
 import com.j.jface.client.action.ui.ReportActionWithSnackbar;
 
 import java.io.File;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -53,7 +52,7 @@ public class RecursiveBackupAction extends Action
   {
     @NonNull public final String name;
     @NonNull public final WithPath.DriveFolder parent;
-    public FileSpec(@NonNull final String name, @NonNull final WithPath.DriveFolder parent) { this.name = name; this.parent = parent; }
+    private FileSpec(@NonNull final String name, @NonNull final WithPath.DriveFolder parent) { this.name = name; this.parent = parent; }
   }
 
   private static final int ONEDAY_MILLIS = 86_400 * 1_000;
@@ -63,19 +62,19 @@ public class RecursiveBackupAction extends Action
   private static final String LAST_RUN_NAME = "lastRun";
   private static final String LATEST_NAME = "latest";
 
-  @NonNull final View mViewToSnackbarInto;
-  @NonNull final List<ResultAction> mPreconditions;
-  @NonNull final ReportActionWithSnackbar mReportStartAction;
-  @NonNull final ResolveOrCreateDriveFolderAction mSavesFolder;
-  @NonNull final ResolveOrCreateDriveFolderAction mHistoryFolder;
-  @NonNull final ResolveOrCreateDriveFolderAction mArchiveFolder;
-  @NonNull final ResolveFirstFileAction mMostRecentArchive;
-  @NonNull final ResolveDriveResourcesAction mHistoryFiles;
-  @NonNull final ResolveFirstFileAction mPreviousRun;
-  @NonNull final ResolveFirstFileAction mLastRun;
-  @NonNull final ResolveFirstFileAction mLatest;
+  @NonNull private final View mViewToSnackbarInto;
+  @NonNull private final List<ResultAction> mPreconditions;
+  @NonNull private final ReportActionWithSnackbar mReportStartAction;
+  @NonNull private final ResolveOrCreateDriveFolderAction mSavesFolder;
+  @NonNull private final ResolveOrCreateDriveFolderAction mHistoryFolder;
+  @NonNull private final ResolveOrCreateDriveFolderAction mArchiveFolder;
+  @NonNull private final ResolveFirstFileAction mMostRecentArchive;
+  @NonNull private final ResolveDriveResourcesAction mHistoryFiles;
+  @NonNull private final ResolveFirstFileAction mPreviousRun;
+  @NonNull private final ResolveFirstFileAction mLastRun;
+  @NonNull private final ResolveFirstFileAction mLatest;
 
-  @Nullable ArrayList<ResultAction> mFileOps;
+  @Nullable private ArrayList<ResultAction> mFileOps;
 
   public RecursiveBackupAction(@NonNull final Client client, @Nullable final Action then, @NonNull final View viewToSnackbarInto)
   {
@@ -208,9 +207,7 @@ public class RecursiveBackupAction extends Action
 
   private static String datedName(@NonNull final WithPath.Metadata file)
   {
-    final Date date = file.metadata.getCreatedDate();
-    final GregorianCalendar calendar = new GregorianCalendar();
-    calendar.setTime(date);
-    return String.format(Locale.JAPANESE, "%04d%02d%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+    final ZonedDateTime date = file.metadata.getCreatedDate().toInstant().atZone(ZoneOffset.UTC);
+    return String.format(Locale.JAPAN, "%04d%02d%02d", date.getYear(), date.getMonthValue(), date.getDayOfMonth());
   }
 }

@@ -14,7 +14,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.j.jface.Util;
-import com.j.jface.lifecycle.TodoProviderBoot;
 
 import org.junit.Before;
 import org.junit.Test;

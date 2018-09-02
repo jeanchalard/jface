@@ -14,7 +14,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageButton
 import android.widget.LinearLayout
-
 import com.j.jface.R
 import com.j.jface.org.editor.TodoEditor
 import com.j.jface.org.sound.EditTextSoundRouter
@@ -22,8 +21,7 @@ import com.j.jface.org.sound.SelReportEditText
 import com.j.jface.org.todo.ListChangeObserver
 import com.j.jface.org.todo.Todo
 import com.j.jface.org.todo.TodoListFoldableView
-
-import java.util.ArrayList
+import java.util.*
 
 class TodoViewHolder(itemView : View,
                      private val mJorg : JOrg,
