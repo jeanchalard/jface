@@ -1,6 +1,5 @@
 package com.j.jface.org
 
-import android.app.RemoteInput
 import android.content.Intent
 import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.FloatingActionButton
@@ -33,6 +32,7 @@ import com.j.jface.org.sound.SelReportEditText
 import com.j.jface.org.sound.SoundSource
 import com.j.jface.org.todo.Todo
 import com.j.jface.org.todo.TodoListFoldableView
+import java.time.LocalDate
 import java.util.*
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
@@ -123,9 +123,8 @@ class JOrg(args : WrappedActivity.Args) : WrappedActivity(args)
   override fun onResume()
   {
     mSoundSource.onResume()
-    val c = GregorianCalendar()
-    val title = String.format(Locale.JAPAN, "%02d-%02d %s",
-     c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH), Const.WEEKDAYS[c.get(Calendar.DAY_OF_WEEK) - 1])
+    val c = LocalDate.now()
+    val title = String.format(Locale.JAPAN, "%02d-%02d %s", c.month.value, c.dayOfMonth, Const.WEEKDAYS[c.dayOfWeek.value])
     (mA.findViewById<View>(R.id.title_today) as TextView).text = title
     SnackbarRegistry.setSnackbarParent(mTopLayout)
   }
@@ -175,10 +174,8 @@ class JOrg(args : WrappedActivity.Args) : WrappedActivity(args)
     Log.e("Google sign in result", "" + resultCode + " : " + x.status)
   }
 
-  fun runOnUiThread(r : Runnable)
-  {
-    mA.runOnUiThread(r)
-  }
+  fun runOnUiThread(r : Runnable) = mA.runOnUiThread(r)
+  fun runOnUiThread(r : () -> Unit) = mA.runOnUiThread(r)
 
   private fun scheduleBackup()
   {

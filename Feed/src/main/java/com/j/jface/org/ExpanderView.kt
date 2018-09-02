@@ -9,6 +9,7 @@ import android.util.AttributeSet
 import android.view.View
 
 import com.j.jface.R
+import com.j.jface.clamp
 
 /**
  * A view for expanders with dashed lines, possibly a + or - sign in a square.
@@ -124,8 +125,6 @@ class ExpanderView @JvmOverloads constructor(context : Context, attrs : Attribut
       clamp(minW, View.MeasureSpec.getSize(widthMeasureSpec), maxW)
     setMeasuredDimension(w, h)
   }
-
-  private fun clamp(min : Int, value : Int, max : Int) : Int = Math.min(Math.max(min, value), max)
 
   private fun oddMin(vararg values : Int) : Int
   {

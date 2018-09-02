@@ -55,6 +55,8 @@ fun PersistableBundle.toDataMap() : DataMap
   return target
 }
 
+fun <T : Comparable<T>> clamp(min : T, value : T, max : T) : T = if (value < min) min else if (value > max) max else value
+
 fun Context.nextNotifId(channel : String) : Int
 {
   val persist : SharedPreferences = getSharedPreferences(Const.INTERNAL_PERSISTED_VALUES_FILES, Context.MODE_PRIVATE)
