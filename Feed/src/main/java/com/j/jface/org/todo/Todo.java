@@ -87,40 +87,17 @@ public class Todo extends TodoCore
     else return other instanceof TodoCore;
   }
 
-  public static class Builder
+  public static class Builder extends TodoCore.TodoBuilder<Todo>
   {
-    @Nullable private String id;
-    @NonNull private String ord;
-    private long creationTime;
-    private long completionTime;
-    @NonNull private String text;
-    private int depth;
-    private long lifeline;
-    private long deadline;
-    private int hardness;
-    private int constraint;
-    private int estimatedTime;
-    private long lastUpdateTime;
     @Nullable private Todo parent;
     private boolean open;
     private boolean leaf;
     private boolean lastChild;
 
-    public Builder(@NonNull final String text, @NonNull final String ord) { creationTime = System.currentTimeMillis(); this.text = text; this.ord = ord; this.estimatedTime = -1; }
+    public Builder(@NonNull final String text, @NonNull final String ord) { super(text, ord); }
     public Builder(@NonNull final TodoCore todoCore)
     {
-      id = todoCore.id;
-      ord = todoCore.ord;
-      creationTime = todoCore.creationTime;
-      completionTime = todoCore.completionTime;
-      text = todoCore.text;
-      depth = todoCore.depth;
-      lifeline = todoCore.lifeline;
-      deadline = todoCore.deadline;
-      hardness = todoCore.hardness;
-      constraint = todoCore.constraint;
-      estimatedTime = todoCore.estimatedTime;
-      lastUpdateTime = todoCore.lastUpdateTime;
+      super(todoCore);
       if (todoCore instanceof Todo)
       {
         final Todo todo = (Todo)todoCore;
@@ -137,17 +114,6 @@ public class Todo extends TodoCore
         lastChild = false;
       }
     }
-    public Builder setId(@Nullable final String id) { this.id = id; return this; }
-    public Builder setOrd(@NonNull final String ord) { this.ord = ord; return this; }
-    public Builder setCompletionTime(final long completionTime) { this.completionTime = completionTime; return this; }
-    public Builder setText(@NonNull final String text) { this.text = text; return this; }
-    public Builder setDepth(final int depth) { this.depth = depth; return this; }
-    public Builder setLifeline(final long lifeline) { this.lifeline = lifeline; return this; }
-    public Builder setDeadline(final long deadline) { this.deadline = deadline; return this; }
-    public Builder setHardness(final int hardness) { this.hardness = hardness; return this; }
-    public Builder setConstraint(final int constraint) { this.constraint = constraint; return this; }
-    public Builder setEstimatedTime(final int estimatedTime) { this.estimatedTime = estimatedTime; return this; }
-    public Builder setLastUpdateTime(final long lastUpdateTime) { this.lastUpdateTime = lastUpdateTime; return this; }
     public Builder setParent(@Nullable final Todo parent) { this.parent = parent; return this; }
     public Builder setOpen(final boolean open) { this.open = open; return this; }
     public Builder setLeaf(final boolean leaf) { this.leaf = leaf; return this; }
@@ -159,6 +125,11 @@ public class Todo extends TodoCore
       ui.leaf = leaf;
       return new Todo(id, ord, creationTime, completionTime, text, depth, lifeline, deadline, hardness, constraint, estimatedTime, lastUpdateTime, ui);
     }
+  }
+
+  @Override public TodoBuilder<Todo> builder()
+  {
+    return new Builder(this);
   }
 
   // Utility functions

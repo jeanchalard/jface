@@ -1,7 +1,6 @@
 package com.j.jface.org
 
 import android.animation.ObjectAnimator
-import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.text.Editable
 import android.text.TextWatcher
@@ -177,7 +176,7 @@ class TodoViewHolder(itemView : View,
   fun requestFocus()
   {
     mEditText.requestFocus()
-    val imm = mEditText.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    val imm = mEditText.context.getSystemService(InputMethodManager::class.java)
     imm?.showSoftInput(mEditText, 0)
   }
 

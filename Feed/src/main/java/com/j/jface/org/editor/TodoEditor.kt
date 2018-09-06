@@ -14,6 +14,7 @@ import com.j.jface.lifecycle.ActivityWrapper
 import com.j.jface.lifecycle.AuthTrampoline
 import com.j.jface.lifecycle.WrappedActivity
 import com.j.jface.org.todo.Todo
+import com.j.jface.org.todo.TodoCore
 import com.j.jface.org.todo.TodoUpdaterProxy
 import java.util.*
 
@@ -113,7 +114,7 @@ class TodoEditor(a : WrappedActivity.Args) : WrappedActivity(a)
     {
       val editing = mEditing ?: return
       setTextDate(editing, newDate)
-      val b = Todo.Builder(mTodo)
+      val b = mTodo.builder()
       if (mLifeline === editing)
         b.setLifeline(newDate)
       else
@@ -148,17 +149,17 @@ class TodoEditor(a : WrappedActivity.Args) : WrappedActivity(a)
     override fun onItemSelected(parent : AdapterView<*>, view : View?, position : Int, id : Long)
     {
       if (null == view) return
-      val b : Todo.Builder
+      val b : TodoCore.TodoBuilder<Todo>
       if (view.parent === mHardness)
       {
         if (position == mTodo.hardness) return
-        b = Todo.Builder(mTodo)
+        b = mTodo.builder()
         b.setHardness(position)
       }
       else if (view.parent === mConstraint)
       {
         if (position == mTodo.constraint) return
-        b = Todo.Builder(mTodo)
+        b = mTodo.builder()
         b.setConstraint(position)
       }
       else return
@@ -173,7 +174,7 @@ class TodoEditor(a : WrappedActivity.Args) : WrappedActivity(a)
 
     override fun onValueChange(picker : NumericPicker, oldVal : Int, newVal : Int)
     {
-      mTodo = Todo.Builder(mTodo).setEstimatedTime(if (newVal < 0) newVal else newVal * 5).build()
+      mTodo = mTodo.builder().setEstimatedTime(if (newVal < 0) newVal else newVal * 5).build()
       mUpdater.updateTodo(mTodo)
     }
 

@@ -8,10 +8,6 @@ import com.j.jface.nextNotifId
 import com.j.jface.notifManager
 import com.j.jface.org.todo.TodoCore
 
-const val CHANNEL_ID = "jorg_todo"
-const val CHANNEL_NAME = "Jormungand : Todo"
-const val LAST_NOTIF_ID = "todo_lastId"
-
 class NotifEngine(val context : Context)
 {
   enum class NotifType
@@ -24,6 +20,10 @@ class NotifEngine(val context : Context)
 
   companion object
   {
+    const val CHANNEL_ID = "jorg_todo"
+    const val CHANNEL_NAME = "Jormungand : Todo"
+    const val LAST_NOTIF_ID = "todo_lastId"
+
     internal fun getChannel(context : Context) : NotificationChannel
     {
       val notifManager = context.notifManager

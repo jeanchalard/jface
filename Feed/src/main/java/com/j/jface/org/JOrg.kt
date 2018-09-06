@@ -155,7 +155,7 @@ class JOrg(args : WrappedActivity.Args) : WrappedActivity(args)
   fun updateTodoContents(todo : Todo, editable : Editable) : Todo
   {
     val text = editable.toString()
-    val newTodo = Todo.Builder(todo).setText(text).build()
+    val newTodo = todo.builder().setText(text).build()
     mTodoList?.updateTodo(newTodo)
     return newTodo
   }
