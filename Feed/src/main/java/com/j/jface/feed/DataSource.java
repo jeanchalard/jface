@@ -17,13 +17,13 @@ public class DataSource
 
   private static final DataSource[] J_SOURCES = {
    new DataSource(Const.日比谷線_北千住_平日,
-    "http://www.tokyometro.jp/station/kita-senju/timetable/hibiya/a/index.html", HibiyaParser.class),
+    "https://www.tokyometro.jp/station/kita-senju/timetable/hibiya/a/index.html", HibiyaParser.class),
    new DataSource(Const.日比谷線_北千住_休日,
-    "http://www.tokyometro.jp/station/kita-senju/timetable/hibiya/a/holiday.html", HibiyaParser.class),
+    "https://www.tokyometro.jp/station/kita-senju/timetable/hibiya/a/holiday.html", HibiyaParser.class),
    new DataSource(Const.日比谷線_六本木_平日,
-    "http://www.tokyometro.jp/station/roppongi/timetable/hibiya/b/index.html", HibiyaParser.class),
+    "https://www.tokyometro.jp/station/roppongi/timetable/hibiya/b/index.html", HibiyaParser.class),
    new DataSource(Const.日比谷線_六本木_休日,
-    "http://www.tokyometro.jp/station/roppongi/timetable/hibiya/b/holiday.html", HibiyaParser.class),
+    "https://www.tokyometro.jp/station/roppongi/timetable/hibiya/b/holiday.html", HibiyaParser.class),
    new DataSource(Const.京成線_千住大橋_上野方面_平日,
     "http://keisei.ekitan.com/norikae/pc/T5?dir=35&dw=0&slCode=254-4&d=1", KeiseiParser.class),
    new DataSource(Const.京成線_千住大橋_上野方面_休日,

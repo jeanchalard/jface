@@ -31,7 +31,7 @@ public class FragmentWrapper<T extends WrappedFragment> extends Fragment
 
   @SuppressWarnings("unchecked") @Override public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle icicle)
   {
-    mW = (T)WrapUtils.build(wrappedClass,
+    mW = WrapUtils.build(wrappedClass,
      new Class[]{Args.class, arg.getClass()},
      new Object[]{new Args(this, inflater, container, icicle), arg});
     return mW.getView();

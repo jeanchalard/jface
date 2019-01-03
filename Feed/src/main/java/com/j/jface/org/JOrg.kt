@@ -64,7 +64,7 @@ class JOrg(args : WrappedActivity.Args) : WrappedActivity(args)
     val loadingSpinner = mA.findViewById<ProgressBar>(R.id.orgTop_loading)
     mRecyclerView.addItemDecoration(DividerItemDecoration(mA, (mRecyclerView.layoutManager as LinearLayoutManager).orientation))
     val fab = mA.findViewById<FloatingActionButton>(R.id.addTodo)
-    fab.setOnClickListener { _ -> addNewSubTodo(null) }
+    fab.setOnClickListener { addNewSubTodo(null) }
 
     val editedTodoId : String? = mA.intent.getStringExtra(Const.EXTRA_TODO_ID)
     if (null == editedTodoId) mA.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
@@ -148,7 +148,7 @@ class JOrg(args : WrappedActivity.Args) : WrappedActivity(args)
     val oldTree = todoList.markTodoCompleteAndReturnOldTree(todo)
     val undoChance = Snackbar.make(mTopLayout, "Marked done.", Snackbar.LENGTH_LONG)
     undoChance.duration = 8000 // 8 seconds, because LENGTH_LONG is punily short
-    undoChance.setAction("Undo") { _ -> for (t in oldTree) todoList.updateRawTodo(t) }
+    undoChance.setAction("Undo") { for (t in oldTree) todoList.updateRawTodo(t) }
     undoChance.show()
   }
 

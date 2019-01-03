@@ -9,6 +9,7 @@ import com.j.jface.wear.Wear;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.ParseException;
@@ -48,6 +49,9 @@ public class FeedLoader
         final HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
         if (url.getAuthority().startsWith("keisei"))
           urlConnection.addRequestProperty("User-Agent", "Mozilla");
+        urlConnection.setInstanceFollowRedirects(true);
+        int code = urlConnection.getResponseCode();
+        if (2 != code / 100) throw new ParseException("Can't open URL (HTTP" + code + ") : " + url, 0);
         final BufferedInputStream in = new BufferedInputStream(urlConnection.getInputStream());
         final FeedParser parser = ds.parser.newInstance();
         final DataMap data = parser.parseStream(ds.name, in);
