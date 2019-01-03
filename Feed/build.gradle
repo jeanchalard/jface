@@ -5,11 +5,11 @@ List<String> dirs = ['main']
 
 android {
     compileSdkVersion 27
-    buildToolsVersion '27.0.3'
+    buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "com.j.jface"
-        minSdkVersion 26 // STOPSHIP : somehow work around geofences service being broken, or send this down to 25
-        targetSdkVersion 26 // STOPSHIP : likewise
+        minSdkVersion 25 // STOPSHIP : as of API 26 geofences are broken. Somehow work around this, or keep this at 25
+        targetSdkVersion 25 // STOPSHIP : likewise
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
