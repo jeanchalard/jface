@@ -22,6 +22,10 @@ public class Const
   public static final int DESTROY_DATABASE_AND_REPLACE_WITH_FILE_CONTENTS_RESULT_CODE = 200;
   public static final int GOOGLE_SIGN_IN_RESULT_CODE = 300;
   public static final int NOTIFICATION_RESULT_CODE = 400;
+  public static final int NOTIFICATION_TYPE_SUGGESTION = 401;
+  public static final int NOTIFICATION_TYPE_SPLIT = 402;
+  public static final int NOTIFICATION_TYPE_FILLIN = 403;
+  public static final int NOTIFICATION_TYPE_CANCEL_DONE = 404;
 
   @NonNull public static final String INTERNAL_PERSISTED_VALUES_FILES = "SystemValues";
 
@@ -59,8 +63,11 @@ public class Const
 
   @NonNull public static final String EXTRA_TODO_ID = "todoId";
   @NonNull public static final String EXTRA_NOTIF_ID = "notifId";
+  @NonNull public static final String EXTRA_NOTIF_TYPE = "notifType";
   @NonNull public static final String EXTRA_PATH = "path";
   @NonNull public static final String EXTRA_WEAR_DATA = "wearData";
+  @NonNull public static final String EXTRA_FILLIN_FIELD = "fillinField";
+  @NonNull public static final String EXTRA_FILLIN_REPLY_INDEX = "fillinReplyIndex";
 
   @NonNull public static final String EXTRA_TODO_SUBITEMS = "todoSubitems";
 

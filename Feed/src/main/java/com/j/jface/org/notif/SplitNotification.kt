@@ -11,6 +11,10 @@ import com.j.jface.org.AutomaticEditorProcessor
 import com.j.jface.org.JOrg
 import com.j.jface.org.todo.TodoCore
 
+const val HOUR = 60L * 60 * 1_000
+const val DAY = 24 * HOUR
+const val MONTH = 30 * DAY // 30 days is a month, sure
+
 /**
  * A notification suggesting the user split a TODO into multiple subitems.
  */
@@ -18,30 +22,22 @@ class SplitNotification(val context : Context)
 {
   private fun TodoCore.timeAgo() : String
   {
-    val HOUR = 60L * 60 * 1_000
-    val DAY = 24 * HOUR
-    val MONTH = 30 * DAY // 30 days is a month, sure
     val diff = System.currentTimeMillis() - this.lastUpdateTime
     if (diff < 0) return "in the future"
-    return if (diff > 2 * MONTH)
-      "${diff / MONTH} months ago"
-    else if (diff > MONTH)
-      "last month"
-    else if (diff > 2 * DAY)
-      "${diff / DAY} days ago"
-    else if (diff > DAY)
-      "yesterday"
-    else if (diff > 2 * HOUR)
-      "${diff / HOUR} hours ago"
-    else
-      "in the last two hours"
+    return when
+    {
+      diff > 2 * MONTH -> "${diff / MONTH} months ago"
+      diff > MONTH     -> "last month"
+      diff > 2 * DAY   -> "${diff / DAY} days ago"
+      diff > DAY       -> "yesterday"
+      diff > 2 * HOUR  -> "${diff / HOUR} hours ago"
+      else             -> "in the last two hours"
+    }
   }
 
-  private fun buildSplitNotificationAction(id : Int, todo : TodoCore) : Notification.Action
+  private fun buildSplitNotificationAction(existingIntent : Intent) : Notification.Action
   {
-    val intent = Intent(context, AutomaticEditorProcessor.Receiver::class.java)
-    intent.putExtra(Const.EXTRA_TODO_ID, todo.id)
-    intent.putExtra(Const.EXTRA_NOTIF_ID, id)
+    val intent = Intent(existingIntent).setClass(context, AutomaticEditorProcessor.Receiver::class.java)
     val pendingIntent = PendingIntent.getBroadcast(context, Const.NOTIFICATION_RESULT_CODE, intent, PendingIntent.FLAG_ONE_SHOT)
     return Notification.Action.Builder(null, "Subitems", pendingIntent)
      .addRemoteInput(RemoteInput.Builder(Const.EXTRA_TODO_SUBITEMS)
@@ -53,8 +49,9 @@ class SplitNotification(val context : Context)
   internal fun buildSplitNotification(id : Int, todo : TodoCore) : Notification
   {
     val intent = Intent(context, JOrg.activityClass())
-    intent.putExtra(Const.EXTRA_TODO_ID, todo.id)
-    intent.putExtra(Const.EXTRA_NOTIF_ID, id)
+     .putExtra(Const.EXTRA_TODO_ID, todo.id)
+     .putExtra(Const.EXTRA_NOTIF_ID, id)
+     .putExtra(Const.EXTRA_NOTIF_TYPE, Const.NOTIFICATION_TYPE_SPLIT)
     val pendingIntent = PendingIntent.getActivity(context, Const.NOTIFICATION_RESULT_CODE, intent, PendingIntent.FLAG_ONE_SHOT)
 
     val title = "Split todo : " + todo.text
@@ -72,7 +69,7 @@ class SplitNotification(val context : Context)
       setOnlyAlertOnce(true)
       setCategory(Notification.CATEGORY_REMINDER)
       setVisibility(Notification.VISIBILITY_SECRET)
-      addAction(buildSplitNotificationAction(id, todo))
+      addAction(buildSplitNotificationAction(intent))
       // setContentIntent()
       // setDeleteIntent() // when dismissed
       // setCustomRemoveViews() // bazooka

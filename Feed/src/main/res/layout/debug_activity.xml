@@ -8,4 +8,17 @@
    android:layout_width="match_parent"
    android:layout_height="wrap_content"
    android:text="Try notif" />
+
+  <Button
+   android:id="@+id/apply_oneshot_change"
+   android:layout_marginTop="400dp"
+   android:layout_width="match_parent"
+   android:layout_height="wrap_content"
+   android:text="Apply oneshot change" />
+  <TextView
+   android:id="@+id/debug_exception_text"
+   android:layout_width="match_parent"
+   android:layout_height="wrap_content"
+   android:text="" />
+
 </LinearLayout>

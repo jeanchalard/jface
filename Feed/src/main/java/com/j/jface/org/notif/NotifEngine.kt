@@ -43,7 +43,14 @@ class NotifEngine(val context : Context)
   fun splitNotification(todo : TodoCore)
   {
     val id = context.nextNotifId(LAST_NOTIF_ID)
-    val notification = SplitNotification(context).buildSplitNotification(id, todo)
+    val notification = FillinNotification(context).buildFillinNotification(id, todo)
+    context.notifManager.notify(id, notification)
+  }
+
+  fun suggestionNotification(todo : TodoCore)
+  {
+    val id = context.nextNotifId(LAST_NOTIF_ID)
+    val notification = SuggestionNotification(context).buildSuggestionNotification(id, todo)
     context.notifManager.notify(id, notification)
   }
 }

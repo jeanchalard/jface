@@ -13,8 +13,9 @@ import com.j.jface.R
 import com.j.jface.lifecycle.ActivityWrapper
 import com.j.jface.lifecycle.AuthTrampoline
 import com.j.jface.lifecycle.WrappedActivity
+import com.j.jface.org.notif.FillinNotification
+import com.j.jface.org.notif.NotifEngine
 import com.j.jface.org.todo.Todo
-import com.j.jface.org.todo.TodoCore
 import com.j.jface.org.todo.TodoUpdaterProxy
 import java.util.*
 
@@ -32,14 +33,42 @@ class TodoEditor(a : WrappedActivity.Args) : WrappedActivity(a)
     mA.setContentView(R.layout.todo_editor)
     val title = mA.findViewById<TextView>(R.id.todoEditor_title)
 
-    val intent = mA.intent
-    val todoId = intent?.getStringExtra(Const.EXTRA_TODO_ID)
     val updaterProxy = TodoUpdaterProxy.getInstance(mA)
-    val t = if (null == todoId) Todo.NULL_TODO else updaterProxy.findById(todoId)
-    val todo = t ?: Todo.NULL_TODO
+
+    val intent = mA.intent
+    val todo : Todo
+    val openField : Int
+    val todoId = intent?.getStringExtra(Const.EXTRA_TODO_ID)
+    if (null == intent || null == todoId)
+    {
+      todo = Todo.NULL_TODO
+      openField = -1
+    }
+    else
+    {
+      todo = updaterProxy.findById(todoId) ?: Todo.NULL_TODO
+      // No need to read the notif ID if the control comes here, as it should have been dismissed by the system already.
+      openField = when
+      {
+        // At this time, only FILLIN notifications implemented
+        intent.getIntExtra(Const.EXTRA_NOTIF_TYPE, -1) != NotifEngine.NotifType.FILLIN.ordinal -> -1
+        // A reply should never be present
+        -1 != intent.getIntExtra(Const.EXTRA_FILLIN_REPLY_INDEX, -1)                           -> -1
+        else -> FillinNotification.Field.values()[intent.getIntExtra(Const.EXTRA_FILLIN_FIELD, -1)].fieldId
+      }
+    }
 
     title.text = todo.text
     mDetails = TodoDetails(updaterProxy, todo, mA.findViewById(R.id.todoEditor_details))
+    if (openField > 0)
+    {
+      val openView = mA.findViewById<View>(openField)
+      openView?.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener
+      {
+        override fun onViewAttachedToWindow(v : View?) { v?.performClick() }
+        override fun onViewDetachedFromWindow(v : View?) = Unit
+      })
+    }
   }
 
   companion object
@@ -54,7 +83,7 @@ class TodoEditor(a : WrappedActivity.Args) : WrappedActivity(a)
     private val mCalendarView : CalendarView = mRootView.findViewById(R.id.todoDetails_calendarView)
     private val mHardness : Spinner = mRootView.findViewById(R.id.todoDetails_hardness)
     private val mConstraint : Spinner = mRootView.findViewById(R.id.todoDetails_constraint)
-    private val mEstimatedTime : NumericPicker = mRootView.findViewById(R.id.todoDetails_estimatedTime)
+    private val mEstimatedTimeFiveMinutes : NumericPicker = mRootView.findViewById(R.id.todoDetails_estimatedTime) // By increments of 5'
     private var mEditing : TextView? = null
 
     init
@@ -73,9 +102,9 @@ class TodoEditor(a : WrappedActivity.Args) : WrappedActivity(a)
       mConstraint.onItemSelectedListener = this
       mConstraint.setBackgroundResource(R.drawable.rectangle)
 
-      mEstimatedTime.minValue = -1
-      mEstimatedTime.maxValue = 96
-      mEstimatedTime.setOnValueChangedListener(this)
+      mEstimatedTimeFiveMinutes.minValue = -1
+      mEstimatedTimeFiveMinutes.maxValue = 96
+      mEstimatedTimeFiveMinutes.setOnValueChangedListener(this)
 
       bind(mTodo)
     }
@@ -95,7 +124,7 @@ class TodoEditor(a : WrappedActivity.Args) : WrappedActivity(a)
       setTextDate(mDeadline, todo.deadline)
       mHardness.setSelection(todo.hardness)
       mConstraint.setSelection(todo.constraint)
-      mEstimatedTime.value = if (mTodo.estimatedTime < 0) mTodo.estimatedTime else mTodo.estimatedTime / 5
+      mEstimatedTimeFiveMinutes.value = if (mTodo.estimatedTimeMinutes < 0) mTodo.estimatedTimeMinutes else mTodo.estimatedTimeMinutes / 5
       mCalendarView.visibility = View.GONE
     }
 
@@ -149,21 +178,17 @@ class TodoEditor(a : WrappedActivity.Args) : WrappedActivity(a)
     override fun onItemSelected(parent : AdapterView<*>, view : View?, position : Int, id : Long)
     {
       if (null == view) return
-      val b : TodoCore.TodoBuilder<Todo>
       if (view.parent === mHardness)
       {
         if (position == mTodo.hardness) return
-        b = mTodo.builder()
-        b.setHardness(position)
+        mTodo = mTodo.withHardness(position)
       }
       else if (view.parent === mConstraint)
       {
         if (position == mTodo.constraint) return
-        b = mTodo.builder()
-        b.setConstraint(position)
+        mTodo = mTodo.withConstraint(position)
       }
       else return
-      mTodo = b.build()
       mUpdater.updateTodo(mTodo)
     }
 
@@ -174,7 +199,7 @@ class TodoEditor(a : WrappedActivity.Args) : WrappedActivity(a)
 
     override fun onValueChange(picker : NumericPicker, oldVal : Int, newVal : Int)
     {
-      mTodo = mTodo.builder().setEstimatedTime(if (newVal < 0) newVal else newVal * 5).build()
+      mTodo = mTodo.builder().setEstimatedTimeMinutes(if (newVal < 0) newVal else newVal * 5).build()
       mUpdater.updateTodo(mTodo)
     }
 
