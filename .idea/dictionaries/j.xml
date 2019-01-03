@@ -2,20 +2,25 @@
   <dictionary name="j">
     <words>
       <w>coord</w>
+      <w>fillin</w>
       <w>firebase</w>
       <w>firestore</w>
       <w>foldable</w>
       <w>geofence</w>
       <w>geofences</w>
       <w>hardnesses</w>
+      <w>hibiya</w>
       <w>jface</w>
       <w>jormungand</w>
       <w>jwatch</w>
+      <w>keisei</w>
       <w>mozilla</w>
+      <w>nippori</w>
       <w>notif</w>
       <w>orgtool</w>
       <w>semihard</w>
       <w>senju</w>
+      <w>shihatsu</w>
       <w>snackbar</w>
       <w>subitem</w>
       <w>subitems</w>
