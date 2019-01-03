@@ -110,8 +110,8 @@ public class TodoSource implements Firebase.TodoUpdateListener.Listener
     cv.put(TodoProviderContract.COLUMN_lifeline, todo.lifeline);
     cv.put(TodoProviderContract.COLUMN_deadline, todo.deadline);
     cv.put(TodoProviderContract.COLUMN_hardness, todo.hardness);
-    cv.put(TodoProviderContract.COLUMN_constraint, todo.constraint);
-    cv.put(TodoProviderContract.COLUMN_estimatedTime, todo.estimatedTime);
+    cv.put(TodoProviderContract.COLUMN_constraintSql, todo.constraint);
+    cv.put(TodoProviderContract.COLUMN_estimatedTime, todo.estimatedTimeMinutes);
     cv.put(TodoProviderContract.COLUMN_updateTime, System.currentTimeMillis());
     return cv;
   }

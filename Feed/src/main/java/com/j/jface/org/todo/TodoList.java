@@ -160,7 +160,6 @@ class TodoList implements Iterable<Todo>, TodoUpdaterProxy, TodoSource.ListChang
   @NonNull public Todo createAndInsertTodo(@NonNull final String text, @Nullable final Todo parent)
   {
     final Todo result = new Todo.Builder(text, ordForNewChild(parent))
-     .setDepth(null == parent ? 0 : parent.depth + 1)
      .setParent(parent)
      .setOpen(true)
      .setLastChild(true)

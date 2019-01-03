@@ -44,7 +44,7 @@ class TodoProvider(a : WrappedContentProvider.Args) : WrappedContentProvider(a),
        /*  7 */              TodoProviderContract.COLUMN_lifeline + " INTEGER," +
        /*  8 */              TodoProviderContract.COLUMN_deadline + " INTEGER," +
        /*  9 */              TodoProviderContract.COLUMN_hardness + " TINYINT," +
-       /* 10 */              TodoProviderContract.COLUMN_constraint + " TINYINT," +
+       /* 10 */              TodoProviderContract.COLUMN_constraintSql + " TINYINT," +
        /* 11 */              TodoProviderContract.COLUMN_estimatedTime + " INTEGER," +
        /* 12 */              TodoProviderContract.COLUMN_status + " INTEGER)")
       sqLiteDatabase.execSQL("CREATE TABLE " + TodoProviderContract.UI_METADATA_TABLE_NAME + " (" +

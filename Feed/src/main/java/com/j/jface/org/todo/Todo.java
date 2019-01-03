@@ -65,11 +65,11 @@ public class Todo extends TodoCore
               final long deadline,
               final int hardness,
               final int constraint,
-              final int estimatedTime,
+              final int estimatedTimeMinutes,
               final long lastUpdateTime,
               @NonNull final TodoUI params)
   {
-    super(id, ord, creationTime, completionTime, text, depth, lifeline, deadline, hardness, constraint, estimatedTime, lastUpdateTime);
+    super(id, ord, creationTime, completionTime, text, depth, lifeline, deadline, hardness, constraint, estimatedTimeMinutes, lastUpdateTime);
     ui = params;
   }
 
@@ -87,7 +87,7 @@ public class Todo extends TodoCore
     else return other instanceof TodoCore;
   }
 
-  public static class Builder extends TodoCore.TodoBuilder<Todo>
+  public static class Builder extends TodoCore.TodoBuilder<Builder>
   {
     @Nullable private Todo parent;
     private boolean open;
@@ -119,15 +119,15 @@ public class Todo extends TodoCore
     public Builder setLeaf(final boolean leaf) { this.leaf = leaf; return this; }
     public Builder setLastChild(final boolean lastChild) { this.lastChild = lastChild; return this; }
 
-    public Todo build()
+    @Override public Todo build()
     {
       final TodoUI ui = new TodoUI(parent, open, lastChild);
       ui.leaf = leaf;
-      return new Todo(id, ord, creationTime, completionTime, text, depth, lifeline, deadline, hardness, constraint, estimatedTime, lastUpdateTime, ui);
+      return new Todo(id, ord, creationTime, completionTime, text, depth, lifeline, deadline, hardness, constraint, estimatedTimeMinutes, lastUpdateTime, ui);
     }
   }
 
-  @Override public TodoBuilder<Todo> builder()
+  @Override @NonNull public Builder builder()
   {
     return new Builder(this);
   }

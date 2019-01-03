@@ -19,14 +19,15 @@ internal object TodoProviderContract
   const val COLUMN_id = "id"
   const val COLUMN_ord = "ord"
   const val COLUMN_creationTime = "creationTime"
-  const val COLUMN_updateTime = "updateTime"
+  const val COLUMN_updateTime = "lastUpdateTime"
   const val COLUMN_completionTime = "completionTime"
   const val COLUMN_text = "text"
   const val COLUMN_depth = "depth"
   const val COLUMN_lifeline = "lifeline"
   const val COLUMN_deadline = "deadline"
   const val COLUMN_hardness = "hardness"
-  const val COLUMN_constraint = "constraintSpec" // "constraint" is a reserved SQL word :/
+  const val COLUMN_constraint = "constraint"
+  const val COLUMN_constraintSql = "constraintSpec" // "constraint" is a reserved SQL word :/
   const val COLUMN_estimatedTime = "estimatedTime"
   const val COLUMN_status = "status"
 
