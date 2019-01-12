@@ -19,7 +19,6 @@ public class Const
   public static final int DISPLAYED_DEPARTURES_PER_LINE = 3;
 
   public static final int CHOOSE_IMAGE_RESULT_CODE = 100;
-  public static final int DESTROY_DATABASE_AND_REPLACE_WITH_FILE_CONTENTS_RESULT_CODE = 200;
   public static final int GOOGLE_SIGN_IN_RESULT_CODE = 300;
   public static final int NOTIFICATION_RESULT_CODE = 400;
   public static final int NOTIFICATION_TYPE_SUGGESTION = 401;

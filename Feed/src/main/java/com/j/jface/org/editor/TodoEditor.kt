@@ -124,7 +124,7 @@ class TodoEditor(a : WrappedActivity.Args) : WrappedActivity(a)
       setTextDate(mDeadline, todo.deadline)
       mHardness.setSelection(todo.hardness)
       mConstraint.setSelection(todo.constraint)
-      mEstimatedTimeFiveMinutes.value = if (mTodo.estimatedTimeMinutes < 0) mTodo.estimatedTimeMinutes else mTodo.estimatedTimeMinutes / 5
+      mEstimatedTimeFiveMinutes.value = if (mTodo.estimatedMinutes < 0) mTodo.estimatedMinutes else mTodo.estimatedMinutes / 5
       mCalendarView.visibility = View.GONE
     }
 
@@ -199,7 +199,7 @@ class TodoEditor(a : WrappedActivity.Args) : WrappedActivity(a)
 
     override fun onValueChange(picker : NumericPicker, oldVal : Int, newVal : Int)
     {
-      mTodo = mTodo.builder().setEstimatedTimeMinutes(if (newVal < 0) newVal else newVal * 5).build()
+      mTodo = mTodo.builder().setEstimatedMinutes(if (newVal < 0) newVal else newVal * 5).build()
       mUpdater.updateTodo(mTodo)
     }
 

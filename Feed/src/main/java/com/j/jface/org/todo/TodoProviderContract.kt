@@ -8,9 +8,7 @@ internal object TodoProviderContract
 {
   const val BASE_URI_SCHEME = "content"
   const val BASE_URI_HOST = Const.APP_PACKAGE + ".provider"
-  const val TABLE_NAME = "todo"
   const val UI_METADATA_TABLE_NAME = "uiMetadata"
-  val BASE_URI_TODO = Uri.parse("${BASE_URI_SCHEME}://${BASE_URI_HOST}/${TABLE_NAME}")!!
   val BASE_URI_METADATA = Uri.parse("${BASE_URI_SCHEME}://${BASE_URI_HOST}/${UI_METADATA_TABLE_NAME}")!!
 
   const val MIMETYPE_TODOLIST = "vnd.android.cursor.dir/vnd.com.j.jface.todolist"
@@ -27,23 +25,7 @@ internal object TodoProviderContract
   const val COLUMN_deadline = "deadline"
   const val COLUMN_hardness = "hardness"
   const val COLUMN_constraint = "constraint"
-  const val COLUMN_constraintSql = "constraintSpec" // "constraint" is a reserved SQL word :/
-  const val COLUMN_estimatedTime = "estimatedTime"
-  const val COLUMN_status = "status"
-
-  const val COLUMNINDEX_id = 0
-  const val COLUMNINDEX_ord = 1
-  const val COLUMNINDEX_creationTime = 2
-  const val COLUMNINDEX_updateTime = 3
-  const val COLUMNINDEX_completionTime = 4
-  const val COLUMNINDEX_text = 5
-  const val COLUMNINDEX_depth = 6
-  const val COLUMNINDEX_lifeline = 7
-  const val COLUMNINDEX_deadline = 8
-  const val COLUMNINDEX_hardness = 9
-  const val COLUMNINDEX_constraint = 10
-  const val COLUMNINDEX_estimatedTime = 11
-  const val COLUMNINDEX_status = 12
+  const val COLUMN_estimatedMinutes = "estimatedMinutes"
 
   // UI save table
   const val COLUMN_open = "open"

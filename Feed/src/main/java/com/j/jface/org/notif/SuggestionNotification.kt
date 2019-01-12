@@ -21,7 +21,7 @@ class SuggestionNotification(val context : Context)
 
   fun buildSuggestionNotification(id : Int, todo : TodoCore) : Notification
   {
-    val title = "Got ${if (todo.estimatedTimeMinutes > 5) "10" else "5"} min ?"
+    val title = "Got ${if (todo.estimatedMinutes > 5) "10" else "5"} min ?"
     val description = "Do this : " + todo.text
     val intent = Intent(context, JOrg.activityClass())
      .putExtra(Const.EXTRA_TODO_ID, todo.id)

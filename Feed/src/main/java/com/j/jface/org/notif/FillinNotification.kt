@@ -34,9 +34,9 @@ class FillinNotification(val context : Context)
      Reply("Home") { it.withConstraint(TodoCore.ON_HOME) },
      Reply("Work") { it.withConstraint(TodoCore.ON_WORK) }),
     ESTIMATED_TIME(30, "How long will this take ?", R.id.todoDetails_estimatedTime,
-     Reply("5'") { it.withEstimatedTimeMinutes(5) },
-     Reply("15'") { it.withEstimatedTimeMinutes(15) },
-     Reply("1h") { it.withEstimatedTimeMinutes(60) });
+     Reply("5'") { it.withEstimatedMinutes(5) },
+     Reply("15'") { it.withEstimatedMinutes(15) },
+     Reply("1h") { it.withEstimatedMinutes(60) });
   }
 
   private fun buildFillinNotificationActions(existingIntent : Intent, attr : Field) : List<Notification.Action>
@@ -54,7 +54,7 @@ class FillinNotification(val context : Context)
     if (0L == todo.deadline) r.add(Field.DEADLINE)
     else if (TodoCore.UNKNOWN == todo.hardness) r.add(Field.HARDNESS)
     if (TodoCore.UNKNOWN == todo.constraint) r.add(Field.CONSTRAINT)
-    if (0 == todo.estimatedTimeMinutes) r.add(Field.ESTIMATED_TIME)
+    if (0 == todo.estimatedMinutes) r.add(Field.ESTIMATED_TIME)
     return r
   }
 

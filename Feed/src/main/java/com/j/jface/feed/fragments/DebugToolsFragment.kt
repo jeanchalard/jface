@@ -89,13 +89,6 @@ class DebugToolsFragment(a : WrappedFragment.Args, private val mWear : Wear) : W
       a.fragment.activity.runOnUiThread { nodeNameTextView.text = "Node id : ${nodeName}" }
     }
 
-    mView.findViewById<View>(R.id.button_copy_todo_from_storage).setOnClickListener {
-      val intent = Intent()
-      intent.type = "*/*"
-      intent.action = Intent.ACTION_GET_CONTENT
-      a.fragment.startActivityForResult(intent, Const.DESTROY_DATABASE_AND_REPLACE_WITH_FILE_CONTENTS_RESULT_CODE)
-    }
-
     mView.findViewById<View>(R.id.button_delete_FCM_token).setOnClickListener {
       Thread {
         try
@@ -159,35 +152,6 @@ class DebugToolsFragment(a : WrappedFragment.Args, private val mWear : Wear) : W
   {
     SnackbarRegistry.unsetSnackbarParent(mView)
     mWearUpdateListener.pause()
-  }
-
-  override fun onActivityResult(requestCode : Int, resultCode : Int, data : Intent?)
-  {
-    if (null == data || Const.DESTROY_DATABASE_AND_REPLACE_WITH_FILE_CONTENTS_RESULT_CODE != requestCode) return
-    val fileUri = data.data
-    var exception : FileNotFoundException? = null
-    if (null != fileUri)
-    {
-      var inputStream : InputStream? = null
-      try
-      {
-        inputStream = mFragment.context.contentResolver.openInputStream(fileUri)
-      }
-      catch (e : FileNotFoundException)
-      {
-        exception = e
-      }
-
-      if (null == exception && null != inputStream)
-      // Do this on the UI thread because YOLO. This is only for debug so we don't care.
-        if (TodoProvider.destroyDatabaseAndReplaceWithFileContents(mFragment.context, inputStream))
-        {
-          InformUserAction(mFragment.activity, "Database dumped, restart JOrg", "Kill",
-           View.OnClickListener { System.exit(0) }, null).invoke()
-          return
-        }
-    }
-    InformUserAction(mFragment.activity, "File can't be opened." + if (null == exception) "" else " " + exception.toString(), null, null, null).invoke()
   }
 
   private fun tick()

@@ -45,7 +45,7 @@ public class TodoCore implements Comparable<String>
   public final long deadline; // Timestamp : when this has to be done
   public final int hardness; // UNKNOWN or *_DEADLINE
   public final int constraint; // ANY or ON_*
-  public final int estimatedTimeMinutes; // In minutes
+  public final int estimatedMinutes; // In minutes
   public final long lastUpdateTime;
 
   public TodoCore(@NonNull final String text, @NonNull final String ord) { this(null, ord, System.currentTimeMillis(), 0, text, 0, 0, 0, UNKNOWN, UNKNOWN, -1, System.currentTimeMillis()); }
@@ -59,7 +59,7 @@ public class TodoCore implements Comparable<String>
                   final long deadline,
                   final int hardness,
                   final int constraint,
-                  final int estimatedTimeMinutes,
+                  final int estimatedMinutes,
                   final long lastUpdateTime)
   {
     this.id = null == id ? UUID.randomUUID().toString() : id;
@@ -72,7 +72,7 @@ public class TodoCore implements Comparable<String>
     this.deadline = deadline;
     this.hardness = hardness;
     this.constraint = constraint;
-    this.estimatedTimeMinutes = estimatedTimeMinutes;
+    this.estimatedMinutes = estimatedMinutes;
     this.lastUpdateTime = lastUpdateTime;
   }
 
@@ -136,10 +136,10 @@ public class TodoCore implements Comparable<String>
     protected long deadline;
     protected int hardness;
     protected int constraint;
-    protected int estimatedTimeMinutes;
+    protected int estimatedMinutes;
     protected long lastUpdateTime;
 
-    public TodoBuilder(@NonNull final String text, @NonNull final String ord) { creationTime = System.currentTimeMillis(); this.text = text; this.ord = ord; this.estimatedTimeMinutes = -1; }
+    public TodoBuilder(@NonNull final String text, @NonNull final String ord) { creationTime = System.currentTimeMillis(); this.text = text; this.ord = ord; this.estimatedMinutes = -1; }
     public TodoBuilder(@NonNull final TodoCore todo)
     {
       id = todo.id;
@@ -152,23 +152,23 @@ public class TodoCore implements Comparable<String>
       deadline = todo.deadline;
       hardness = todo.hardness;
       constraint = todo.constraint;
-      estimatedTimeMinutes = todo.estimatedTimeMinutes;
+      estimatedMinutes = todo.estimatedMinutes;
       lastUpdateTime = todo.lastUpdateTime;
     }
-    public U setId                  (@Nullable final String id)      { this.id                   = id;                   return (U) this; }
-    public U setOrd                 (@NonNull final String ord)      { this.ord                  = ord;                  return (U) this; }
-    public U setCompletionTime      (final long completionTime)      { this.completionTime       = completionTime;       return (U) this; }
-    public U setText                (@NonNull final String text)     { this.text                 = text;                 return (U) this; }
-    public U setDepth               (final int depth)                { this.depth                = depth;                return (U) this; }
-    public U setLifeline            (final long lifeline)            { this.lifeline             = lifeline;             return (U) this; }
-    public U setDeadline            (final long deadline)            { this.deadline             = deadline;             return (U) this; }
-    public U setHardness            (final int hardness)             { this.hardness             = hardness;             return (U) this; }
-    public U setConstraint          (final int constraint)           { this.constraint           = constraint;           return (U) this; }
-    public U setEstimatedTimeMinutes(final int estimatedTimeMinutes) { this.estimatedTimeMinutes = estimatedTimeMinutes; return (U) this; }
-    public U setLastUpdateTime      (final long lastUpdateTime)      { this.lastUpdateTime       = lastUpdateTime;       return (U) this; }
+    public U setId              (@Nullable final String id)  { this.id               = id;               return (U) this; }
+    public U setOrd             (@NonNull final String ord)  { this.ord              = ord;              return (U) this; }
+    public U setCompletionTime  (final long completionTime)  { this.completionTime   = completionTime;   return (U) this; }
+    public U setText            (@NonNull final String text) { this.text             = text;             return (U) this; }
+    public U setDepth           (final int depth)            { this.depth            = depth;            return (U) this; }
+    public U setLifeline        (final long lifeline)        { this.lifeline         = lifeline;         return (U) this; }
+    public U setDeadline        (final long deadline)        { this.deadline         = deadline;         return (U) this; }
+    public U setHardness        (final int hardness)         { this.hardness         = hardness;         return (U) this; }
+    public U setConstraint      (final int constraint)       { this.constraint       = constraint;       return (U) this; }
+    public U setEstimatedMinutes(final int estimatedMinutes) { this.estimatedMinutes = estimatedMinutes; return (U) this; }
+    public U setLastUpdateTime  (final long lastUpdateTime)  { this.lastUpdateTime   = lastUpdateTime;   return (U) this; }
 
     public <T extends TodoCore> T build() {
-      return (T) new TodoCore(id, ord, creationTime, completionTime, text, depth, lifeline, deadline, hardness, constraint, estimatedTimeMinutes, lastUpdateTime);
+      return (T) new TodoCore(id, ord, creationTime, completionTime, text, depth, lifeline, deadline, hardness, constraint, estimatedMinutes, lastUpdateTime);
     }
   }
   public class Builder extends TodoBuilder<Builder> {
@@ -176,15 +176,15 @@ public class TodoCore implements Comparable<String>
     public Builder(@NonNull final TodoCore todo) { super(todo); }
   }
 
-  public <T extends TodoCore> T withCompletionTime      (final long completionTime)  { return (T) builder().setCompletionTime(completionTime).build(); }
-  public <T extends TodoCore> T withText                (@NonNull final String text) { return (T) builder().setText(text).build(); }
-  public <T extends TodoCore> T withDepth               (final int depth)            { return (T) builder().setDepth(depth).build(); }
-  public <T extends TodoCore> T withLifeline            (final long lifeline)        { return (T) builder().setLifeline(lifeline).build(); }
-  public <T extends TodoCore> T withDeadline            (final long deadline)        { return (T) builder().setDeadline(deadline).build(); }
-  public <T extends TodoCore> T withHardness            (final int hardness)         { return (T) builder().setHardness(hardness).build(); }
-  public <T extends TodoCore> T withConstraint          (final int constraint)       { return (T) builder().setConstraint(constraint).build(); }
-  public <T extends TodoCore> T withEstimatedTimeMinutes(final int estimatedTime)    { return (T) builder().setEstimatedTimeMinutes(estimatedTime).build(); }
-  public <T extends TodoCore> T withLastUpdateTime      (final long lastUpdateTime)  { return (T) builder().setLastUpdateTime(lastUpdateTime).build(); }
+  public <T extends TodoCore> T withCompletionTime  (final long completionTime)  { return (T) builder().setCompletionTime(completionTime).build(); }
+  public <T extends TodoCore> T withText            (@NonNull final String text) { return (T) builder().setText(text).build(); }
+  public <T extends TodoCore> T withDepth           (final int depth)            { return (T) builder().setDepth(depth).build(); }
+  public <T extends TodoCore> T withLifeline        (final long lifeline)        { return (T) builder().setLifeline(lifeline).build(); }
+  public <T extends TodoCore> T withDeadline        (final long deadline)        { return (T) builder().setDeadline(deadline).build(); }
+  public <T extends TodoCore> T withHardness        (final int hardness)         { return (T) builder().setHardness(hardness).build(); }
+  public <T extends TodoCore> T withConstraint      (final int constraint)       { return (T) builder().setConstraint(constraint).build(); }
+  public <T extends TodoCore> T withEstimatedMinutes(final int estimatedMinutes) { return (T) builder().setEstimatedMinutes(estimatedMinutes).build(); }
+  public <T extends TodoCore> T withLastUpdateTime  (final long lastUpdateTime)  { return (T) builder().setLastUpdateTime(lastUpdateTime).build(); }
 
   public int compareTo(@NonNull final String otherOrd)
   {
@@ -205,7 +205,7 @@ public class TodoCore implements Comparable<String>
      && other.deadline == deadline
      && other.hardness == hardness
      && other.constraint == constraint
-     && other.estimatedTimeMinutes == estimatedTimeMinutes
+     && other.estimatedMinutes == estimatedMinutes
      && other.lastUpdateTime == lastUpdateTime;
   }
 

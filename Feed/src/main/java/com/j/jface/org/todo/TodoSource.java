@@ -23,7 +23,6 @@ public class TodoSource implements Firebase.TodoUpdateListener.Listener
     void onTodoUpdated(@NonNull final TodoCore todo);
   }
 
-  private static final boolean FIRESTORE = true;
   @NonNull private final ContentResolver mResolver;
 
   public TodoSource(@NonNull final Context context)
@@ -52,68 +51,19 @@ public class TodoSource implements Firebase.TodoUpdateListener.Listener
 
   @NonNull public ArrayList<TodoCore> fetchTodoList()
   {
-    if (FIRESTORE)
-      synchronized (mLock)
-      {
-        Firebase.TodoUpdateListener.INSTANCE.addListener(this);
-        final List<TodoCore> l = Firebase.INSTANCE.getTodoList();
-        if (l instanceof ArrayList) return (ArrayList<TodoCore>)l;
-        return new ArrayList<>(l);
-      }
-    else
+    synchronized (mLock)
     {
-      final String condition = "completionTime = 0";
-      final Cursor c = mResolver.query(TodoProviderContract.INSTANCE.getBASE_URI_TODO(), null, condition, null, "ord");
-      if (null == c || !c.moveToFirst()) return new ArrayList<>();
-      final ArrayList<TodoCore> todos = new ArrayList<>(c.getCount());
-      while (!c.isAfterLast())
-      {
-        final TodoCore t = new TodoCore(
-         c.getString(TodoProviderContract.COLUMNINDEX_id),
-         c.getString(TodoProviderContract.COLUMNINDEX_ord),
-         c.getLong(TodoProviderContract.COLUMNINDEX_creationTime),
-         c.getLong(TodoProviderContract.COLUMNINDEX_completionTime),
-         c.getString(TodoProviderContract.COLUMNINDEX_text),
-         c.getInt(TodoProviderContract.COLUMNINDEX_depth),
-         c.getInt(TodoProviderContract.COLUMNINDEX_lifeline),
-         c.getInt(TodoProviderContract.COLUMNINDEX_deadline),
-         c.getInt(TodoProviderContract.COLUMNINDEX_hardness),
-         c.getInt(TodoProviderContract.COLUMNINDEX_constraint),
-         c.getInt(TodoProviderContract.COLUMNINDEX_estimatedTime),
-         c.getLong(TodoProviderContract.COLUMNINDEX_updateTime));
-        c.moveToNext();
-        todos.add(t);
-        // Uncomment to write the local DB to remote
-        // Firebase.INSTANCE.updateTodo(t);
-      }
-      c.close();
-      return todos;
+      Firebase.TodoUpdateListener.INSTANCE.addListener(this);
+      final List<TodoCore> l = Firebase.INSTANCE.getTodoList();
+      if (l instanceof ArrayList) return (ArrayList<TodoCore>)l;
+      return new ArrayList<>(l);
     }
   }
 
   @NonNull public TodoCore updateTodo(@NonNull final TodoCore todo)
   {
-    mResolver.insert(Uri.withAppendedPath(TodoProviderContract.INSTANCE.getBASE_URI_TODO(), todo.id), contentValuesFromTodo(todo));
     Firebase.INSTANCE.updateTodo(todo);
     return todo;
-  }
-
-  @NonNull private ContentValues contentValuesFromTodo(@NonNull final TodoCore todo)
-  {
-    final ContentValues cv = new ContentValues();
-    cv.put(TodoProviderContract.COLUMN_id, todo.id);
-    cv.put(TodoProviderContract.COLUMN_ord, todo.ord);
-    cv.put(TodoProviderContract.COLUMN_creationTime, todo.creationTime);
-    cv.put(TodoProviderContract.COLUMN_completionTime, todo.completionTime);
-    cv.put(TodoProviderContract.COLUMN_text, todo.text);
-    cv.put(TodoProviderContract.COLUMN_depth, todo.depth);
-    cv.put(TodoProviderContract.COLUMN_lifeline, todo.lifeline);
-    cv.put(TodoProviderContract.COLUMN_deadline, todo.deadline);
-    cv.put(TodoProviderContract.COLUMN_hardness, todo.hardness);
-    cv.put(TodoProviderContract.COLUMN_constraintSql, todo.constraint);
-    cv.put(TodoProviderContract.COLUMN_estimatedTime, todo.estimatedTimeMinutes);
-    cv.put(TodoProviderContract.COLUMN_updateTime, System.currentTimeMillis());
-    return cv;
   }
 
   public boolean updateTodoOpen(@NonNull final Todo todo)

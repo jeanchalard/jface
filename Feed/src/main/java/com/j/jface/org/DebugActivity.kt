@@ -63,8 +63,8 @@ class DebugActivity(args : WrappedActivity.Args) : WrappedActivity(args), EventL
 
   fun transform(dataMap : HashMap<String, Any?>) : Map<String, Any?>
   {
-    dataMap["constraintSpec"] = dataMap["constraint"]
-    dataMap.remove("constraint")
+    dataMap["estimatedMinutes"] = dataMap["estimatedTime"]
+    dataMap.remove("estimatedTime")
     return dataMap
   }
 }

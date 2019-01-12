@@ -219,7 +219,7 @@ object Firebase
     val config = db.document(Const.DB_APP_TOP_PATH).collection(wearPathToFirebasePath(Const.CONFIG_PATH, PathType.COLLECTION)).get()
     Tasks.await(config)
     var key = ""
-    var listeners = ArrayList<String>()
+    val listeners = ArrayList<String>()
     config.result.documents.forEach {
       if (null != it[Const.CONFIG_KEY_SERVER_KEY])
         key = it.getString(Const.CONFIG_KEY_SERVER_KEY)
@@ -276,22 +276,22 @@ fun DocumentSnapshot.directToTodoCore() = TodoCore(
    this.getLong  (TodoProviderContract.COLUMN_deadline),
    this.getLong  (TodoProviderContract.COLUMN_hardness).toInt(),
    this.getLong  (TodoProviderContract.COLUMN_constraint).toInt(),
-   this.getLong  (TodoProviderContract.COLUMN_estimatedTime).toInt(),
+   this.getLong  (TodoProviderContract.COLUMN_estimatedMinutes).toInt(),
    this.getLong  (TodoProviderContract.COLUMN_updateTime).toLong())
 fun DocumentSnapshot.toTodoCoreDebug() : TodoCore {
   val id = this.getString(TodoProviderContract.COLUMN_id)
-  if (null == this.getString(TodoProviderContract.COLUMN_id))             Log.e("Todo ${id}", "id is null")
-  if (null == this.getString(TodoProviderContract.COLUMN_ord))            Log.e("Todo ${id}", "ord is null")
-  if (null == this.getLong  (TodoProviderContract.COLUMN_creationTime))   Log.e("Todo ${id}", "creationTime is null")
-  if (null == this.getLong  (TodoProviderContract.COLUMN_completionTime)) Log.e("Todo ${id}", "completionTime is null")
-  if (null == this.get      (TodoProviderContract.COLUMN_text))           Log.e("Todo ${id}", "text is null")
-  if (null == this.getLong  (TodoProviderContract.COLUMN_depth))          Log.e("Todo ${id}", "depth is null")
-  if (null == this.getLong  (TodoProviderContract.COLUMN_lifeline))       Log.e("Todo ${id}", "lifeline is null")
-  if (null == this.getLong  (TodoProviderContract.COLUMN_deadline))       Log.e("Todo ${id}", "deadline is null")
-  if (null == this.getLong  (TodoProviderContract.COLUMN_hardness))       Log.e("Todo ${id}", "hardness is null")
-  if (null == this.getLong  (TodoProviderContract.COLUMN_constraint))     Log.e("Todo ${id}", "constraint is null")
-  if (null == this.getLong  (TodoProviderContract.COLUMN_estimatedTime))  Log.e("Todo ${id}", "estimatedTime is null")
-  if (null == this.getLong  (TodoProviderContract.COLUMN_updateTime))     Log.e("Todo ${id}", "updateTime is null")
+  if (null == this.getString(TodoProviderContract.COLUMN_id))               Log.e("Todo ${id}", "id is null")
+  if (null == this.getString(TodoProviderContract.COLUMN_ord))              Log.e("Todo ${id}", "ord is null")
+  if (null == this.getLong  (TodoProviderContract.COLUMN_creationTime))     Log.e("Todo ${id}", "creationTime is null")
+  if (null == this.getLong  (TodoProviderContract.COLUMN_completionTime))   Log.e("Todo ${id}", "completionTime is null")
+  if (null == this.get      (TodoProviderContract.COLUMN_text))             Log.e("Todo ${id}", "text is null")
+  if (null == this.getLong  (TodoProviderContract.COLUMN_depth))            Log.e("Todo ${id}", "depth is null")
+  if (null == this.getLong  (TodoProviderContract.COLUMN_lifeline))         Log.e("Todo ${id}", "lifeline is null")
+  if (null == this.getLong  (TodoProviderContract.COLUMN_deadline))         Log.e("Todo ${id}", "deadline is null")
+  if (null == this.getLong  (TodoProviderContract.COLUMN_hardness))         Log.e("Todo ${id}", "hardness is null")
+  if (null == this.getLong  (TodoProviderContract.COLUMN_constraint))       Log.e("Todo ${id}", "constraint is null")
+  if (null == this.getLong  (TodoProviderContract.COLUMN_estimatedMinutes)) Log.e("Todo ${id}", "estimatedTime is null")
+  if (null == this.getLong  (TodoProviderContract.COLUMN_updateTime))       Log.e("Todo ${id}", "updateTime is null")
   return TodoCore(
    this.getString(TodoProviderContract.COLUMN_id) ?: "",
    this.getString(TodoProviderContract.COLUMN_ord) ?: "",
@@ -303,7 +303,7 @@ fun DocumentSnapshot.toTodoCoreDebug() : TodoCore {
    this.getLong  (TodoProviderContract.COLUMN_deadline) ?: -1,
    this.getLong  (TodoProviderContract.COLUMN_hardness)?.toInt() ?: -1,
    this.getLong  (TodoProviderContract.COLUMN_constraint)?.toInt() ?: -1,
-   this.getLong  (TodoProviderContract.COLUMN_estimatedTime)?.toInt() ?: -1,
+   this.getLong  (TodoProviderContract.COLUMN_estimatedMinutes)?.toInt() ?: -1,
    this.getLong  (TodoProviderContract.COLUMN_updateTime)?.toLong() ?: -1)
 }
 

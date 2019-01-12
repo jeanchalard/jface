@@ -153,13 +153,6 @@
   </LinearLayout>
 
   <Button
-   android:id="@+id/button_copy_todo_from_storage"
-   android:layout_width="match_parent"
-   android:layout_height="wrap_content"
-   android:layout_weight="0"
-   android:text="Copy TODO DB from storage"/>
-
-  <Button
    android:id="@+id/button_delete_FCM_token"
    android:layout_width="match_parent"
    android:layout_height="wrap_content"

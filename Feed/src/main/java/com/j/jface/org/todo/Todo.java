@@ -123,7 +123,7 @@ public class Todo extends TodoCore
     {
       final TodoUI ui = new TodoUI(parent, open, lastChild);
       ui.leaf = leaf;
-      return new Todo(id, ord, creationTime, completionTime, text, depth, lifeline, deadline, hardness, constraint, estimatedTimeMinutes, lastUpdateTime, ui);
+      return new Todo(id, ord, creationTime, completionTime, text, depth, lifeline, deadline, hardness, constraint, estimatedMinutes, lastUpdateTime, ui);
     }
   }
 
