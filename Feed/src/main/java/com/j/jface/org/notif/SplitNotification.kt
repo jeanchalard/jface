@@ -18,7 +18,7 @@ const val MONTH = 30 * DAY // 30 days is a month, sure
 /**
  * A notification suggesting the user split a TODO into multiple subitems.
  */
-class SplitNotification(val context : Context)
+class SplitNotification(val context : Context) : NotificationBuilder
 {
   private fun TodoCore.timeAgo() : String
   {
@@ -46,7 +46,7 @@ class SplitNotification(val context : Context)
      .build()
   }
 
-  internal fun buildSplitNotification(id : Int, todo : TodoCore) : Notification
+  override fun buildNotification(id : Int, todo : TodoCore) : Notification
   {
     val intent = Intent(context, JOrg.activityClass())
      .putExtra(Const.EXTRA_TODO_ID, todo.id)

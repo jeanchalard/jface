@@ -17,7 +17,7 @@ import kotlin.collections.ArrayList
 fun endOfMonth(date : Long) = Instant.ofEpochMilli(date).with(TemporalAdjusters.lastDayOfMonth()).epochSecond
 fun endOfYear(date : Long) = Instant.ofEpochMilli(date).with(TemporalAdjusters.lastDayOfYear()).epochSecond
 
-class FillinNotification(val context : Context)
+class FillinNotification(val context : Context) : NotificationBuilder
 {
   data class Reply(val label : String, val transform : (TodoCore) -> TodoCore)
   enum class Field(val weight : Int, val description : String, val fieldId : Int, vararg val replies : Reply)
@@ -68,7 +68,7 @@ class FillinNotification(val context : Context)
     return Field.NOT_AN_ATTRIBUTE
   }
 
-  fun buildFillinNotification(id : Int, todo : TodoCore) : Notification
+  override fun buildNotification(id : Int, todo : TodoCore) : Notification
   {
     val missingAttributes = getMissingAttributes(todo)
     val attr = chooseAttribute(missingAttributes)

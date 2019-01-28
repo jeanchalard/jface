@@ -1,10 +1,12 @@
 package com.j.jface.org.notif
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.util.Log
 import com.j.jface.R
+import com.j.jface.R.layout.todo
 import com.j.jface.nextNotifId
 import com.j.jface.notifManager
 import com.j.jface.org.todo.TodoCore
@@ -41,18 +43,13 @@ class NotifEngine(val context : Context)
     }
   }
 
-  fun splitNotification(todo : TodoCore)
+  fun fillInNotification(todo : TodoCore) = notify(FillinNotification(context), todo)
+  fun splitNotification(todo : TodoCore) = notify(SplitNotification(context), todo)
+  fun suggestionNotification(todo : TodoCore) = notify(SuggestionNotification(context), todo)
+  private fun notify(builder : NotificationBuilder, todo : TodoCore)
   {
     val id = context.nextNotifId(LAST_NOTIF_ID)
-    val notification = FillinNotification(context).buildFillinNotification(id, todo)
-    context.notifManager.notify(id, notification)
-  }
-
-  fun suggestionNotification(todo : TodoCore)
-  {
-    val id = context.nextNotifId(LAST_NOTIF_ID)
-    val notification = SuggestionNotification(context).buildSuggestionNotification(id, todo)
-    Log.e("NOTIF", "${id} ${notification.actions}")
+    val notification = builder.buildNotification(id, todo)
     context.notifManager.notify(id, notification)
   }
 }
