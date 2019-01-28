@@ -177,6 +177,12 @@ class TodoList implements Iterable<Todo>, TodoUpdaterProxy, TodoSource.ListChang
   }
 
   // Implementation of TodoSource.ListChangeListener
+  @Override public void onTodoRemoved(@NonNull final TodoCore todo)
+  {
+    final int index = rindex(todo);
+    if (index >= 0) internalUpdateRemoveTodo(todo, index);
+    else Log.e("REMOVED", "Firebase says Todo " + todo + " was removed, but it was not found locally");
+  }
   @Override public void onTodoUpdated(@NonNull final TodoCore todo)
   {
     updateLocalTodo(todo);
@@ -216,18 +222,33 @@ class TodoList implements Iterable<Todo>, TodoUpdaterProxy, TodoSource.ListChang
     for (final ListChangeObserver obs : mObservers) obs.notifyItemChanged(index, nTodo);
   }
 
+  private void internalUpdateRemoveTodo(@NonNull final TodoCore todo, final int index)
+  {
+    internalUpdateCompleteOrRemoveTodo(todo, index, false);
+  }
+
   private void internalUpdateCompleteTodo(@NonNull final TodoCore todo, final int index)
   {
-    // Completed todo. Remove.
+    internalUpdateCompleteOrRemoveTodo(todo, index, true);
+  }
+
+  private void internalUpdateCompleteOrRemoveTodo(@NonNull final TodoCore todo, final int index, final boolean complete)
+  {
+    // Remove a Todo and its descendants because they have been marked as completed locally or because the remote DB says they disappeared for any reason.
     final int lastChildIndex = getLastChildIndex(index);
     final List<Todo> subListToClear = mList.subList(index, lastChildIndex + 1); // inclusive, exclusive
     final ArrayList<Todo> removed = new ArrayList<>(subListToClear);
     subListToClear.clear();
-    for (int i = 0; i < removed.size(); ++i)
+    if (complete)
     {
-      final Todo completedTodo = new Todo.Builder(removed.get(i)).setCompletionTime(todo.completionTime).build();
-      mSource.updateTodo(completedTodo);
-      removed.set(i, completedTodo);
+      // If this is a todo marked complete locally, mark all descendants as complete. Otherwise, it's come from
+      // the DB and it should simply be removed from display.
+      for (int i = 0; i < removed.size(); ++i)
+      {
+        final Todo completedTodo = new Todo.Builder(removed.get(i)).setCompletionTime(todo.completionTime).build();
+        mSource.updateTodo(completedTodo);
+        removed.set(i, completedTodo);
+      }
     }
     for (final ListChangeObserver obs : mObservers) obs.notifyItemRangeRemoved(index, removed);
   }

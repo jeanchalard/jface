@@ -138,7 +138,7 @@ public class TodoListFoldableView extends TodoListView
       parent = parent.ui.parent;
     }
     final int index = Collections.binarySearch(mView, position);
-    final int insertionPoint = index > 0 ? index : -index - 1;
+    final int insertionPoint = index >= 0 ? index : -index - 1;
     if (shiftExisting) shiftView(insertionPoint, 1);
     mView.add(insertionPoint, position);
     for (final ListChangeObserver obs : mObservers) obs.notifyItemInserted(insertionPoint, payload);
@@ -163,7 +163,7 @@ public class TodoListFoldableView extends TodoListView
   {
     if (DEBUG_VIEW) Log.e("insertRange", "" + position + " (" + (shiftExisting ? "shift" : "view") + ") : " + payload.size());
     final int index = Collections.binarySearch(mView, position);
-    final int insertionPoint = index > 0 ? index : -index - 1;
+    final int insertionPoint = index >= 0 ? index : -index - 1;
     if (shiftExisting) shiftView(insertionPoint, payload.size());
     final ArrayList<Todo> insertedItems = new ArrayList<>(payload.size());
     final ArrayList<Integer> insertedIndices = new ArrayList<>(payload.size());

@@ -21,6 +21,7 @@ public class TodoSource implements Firebase.TodoUpdateListener.Listener
   public interface ListChangeListener
   {
     void onTodoUpdated(@NonNull final TodoCore todo);
+    void onTodoRemoved(@NonNull final TodoCore todo);
   }
 
   @NonNull private final ContentResolver mResolver;
@@ -37,7 +38,15 @@ public class TodoSource implements Firebase.TodoUpdateListener.Listener
     synchronized (mLock)
     {
       Log.e("Update", "" + type + " : " + todo);
-      for (ListChangeListener l : listeners) l.onTodoUpdated(todo);
+      switch (type) {
+        case REMOVED:
+          for (ListChangeListener l : listeners) l.onTodoRemoved(todo);
+          break;
+        case ADDED:
+        case MODIFIED:
+          for (ListChangeListener l : listeners) l.onTodoUpdated(todo);
+          break;
+      }
     }
   }
   public void addListChangeListener(@NonNull final ListChangeListener l)
