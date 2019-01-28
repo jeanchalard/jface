@@ -28,19 +28,19 @@ class DebugActivity(args : WrappedActivity.Args) : WrappedActivity(args), EventL
 
     val applyOneshotButton = mA.findViewById<Button>(R.id.apply_oneshot_change)
     val user = FirebaseAuth.getInstance().currentUser
-    if (Firebase.isLoggedIn() && null != user)
+    if (Firebase.isLoggedIn && null != user)
       applyOneshotButton.setOnClickListener {
         val db = FirebaseFirestore.getInstance().collection(user.uid)
         val executor = Executors.newSingleThreadExecutor()
         db.document(Const.DB_APP_TOP_PATH).collection(Const.DB_ORG_TOP).orderBy("ord").addSnapshotListener(executor, this)
       }
     else
-      applyOneshotButton.setText("Firebase not logged in")
+      applyOneshotButton.text = "Firebase not logged in"
   }
 
   override fun onEvent(snapshot : QuerySnapshot?, exception : FirebaseFirestoreException?)
   {
-    if (null != exception) mA.findViewById<TextView>(R.id.debug_exception_text).setText(exception.toString())
+    if (null != exception) mA.findViewById<TextView>(R.id.debug_exception_text).text = exception.toString()
     if (null == snapshot) return
     FirebaseFirestore.getInstance().runTransaction { transaction ->
       applyOneshotChange(snapshot.documents, transaction)
@@ -63,7 +63,7 @@ class DebugActivity(args : WrappedActivity.Args) : WrappedActivity(args), EventL
 
   fun transform(dataMap : HashMap<String, Any?>) : Map<String, Any?>
   {
-    dataMap["estimatedMinutes"] = dataMap["estimatedTime"]
+    dataMap["estimatedMinutes"] = -1
     dataMap.remove("estimatedTime")
     return dataMap
   }

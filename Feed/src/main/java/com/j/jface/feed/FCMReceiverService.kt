@@ -15,7 +15,7 @@ class FCMReceiverService : FirebaseMessagingService()
   {
     if (null == msg) return
     Log.e("Firebase message", "" + msg.data)
-    if (!Firebase.isLoggedIn()) { Log.e("...but", "firebase not logged in ?!"); return }
+    if (!Firebase.isLoggedIn) { Log.e("...but", "firebase not logged in ?!"); return }
     val path = msg.data[Const.FIREBASE_MESSAGE_WEAR_PATH]
     if (null == path) { Log.e("...but", "Message is ill-formed, no ${Const.FIREBASE_MESSAGE_WEAR_PATH} field : " + msg); return }
     Firebase.getWearData(path).addOnCompleteListener {

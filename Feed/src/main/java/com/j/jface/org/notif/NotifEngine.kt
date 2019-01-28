@@ -3,6 +3,7 @@ package com.j.jface.org.notif
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.util.Log
 import com.j.jface.R
 import com.j.jface.nextNotifId
 import com.j.jface.notifManager
@@ -51,6 +52,7 @@ class NotifEngine(val context : Context)
   {
     val id = context.nextNotifId(LAST_NOTIF_ID)
     val notification = SuggestionNotification(context).buildSuggestionNotification(id, todo)
+    Log.e("NOTIF", "${id} ${notification.actions}")
     context.notifManager.notify(id, notification)
   }
 }

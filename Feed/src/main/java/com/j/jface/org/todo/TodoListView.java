@@ -61,9 +61,15 @@ public abstract class TodoListView implements ListChangeObserver, TodoUpdaterPro
   @NonNull public ArrayList<Todo> markTodoCompleteAndReturnOldTree(@NonNull final Todo todo)
   {
     final ArrayList<Todo> descendants = mList.getTreeRootedAt(todo);
-    final Todo newTodo = new Todo.Builder(todo).setCompletionTime(System.currentTimeMillis()).build();
+    final Todo newTodo = todo.withCompletionTime(System.currentTimeMillis());
     mList.updateRawTodo(newTodo);
     return descendants;
+  }
+  @NonNull public Todo unmarkTodoComplete(@NonNull final Todo todo)
+  {
+    final Todo newTodo = todo.withCompletionTime(0);
+    mList.updateRawTodo(newTodo);
+    return newTodo;
   }
 
   /***************

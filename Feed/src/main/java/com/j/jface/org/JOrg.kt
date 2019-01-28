@@ -22,16 +22,20 @@ import com.google.android.gms.auth.api.Auth
 import com.j.jface.Const
 import com.j.jface.R
 import com.j.jface.feed.views.SnackbarRegistry
+import com.j.jface.firebase.Firebase
+import com.j.jface.firebase.await
 import com.j.jface.lifecycle.ActivityWrapper
 import com.j.jface.lifecycle.AppCompatActivityWrapper
 import com.j.jface.lifecycle.AuthTrampoline
 import com.j.jface.lifecycle.WrappedActivity
+import com.j.jface.notifManager
 import com.j.jface.org.editor.TodoEditor
 import com.j.jface.org.sound.EditTextSoundRouter
 import com.j.jface.org.sound.SelReportEditText
 import com.j.jface.org.sound.SoundSource
 import com.j.jface.org.todo.Todo
 import com.j.jface.org.todo.TodoListFoldableView
+import com.j.jface.org.todo.TodoProviderContract
 import java.time.LocalDate
 import java.util.*
 import java.util.concurrent.Callable
@@ -67,11 +71,18 @@ class JOrg(args : WrappedActivity.Args) : WrappedActivity(args)
     fab.setOnClickListener { addNewSubTodo(null) }
 
     val editedTodoId : String? = mA.intent.getStringExtra(Const.EXTRA_TODO_ID)
+    val notifId = mA.intent.getIntExtra(Const.EXTRA_NOTIF_ID, 0)
+    val notifType = mA.intent.getIntExtra(Const.EXTRA_NOTIF_TYPE, 0)
     if (null == editedTodoId) mA.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
 
     val executor = Executors.newSingleThreadExecutor()
     executor.submit(Callable {
       executor.shutdown()
+      if (Const.NOTIFICATION_TYPE_CANCEL_DONE == notifType && null != editedTodoId)
+      {
+        Firebase.outOfBandUpdateTodoField(editedTodoId, TodoProviderContract.COLUMN_completionTime, 0).await()
+        mA.notifManager.cancel(notifId)
+      }
       val tlv = TodoListFoldableView(mA.getApplicationContext())
       val adapter = TodoAdapter(this, mA, mSoundRouter, tlv, mRecyclerView)
       val touchHelper = ItemTouchHelper(TodoMover(adapter, tlv))

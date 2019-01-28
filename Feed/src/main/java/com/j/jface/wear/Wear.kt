@@ -71,7 +71,7 @@ class Wear(val context : Context)
   {
     val data = PutDataMapRequest.create(path).apply { f(dataMap) }
     dataClient.putDataItem(data.asPutDataRequest())
-    if (!toCloud or !Firebase.isLoggedIn()) return
+    if (!toCloud or !Firebase.isLoggedIn) return
     // If this device is the master node, there is no point in sending an FCM message anyway.
     // hasConnectedNodes is a Task that almost certainly completed by now, but if not well
     // this will just send the message anyway which is harmless. The reason to test for isComplete

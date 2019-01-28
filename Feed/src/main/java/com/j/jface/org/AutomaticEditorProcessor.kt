@@ -21,6 +21,7 @@ import com.j.jface.org.notif.errorNotification
 import com.j.jface.org.todo.Todo
 import com.j.jface.org.todo.TodoCore
 import com.j.jface.org.todo.TodoListReadonlyFullView
+import com.j.jface.org.todo.TodoSource
 import java.util.Collections
 
 class AutomaticEditorProcessor : JobService()
@@ -52,6 +53,7 @@ class AutomaticEditorProcessor : JobService()
        .setPersisted(true)
        .build()
       val jobScheduler = context.getSystemService(JobScheduler::class.java)
+      Log.e("RECEIVED NOTIF", "todoId ${todoId} ; notifId ${notifId} ; notifType ${notifType} → ${intent.extras}")
       Log.e("SEND " + if (Const.NOTIFICATION_TYPE_SPLIT == notifType) "SPLIT" else "SUGGESTION", Integer.toString(jobScheduler.schedule(job)))
     }
   }
@@ -64,7 +66,7 @@ class AutomaticEditorProcessor : JobService()
 
   override fun onStartJob(params : JobParameters?) : Boolean
   {
-    if (!Firebase.isLoggedIn()) { Log.e("JOrg", "Click on notif but Firebase is not logged in >.>"); return false }
+    if (!Firebase.isLoggedIn) { Log.e("JOrg", "Click on notif but Firebase is not logged in >.>"); return false }
     val todoId = params?.extras?.getString(Const.EXTRA_TODO_ID)
     val notifId = params?.extras?.getInt(Const.EXTRA_NOTIF_ID)
     val notifType = params?.extras?.getInt(Const.EXTRA_NOTIF_TYPE)
@@ -73,11 +75,12 @@ class AutomaticEditorProcessor : JobService()
     {
       Const.NOTIFICATION_TYPE_SPLIT -> params.extras?.getString(Const.EXTRA_TODO_SUBITEMS)?.split(",") ?: return logErrorAndFalse("Split todo but subitems are null")
       Const.NOTIFICATION_TYPE_SUGGESTION -> Collections.emptyList()
-      else -> return logErrorAndFalse("Click on notif type is ${notifType}")
+      else -> return logErrorAndFalse("Click on notif with wrong type ${notifType}")
     }
     CommonObjects.executor.execute {
       val tl = TodoListReadonlyFullView(this)
       val parent : Todo? = tl.findById(todoId)
+      Log.e("INJOB", "todoId ${todoId} ; notifId ${notifId} ; notifType ${notifType} : ${parent}")
       if (null == parent) return@execute notifManager.notify(notifId, errorNotification("Somehow can't find todo with ID ${todoId}", this))
       val notif = when (notifType) {
         Const.NOTIFICATION_TYPE_SPLIT ->
@@ -91,12 +94,9 @@ class AutomaticEditorProcessor : JobService()
           tl.markTodoCompleteAndReturnOldTree(parent)
           SuggestionNotification(this).buildAckOrCancelNotification(notifId, parent)
         }
-//        Const.NOTIFICATION_TYPE_CANCEL_DONE ->
-//        {
-//          tl.markTodoCompleteAndReturnOldTree(parent)
-//        }
         else -> return@execute
       }
+      Log.e("AUTOP NOTIF", "${notifId} ${notif}")
       notifManager.notify(notifId, notif)
       jobFinished(params, false)
     }

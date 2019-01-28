@@ -1,5 +1,6 @@
 package com.j.jface.firebase
 
+import android.util.ArrayMap
 import android.util.Log
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -12,7 +13,16 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.firestore.*
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentChange
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.EventListener
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.Transaction
 import com.j.jface.Const
 import com.j.jface.R
 import com.j.jface.Util
@@ -52,7 +62,8 @@ object Firebase
   /**************
    * Login
    **************/
-  fun isLoggedIn() : Boolean = ::firebaseUser.isInitialized
+  val isLoggedIn : Boolean
+    get() = ::firebaseUser.isInitialized
 
   fun signIn(host : AuthTrampoline)
   {
@@ -86,7 +97,10 @@ object Firebase
   {
     firebaseUser = user
     db = FirebaseFirestore.getInstance().collection(user.uid)
-    db.document(Const.DB_APP_TOP_PATH).collection(Const.DB_ORG_TOP).orderBy("ord").addSnapshotListener(executor, TodoUpdateListener)
+    db.document(Const.DB_APP_TOP_PATH).collection(Const.DB_ORG_TOP)
+     .whereEqualTo(TodoProviderContract.COLUMN_completionTime, 0)
+     .orderBy("ord")
+     .addSnapshotListener(executor, TodoUpdateListener)
   }
 
   /**************
@@ -112,6 +126,20 @@ object Firebase
       }
       return t
     }
+  }
+
+  // Use to update a single field of a known todo ID without reading the entire database.
+  // Use is generally discouraged, but it's useful to avoid getting the entire database
+  // (please don't do this if you have a reference to it, just call updateTodo)
+  // and to update a Todo that is not normally found, like a Todo that's already complete
+  // (that's useful to undo completion typically)
+  fun outOfBandUpdateTodoField(id : String, field : String, value : Any) : Task<Void>
+  {
+    if (!isLoggedIn) throw RuntimeException("You must be logged in to do this")
+    val vals = ArrayMap<String, Any>()
+    vals[field] = value
+    return FirebaseFirestore.getInstance().collection(firebaseUser.uid).document(Const.DB_APP_TOP_PATH).collection(Const.DB_ORG_TOP)
+     .document(id).set(vals, SetOptions.merge())
   }
 
   fun updateTodo(todo : TodoCore)

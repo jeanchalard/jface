@@ -21,7 +21,7 @@ abstract class AuthTrampoline(args : WrappedActivity.Args) : WrappedActivity(arg
 
   init
   {
-    if (Firebase.isLoggedIn()) finish()
+    if (Firebase.isLoggedIn) finish()
     else
     {
       context.setContentView(R.layout.auth_trampoline)
@@ -37,7 +37,7 @@ abstract class AuthTrampoline(args : WrappedActivity.Args) : WrappedActivity(arg
 
   private fun trySignIn()
   {
-    if (Firebase.isLoggedIn())
+    if (Firebase.isLoggedIn)
     {
       FirebaseInstanceId.getInstance().token // Force token generation
       log("Login successful.")
@@ -62,7 +62,7 @@ abstract class AuthTrampoline(args : WrappedActivity.Args) : WrappedActivity(arg
   private var signIns : Int = 0
   fun onSignInSuccess()
   {
-    if (!Firebase.isLoggedIn())
+    if (!Firebase.isLoggedIn)
     {
       if (++signIns < 3)
       {

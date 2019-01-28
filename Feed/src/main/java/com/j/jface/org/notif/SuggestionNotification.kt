@@ -15,7 +15,7 @@ class SuggestionNotification(val context : Context)
   private fun buildSuggestionNotificationActions(existingIntent : Intent) : Notification.Action
   {
     val intent = Intent(existingIntent).setClass(context, AutomaticEditorProcessor.Receiver::class.java)
-    val pendingIntent = PendingIntent.getBroadcast(context, Const.NOTIFICATION_RESULT_CODE, intent, PendingIntent.FLAG_ONE_SHOT)
+    val pendingIntent = PendingIntent.getBroadcast(context, Const.NOTIFICATION_RESULT_CODE, intent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_UPDATE_CURRENT)
     return Notification.Action.Builder(null, "Done", pendingIntent).build()
   }
 
@@ -27,7 +27,7 @@ class SuggestionNotification(val context : Context)
      .putExtra(Const.EXTRA_TODO_ID, todo.id)
      .putExtra(Const.EXTRA_NOTIF_ID, id)
      .putExtra(Const.EXTRA_NOTIF_TYPE, Const.NOTIFICATION_TYPE_SUGGESTION)
-    val pendingIntent = PendingIntent.getActivity(context, Const.NOTIFICATION_RESULT_CODE, intent, PendingIntent.FLAG_ONE_SHOT)
+    val pendingIntent = PendingIntent.getActivity(context, Const.NOTIFICATION_RESULT_CODE, intent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_UPDATE_CURRENT)
     return Notification.Builder(context, NotifEngine.getChannel(context).id).apply {
       setShowWhen(true)
       setWhen(System.currentTimeMillis())
@@ -49,11 +49,11 @@ class SuggestionNotification(val context : Context)
   {
     val title = "Marked done, tap to undo"
     val description = todo.text
-    val intent = Intent(context, AutomaticEditorProcessor.Receiver::class.java)
+    val intent = Intent(context, JOrg.activityClass())
      .putExtra(Const.EXTRA_TODO_ID, todo.id)
      .putExtra(Const.EXTRA_NOTIF_ID, id)
      .putExtra(Const.EXTRA_NOTIF_TYPE, Const.NOTIFICATION_TYPE_CANCEL_DONE)
-    val pendingIntent = PendingIntent.getBroadcast(context, Const.NOTIFICATION_RESULT_CODE, intent, PendingIntent.FLAG_ONE_SHOT)
+    val pendingIntent = PendingIntent.getActivity(context, Const.NOTIFICATION_RESULT_CODE, intent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_UPDATE_CURRENT)
     return Notification.Builder(context, NotifEngine.getChannel(context).id).apply {
       setSmallIcon(R.drawable.jormungand)
       setColor(context.getColor(R.color.jormungand_color))
@@ -61,7 +61,6 @@ class SuggestionNotification(val context : Context)
       setContentTitle(title)
       setContentText(description)
       setTimeoutAfter(8000) // 8 seconds ought to be enough for anybody
-      setAutoCancel(true)
       setOnlyAlertOnce(true)
       // setVisibility(Notification.VISIBILITY_SECRET) // Broken in the latest custom build apparently
     }.build()

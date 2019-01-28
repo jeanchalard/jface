@@ -71,7 +71,7 @@ class FCMHandler : FirebaseInstanceIdService()
         val d = DataMap().apply {
           putString(Const.CONFIG_KEY_WEAR_LISTENER_ID, token)
         }
-        if (Firebase.isLoggedIn()) Firebase.updateWearData("${Const.CONFIG_PATH}/${Const.CONFIG_KEY_WEAR_LISTENER_PREFIX}${token}", d)
+        if (Firebase.isLoggedIn) Firebase.updateWearData("${Const.CONFIG_PATH}/${Const.CONFIG_KEY_WEAR_LISTENER_PREFIX}${token}", d)
       }
     }
   }
