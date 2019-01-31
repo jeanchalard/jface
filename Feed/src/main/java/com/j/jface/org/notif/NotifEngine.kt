@@ -1,30 +1,29 @@
 package com.j.jface.org.notif
 
-import android.app.Notification
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.util.Log
 import com.j.jface.R
-import com.j.jface.R.layout.todo
 import com.j.jface.nextNotifId
 import com.j.jface.notifManager
 import com.j.jface.org.todo.TodoCore
 
+@SuppressLint("NewApi")
 class NotifEngine(val context : Context)
 {
-  enum class NotifType
+  enum class NotifType(override val weight : Int) : WeightedChoice
   {
-    SPLIT, // Split this TODO into multiple TODOs.
-    FILLIN, // Please add missing info : deadline + hardness, estimated time, constraint
-    SUGGESTION, // How about you do this now ? Constraints are fulfilled and it's not too hard
-    REMINDER, // This deadline is very soon, make sure you don't forget
+    SPLIT(150), // Split this TODO into multiple TODOs.
+    FILLIN(300), // Please add missing info : deadline + hardness, estimated time, constraint
+    SUGGESTION(100), // How about you do this now ? Constraints are fulfilled and it's not too hard
+    REMINDER(0), // This deadline is very soon, make sure you don't forget
   }
 
   companion object
   {
-    const val CHANNEL_ID = "jorg_todo"
-    const val CHANNEL_NAME = "Jormungand : Todo"
+    private const val CHANNEL_ID = "jorg_todo"
+    private const val CHANNEL_NAME = "Jormungand : Todo"
     const val LAST_NOTIF_ID = "todo_lastId"
 
     internal fun getChannel(context : Context) : NotificationChannel
@@ -43,13 +42,18 @@ class NotifEngine(val context : Context)
     }
   }
 
-  fun fillInNotification(todo : TodoCore) = notify(FillinNotification(context), todo)
-  fun splitNotification(todo : TodoCore) = notify(SplitNotification(context), todo)
-  fun suggestionNotification(todo : TodoCore) = notify(SuggestionNotification(context), todo)
+  internal fun fillInNotification(todo : TodoCore) = notify(FillinNotification(context), todo)
+  internal fun splitNotification(todo : TodoCore) = notify(SplitNotification(context), todo)
+  internal fun suggestionNotification(todo : TodoCore) = notify(SuggestionNotification(context), todo)
   private fun notify(builder : NotificationBuilder, todo : TodoCore)
   {
     val id = context.nextNotifId(LAST_NOTIF_ID)
     val notification = builder.buildNotification(id, todo)
     context.notifManager.notify(id, notification)
+  }
+
+  fun chooseNotification()
+  {
+    chooseWeighted(enumValues<NotifType>())
   }
 }

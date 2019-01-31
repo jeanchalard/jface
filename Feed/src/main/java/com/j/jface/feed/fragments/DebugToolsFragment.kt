@@ -1,6 +1,5 @@
 package com.j.jface.feed.fragments
 
-import android.content.Intent
 import android.os.Handler
 import android.os.Message
 import android.text.format.DateUtils
@@ -14,15 +13,11 @@ import com.google.android.gms.wearable.DataMap
 import com.google.firebase.iid.FirebaseInstanceId
 import com.j.jface.Const
 import com.j.jface.R
-import com.j.jface.action.InformUserAction
 import com.j.jface.feed.views.SnackbarRegistry
 import com.j.jface.firebase.Firebase
 import com.j.jface.lifecycle.WrappedFragment
-import com.j.jface.org.todo.TodoProvider
 import com.j.jface.wear.Wear
-import java.io.FileNotFoundException
 import java.io.IOException
-import java.io.InputStream
 import java.time.Instant
 import java.time.LocalTime
 import java.time.OffsetDateTime

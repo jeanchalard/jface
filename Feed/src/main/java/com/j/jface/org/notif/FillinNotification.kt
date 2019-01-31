@@ -4,6 +4,8 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
+import android.support.annotation.RequiresApi
 import com.j.jface.Const
 import com.j.jface.R
 import com.j.jface.org.AutomaticEditorProcessor
@@ -14,13 +16,16 @@ import java.time.temporal.TemporalAdjusters
 import java.util.*
 import kotlin.collections.ArrayList
 
+@RequiresApi(Build.VERSION_CODES.O)
 fun endOfMonth(date : Long) = Instant.ofEpochMilli(date).with(TemporalAdjusters.lastDayOfMonth()).epochSecond
+@RequiresApi(Build.VERSION_CODES.O)
 fun endOfYear(date : Long) = Instant.ofEpochMilli(date).with(TemporalAdjusters.lastDayOfYear()).epochSecond
 
+@RequiresApi(Build.VERSION_CODES.O)
 class FillinNotification(val context : Context) : NotificationBuilder
 {
   data class Reply(val label : String, val transform : (TodoCore) -> TodoCore)
-  enum class Field(val weight : Int, val description : String, val fieldId : Int, vararg val replies : Reply)
+  enum class Field(override val weight : Int, val description : String, val fieldId : Int, vararg val replies : Reply) : WeightedChoice
   {
     NOT_AN_ATTRIBUTE(0, "Hey hey a bug in your code ˙ ͜ʟ˙", -1 ),
     DEADLINE(80, "When is the deadline ?", R.id.todoDetails_estimatedTime,
@@ -58,20 +63,10 @@ class FillinNotification(val context : Context) : NotificationBuilder
     return r
   }
 
-  private fun chooseAttribute(missingAttributes : ArrayList<Field>) : Field
-  {
-    var lot = Random().nextInt(missingAttributes.sumBy { it.weight })
-    missingAttributes.forEach {
-      lot -= it.weight
-      if (lot <= 0) return it
-    }
-    return Field.NOT_AN_ATTRIBUTE
-  }
-
   override fun buildNotification(id : Int, todo : TodoCore) : Notification
   {
     val missingAttributes = getMissingAttributes(todo)
-    val attr = chooseAttribute(missingAttributes)
+    val attr = chooseWeighted(missingAttributes) ?: Field.NOT_AN_ATTRIBUTE
     val title = "Tell me more about : " + todo.text
     val description = attr.description
     val intent = Intent(context, TodoEditor.activityClass())

@@ -21,7 +21,6 @@ import com.j.jface.org.notif.errorNotification
 import com.j.jface.org.todo.Todo
 import com.j.jface.org.todo.TodoCore
 import com.j.jface.org.todo.TodoListReadonlyFullView
-import com.j.jface.org.todo.TodoSource
 import java.util.Collections
 
 class AutomaticEditorProcessor : JobService()

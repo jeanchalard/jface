@@ -4,12 +4,15 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
+import android.support.annotation.RequiresApi
 import com.j.jface.Const
 import com.j.jface.R
 import com.j.jface.org.AutomaticEditorProcessor
 import com.j.jface.org.JOrg
 import com.j.jface.org.todo.TodoCore
 
+@RequiresApi(Build.VERSION_CODES.O)
 class SuggestionNotification(val context : Context) : NotificationBuilder
 {
   private fun buildSuggestionNotificationActions(existingIntent : Intent) : Notification.Action

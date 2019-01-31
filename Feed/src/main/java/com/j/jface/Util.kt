@@ -7,12 +7,13 @@ import android.os.PersistableBundle
 import com.google.android.gms.wearable.DataMap
 import com.j.jface.Util.arrayListFromIntArray
 
+@Suppress("UNCHECKED_CAST")
 private operator fun PersistableBundle.set(key : String, value : Any)
 {
   when (value)
   {
     // Careful : this converts ArrayList<Int> to Int[]. The method below does the opposite.
-    // There are types not handled here but that could be, like list of strings or so.
+    // There are types not handled here but that could be, like, list of strings or so.
     is String -> putString(key, value)
     is Int -> putInt(key, value)
     is Long -> putLong(key, value)
@@ -28,7 +29,7 @@ private operator fun DataMap.set(key : String, value : Any)
   when (value)
   {
     // Careful : this converts Int[] to ArrayList<Int>. The method above does the opposite.
-    // There are types not handled here but that could be, like list of strings or so.
+    // There are types not handled here but that could be, like, list of strings or so.
     is String -> putString(key, value)
     is Int -> putInt(key, value)
     is Long -> putLong(key, value)

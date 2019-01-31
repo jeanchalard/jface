@@ -49,6 +49,7 @@ class JFaceDataFeed(args : WrappedActivity.Args) : WrappedActivity(args)
 
     val list = mA.findViewById<ListView>(R.id.dataFeedDrawerContents)
     list.adapter = ArrayAdapter(mA, R.layout.data_feed_drawer_item, arrayOf("Messages", "Settings", "Logs & data", "Debug tools"))
+    @Suppress("UNUSED_ANONYMOUS_PARAMETER")
     val listener = AdapterView.OnItemClickListener { parent, view, position, id ->
       val f = getFragmentForPosition(position, mWear)
       mA.fragmentManager.beginTransaction()

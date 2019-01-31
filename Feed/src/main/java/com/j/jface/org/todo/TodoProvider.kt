@@ -2,23 +2,12 @@ package com.j.jface.org.todo
 
 import android.content.ContentProvider
 import android.content.ContentValues
-import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.net.Uri
-import android.os.Handler
-import android.os.Message
-import android.util.Log
-import com.j.jface.Util
-import com.j.jface.client.Client
-import com.j.jface.client.action.drive.WriteFileAction
 import com.j.jface.lifecycle.ContentProviderWrapper
 import com.j.jface.lifecycle.WrappedContentProvider
-import java.io.FileInputStream
-import java.io.FileNotFoundException
-import java.io.IOException
-import java.io.InputStream
 
 // A provider of Todos.
 // Needs to be public to be accessed by the booter

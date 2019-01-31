@@ -5,6 +5,8 @@ import android.app.PendingIntent
 import android.app.RemoteInput
 import android.content.Context
 import android.content.Intent
+import android.os.Build
+import android.support.annotation.RequiresApi
 import com.j.jface.Const
 import com.j.jface.R
 import com.j.jface.org.AutomaticEditorProcessor
@@ -18,6 +20,7 @@ const val MONTH = 30 * DAY // 30 days is a month, sure
 /**
  * A notification suggesting the user split a TODO into multiple subitems.
  */
+@RequiresApi(Build.VERSION_CODES.O)
 class SplitNotification(val context : Context) : NotificationBuilder
 {
   private fun TodoCore.timeAgo() : String
