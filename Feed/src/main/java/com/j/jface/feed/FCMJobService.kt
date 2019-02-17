@@ -37,5 +37,5 @@ class FCMJobService : JobService()
     return false
   }
 
-  override fun onStopJob(params : JobParameters?) : Boolean = false
+  override fun onStopJob(params : JobParameters?) = false
 }

@@ -30,6 +30,7 @@ import com.j.jface.lifecycle.AuthTrampoline
 import com.j.jface.lifecycle.WrappedActivity
 import com.j.jface.notifManager
 import com.j.jface.org.editor.TodoEditor
+import com.j.jface.org.notif.NotifEngine
 import com.j.jface.org.sound.EditTextSoundRouter
 import com.j.jface.org.sound.SelReportEditText
 import com.j.jface.org.sound.SoundSource
@@ -114,6 +115,7 @@ class JOrg(args : WrappedActivity.Args) : WrappedActivity(args)
       mTodoList = tlv
     })
 
+    NotifEngine.scheduleClue(mA)
     scheduleBackup()
   }
 

@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
 
 public abstract class TodoListView implements ListChangeObserver, TodoUpdaterProxy
 {
@@ -87,4 +89,15 @@ public abstract class TodoListView implements ListChangeObserver, TodoUpdaterPro
   @Override public void notifyItemMoved(int from, int to, @NonNull final Todo payload) {}
   @Override public void notifyItemRangeInserted(int position, @Nullable final ArrayList<Todo> payload) {}
   @Override public void notifyItemRangeRemoved(int position, @Nullable final ArrayList<Todo> payload) {}
+
+  // TODO : remove this function and make the class iterable.
+  public List<TodoCore> filter(Predicate<TodoCore> predicate) {
+    final ArrayList<TodoCore> result = new ArrayList<>();
+    final int size = size();
+    for (int i = 0; i < size; ++i) {
+      final TodoCore elem = get(i);
+      if (predicate.test(elem)) result.add(elem);
+    }
+    return result;
+  }
 }

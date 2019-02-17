@@ -3,14 +3,25 @@ package com.j.jface.org.notif
 import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.job.JobInfo
+import android.app.job.JobParameters
+import android.app.job.JobService
+import android.content.ComponentName
 import android.content.Context
-import com.j.jface.R
-import com.j.jface.nextNotifId
-import com.j.jface.notifManager
+import com.j.jface.*
+import com.j.jface.action.NotificationAction
 import com.j.jface.org.todo.TodoCore
+import com.j.jface.org.todo.TodoListReadonlyFullView
+import java.time.Instant
+import java.time.ZoneOffset
+import java.util.*
+
+private const val SCHEDULE_CLUE_JOB_ID = Integer.MAX_VALUE - 1 // Must be globally unique... :/
+private const val MIN_CLUE_INTERVAL = 4 * 3600_000 // 4h
+private const val MAX_CLUE_INTERVAL = 48 * 3600_000
 
 @SuppressLint("NewApi")
-class NotifEngine(val context : Context)
+class NotifEngine : JobService()
 {
   enum class NotifType(override val weight : Int) : WeightedChoice
   {
@@ -40,20 +51,57 @@ class NotifEngine(val context : Context)
       notifManager.createNotificationChannel(channel)
       return notifManager.getNotificationChannel(CHANNEL_ID)
     }
+
+    /**
+     * Clues (automatic split/fillin notifications) are managed as follow.
+     * Each time the JOrg activity is started or a notification is either dismissed or used,
+     * scheduleClue is called. It starts with checking the existence of the job to put up a
+     * notification, and exits immediately if it already exists.
+     * The job is scheduled at a random time between [4h,48h] to which ±2h of leeway is given
+     * to JobScheduler. When the job starts executing, it randomly selects one work item to do
+     * from the list of items offered by both styles of notification, and delegates putting up
+     * the notification to the relevant NotificationBuilder.
+     *
+     * The notification stays up until it is dismissed or acted upon, at which point scheduleClue
+     * is called again.
+     */
+    fun scheduleClue(context : Context)
+    {
+      val jobScheduler = context.jobScheduler
+      if (jobScheduler.getPendingJob(SCHEDULE_CLUE_JOB_ID) != null) return
+      val interval = (MIN_CLUE_INTERVAL + Random().nextInt(MAX_CLUE_INTERVAL - MIN_CLUE_INTERVAL)).toLong()
+      val job = JobInfo.Builder(SCHEDULE_CLUE_JOB_ID, ComponentName(context, NotifEngine::class.java)).apply {
+        setMinimumLatency(interval - 2 * 3600_000)
+        setOverrideDeadline(interval + 2 * 3600_000)
+        setPersisted(true)
+      }.build()
+      NotificationAction.postNotification(context, "Clue scheduled in ${interval}s (${Instant.now().plusMillis(interval).atOffset(ZoneOffset.ofHours(9))})", null)
+      jobScheduler.schedule(job)
+    }
   }
 
-  internal fun fillInNotification(todo : TodoCore) = notify(FillinNotification(context), todo)
-  internal fun splitNotification(todo : TodoCore) = notify(SplitNotification(context), todo)
-  internal fun suggestionNotification(todo : TodoCore) = notify(SuggestionNotification(context), todo)
   private fun notify(builder : NotificationBuilder, todo : TodoCore)
   {
-    val id = context.nextNotifId(LAST_NOTIF_ID)
+    val id = this.nextNotifId(LAST_NOTIF_ID)
     val notification = builder.buildNotification(id, todo)
-    context.notifManager.notify(id, notification)
+    notifManager.notify(id, notification)
   }
 
-  fun chooseNotification()
+  override fun onStartJob(params : JobParameters?) : Boolean // returns whether work is still happening in another thread
   {
-    chooseWeighted(enumValues<NotifType>())
+    val list = TodoListReadonlyFullView(this)
+    val fillinNotification = FillinNotification(this)
+    val splitNotification = SplitNotification(this)
+    val fnn = fillinNotification.remainingItems(list)
+    val snn = splitNotification.remainingItems(list)
+    if (fnn.isEmpty() && snn.isEmpty()) return false
+
+    if (Random().nextInt(fnn.size + snn.size) < fnn.size)
+      notify(fillinNotification, fnn.randomItem())
+    else
+      notify(splitNotification, snn.randomItem())
+    return false
   }
+
+  override fun onStopJob(params : JobParameters?) = false
 }

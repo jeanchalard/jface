@@ -67,6 +67,7 @@ public class Const
   @NonNull public static final String EXTRA_WEAR_DATA = "wearData";
   @NonNull public static final String EXTRA_FILLIN_FIELD = "fillinField";
   @NonNull public static final String EXTRA_FILLIN_REPLY_INDEX = "fillinReplyIndex";
+  @NonNull public static final String EXTRA_WAS_DISMISSED = "wasDismissed";
 
   @NonNull public static final String EXTRA_TODO_SUBITEMS = "todoSubitems";
 

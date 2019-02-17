@@ -1,5 +1,7 @@
 package com.j.jface.org
 
+import android.annotation.SuppressLint
+import android.app.PendingIntent
 import android.app.RemoteInput
 import android.app.job.JobInfo
 import android.app.job.JobParameters
@@ -11,10 +13,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.PersistableBundle
 import android.util.Log
-import com.j.jface.Const
+import com.j.jface.*
 import com.j.jface.firebase.Firebase
 import com.j.jface.lifecycle.CommonObjects
-import com.j.jface.notifManager
+import com.j.jface.org.notif.NotifEngine
 import com.j.jface.org.notif.SplitNotification
 import com.j.jface.org.notif.SuggestionNotification
 import com.j.jface.org.notif.errorNotification
@@ -23,20 +25,35 @@ import com.j.jface.org.todo.TodoCore
 import com.j.jface.org.todo.TodoListReadonlyFullView
 import java.util.Collections
 
+@SuppressLint("NewApi")
 class AutomaticEditorProcessor : JobService()
 {
+  companion object
+  {
+    fun reschedulePendingIntent(context : Context, intent : Intent) : PendingIntent {
+      val deleteIntent = Intent(intent).apply {
+        setClass(context, AutomaticEditorProcessor.Receiver::class.java)
+        putExtra(Const.EXTRA_WAS_DISMISSED, true)
+      }
+      return PendingIntent.getBroadcast(context, Const.NOTIFICATION_RESULT_CODE, deleteIntent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_UPDATE_CURRENT)
+    }
+  }
+
   class Receiver : BroadcastReceiver()
   {
     override fun onReceive(context : Context?, intent : Intent?)
     {
       if (null == context || null == intent) return
+      NotifEngine.scheduleClue(context)
+      if (intent.getBooleanExtra(Const.EXTRA_WAS_DISMISSED, false)) return
+
       val todoId = intent.getStringExtra(Const.EXTRA_TODO_ID) ?: return
       val notifId = intent.getIntExtra(Const.EXTRA_NOTIF_ID, 0)
       if (0 == notifId) return
 
       val notifType = intent.getIntExtra(Const.EXTRA_NOTIF_TYPE, 0)
 
-      val job = JobInfo.Builder(todoId.hashCode(), ComponentName(context, AutomaticEditorProcessor::class.java))
+      val job = JobInfo.Builder(notifId, ComponentName(context, AutomaticEditorProcessor::class.java))
        .setExtras(PersistableBundle().apply {
          putString(Const.EXTRA_TODO_ID, todoId)
          putInt(Const.EXTRA_NOTIF_ID, notifId)
@@ -51,9 +68,8 @@ class AutomaticEditorProcessor : JobService()
        .setBackoffCriteria(5000, JobInfo.BACKOFF_POLICY_EXPONENTIAL) // retry after 5s on first failure, then exponential backoff
        .setPersisted(true)
        .build()
-      val jobScheduler = context.getSystemService(JobScheduler::class.java)
       Log.e("RECEIVED NOTIF", "todoId ${todoId} ; notifId ${notifId} ; notifType ${notifType} → ${intent.extras}")
-      Log.e("SEND " + if (Const.NOTIFICATION_TYPE_SPLIT == notifType) "SPLIT" else "SUGGESTION", Integer.toString(jobScheduler.schedule(job)))
+      Log.e("SEND " + if (Const.NOTIFICATION_TYPE_SPLIT == notifType) "SPLIT" else "SUGGESTION", Integer.toString(context.jobScheduler.schedule(job)))
     }
   }
 

@@ -1,11 +1,13 @@
 package com.j.jface
 
 import android.app.NotificationManager
+import android.app.job.JobScheduler
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.PersistableBundle
 import com.google.android.gms.wearable.DataMap
 import com.j.jface.Util.arrayListFromIntArray
+import java.util.*
 
 @Suppress("UNCHECKED_CAST")
 private operator fun PersistableBundle.set(key : String, value : Any)
@@ -55,9 +57,10 @@ fun PersistableBundle.toDataMap() : DataMap
 }
 
 fun <T : Comparable<T>> clamp(min : T, value : T, max : T) : T = if (value < min) min else if (value > max) max else value
+fun <T> List<T>.randomItem() = this[Random().nextInt(this.size)] // throws if the list is empty
 
-fun Context.nextNotifId(channel : String) : Int
-{
+private val lock = Any()
+fun Context.nextNotifId(channel : String) : Int = synchronized(lock) {
   val persist : SharedPreferences = getSharedPreferences(Const.INTERNAL_PERSISTED_VALUES_FILES, Context.MODE_PRIVATE)
   val notifId = persist.getInt(channel, 1)
   persist.edit().putInt(channel, notifId + 1).apply()
@@ -66,3 +69,5 @@ fun Context.nextNotifId(channel : String) : Int
 
 val Context.notifManager : NotificationManager
   get() = getSystemService(NotificationManager::class.java)
+val Context.jobScheduler : JobScheduler
+  get() = getSystemService(JobScheduler::class.java)

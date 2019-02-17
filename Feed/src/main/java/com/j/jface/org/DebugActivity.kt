@@ -23,7 +23,7 @@ class DebugActivity(args : WrappedActivity.Args) : WrappedActivity(args), EventL
     mA.findViewById<Button>(R.id.try_notif).setOnClickListener {
       val lv = TodoListReadonlyFullView(mA)
       val todo = lv[0]
-      NotifEngine(mA).suggestionNotification(todo)
+      NotifEngine.scheduleClue(mA)
     }
 
     val applyOneshotButton = mA.findViewById<Button>(R.id.apply_oneshot_change)
@@ -46,7 +46,7 @@ class DebugActivity(args : WrappedActivity.Args) : WrappedActivity(args), EventL
       applyOneshotChange(snapshot.documents, transaction)
     }.addOnCompleteListener {
       val success = if (it.isSuccessful) "success" else "failure"
-      Toast.makeText(mA, "Update transaction : ${success}", Toast.LENGTH_LONG)
+      Toast.makeText(mA, "Update transaction : ${success}", Toast.LENGTH_LONG).show()
     }
   }
 

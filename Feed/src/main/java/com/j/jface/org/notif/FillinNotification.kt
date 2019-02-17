@@ -11,6 +11,7 @@ import com.j.jface.R
 import com.j.jface.org.AutomaticEditorProcessor
 import com.j.jface.org.editor.TodoEditor
 import com.j.jface.org.todo.TodoCore
+import com.j.jface.org.todo.TodoListView
 import java.time.Instant
 import java.time.temporal.TemporalAdjusters
 import java.util.*
@@ -63,10 +64,12 @@ class FillinNotification(val context : Context) : NotificationBuilder
     return r
   }
 
+  override fun remainingItems(list : TodoListView) : List<TodoCore> = list.filter { getMissingAttributes(it).isNotEmpty() }
+
   override fun buildNotification(id : Int, todo : TodoCore) : Notification
   {
     val missingAttributes = getMissingAttributes(todo)
-    val attr = chooseWeighted(missingAttributes) ?: Field.NOT_AN_ATTRIBUTE
+    val attr = chooseWeighted(missingAttributes)
     val title = "Tell me more about : " + todo.text
     val description = attr.description
     val intent = Intent(context, TodoEditor.activityClass())
@@ -83,6 +86,7 @@ class FillinNotification(val context : Context) : NotificationBuilder
       setSmallIcon(R.drawable.jormungand)
       setColor(context.getColor(R.color.jormungand_color))
       setContentIntent(pendingIntent)
+      setDeleteIntent(AutomaticEditorProcessor.reschedulePendingIntent(context, intent))
       setContentTitle(title)
       setContentText(description)
       setStyle(Notification.BigTextStyle().bigText(description))

@@ -12,10 +12,13 @@ import com.j.jface.R
 import com.j.jface.org.AutomaticEditorProcessor
 import com.j.jface.org.JOrg
 import com.j.jface.org.todo.TodoCore
+import com.j.jface.org.todo.TodoListView
 
 const val HOUR = 60L * 60 * 1_000
 const val DAY = 24 * HOUR
 const val MONTH = 30 * DAY // 30 days is a month, sure
+
+const val OLDNESS_THRESHOLD = 10 * DAY
 
 /**
  * A notification suggesting the user split a TODO into multiple subitems.
@@ -49,6 +52,12 @@ class SplitNotification(val context : Context) : NotificationBuilder
      .build()
   }
 
+  override fun remainingItems(list : TodoListView) : List<TodoCore>
+  {
+    val cutoff = System.currentTimeMillis() - OLDNESS_THRESHOLD
+    return list.filter { it.lastUpdateTime < cutoff }
+  }
+
   override fun buildNotification(id : Int, todo : TodoCore) : Notification
   {
     val intent = Intent(context, JOrg.activityClass())
@@ -56,7 +65,6 @@ class SplitNotification(val context : Context) : NotificationBuilder
      .putExtra(Const.EXTRA_NOTIF_ID, id)
      .putExtra(Const.EXTRA_NOTIF_TYPE, Const.NOTIFICATION_TYPE_SPLIT)
     val pendingIntent = PendingIntent.getActivity(context, Const.NOTIFICATION_RESULT_CODE, intent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_UPDATE_CURRENT)
-
     val title = "Split todo : " + todo.text
     val description = "This todo has last been updated " + todo.timeAgo() + " ; do something and split it up"
     return Notification.Builder(context, NotifEngine.getChannel(context).id).apply {
@@ -65,6 +73,7 @@ class SplitNotification(val context : Context) : NotificationBuilder
       setSmallIcon(R.drawable.jormungand)
       setColor(context.getColor(R.color.jormungand_color))
       setContentIntent(pendingIntent)
+      setDeleteIntent(AutomaticEditorProcessor.reschedulePendingIntent(context, intent))
       setContentTitle(title)
       setContentText(description)
       setStyle(Notification.BigTextStyle().bigText(description))

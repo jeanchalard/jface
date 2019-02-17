@@ -11,6 +11,7 @@ import com.j.jface.R
 import com.j.jface.org.AutomaticEditorProcessor
 import com.j.jface.org.JOrg
 import com.j.jface.org.todo.TodoCore
+import com.j.jface.org.todo.TodoListView
 
 @RequiresApi(Build.VERSION_CODES.O)
 class SuggestionNotification(val context : Context) : NotificationBuilder
@@ -42,6 +43,8 @@ class SuggestionNotification(val context : Context) : NotificationBuilder
       // setVisibility(Notification.VISIBILITY_SECRET) // Broken in the latest custom build apparently
     }.build()
   }
+
+  override fun remainingItems(list : TodoListView) : List<TodoCore> = emptyList()
 
   override fun buildNotification(id : Int, todo : TodoCore) : Notification
   {
