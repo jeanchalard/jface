@@ -78,7 +78,7 @@ public abstract class TodoListView implements ListChangeObserver, TodoUpdaterPro
    * App lifecycle and todo operations.
    ***************/
   @NonNull public TodoCore updateRawTodo(@NonNull final TodoCore todo) { return mList.updateRawTodo(todo); }
-  @NonNull public Todo updateTodo(@NonNull final Todo todo) { return mList.updateTodo(todo); }
+  @NonNull public TodoCore updateTodo(@NonNull final TodoCore todo) { return mList.updateTodo(todo); }
   @NonNull public Todo createAndInsertTodo(@NonNull final String text, @Nullable final Todo parent) { return mList.createAndInsertTodo(text, parent); }
 
   /***************

@@ -315,8 +315,7 @@ class TodoList implements Iterable<Todo>, TodoUpdaterProxy, TodoSource.ListChang
     return Todo.ordBetween(prevOrd, nextOrd);
   }
 
-
-  @NonNull public Todo updateTodo(@NonNull final Todo todo)
+  @NonNull public TodoCore updateTodo(@NonNull final TodoCore todo)
   {
     if ("!".equals(todo.ord)) throw new RuntimeException("Trying to update a null Todo");
     updateRawTodo(todo);
