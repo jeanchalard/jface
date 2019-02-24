@@ -53,10 +53,10 @@ class TodoAdapter(private val mJorg : JOrg,
    */
   private inner class TodoListChangeObserver : ListChangeObserver
   {
-    override fun notifyItemChanged(position : Int, payload : Todo) = mJorg.runOnUiThread { this@TodoAdapter.notifyItemChanged(position, payload) }
-    override fun notifyItemInserted(position : Int, payload : Todo) = mJorg.runOnUiThread { this@TodoAdapter.notifyItemInserted(position) }
-    override fun notifyItemMoved(from : Int, to : Int, payload : Todo) = mJorg.runOnUiThread { if (mTodoList.get(to).id != payload.id) this@TodoAdapter.notifyItemMoved(from, to) }
-    override fun notifyItemRangeInserted(from : Int, payload : ArrayList<Todo>) = mJorg.runOnUiThread { this@TodoAdapter.notifyItemRangeInserted(from, payload.size) }
-    override fun notifyItemRangeRemoved(from : Int, payload : ArrayList<Todo>) = mJorg.runOnUiThread { this@TodoAdapter.notifyItemRangeRemoved(from, payload.size) }
+    override fun onItemChanged(position : Int, payload : Todo) = mJorg.runOnUiThread { this@TodoAdapter.notifyItemChanged(position, payload) }
+    override fun onItemInserted(position : Int, payload : Todo) = mJorg.runOnUiThread { this@TodoAdapter.notifyItemInserted(position) }
+    override fun onItemMoved(from : Int, to : Int, payload : Todo) = mJorg.runOnUiThread { if (mTodoList.get(to).id != payload.id) this@TodoAdapter.notifyItemMoved(from, to) }
+    override fun onItemRangeInserted(from : Int, payload : ArrayList<Todo>) = mJorg.runOnUiThread { this@TodoAdapter.notifyItemRangeInserted(from, payload.size) }
+    override fun onItemRangeRemoved(from : Int, payload : ArrayList<Todo>) = mJorg.runOnUiThread { this@TodoAdapter.notifyItemRangeRemoved(from, payload.size) }
   }
 }

@@ -84,15 +84,15 @@ public class TodoListFoldableView extends TodoListView
       mView.set(i, mView.get(i) + by);
   }
 
-  @Override public void notifyItemChanged(final int position, @NonNull final Todo payload)
+  @Override public void onItemChanged(final int position, @NonNull final Todo payload)
   {
     final int posInView = Collections.binarySearch(mView, position);
     if (posInView > 0)
-      for (final ListChangeObserver obs : mObservers) obs.notifyItemChanged(position, payload);
+      for (final ListChangeObserver obs : mObservers) obs.onItemChanged(position, payload);
     if (DEBUG_VIEW) dumpView("itemChanged");
   }
 
-  @Override public void notifyItemMoved(final int from, final int to, @NonNull final Todo payload)
+  @Override public void onItemMoved(final int from, final int to, @NonNull final Todo payload)
   {
     final boolean removed, added;
     final int localFrom = Collections.binarySearch(mView, from);
@@ -111,19 +111,19 @@ public class TodoListFoldableView extends TodoListView
       added = true;
     } else added = false;
     if (removed && added)
-      for (final ListChangeObserver obs : mObservers) obs.notifyItemMoved(localFrom, localTo, payload);
+      for (final ListChangeObserver obs : mObservers) obs.onItemMoved(localFrom, localTo, payload);
     else if (added)
-      for (final ListChangeObserver obs : mObservers) obs.notifyItemInserted(localTo, payload);
+      for (final ListChangeObserver obs : mObservers) obs.onItemInserted(localTo, payload);
     else if (removed)
     {
       final ArrayList<Todo> l = new ArrayList<>(1);
       l.add(payload);
-      for (final ListChangeObserver obs : mObservers) obs.notifyItemRangeRemoved(localFrom, l);
+      for (final ListChangeObserver obs : mObservers) obs.onItemRangeRemoved(localFrom, l);
     }
     if (DEBUG_VIEW) dumpView("itemMoved " + this);
   }
 
-  @Override public void notifyItemInserted(final int position, @NonNull final Todo payload)
+  @Override public void onItemInserted(final int position, @NonNull final Todo payload)
   {
     insertItem(position, payload, true);
   }
@@ -141,20 +141,20 @@ public class TodoListFoldableView extends TodoListView
     final int insertionPoint = index >= 0 ? index : -index - 1;
     if (shiftExisting) shiftView(insertionPoint, 1);
     mView.add(insertionPoint, position);
-    for (final ListChangeObserver obs : mObservers) obs.notifyItemInserted(insertionPoint, payload);
+    for (final ListChangeObserver obs : mObservers) obs.onItemInserted(insertionPoint, payload);
     if (insertionPoint > 0)
     {
       final Todo prevTodo = get(insertionPoint - 1);
       if (prevTodo.depth == payload.depth)
       {
         prevTodo.ui.lastChild = false;
-        for (final ListChangeObserver obs : mObservers) obs.notifyItemChanged(insertionPoint - 1, prevTodo);
+        for (final ListChangeObserver obs : mObservers) obs.onItemChanged(insertionPoint - 1, prevTodo);
       }
     }
     if (DEBUG_VIEW) dumpView("itemInserted");
   }
 
-  @Override public void notifyItemRangeInserted(final int position, final ArrayList<Todo> payload)
+  @Override public void onItemRangeInserted(final int position, final ArrayList<Todo> payload)
   {
     insertRange(position, payload, true);
   }
@@ -188,14 +188,14 @@ public class TodoListFoldableView extends TodoListView
       lastInserted.ui.lastChild = lastInserted.depth >= get(insertionPoint).depth;
     }
     mView.addAll(insertionPoint, insertedIndices);
-    for (final ListChangeObserver obs : mObservers) obs.notifyItemRangeInserted(insertionPoint, insertedItems);
+    for (final ListChangeObserver obs : mObservers) obs.onItemRangeInserted(insertionPoint, insertedItems);
     if (insertionPoint > 0)
     {
       final Todo prevTodo = get(insertionPoint - 1);
       if (prevTodo.depth == insertedItems.get(0).depth)
       {
         prevTodo.ui.lastChild = false;
-        for (final ListChangeObserver obs : mObservers) obs.notifyItemChanged(insertionPoint - 1, prevTodo);
+        for (final ListChangeObserver obs : mObservers) obs.onItemChanged(insertionPoint - 1, prevTodo);
       }
     }
     if (DEBUG_VIEW) dumpView("rangeInserted");
@@ -214,7 +214,7 @@ public class TodoListFoldableView extends TodoListView
     public void add(@NonNull final Todo t) { todos.add(t); }
     public int end() { return start + todos.size(); }
   }
-  @Override public void notifyItemRangeRemoved(final int position, @NonNull final ArrayList<Todo> payload)
+  @Override public void onItemRangeRemoved(final int position, @NonNull final ArrayList<Todo> payload)
   {
     removeRange(position, payload, true);
   }
@@ -272,7 +272,7 @@ public class TodoListFoldableView extends TodoListView
         final Todo after = range.start >= mView.size() ? null : get(range.start);
         before.ui.lastChild = null == after || after.depth < before.depth;
       }
-      for (final ListChangeObserver obs : mObservers) obs.notifyItemRangeRemoved(range.start, range.todos);
+      for (final ListChangeObserver obs : mObservers) obs.onItemRangeRemoved(range.start, range.todos);
     }
     if (DEBUG_VIEW) dumpView("rangeRemoved " + this);
   }

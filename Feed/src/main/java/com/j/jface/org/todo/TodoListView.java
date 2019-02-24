@@ -84,11 +84,11 @@ public abstract class TodoListView implements ListChangeObserver, TodoUpdaterPro
   /***************
    * Default empty implementations so that subclasses don't have to provide what they don't care about
    ***************/
-  @Override public void notifyItemInserted(final int position, @NonNull final Todo payload) {}
-  @Override public void notifyItemChanged(int position, @NonNull final Todo payload) {}
-  @Override public void notifyItemMoved(int from, int to, @NonNull final Todo payload) {}
-  @Override public void notifyItemRangeInserted(int position, @Nullable final ArrayList<Todo> payload) {}
-  @Override public void notifyItemRangeRemoved(int position, @Nullable final ArrayList<Todo> payload) {}
+  @Override public void onItemInserted(final int position, @NonNull final Todo payload) {}
+  @Override public void onItemChanged(int position, @NonNull final Todo payload) {}
+  @Override public void onItemMoved(int from, int to, @NonNull final Todo payload) {}
+  @Override public void onItemRangeInserted(int position, @Nullable final ArrayList<Todo> payload) {}
+  @Override public void onItemRangeRemoved(int position, @Nullable final ArrayList<Todo> payload) {}
 
   // TODO : remove this function and make the class iterable.
   public List<TodoCore> filter(Predicate<TodoCore> predicate) {

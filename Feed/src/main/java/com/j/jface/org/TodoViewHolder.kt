@@ -202,19 +202,19 @@ class TodoViewHolder(itemView : View,
     mTodoActionButtons.visibility = View.VISIBLE
   }
 
-  override fun notifyItemChanged(position : Int, payload : Todo)
+  override fun onItemChanged(position : Int, payload : Todo)
   {
     if (payload.id != mCurrentTodo.id) return
     TransitionManager.beginDelayedTransition(itemView as ViewGroup)
     bind(payload) // This also sets mCurrentTodo.
   }
 
-  override fun notifyItemMoved(from : Int, to : Int, payload : Todo)
+  override fun onItemMoved(from : Int, to : Int, payload : Todo)
   {
-    mJorg.runOnUiThread(Runnable { notifyItemChanged(to, payload) })
+    mJorg.runOnUiThread(Runnable { onItemChanged(to, payload) })
   }
 
-  override fun notifyItemInserted(position : Int, payload : Todo) {}
-  override fun notifyItemRangeInserted(from : Int, payload : ArrayList<Todo>) {}
-  override fun notifyItemRangeRemoved(from : Int, payload : ArrayList<Todo>) {}
+  override fun onItemInserted(position : Int, payload : Todo) {}
+  override fun onItemRangeInserted(from : Int, payload : ArrayList<Todo>) {}
+  override fun onItemRangeRemoved(from : Int, payload : ArrayList<Todo>) {}
 }

@@ -219,7 +219,7 @@ class TodoList implements Iterable<Todo>, TodoUpdaterProxy, TodoSource.ListChang
   {
     final Todo nTodo = decorate(todo);
     mList.set(index, nTodo);
-    for (final ListChangeObserver obs : mObservers) obs.notifyItemChanged(index, nTodo);
+    for (final ListChangeObserver obs : mObservers) obs.onItemChanged(index, nTodo);
   }
 
   private void internalUpdateRemoveTodo(@NonNull final TodoCore todo, final int index)
@@ -250,7 +250,7 @@ class TodoList implements Iterable<Todo>, TodoUpdaterProxy, TodoSource.ListChang
         removed.set(i, completedTodo);
       }
     }
-    for (final ListChangeObserver obs : mObservers) obs.notifyItemRangeRemoved(index, removed);
+    for (final ListChangeObserver obs : mObservers) obs.onItemRangeRemoved(index, removed);
   }
 
   private void internalUpdateAddTodo(@NonNull final TodoCore todo, final int insertionPoint)
@@ -258,7 +258,7 @@ class TodoList implements Iterable<Todo>, TodoUpdaterProxy, TodoSource.ListChang
     // This todo was actually not here, it's a new one.
     final Todo nTodo = decorate(todo);
     mList.add(insertionPoint, nTodo);
-    for (final ListChangeObserver obs : mObservers) obs.notifyItemInserted(insertionPoint, nTodo);
+    for (final ListChangeObserver obs : mObservers) obs.onItemInserted(insertionPoint, nTodo);
   }
 
   private Todo internalUpdateReorderTodo(@NonNull final TodoCore oldTodo, @NonNull final TodoCore newTodo)
@@ -284,20 +284,20 @@ class TodoList implements Iterable<Todo>, TodoUpdaterProxy, TodoSource.ListChang
       }
       final int lastRemovedIndex = oldPos + oldTree.size() + 1;
       mList.subList(oldPos + 1, lastRemovedIndex).clear(); // incl, excl
-      for (final ListChangeObserver obs : mObservers) obs.notifyItemRangeRemoved(oldPos + 1, oldTree);
+      for (final ListChangeObserver obs : mObservers) obs.onItemRangeRemoved(oldPos + 1, oldTree);
       mList.remove(oldPos);
       final int insertionPoint = -rindex(todo) - 1;
       mList.add(insertionPoint, todo);
-      for (final ListChangeObserver obs : mObservers) obs.notifyItemMoved(oldPos, insertionPoint, todo);
+      for (final ListChangeObserver obs : mObservers) obs.onItemMoved(oldPos, insertionPoint, todo);
       mList.addAll(insertionPoint + 1, newTree);
-      for (final ListChangeObserver obs : mObservers) obs.notifyItemRangeInserted(insertionPoint + 1, newTree);
+      for (final ListChangeObserver obs : mObservers) obs.onItemRangeInserted(insertionPoint + 1, newTree);
     }
     else
     {
       mList.remove(oldPos);
       final int insertionPoint = -rindex(todo) - 1;
       mList.add(insertionPoint, todo);
-      for (final ListChangeObserver obs : mObservers) obs.notifyItemMoved(oldPos, insertionPoint, todo);
+      for (final ListChangeObserver obs : mObservers) obs.onItemMoved(oldPos, insertionPoint, todo);
     }
     return todo;
   }
