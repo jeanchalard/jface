@@ -6,7 +6,7 @@ import android.app.RemoteInput
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.support.annotation.RequiresApi
+import androidx.annotation.RequiresApi
 import com.j.jface.Const
 import com.j.jface.R
 import com.j.jface.org.AutomaticEditorProcessor

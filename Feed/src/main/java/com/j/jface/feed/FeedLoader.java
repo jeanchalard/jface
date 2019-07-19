@@ -1,6 +1,6 @@
 package com.j.jface.feed;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
@@ -9,7 +9,6 @@ import com.j.jface.wear.Wear;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.ParseException;

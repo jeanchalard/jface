@@ -5,7 +5,7 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 // The class that sanitizes the content provider lifecycle.
 @SuppressLint("Registered")

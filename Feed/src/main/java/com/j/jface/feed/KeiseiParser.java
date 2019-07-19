@@ -1,6 +1,6 @@
 package com.j.jface.feed;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;

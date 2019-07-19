@@ -1,6 +1,6 @@
 package com.j.jface;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * A simpler Future

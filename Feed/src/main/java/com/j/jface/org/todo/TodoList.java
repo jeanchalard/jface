@@ -1,18 +1,18 @@
 package com.j.jface.org.todo;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Stack;
 
 import static java.util.Collections.binarySearch;
-import static junit.framework.Assert.assertEquals;
 
 /**
  * A todo list backed by a sorted ArrayList. It guarantees ordering according to the ID,
@@ -375,8 +375,9 @@ class TodoList implements Iterable<Todo>, TodoUpdaterProxy, TodoSource.ListChang
    ***************/
   void assertListIsConsistentWithDB()
   {
-    assertEquals(mList, mSource.fetchTodoList());
+    assert(Objects.equals(mList, mSource.fetchTodoList()));
   }
+
   void unload() // Please do not use this out of tests.
   {
     sList = null;

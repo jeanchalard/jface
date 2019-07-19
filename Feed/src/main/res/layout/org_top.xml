@@ -6,7 +6,7 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-  <android.support.v7.widget.Toolbar
+  <androidx.appcompat.widget.Toolbar
    android:layout_width="match_parent"
    android:layout_height="wrap_content"
    android:background="?attr/colorPrimary"
@@ -28,25 +28,25 @@
 
     <include layout="@layout/sound_visualizer"/>
 
-  </android.support.v7.widget.Toolbar>
+  </androidx.appcompat.widget.Toolbar>
 
-  <android.support.design.widget.CoordinatorLayout
+  <androidx.coordinatorlayout.widget.CoordinatorLayout
     android:background="@color/org_background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:visibility="gone"
     android:id="@+id/topLayout">
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:orientation="vertical"
       android:id="@+id/todoList"
       android:clipToPadding="false"
       android:clipChildren="false"
-      app:layoutManager="android.support.v7.widget.LinearLayoutManager"/>
+      app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
       android:id="@+id/addTodo"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
@@ -57,7 +57,7 @@
       android:clickable="true"
       app:fabSize="normal"/>
 
-  </android.support.design.widget.CoordinatorLayout>
+  </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
   <FrameLayout
    android:layout_width="match_parent"

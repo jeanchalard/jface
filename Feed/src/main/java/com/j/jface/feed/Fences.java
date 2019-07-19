@@ -1,6 +1,6 @@
 package com.j.jface.feed;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.j.jface.Const;
 

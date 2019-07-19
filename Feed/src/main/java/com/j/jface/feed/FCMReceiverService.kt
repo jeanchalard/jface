@@ -18,8 +18,10 @@ class FCMReceiverService : FirebaseMessagingService()
     if (!Firebase.isLoggedIn) { Log.e("...but", "firebase not logged in ?!"); return }
     val path = msg.data[Const.FIREBASE_MESSAGE_WEAR_PATH]
     if (null == path) { Log.e("...but", "Message is ill-formed, no ${Const.FIREBASE_MESSAGE_WEAR_PATH} field : " + msg); return }
-    Firebase.getWearData(path).addOnCompleteListener {
-      wear.putDataLocally(path, it.result)
+    Firebase.getWearData(path).addOnCompleteListener { dm ->
+      dm.result?.let { wear.putDataLocally(path, it) }
     }
   }
+
+  override fun onNewToken(p0 : String?) = FCMHandler.registerTokenForWearData(this)
 }

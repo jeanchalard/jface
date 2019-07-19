@@ -237,10 +237,10 @@ object Firebase
   }
 
   fun updateWearData(path : String, d : DataMap) = FirebaseFirestore.getInstance().batch().set(db.document(wearPathToFirebasePath(path)), d.toMap()).commit()
-  fun getWearData(path : String) : Task<DataMap>
+  fun getWearData(path : String) : Task<DataMap?>
   {
     val p = wearPathToFirebasePath(path)
-    return db.document(p).get().continueWith { it: Task<DocumentSnapshot> -> it.result.toDataMap() }
+    return db.document(p).get().continueWith { it.result?.toDataMap() }
   }
   fun getAccessKeyAndWearListenersSynchronously() : Pair<String, List<String>>
   {
@@ -248,11 +248,11 @@ object Firebase
     Tasks.await(config)
     var key = ""
     val listeners = ArrayList<String>()
-    config.result.documents.forEach {
+    config.result?.documents?.forEach {
       if (null != it[Const.CONFIG_KEY_SERVER_KEY])
-        key = it.getString(Const.CONFIG_KEY_SERVER_KEY)
+        key = it.getString(Const.CONFIG_KEY_SERVER_KEY) ?: ""
       else
-        listeners.add(it.getString(Const.CONFIG_KEY_WEAR_LISTENER_ID))
+        it.getString(Const.CONFIG_KEY_WEAR_LISTENER_ID)?.let { listenerId -> listeners.add(listenerId) }
     }
     return Pair(key, listeners)
   }
@@ -295,17 +295,17 @@ fun DocumentSnapshot.toTodoCore() : TodoCore
 }
 fun DocumentSnapshot.directToTodoCore() = TodoCore(
    this.getString(TodoProviderContract.COLUMN_id),
-   this.getString(TodoProviderContract.COLUMN_ord),
-   this.getLong  (TodoProviderContract.COLUMN_creationTime),
-   this.getLong  (TodoProviderContract.COLUMN_completionTime),
+   this.getString(TodoProviderContract.COLUMN_ord)!!,
+   this.getLong  (TodoProviderContract.COLUMN_creationTime)!!,
+   this.getLong  (TodoProviderContract.COLUMN_completionTime)!!,
    this.get      (TodoProviderContract.COLUMN_text) as String,
-   this.getLong  (TodoProviderContract.COLUMN_depth).toInt(),
-   this.getLong  (TodoProviderContract.COLUMN_lifeline),
-   this.getLong  (TodoProviderContract.COLUMN_deadline),
-   this.getLong  (TodoProviderContract.COLUMN_hardness).toInt(),
-   this.getLong  (TodoProviderContract.COLUMN_constraint).toInt(),
-   this.getLong  (TodoProviderContract.COLUMN_estimatedMinutes).toInt(),
-   this.getLong  (TodoProviderContract.COLUMN_updateTime).toLong())
+   this.getLong  (TodoProviderContract.COLUMN_depth)!!.toInt(),
+   this.getLong  (TodoProviderContract.COLUMN_lifeline)!!,
+   this.getLong  (TodoProviderContract.COLUMN_deadline)!!,
+   this.getLong  (TodoProviderContract.COLUMN_hardness)!!.toInt(),
+   this.getLong  (TodoProviderContract.COLUMN_constraint)!!.toInt(),
+   this.getLong  (TodoProviderContract.COLUMN_estimatedMinutes)!!.toInt(),
+   this.getLong  (TodoProviderContract.COLUMN_updateTime)!!.toLong())
 fun DocumentSnapshot.toTodoCoreDebug() : TodoCore {
   val id = this.getString(TodoProviderContract.COLUMN_id)
   if (null == this.getString(TodoProviderContract.COLUMN_id))               Log.e("Todo ${id}", "id is null")
@@ -336,7 +336,7 @@ fun DocumentSnapshot.toTodoCoreDebug() : TodoCore {
 }
 
 fun DocumentSnapshot.toDataMap() = DataMap().apply {
-  this@toDataMap.data.forEach {
+  this@toDataMap.data?.forEach {
     key, value -> when(value) {
       is String -> this.putString(key, value)
       is Boolean -> this.putBoolean(key, value)

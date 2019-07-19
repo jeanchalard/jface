@@ -1,7 +1,7 @@
 package com.j.jface.org
 
 import android.content.Context
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.j.jface.R.layout.todo
@@ -42,9 +42,8 @@ class TodoAdapter(private val mJorg : JOrg,
     mExpectFocus = todo
   }
 
-  override fun onViewAttachedToWindow(holder : TodoViewHolder?)
+  override fun onViewAttachedToWindow(holder : TodoViewHolder)
   {
-    if (null == holder) return
     if (holder.todo() === mExpectFocus) holder.requestFocus()
   }
 

@@ -4,14 +4,14 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 import java.util.ArrayList;
 
-public class PaletteView extends android.support.v7.widget.AppCompatImageView
+public class PaletteView extends androidx.appcompat.widget.AppCompatImageView
 {
   @NonNull final private Bitmap mPaletteBitmap;
   @NonNull final private Matrix mImageMatrix;
