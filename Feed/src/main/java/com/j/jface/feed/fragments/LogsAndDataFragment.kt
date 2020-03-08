@@ -23,7 +23,7 @@ class LogsAndDataFragment(a : WrappedFragment.Args, private val mWear : Wear) : 
 
   init
   {
-    mView.findViewById<View>(R.id.button_refresh).setOnClickListener(this)
+    mView.findViewById<View>(R.id.button_show).setOnClickListener(this)
     mView.findViewById<View>(R.id.button_load).setOnClickListener(this)
     mView.findViewById<View>(R.id.button_clear).setOnClickListener(this)
   }
@@ -73,12 +73,12 @@ class LogsAndDataFragment(a : WrappedFragment.Args, private val mWear : Wear) : 
   {
     when (v.id)
     {
-      R.id.button_refresh ->
+      R.id.button_show  ->
       {
         mLog.text = ""
         retrieveStatus(mWear)
       }
-      R.id.button_load -> FeedLoader.startAllLoads(mWear)
+      R.id.button_load  -> FeedLoader.startAllLoads(mWear)
       R.id.button_clear -> mWear.deleteAllData()
     }
   }

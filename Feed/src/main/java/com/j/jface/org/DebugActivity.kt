@@ -21,8 +21,6 @@ class DebugActivity(args : WrappedActivity.Args) : WrappedActivity(args), EventL
   {
     mA.setContentView(R.layout.debug_activity)
     mA.findViewById<Button>(R.id.try_notif).setOnClickListener {
-      val lv = TodoListReadonlyFullView(mA)
-      val todo = lv[0]
       NotifEngine.scheduleClue(mA)
     }
 
@@ -56,7 +54,7 @@ class DebugActivity(args : WrappedActivity.Args) : WrappedActivity(args), EventL
     val collection = FirebaseFirestore.getInstance().collection(user.uid).document(Const.DB_APP_TOP_PATH).collection(Const.DB_ORG_TOP)
     docs.forEach {
       val id = it["id"] as String
-      val map = transform(HashMap(it.data))
+      val map = transform(HashMap(it.data!!))
       transaction.set(collection.document(id), map)
     }
   }

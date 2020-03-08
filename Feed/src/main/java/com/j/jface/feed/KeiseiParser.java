@@ -1,6 +1,7 @@
 package com.j.jface.feed;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
@@ -15,8 +16,9 @@ import java.util.Scanner;
 public class KeiseiParser extends FeedParser
 {
   @Override @NonNull
-  public DataMap parseStream(@NonNull final String dataName, @NonNull final BufferedInputStream srcStream) throws IOException
+  public DataMap parseStream(@NonNull final String dataName, @NonNull final BufferedInputStream srcStream, @Nullable final Object arg) throws IOException
   {
+    if (null != arg) throw new IllegalArgumentException("KeiseiParser : arg must be null.");
     final DataMap result = new DataMap();
     final BufferedReader src = new BufferedReader(new InputStreamReader(new BufferedInputStream(srcStream), "Shift_JIS"));
 

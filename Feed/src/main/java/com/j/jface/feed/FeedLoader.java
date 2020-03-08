@@ -31,7 +31,7 @@ public class FeedLoader
   {
     executor.execute(() ->
     {
-      final String dataPath = Const.DATA_PATH + "/" + ds.name;
+      final String dataPath = Const.DATA_PATH + "/" + ds.getName();
       final String statusDataPath = dataPath + Const.DATA_PATH_SUFFIX_STATUS;
       final DataMap statusData = wear.getDataSynchronously(statusDataPath);
       final long lastSuccessfulUpdateDate = statusData.getLong(Const.DATA_KEY_SUCCESSFUL_UPDATE_DATE);
@@ -44,7 +44,7 @@ public class FeedLoader
       }
       try
       {
-        final URL url = new URL(ds.url);
+        final URL url = new URL(ds.getUrl());
         final HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
         if (url.getAuthority().startsWith("keisei"))
           urlConnection.addRequestProperty("User-Agent", "Mozilla");
@@ -52,8 +52,8 @@ public class FeedLoader
         int code = urlConnection.getResponseCode();
         if (2 != code / 100) throw new ParseException("Can't open URL (HTTP" + code + ") : " + url, 0);
         final BufferedInputStream in = new BufferedInputStream(urlConnection.getInputStream());
-        final FeedParser parser = ds.parser.newInstance();
-        final DataMap data = parser.parseStream(ds.name, in);
+        final FeedParser parser = ds.getParser().newInstance();
+        final DataMap data = parser.parseStream(ds.getName(), in, ds.getArg());
         wear.putDataLocally(dataPath, data);
         statusData.putLong(Const.DATA_KEY_SUCCESSFUL_UPDATE_DATE, System.currentTimeMillis());
         statusData.putString(Const.DATA_KEY_LAST_STATUS, "Success");

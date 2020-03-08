@@ -30,6 +30,7 @@ public class DrawTools
 
   public final Path watchContourPath;
 
+  private final Bitmap jrIcon;
   private final Bitmap hibiyaIcon;
   private final Bitmap keiseiIcon;
   private final Bitmap keiōIcon;
@@ -56,12 +57,14 @@ public class DrawTools
      -269, 358); // startAngle, sweepAngle
 
     if (null != resources) {
+      jrIcon = ((BitmapDrawable)resources.getDrawable(R.drawable.jr)).getBitmap();
       hibiyaIcon = ((BitmapDrawable)resources.getDrawable(R.drawable.hibiya)).getBitmap();
       keiseiIcon = ((BitmapDrawable)resources.getDrawable(R.drawable.keisei)).getBitmap();
       keiōIcon = ((BitmapDrawable)resources.getDrawable(R.drawable.keiou)).getBitmap();
       mitaIcon = ((BitmapDrawable)resources.getDrawable(R.drawable.mita)).getBitmap();
       ōedoIcon = ((BitmapDrawable)resources.getDrawable(R.drawable.ooedo)).getBitmap();
     } else {
+      jrIcon = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
       hibiyaIcon = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
       keiseiIcon = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
       keiōIcon = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
@@ -85,6 +88,11 @@ public class DrawTools
 
   @Nullable public Bitmap getIconForKey(final String key) {
     switch (key) {
+      case Const.山手線_日暮里_渋谷方面_平日:
+      case Const.山手線_日暮里_渋谷方面_休日:
+      case Const.山手線_渋谷_日暮里方面_平日:
+      case Const.山手線_渋谷_日暮里方面_休日:
+        return jrIcon;
       case Const.日比谷線_北千住_平日:
       case Const.日比谷線_北千住_休日:
       case Const.日比谷線_六本木_平日:

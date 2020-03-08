@@ -88,7 +88,7 @@ class AutomaticEditorProcessor : JobService()
     if (null == todoId || null == notifId || 0 == notifId || null == notifType) return logErrorAndFalse("Click on notif but some param is null")
     val subitems = when (notifType)
     {
-      Const.NOTIFICATION_TYPE_SPLIT -> params.extras?.getString(Const.EXTRA_TODO_SUBITEMS)?.split(",") ?: return logErrorAndFalse("Split todo but subitems are null")
+      Const.NOTIFICATION_TYPE_SPLIT -> params.extras.getString(Const.EXTRA_TODO_SUBITEMS)?.split(",") ?: return logErrorAndFalse("Split todo but subitems are null")
       Const.NOTIFICATION_TYPE_SUGGESTION -> Collections.emptyList()
       else -> return logErrorAndFalse("Click on notif with wrong type ${notifType}")
     }

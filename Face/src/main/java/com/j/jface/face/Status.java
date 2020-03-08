@@ -6,6 +6,7 @@ import android.text.format.Time;
 
 import com.j.jface.Const;
 
+@SuppressWarnings("NonAsciiCharacters")
 public enum Status
 {
   COMMUTE_MORNING_平日_J("J : Commute (morning)"),
@@ -14,12 +15,13 @@ public enum Status
   HOME_休日_J("J : At home (holiday)"),
   日暮里_平日_J("J : Nippori (workday)"),
   日暮里_休日_J("J : Nippori (holiday)"),
+  SHIBUYA_休日_J("J : Shibuya (holiday)"),
+  ROPPONGI_休日_J("J : Roppongi (holiday)"),
   HOME_平日_RIO("Rio : At home (workday)"),
   HOME_休日_RIO("Rio : At home (holiday)"),
   WORK_平日_RIO("Rio : At work (workday)"),
   WORK_休日_RIO("Rio : Commute (holiday)"),
-  JUGGLING_月曜_RIO("Rio : Juggling ▶ Home"),
-  ROPPONGI_休日_J("J : Roppongi (holiday)"),
+  JUGGLING_木曜_RIO("Rio : Juggling ▶ Home"),
   ROPPONGI_休日_RIO("Rio : Roppongi (holiday)"),
   OTHER("Somewhere");
 
@@ -33,7 +35,8 @@ public enum Status
   private static final int 稲城 = 4;
   private static final int 本蓮沼 = 5;
   private static final int 東京 = 6;
-  private static final int SOMEWHERE = 7;
+  private static final int 渋谷 = 7;
+  private static final int SOMEWHERE = 8;
 
   Status(@NonNull final String d) { description = d; }
 
@@ -49,12 +52,13 @@ public enum Status
       case 日暮里_平日_J : return OTHER;
 
       case HOME_休日_J : return 日暮里_休日_J;
-      case 日暮里_休日_J : return ROPPONGI_休日_J;
+      case 日暮里_休日_J : return SHIBUYA_休日_J;
+      case SHIBUYA_休日_J : return ROPPONGI_休日_J;
       case ROPPONGI_休日_J : return OTHER;
 
       case HOME_平日_RIO : return WORK_平日_RIO;
-      case WORK_平日_RIO : return JUGGLING_月曜_RIO;
-      case JUGGLING_月曜_RIO : return OTHER;
+      case WORK_平日_RIO : return JUGGLING_木曜_RIO;
+      case JUGGLING_木曜_RIO: return OTHER;
 
       case HOME_休日_RIO : return WORK_休日_RIO;
       case WORK_休日_RIO : return ROPPONGI_休日_RIO;
@@ -78,9 +82,9 @@ public enum Status
       final Boolean in本蓮沼 = dataStore.isWithinFence(Const.本蓮沼_FENCE_NAME);
       if (null == in本蓮沼) return DUNNO;
       if (in本蓮沼) return 本蓮沼;
-      final Boolean in六本木 = dataStore.isWithinFence(Const.六本木_FENCE_NAME);
-      if (null == in六本木) return DUNNO;
-      if (in六本木) return 六本木;
+      final Boolean in渋谷 = dataStore.isWithinFence(Const.渋谷_FENCE_NAME);
+      if (null == in渋谷) return DUNNO;
+      if (in渋谷) return 渋谷;
     }
     else
     {
@@ -90,6 +94,9 @@ public enum Status
       final Boolean in千住大橋 = dataStore.isWithinFence(Const.千住大橋_FENCE_NAME);
       if (null == in千住大橋) return DUNNO;
       if (in千住大橋) return 千住大橋;
+      final Boolean in渋谷 = dataStore.isWithinFence(Const.渋谷_FENCE_NAME);
+      if (null == in渋谷) return DUNNO;
+      if (in渋谷) return 渋谷;
       final Boolean in六本木 = dataStore.isWithinFence(Const.六本木_FENCE_NAME);
       if (null == in六本木) return DUNNO;
       if (in六本木) return 六本木;
@@ -108,6 +115,8 @@ public enum Status
         case 稲城 :
         case 千住大橋 :
           return "家";
+        case 渋谷:
+          return "渋谷";
         case 六本木 :
           return "六本木";
         case 日暮里 :
@@ -135,7 +144,9 @@ public enum Status
         return "日暮里";
 
       case COMMUTE_EVENING_平日_J :
-      case JUGGLING_月曜_RIO :
+      case JUGGLING_木曜_RIO:
+        return "渋谷";
+
       case ROPPONGI_休日_J:
       case ROPPONGI_休日_RIO:
         return "六本木";
@@ -165,7 +176,9 @@ public enum Status
 
     if (workDay
      && ((time.hour >= 18 && time.hour <= 23) || time.hour <= 0)
-     && (DUNNO == symbolicLocation || 六本木 == symbolicLocation)) return COMMUTE_EVENING_平日_J;
+     && (DUNNO == symbolicLocation || 渋谷 == symbolicLocation)) return COMMUTE_EVENING_平日_J;
+
+    if (!workDay && 渋谷 == symbolicLocation) return SHIBUYA_休日_J;
 
     if (!workDay && 六本木 == symbolicLocation) return ROPPONGI_休日_J;
 
@@ -190,8 +203,8 @@ public enum Status
       return workDay ? WORK_平日_RIO : WORK_休日_RIO;
 
     if (((time.weekDay == Time.THURSDAY && time.hour >= 19) || (time.weekDay == Time.FRIDAY && time.hour < 1))
-     && (DUNNO == symbolicLocation || 六本木 == symbolicLocation))
-      return JUGGLING_月曜_RIO;
+     && (DUNNO == symbolicLocation || 渋谷 == symbolicLocation))
+      return JUGGLING_木曜_RIO;
 
     if (!workDay && 六本木 == symbolicLocation) return ROPPONGI_休日_RIO;
 

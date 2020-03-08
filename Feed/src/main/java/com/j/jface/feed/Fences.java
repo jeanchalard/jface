@@ -16,6 +16,7 @@ public class Fences
   // 1km around the center. That should include home and 北千住.
   private static final Params 千住大橋 = new Params(Const.千住大橋_FENCE_NAME, 35.7466148, 139.7996878, 1000);
   // For work 400m is enough.
+  private static final Params 渋谷 = new Params(Const.渋谷_FENCE_NAME, 35.6573423,139.7028578, 400);
   private static final Params 六本木 = new Params(Const.六本木_FENCE_NAME, 35.6607004, 139.7291515, 400);
   // For 日暮里 we want info when heading there, so 2~2.5km should be fine so as not to encroach on home.
   private static final Params 日暮里 = new Params(Const.日暮里_FENCE_NAME, 35.7278246, 139.7715682, 2000);
@@ -27,6 +28,7 @@ public class Fences
   {
     if (千住大橋.name.equals(name)) return 千住大橋;
     if (六本木.name.equals(name)) return 六本木;
+    if (渋谷.name.equals(name)) return 渋谷;
     if (日暮里.name.equals(name)) return 日暮里;
     if (本蓮沼.name.equals(name)) return 本蓮沼;
     if (稲城.name.equals(name)) return 稲城;

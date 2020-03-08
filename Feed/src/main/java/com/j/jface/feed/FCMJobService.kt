@@ -19,12 +19,14 @@ class FCMJobService : JobService()
       val success = try
       {
         val path = params.extras.getString(Const.EXTRA_PATH)
-        val dataMap = params.extras.getPersistableBundle(Const.EXTRA_WEAR_DATA).toDataMap()
-        val future = Firebase.updateWearData(path, dataMap)
-        // If the message does not seem to arrive, do check the FCM server key is
-        // correctly stored in /JOrg/jface/Conf/Conf/key. The value is in the
-        // Firebase console, Gear icon > Settings > Cloud messaging > Server key
-        future.addOnCompleteListener(CommonObjects.executor) { FCMHandler.sendFCMMessageForWearPathNow(path) }
+        val dataMap = params.extras.getPersistableBundle(Const.EXTRA_WEAR_DATA)?.toDataMap()
+        if (path != null && dataMap != null) {
+          val future = Firebase.updateWearData(path, dataMap)
+          // If the message does not seem to arrive, do check the FCM server key is
+          // correctly stored in /JOrg/jface/Conf/Conf/key. The value is in the
+          // Firebase console, Gear icon > Settings > Cloud messaging > Server key
+          future.addOnCompleteListener(CommonObjects.executor) { FCMHandler.sendFCMMessageForWearPathNow(path) }
+        }
         true // Success
       }
       catch (e : Exception)

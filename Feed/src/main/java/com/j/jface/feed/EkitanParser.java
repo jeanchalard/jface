@@ -1,6 +1,7 @@
 package com.j.jface.feed;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
@@ -12,45 +13,40 @@ import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 public class EkitanParser extends FeedParser
 {
   @Override @NonNull
-  public DataMap parseStream(@NonNull final String dataName, @NonNull final BufferedInputStream srcStream) throws IOException, ParseException
+  public DataMap parseStream(@NonNull final String dataName, @NonNull final BufferedInputStream srcStream, @Nullable final Object arg) throws IOException, ParseException
   {
+    final boolean skipFirstTab = Integer.valueOf(2).equals(arg);
+    if (!skipFirstTab && !Integer.valueOf(1).equals(arg))
+      throw new IllegalArgumentException("EkitanParser : arg must be an Integer, 1 or 2 depending on the desired tab on the page");
     final DataMap result = new DataMap();
     final BufferedReader src = new BufferedReader(new InputStreamReader(srcStream));
 
-    // Warning. 駅情報 appears twice in the page, once for each direction. For now the only relevant pages
-    // are for 稲城 towards 新宿 and 本蓮沼 toward 目黒, and as it happens both of these have the relevant
-    // direction in first, so it's going to work for these purposes. However something more sophisticated
-    // will be needed if other pages are read that don't happen have this order.
-    find(src, "駅情報");
-    final String contents = find(src, "駅情報");
+    if (skipFirstTab) find(src, "search-result-body");
+    final String contents = find(src, "search-result-body");
     if (null == contents) throw new ParseException("EkitanParser : can't parse page " + dataName, 0);
-    final Scanner srcTable = new Scanner(contents);
+
     final ArrayList<DataMap> buildData = new ArrayList<>();
-    srcTable.useDelimiter("[<>:]+");
-    int hour = -1;
-    int minute = -1;
-    while (srcTable.hasNext())
-    {
-      final String p = srcTable.next();
-      if (p.startsWith("span class=\"dep-time\""))
-      {
-        hour = srcTable.nextInt();
-        minute = srcTable.nextInt();
-      }
-      else if (p.startsWith("span class=\"train-type"))
-      {
-        final String type = srcTable.next().substring(0, 1);
-        final String mark = "各".equals(type) || "普".equals(type) ? "" : type;
-        final DataMap departure = new DataMap();
-        departure.putInt(Const.DATA_KEY_DEPTIME, hour * 3600 + minute * 60);
-        departure.putString(Const.DATA_KEY_EXTRA, mark);
-        buildData.add(departure);
-      }
+    while (true) {
+      if (null == find(src, "data-tr-type=\"")) break;
+      final String type = find(src, "\"");
+      find(src, "data-departure=\"");
+      final String time = find(src, "\""); // Format is HHMM
+      final int t = Integer.parseInt(time);
+      final int hour = t / 100;
+      final int minute = t % 100;
+
+      final String mark = type.startsWith("各") || type.startsWith("普") ? "" : type;
+      final DataMap departure = new DataMap();
+      departure.putInt(Const.DATA_KEY_DEPTIME, hour * 3600 + minute * 60);
+      departure.putString(Const.DATA_KEY_EXTRA, mark);
+      buildData.add(departure);
     }
+
     result.putDataMapArrayList(Const.DATA_KEY_DEPLIST, buildData);
     return result;
   }

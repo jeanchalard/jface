@@ -1,6 +1,7 @@
 package com.j.jface.feed;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
@@ -16,8 +17,9 @@ import java.util.Scanner;
 public class HibiyaParser extends FeedParser
 {
   @Override @NonNull
-  public DataMap parseStream(@NonNull final String dataName, @NonNull final BufferedInputStream srcStream) throws IOException, ParseException
+  public DataMap parseStream(@NonNull final String dataName, @NonNull final BufferedInputStream srcStream, @Nullable final Object arg) throws IOException, ParseException
   {
+    if (null != arg) throw new IllegalArgumentException("HibiyaParser : arg must be null.");
     final DataMap result = new DataMap();
     final BufferedReader src = new BufferedReader(new InputStreamReader(srcStream));
     if (null == find(src, "table class=\"v2_table "))

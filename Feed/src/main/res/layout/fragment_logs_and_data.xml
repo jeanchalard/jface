@@ -42,11 +42,11 @@
     android:focusable="false">
 
     <Button
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="Refresh"
-      android:layout_margin="8dp"
-      android:id="@+id/button_refresh"/>
+     android:id="@+id/button_show"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_margin="8dp"
+     android:text="Show" />
 
     <Button
       android:layout_width="wrap_content"

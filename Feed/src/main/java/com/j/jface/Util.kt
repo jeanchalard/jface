@@ -26,8 +26,9 @@ private operator fun PersistableBundle.set(key : String, value : Any)
     else -> throw UnsupportedOperationException("Can't put a ${value.javaClass} (${value}) into a PersistableBundle")
   }
 }
-private operator fun DataMap.set(key : String, value : Any)
+private operator fun DataMap.set(key : String, value : Any?)
 {
+  if (null == value) return
   when (value)
   {
     // Careful : this converts Int[] to ArrayList<Int>. The method above does the opposite.

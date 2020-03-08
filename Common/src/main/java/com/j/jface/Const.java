@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 
 import java.util.HashMap;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings({"ConstantConditions", "NonAsciiCharacters"})
 public class Const
 {
   @NonNull public static final String APP_PACKAGE = "com.j.jface";
@@ -25,6 +25,9 @@ public class Const
   public static final int NOTIFICATION_TYPE_SPLIT = 402;
   public static final int NOTIFICATION_TYPE_FILLIN = 403;
   public static final int NOTIFICATION_TYPE_CANCEL_DONE = 404;
+
+  public static final int SECONDS_渋谷_TO_日暮里 = 28 * 60; // About 28 minutes of riding the train
+  public static final int SECONDS_千住大橋_TO_日暮里 = 6 * 60; // About 6 minutes of riding the train
 
   @NonNull public static final String INTERNAL_PERSISTED_VALUES_FILES = "SystemValues";
 
@@ -75,6 +78,10 @@ public class Const
   @NonNull public static final String 日比谷線_北千住_休日 = "日比谷線・北千住・休日";
   @NonNull public static final String 日比谷線_六本木_平日 = "日比谷線・六本木・平日";
   @NonNull public static final String 日比谷線_六本木_休日 = "日比谷線・六本木・休日";
+  @NonNull public static final String 山手線_日暮里_渋谷方面_平日 = "山手線・日暮里・平日";
+  @NonNull public static final String 山手線_日暮里_渋谷方面_休日 = "山手線・日暮里・休日";
+  @NonNull public static final String 山手線_渋谷_日暮里方面_平日 = "山手線・渋谷・平日";
+  @NonNull public static final String 山手線_渋谷_日暮里方面_休日 = "山手線・渋谷・休日";
   @NonNull public static final String 大江戸線_六本木_新宿方面_平日 = "大江戸線・六本木・新宿方面・平日";
   @NonNull public static final String 大江戸線_六本木_新宿方面_休日 = "大江戸線・六本木・新宿方面・休日";
   @NonNull public static final String 京王線_稲城駅_新宿方面_平日 = "京王線・稲城駅・新宿方面・平日";
@@ -95,6 +102,10 @@ public class Const
     HEADSIGNS.put(日比谷線_北千住_休日, "北千住 ▶ 六本木");
     HEADSIGNS.put(日比谷線_六本木_平日, "六本木 ▶ 北千住");
     HEADSIGNS.put(日比谷線_六本木_休日, "六本木 ▶ 北千住");
+    HEADSIGNS.put(山手線_日暮里_渋谷方面_平日, "日暮里 ▶ 渋谷");
+    HEADSIGNS.put(山手線_日暮里_渋谷方面_休日, "日暮里 ▶ 渋谷");
+    HEADSIGNS.put(山手線_渋谷_日暮里方面_平日, "渋谷 ▶ 日暮里");
+    HEADSIGNS.put(山手線_渋谷_日暮里方面_休日, "渋谷 ▶ 日暮里");
     HEADSIGNS.put(大江戸線_六本木_新宿方面_平日, "六本木 ▶ 新宿");
     HEADSIGNS.put(大江戸線_六本木_新宿方面_休日, "六本木 ▶ 新宿");
     HEADSIGNS.put(京王線_稲城駅_新宿方面_平日, "稲城 ▶ 新宿");
@@ -111,8 +122,10 @@ public class Const
 
   @NonNull private static final String[] J_DEPLIST_DATA_PATHS =
    {
-    日比谷線_北千住_平日, 日比谷線_北千住_休日,
-    日比谷線_六本木_平日, 日比谷線_六本木_休日,
+//    日比谷線_北千住_平日, 日比谷線_北千住_休日,
+//    日比谷線_六本木_平日, 日比谷線_六本木_休日,
+    山手線_日暮里_渋谷方面_平日, 山手線_日暮里_渋谷方面_休日,
+    山手線_渋谷_日暮里方面_平日, 山手線_渋谷_日暮里方面_休日,
     京成線_千住大橋_上野方面_平日, 京成線_千住大橋_上野方面_休日,
     京成線_千住大橋_成田方面_平日, 京成線_千住大橋_成田方面_休日,
     京成線_日暮里_千住大橋方面_平日, 京成線_日暮里_千住大橋方面_休日 };
@@ -126,11 +139,12 @@ public class Const
 
   @NonNull public static final String 千住大橋_FENCE_NAME = "千住大橋";
   @NonNull public static final String 六本木_FENCE_NAME = "六本木";
+  @NonNull public static final String 渋谷_FENCE_NAME = "渋谷";
   @NonNull public static final String 日暮里_FENCE_NAME = "日暮里";
   @NonNull public static final String 東京_FENCE_NAME = "東京";
   @NonNull public static final String 稲城_FENCE_NAME = "稲城";
   @NonNull public static final String 本蓮沼_FENCE_NAME = "本蓮沼";
-  @NonNull private static final String[] J_FENCE_NAMES = { 千住大橋_FENCE_NAME, 六本木_FENCE_NAME, 日暮里_FENCE_NAME, 東京_FENCE_NAME };
+  @NonNull private static final String[] J_FENCE_NAMES = { 千住大橋_FENCE_NAME, 六本木_FENCE_NAME, 日暮里_FENCE_NAME, 東京_FENCE_NAME, 渋谷_FENCE_NAME };
   @NonNull private static final String[] RIO_FENCE_NAMES = { 稲城_FENCE_NAME, 本蓮沼_FENCE_NAME, 六本木_FENCE_NAME, 東京_FENCE_NAME };
   @NonNull public static final String[] ALL_FENCE_NAMES = RIO_MODE ? RIO_FENCE_NAMES : J_FENCE_NAMES;
 }
