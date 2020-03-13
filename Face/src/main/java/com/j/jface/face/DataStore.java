@@ -1,9 +1,6 @@
 package com.j.jface.face;
 
 import android.graphics.Bitmap;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import android.text.format.Time;
 
 import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
@@ -12,6 +9,9 @@ import com.j.jface.Departure;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class DataStore
 {

@@ -6,7 +6,6 @@ import android.text.format.Time;
 
 import com.j.jface.Const;
 
-@SuppressWarnings("NonAsciiCharacters")
 public enum Status
 {
   COMMUTE_MORNING_平日_J("J : Commute (morning)"),

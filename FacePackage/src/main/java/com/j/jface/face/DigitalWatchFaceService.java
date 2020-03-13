@@ -445,21 +445,21 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
 
     private void updateConfigAndData()
     {
-      DigitalWatchFaceUtil.fetchData(mDataClient, Const.CONFIG_PATH,
+      WearData.fetchData(mDataClient, Const.CONFIG_PATH,
        (path, startupConfig) ->
        {
          setDefaultValuesForMissingConfigKeys(startupConfig);
-         DigitalWatchFaceUtil.putConfigDataItem(mDataClient, startupConfig);
+         WearData.putConfigDataItem(mDataClient, startupConfig);
        }
       );
-      final DigitalWatchFaceUtil.FetchConfigDataMapCallback dataHandler;
+      final WearData.FetchConfigDataMapCallback dataHandler;
       dataHandler = this::updateDataItem;
       for (final String path : Const.ALL_DEPLIST_DATA_PATHS)
-        DigitalWatchFaceUtil.fetchData(mDataClient, Const.DATA_PATH + "/" + path, dataHandler);
+        WearData.fetchData(mDataClient, Const.DATA_PATH + "/" + path, dataHandler);
       for (final String path : Const.ALL_FENCE_NAMES)
-        DigitalWatchFaceUtil.fetchData(mDataClient, Const.LOCATION_PATH + "/" + path, dataHandler);
-      DigitalWatchFaceUtil.fetchData(mDataClient, Const.DATA_PATH + "/" + Const.DATA_KEY_USER_MESSAGE, dataHandler);
-      DigitalWatchFaceUtil.fetchData(mDataClient, Const.DATA_PATH + "/" + Const.DATA_KEY_BACKGROUND, dataHandler);
+        WearData.fetchData(mDataClient, Const.LOCATION_PATH + "/" + path, dataHandler);
+      WearData.fetchData(mDataClient, Const.DATA_PATH + "/" + Const.DATA_KEY_USER_MESSAGE, dataHandler);
+      WearData.fetchData(mDataClient, Const.DATA_PATH + "/" + Const.DATA_KEY_BACKGROUND, dataHandler);
     }
 
     @Override // DataClient.OnDataChangedListener

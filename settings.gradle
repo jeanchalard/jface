@@ -1,1 +1,2 @@
-include ':Feed', ':Face', ':Common'
+include ':Feed', ':FacePackage', ':Common'
+include ':Face'

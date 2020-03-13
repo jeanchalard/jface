@@ -29,7 +29,7 @@ import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.j.jface.Const;
 
-public final class DigitalWatchFaceUtil
+public final class WearData
 {
   /**
    * Callback interface to perform an action with the current config {@link DataMap} for
@@ -95,5 +95,5 @@ public final class DigitalWatchFaceUtil
     }
   }
 
-  private DigitalWatchFaceUtil() {}
+  private WearData() {}
 }
