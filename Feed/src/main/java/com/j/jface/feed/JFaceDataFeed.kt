@@ -17,6 +17,7 @@ import android.widget.ArrayAdapter
 import android.widget.ListView
 import com.j.jface.R
 import com.j.jface.feed.fragments.DebugToolsFragment
+import com.j.jface.feed.fragments.FaceFragment
 import com.j.jface.feed.fragments.ImageSelectorFragment
 import com.j.jface.feed.fragments.LogsAndDataFragment
 import com.j.jface.feed.fragments.MessagesFragment
@@ -48,7 +49,7 @@ class JFaceDataFeed(args : WrappedActivity.Args) : WrappedActivity(args)
     val drawer = mA.findViewById<DrawerLayout>(R.id.dataFeedDrawer)
 
     val list = mA.findViewById<ListView>(R.id.dataFeedDrawerContents)
-    list.adapter = ArrayAdapter(mA, R.layout.data_feed_drawer_item, arrayOf("Messages", "Settings", "Logs & data", "Debug tools"))
+    list.adapter = ArrayAdapter(mA, R.layout.data_feed_drawer_item, arrayOf("Messages", "Settings", "Logs & data", "Debug tools", "Face"))
     @Suppress("UNUSED_ANONYMOUS_PARAMETER")
     val listener = AdapterView.OnItemClickListener { parent, view, position, id ->
       val f = getFragmentForPosition(position, mWear)
@@ -108,6 +109,7 @@ class JFaceDataFeed(args : WrappedActivity.Args) : WrappedActivity(args)
       1 -> return FragmentWrapper(ImageSelectorFragment::class.java, wear)
       2 -> return FragmentWrapper(LogsAndDataFragment::class.java, wear)
       3 -> return FragmentWrapper(DebugToolsFragment::class.java, wear)
+      4 -> return FragmentWrapper(FaceFragment::class.java, wear)
     }
     return null
   }

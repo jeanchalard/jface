@@ -393,6 +393,7 @@ public class WatchFace implements DataClient.OnDataChangedListener
       WearData.fetchData(mDataClient, Const.LOCATION_PATH + "/" + path, dataHandler);
     WearData.fetchData(mDataClient, Const.DATA_PATH + "/" + Const.DATA_KEY_USER_MESSAGE, dataHandler);
     WearData.fetchData(mDataClient, Const.DATA_PATH + "/" + Const.DATA_KEY_BACKGROUND, dataHandler);
+    WearData.fetchData(mDataClient, Const.DATA_PATH + "/" + Const.DATA_KEY_DEBUG_TIME_OFFSET, dataHandler);
   }
 
   @Override // DataClient.OnDataChangedListener

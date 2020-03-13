@@ -36,7 +36,7 @@ public class CalendarView extends LinearLayout implements NumericPicker.OnValueC
 {
   public interface DateChangeListener
   {
-    public void onDateChanged(final long newDate);
+    void onDateChanged(final long newDate);
   }
   @NonNull private final GregorianCalendar mCalendar;
   @NonNull private final TextView mMonthView;
