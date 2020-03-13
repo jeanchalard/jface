@@ -31,7 +31,7 @@
      tools:ignore="GoogleAppIndexingWarning">
 
         <service
-                android:name=".face.DigitalWatchFaceService"
+                android:name=".face.WatchFaceService"
                 android:label="@string/digital_name"
                 android:permission="android.permission.BIND_WALLPAPER" >
             <meta-data
