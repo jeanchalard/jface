@@ -144,7 +144,7 @@ public class Const
   @NonNull public static final String 東京_FENCE_NAME = "東京";
   @NonNull public static final String 稲城_FENCE_NAME = "稲城";
   @NonNull public static final String 本蓮沼_FENCE_NAME = "本蓮沼";
-  @NonNull private static final String[] J_FENCE_NAMES = { 千住大橋_FENCE_NAME, 六本木_FENCE_NAME, 日暮里_FENCE_NAME, 東京_FENCE_NAME, 渋谷_FENCE_NAME };
+  @NonNull private static final String[] J_FENCE_NAMES = { 千住大橋_FENCE_NAME, 渋谷_FENCE_NAME, 日暮里_FENCE_NAME, 東京_FENCE_NAME, 六本木_FENCE_NAME };
   @NonNull private static final String[] RIO_FENCE_NAMES = { 稲城_FENCE_NAME, 本蓮沼_FENCE_NAME, 六本木_FENCE_NAME, 東京_FENCE_NAME };
   @NonNull public static final String[] ALL_FENCE_NAMES = RIO_MODE ? RIO_FENCE_NAMES : J_FENCE_NAMES;
 }

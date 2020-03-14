@@ -134,29 +134,17 @@
    android:layout_height="1px"
    android:layout_weight="0"/>
 
-  <LinearLayout
-      android:orientation="horizontal"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      >
-    <Button
-        android:id="@+id/button_fetch_data_state"
-        android:layout_width="0px"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Fetch data state"/>
-    <TextView
-        android:id="@+id/text_data_state"
-        android:layout_width="0px"
-        android:layout_height="wrap_content"
-        android:layout_weight="1" />
-  </LinearLayout>
-
   <Button
    android:id="@+id/button_delete_FCM_token"
    android:layout_width="match_parent"
    android:layout_height="wrap_content"
    android:layout_weight="0"
    android:text="Force FCM token refresh"/>
+
+  <com.j.jface.feed.views.FaceView
+   android:id="@+id/face_simulator"
+   android:layout_margin="40dp"
+   android:layout_width="match_parent"
+   android:layout_height="wrap_content"/>
 
 </LinearLayout>

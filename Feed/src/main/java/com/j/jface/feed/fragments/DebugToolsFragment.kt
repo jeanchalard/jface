@@ -13,6 +13,7 @@ import com.google.android.gms.wearable.DataMap
 import com.google.firebase.iid.FirebaseInstanceId
 import com.j.jface.Const
 import com.j.jface.R
+import com.j.jface.feed.views.FaceView
 import com.j.jface.feed.views.SnackbarRegistry
 import com.j.jface.firebase.Firebase
 import com.j.jface.lifecycle.WrappedFragment
@@ -42,6 +43,7 @@ class DebugToolsFragment(a : WrappedFragment.Args, private val mWear : Wear) : W
   private val mOffsetLabel : TextView = mView.findViewById(R.id.offsetLabel)
   private val mFenceUIs : Array<CheckBox> = arrayOf(mView.findViewById(R.id.fence1), mView.findViewById(R.id.fence2), mView.findViewById(R.id.fence3), mView.findViewById(R.id.fence4))
   private val mHandler = TabDebugToolsHandler(this)
+  private val mFace : FaceView = mView.findViewById(R.id.face_simulator) as FaceView
   private val mWearUpdateListener = object : Firebase.WearDataUpdateListener() {
     override fun onWearDataUpdated(path : String, data : DataMap) = this@DebugToolsFragment.onWearDataUpdated(path, data)
   }
@@ -77,7 +79,7 @@ class DebugToolsFragment(a : WrappedFragment.Args, private val mWear : Wear) : W
 
     addListeners()
 
-    if (Const.RIO_MODE) mFenceUIs[2].text = "六本木"
+    if (Const.RIO_MODE) mFenceUIs[2].text = "渋谷"
 
     val nodeNameTextView = mView.findViewById<TextView>(R.id.nodeId_textView)
     mWear.getNodeName(mFragment.context) { nodeName ->
@@ -97,12 +99,6 @@ class DebugToolsFragment(a : WrappedFragment.Args, private val mWear : Wear) : W
 
         FirebaseInstanceId.getInstance().token // Force token generation
       }.start()
-    }
-
-    mView.findViewById<View>(R.id.button_fetch_data_state).setOnClickListener {
-      mWear.getData("${Const.LOCATION_PATH}/千住大橋") { _, data ->
-        a.fragment.activity.runOnUiThread { mView.findViewById<TextView>(R.id.text_data_state).text = data.getBoolean(Const.DATA_KEY_INSIDE).toString() }
-      }
     }
   }
 

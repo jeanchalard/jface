@@ -27,6 +27,6 @@ class FaceView @JvmOverloads constructor(context : Context, attrs : AttributeSet
     val scale = (width).toFloat() / Const.SCREEN_SIZE
     canvas.scale(scale, scale)
     face.onDraw(canvas, bounds)
-    postDelayed({invalidate()}, 1000L)
+    postDelayed({face.onTimeTick()}, 1000L)
   }
 }
