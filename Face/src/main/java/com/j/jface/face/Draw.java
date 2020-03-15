@@ -37,7 +37,7 @@ public class Draw
   {
     long start = System.currentTimeMillis();
 
-    boolean drawFull = 0 == ((Const.AMBIENT_MODE | Const.MUTE_MODE) & modeFlags);
+    boolean drawFull = 0 == (Const.AMBIENT_MODE & modeFlags);
     final Departure departure1 = null == departureLine1 ? departureLine2 : departureLine1;
     final Departure departure2 = null == departureLine1 ? null : departureLine2;
 

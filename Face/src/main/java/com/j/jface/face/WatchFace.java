@@ -43,7 +43,6 @@ import com.j.jface.Departure;
 import com.j.jface.Util;
 
 import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -56,12 +55,7 @@ public class WatchFace implements DataClient.OnDataChangedListener {
     void invalidate();
   }
 
-  private static final long NORMAL_UPDATE_RATE_MS = 1000;
-  private static final long MUTE_UPDATE_RATE_MS = TimeUnit.MINUTES.toMillis(1);
-
   private static final int MSG_UPDATE_TIME = 0;
-
-  private long mInteractiveUpdateRateMs = NORMAL_UPDATE_RATE_MS;
 
   // Stuff to speak to
   @NonNull private final Context mContext;
@@ -147,30 +141,6 @@ public class WatchFace implements DataClient.OnDataChangedListener {
 
     // Whether the timer should be running depends on whether the face is visible (as well as
     // whether it's in ambient mode), so the timer may need to be started or stopped.
-    updateTimer();
-  }
-
-  public void onInterruptionFilterChanged(final int interruptionFilter)
-  {
-    final boolean inMuteMode = interruptionFilter == WatchFaceService.INTERRUPTION_FILTER_NONE;
-    // We only need to update once a minute in mute mode.
-    if (inMuteMode)
-    {
-      setInteractiveUpdateRateMs(MUTE_UPDATE_RATE_MS);
-      mModeFlags |= Const.MUTE_MODE;
-    }
-    else
-    {
-      setInteractiveUpdateRateMs(NORMAL_UPDATE_RATE_MS);
-      mModeFlags &= ~Const.MUTE_MODE;
-    }
-  }
-
-  private void setInteractiveUpdateRateMs(final long updateRateMs)
-  {
-    if (updateRateMs == mInteractiveUpdateRateMs) return;
-    mInteractiveUpdateRateMs = updateRateMs;
-    // Stop and restart the timer so the new update rate takes effect immediately.
     updateTimer();
   }
 
