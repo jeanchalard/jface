@@ -4,10 +4,13 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Rect
 import android.os.Bundle
+import android.os.SystemClock
 import android.support.wearable.watchface.WatchFaceService
 import android.support.wearable.watchface.WatchFaceService.PROPERTY_BURN_IN_PROTECTION
 import android.support.wearable.watchface.WatchFaceService.PROPERTY_LOW_BIT_AMBIENT
 import android.util.AttributeSet
+import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import com.j.jface.Const
 import com.j.jface.face.WatchFace
@@ -39,6 +42,17 @@ class FaceView @JvmOverloads constructor(context : Context, attrs : AttributeSet
   }
 
   fun onDestroy() = face.onDestroy()
+
+  override fun onTouchEvent(event : MotionEvent?) : Boolean {
+    if (null == event) return false
+    if (event.actionMasked == MotionEvent.ACTION_DOWN) return true
+    val scale = (width).toFloat() / Const.SCREEN_SIZE
+    val x = (event.x / scale).toInt()
+    val y = (event.y / scale).toInt()
+    if (event.actionMasked != MotionEvent.ACTION_UP) return false
+    face.onTapCommand(WatchFaceService.TAP_TYPE_TAP, x, y, SystemClock.uptimeMillis())
+    return true
+  }
 
   fun sendOnPropertiesChanged() = face.onPropertiesChanged(Bundle().apply {
     putBoolean(PROPERTY_LOW_BIT_AMBIENT, coarse)
