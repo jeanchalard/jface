@@ -36,7 +36,6 @@ public class WatchFaceService extends CanvasWatchFaceService {
     @Override public void onVisibilityChanged(final boolean visible) { super.onVisibilityChanged(visible); mFace.onVisibilityChanged(visible); }
     @Override public void onPropertiesChanged(@Nullable final Bundle prop) { super.onPropertiesChanged(prop); mFace.onPropertiesChanged(prop); }
     @Override public void onAmbientModeChanged(final boolean mode) { super.onAmbientModeChanged(mode); mFace.onAmbientModeChanged(mode); }
-    @Override public void onInterruptionFilterChanged(final int filt) { super.onInterruptionFilterChanged(filt); mFace.onInterruptionFilterChanged(filt); }
     @Override public void onTimeTick() { super.onTimeTick(); mFace.onTimeTick(); }
     @Override public void onDraw(@NonNull final Canvas c, @NonNull final Rect bounds) { super.onDraw(c, bounds); mFace.onDraw(c, bounds); }
     @Override public void onTapCommand(@TapType final int tapType, final int x, final int y, final long eventTime) {

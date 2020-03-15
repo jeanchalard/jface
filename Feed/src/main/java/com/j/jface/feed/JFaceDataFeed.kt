@@ -62,7 +62,7 @@ class JFaceDataFeed(args : WrappedActivity.Args) : WrappedActivity(args)
     list.onItemClickListener = listener
 
     val icicle = args.icicle
-    mCurrentlyDisplayedFragmentIndex = icicle?.getInt(LAST_OPEN_FRAGMENT_INDEX) ?: 0
+    mCurrentlyDisplayedFragmentIndex = icicle?.getInt(LAST_OPEN_FRAGMENT_INDEX) ?: 3
     listener.onItemClick(null, null, mCurrentlyDisplayedFragmentIndex, 0) // Switch to the initial fragment
 
     val toolbar = mA.findViewById<Toolbar>(R.id.dataFeedToolbar)

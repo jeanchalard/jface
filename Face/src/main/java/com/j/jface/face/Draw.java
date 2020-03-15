@@ -3,6 +3,7 @@ package com.j.jface.face;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Rect;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -69,6 +70,14 @@ public class Draw
       canvas.drawBitmap(background, 0f, 0f, drawTools.imagePaint);
     else
       canvas.drawRect(0, 0, bounds.width(), bounds.height(), drawTools.imagePaint);
+
+    if (0 != (modeFlags & Const.WAITING_FOR_TAP))
+    {
+      canvas.drawArc(15, 10, Const.SCREEN_SIZE - 5, Const.SCREEN_SIZE - 10, 315, 90, true, drawTools.greenPaint);
+      canvas.drawArc(10, 5, Const.SCREEN_SIZE - 10, Const.SCREEN_SIZE - 20, 225, 90, true, drawTools.redPaint);
+      canvas.drawArc(5, 10, Const.SCREEN_SIZE - 20, Const.SCREEN_SIZE - 10, 135, 90, true, drawTools.bluePaint);
+      canvas.drawArc(10, 15, Const.SCREEN_SIZE - 10, Const.SCREEN_SIZE - 5, 45, 90, true, drawTools.yellowPaint);
+    }
 
     // Draw the time.
     final float center = bounds.width() / 2;

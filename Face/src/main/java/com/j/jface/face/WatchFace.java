@@ -56,6 +56,7 @@ public class WatchFace implements DataClient.OnDataChangedListener {
   }
 
   private static final int MSG_UPDATE_TIME = 0;
+  private static final int MSG_CANCEL_WAIT_FOR_TAP_MODE = 1;
 
   // Stuff to speak to
   @NonNull private final Context mContext;
@@ -265,6 +266,12 @@ public class WatchFace implements DataClient.OnDataChangedListener {
   {
     if (WatchFaceService.TAP_TYPE_TAP == tapType)
     {
+      mUpdateTimeHandler.removeMessages(MSG_CANCEL_WAIT_FOR_TAP_MODE);
+      mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_CANCEL_WAIT_FOR_TAP_MODE,3000);
+      if (0 == (mModeFlags & Const.WAITING_FOR_TAP)) {
+        mModeFlags |= Const.WAITING_FOR_TAP;
+        return true;
+      }
       // Determine quadrant. Top quadrant : change location ; bottom quadrant : show/hide message ; left/right : backward/forward departures
       if (x < y) // bottom left triangle
         if (x < Const.SCREEN_SIZE - y) // top left triangle
@@ -431,12 +438,15 @@ public class WatchFace implements DataClient.OnDataChangedListener {
       switch (message.what)
       {
         case MSG_UPDATE_TIME:
-          mEngine.invalidate();
           final long nextUpdateTime = mEngine.nextUpdateTime();
           final long now = mEngine.mDataStore.currentTimeMillis();
           this.sendEmptyMessageDelayed(MSG_UPDATE_TIME, nextUpdateTime - now);
           break;
+        case MSG_CANCEL_WAIT_FOR_TAP_MODE:
+          mEngine.mModeFlags &= ~Const.WAITING_FOR_TAP;
+          break;
       }
+      mEngine.invalidate();
     }
   }
 
