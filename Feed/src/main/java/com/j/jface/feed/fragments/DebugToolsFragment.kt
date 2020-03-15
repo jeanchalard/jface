@@ -186,6 +186,7 @@ class DebugToolsFragment(a : WrappedFragment.Args, private val mWear : Wear) : W
           for (i in mFenceUIs.indices) mFenceUIs[i].isChecked = 0 != (fences and (1 shl i))
       }
     }
+    mFace.invalidate();
   }
 
   private fun updateOffset(grace : Long)
@@ -229,6 +230,7 @@ class DebugToolsFragment(a : WrappedFragment.Args, private val mWear : Wear) : W
       R.id.debug_btn_visible -> mFace.toggleVisible()
       else -> updateFences()
     }
+    mFace.invalidate();
   }
 
   override fun onValueChange(picker : NumberPicker, oldVal : Int, newVal : Int) = updateOffset(GRACE_FOR_UPDATE)

@@ -18,6 +18,11 @@ public class Const
   public static final long UPDATE_DELAY_MILLIS = 7 * 24 * 60 * 60 * 1000; // One week in millis
   public static final int DISPLAYED_DEPARTURES_PER_LINE = 3;
 
+  public static final int COARSE_AMBIENT_MODE = 1; // Ambient mode has fewer bits per pixel
+  public static final int AMBIENT_MODE = 2;
+  public static final int MUTE_MODE = 4;
+  public static final int BURN_IN_PROTECTION_MODE = 8;
+
   public static final int CHOOSE_IMAGE_RESULT_CODE = 100;
   public static final int GOOGLE_SIGN_IN_RESULT_CODE = 300;
   public static final int NOTIFICATION_RESULT_CODE = 400;

@@ -16,7 +16,6 @@
 
 package com.j.jface.face;
 
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -79,10 +78,8 @@ public class WatchFace implements DataClient.OnDataChangedListener {
   @NonNull private final Time mTime = new Time();
 
   // State for configuration
-  private boolean mAmbientModeHasFewerBitsPerPixel;
   private boolean mVisible = true;
-  private boolean mAmbientMode = false;
-  private int mModeFlags = 0; // Default mode mute off, ambient off
+  private int mModeFlags = 0; // Default mode mute off, ambient off, burn-in protection off, coarse ambient mode off
 
   // Business state
   @Nullable private Departure mNextDeparture;
@@ -107,8 +104,14 @@ public class WatchFace implements DataClient.OnDataChangedListener {
 
   public void onPropertiesChanged(@NonNull final Bundle properties)
   {
-    mAmbientModeHasFewerBitsPerPixel = properties.getBoolean(PROPERTY_LOW_BIT_AMBIENT, false);
-    mDrawTools.onPropertiesChanged(properties.getBoolean(PROPERTY_BURN_IN_PROTECTION, false), mAmbientModeHasFewerBitsPerPixel);
+    if (properties.getBoolean(PROPERTY_LOW_BIT_AMBIENT, false))
+      mModeFlags |= Const.COARSE_AMBIENT_MODE;
+    else
+      mModeFlags &= ~Const.COARSE_AMBIENT_MODE;
+    if (properties.getBoolean(PROPERTY_BURN_IN_PROTECTION, false))
+      mModeFlags |= Const.BURN_IN_PROTECTION_MODE;
+    else
+      mModeFlags &= ~Const.BURN_IN_PROTECTION_MODE;
   }
 
   public void onVisibilityChanged(final boolean visible)
@@ -131,8 +134,11 @@ public class WatchFace implements DataClient.OnDataChangedListener {
 
   public void onAmbientModeChanged(final boolean inAmbientMode)
   {
-    mAmbientMode = inAmbientMode;
-    mDrawTools.onAmbientModeChanged(inAmbientMode, mAmbientModeHasFewerBitsPerPixel);
+    if (inAmbientMode)
+      mModeFlags |= Const.AMBIENT_MODE;
+    else
+      mModeFlags &= ~Const.AMBIENT_MODE;
+    mDrawTools.onAmbientModeChanged(inAmbientMode, 0 != (mModeFlags & Const.COARSE_AMBIENT_MODE));
     /*      if (inAmbientMode)
         mSensors.stop();
       else
@@ -151,12 +157,12 @@ public class WatchFace implements DataClient.OnDataChangedListener {
     if (inMuteMode)
     {
       setInteractiveUpdateRateMs(MUTE_UPDATE_RATE_MS);
-      mModeFlags |= Draw.MUTE_MODE;
+      mModeFlags |= Const.MUTE_MODE;
     }
     else
     {
       setInteractiveUpdateRateMs(NORMAL_UPDATE_RATE_MS);
-      mModeFlags &= ~Draw.MUTE_MODE;
+      mModeFlags &= ~Const.MUTE_MODE;
     }
   }
 
@@ -169,7 +175,7 @@ public class WatchFace implements DataClient.OnDataChangedListener {
   }
 
   public long nextUpdateTime() {
-    final boolean active = mVisible && !mAmbientMode;
+    final boolean active = mVisible && (0 == (mModeFlags & Const.AMBIENT_MODE));
     mTime.setToNow();
     final int d = (mTime.hour * 3600 + mTime.minute * 60) % 86400;
     final boolean mustWakeForAnimation = (!active && null != mNextDeparture && mNextDeparture.time == d);
@@ -262,10 +268,7 @@ public class WatchFace implements DataClient.OnDataChangedListener {
         departure1 = mDataStore.findClosestDeparture(Const.都営三田線_本蓮沼_目黒方面_休日, departureTime);
         departure2 = null;
         break;
-      case JUGGLING_木曜_RIO:
-        departure1 = mDataStore.findClosestDeparture(Const.大江戸線_六本木_新宿方面_平日, departureTime);
-        departure2 = null;
-        break;
+      case JUGGLING_木曜_RIO :
       case ROPPONGI_休日_RIO :
         departure1 = mDataStore.findClosestDeparture(Const.大江戸線_六本木_新宿方面_平日, departureTime);
         departure2 = null;
@@ -275,8 +278,7 @@ public class WatchFace implements DataClient.OnDataChangedListener {
         departure2 = null;
     }
 
-    final int ambientFlag = mAmbientMode ? Draw.AMBIENT_MODE : 0;
-    if (mDraw.draw(mDrawTools, mModeFlags | ambientFlag, canvas, bounds, mDataStore.mBackground,
+    if (mDraw.draw(mDrawTools, mModeFlags, canvas, bounds, mDataStore.mBackground,
      departure1, departure2, status, mTime, /*mSensors,*/ Status.getSymbolicLocationName(statusOverride, mDataStore),
      mTapControl.showUserMessage() ? mDataStore.mUserMessage : "", mDataStore.mUserMessageColors))
       invalidate();

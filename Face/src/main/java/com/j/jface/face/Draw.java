@@ -14,8 +14,6 @@ import com.j.jface.Departure;
 
 public class Draw
 {
-  public static final int AMBIENT_MODE = 2;
-  public static final int MUTE_MODE = 4;
 
   private static final int SCHEDULE_ONLY = 1;
   private static final int USER_MESSAGE_ONLY = 2;
@@ -39,7 +37,7 @@ public class Draw
   {
     long start = System.currentTimeMillis();
 
-    boolean drawFull = 0 == ((AMBIENT_MODE | MUTE_MODE) & modeFlags);
+    boolean drawFull = 0 == ((Const.AMBIENT_MODE | Const.MUTE_MODE) & modeFlags);
     final Departure departure1 = null == departureLine1 ? departureLine2 : departureLine1;
     final Departure departure2 = null == departureLine1 ? null : departureLine2;
 
@@ -125,11 +123,15 @@ public class Draw
       ty += drawTools.userMessagePaint.getTextSize() + 2;
     }
 
-    final int borderTextLength = Formatter.formatBorder(mTmpChr, time, drawFull ? locationDescriptor : null);
-    if (Const.ROUND_SCREEN)
-      canvas.drawTextOnPath(mTmpChr, 0, borderTextLength, drawTools.watchContourPath, 0, 0, drawTools.statusPaint);
-    else
-      canvas.drawText(mTmpChr, 0, borderTextLength, bounds.width() / 2, drawTools.statusPaint.getTextSize(), drawTools.statusPaint);
+    // Draw the date, unless ambient mode && burn-in protection
+    if (0 == (modeFlags & Const.BURN_IN_PROTECTION_MODE) || 0 == (modeFlags & Const.AMBIENT_MODE))
+    {
+      final int borderTextLength = Formatter.formatBorder(mTmpChr, time, drawFull ? locationDescriptor : null);
+      if (Const.ROUND_SCREEN)
+        canvas.drawTextOnPath(mTmpChr, 0, borderTextLength, drawTools.watchContourPath, 0, 0, drawTools.statusPaint);
+      else
+        canvas.drawText(mTmpChr, 0, borderTextLength, bounds.width() / 2, drawTools.statusPaint.getTextSize(), drawTools.statusPaint);
+    }
 
 //    long finish = System.currentTimeMillis();
 //    Log.e("TIME", "" + (finish - start));

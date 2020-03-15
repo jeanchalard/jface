@@ -23,11 +23,11 @@ public class Formatter
     buffer[++i] = (char) ('0' + (time.year / 100) % 10);
     buffer[++i] = (char) ('0' + (time.year / 10) % 10);
     buffer[++i] = (char) ('0' + time.year % 10);
-    buffer[++i] = '/';
+    buffer[++i] = '-';
     final int month = time.month + 1;
     buffer[++i] = (char) ('0' + (month / 10) % 10);
     buffer[++i] = (char) ('0' + month % 10);
-    buffer[++i] = '/';
+    buffer[++i] = '-';
     buffer[++i] = (char) ('0' + (time.monthDay / 10) % 10);
     buffer[++i] = (char) ('0' + time.monthDay % 10);
     if (null == extra) return ++i;

@@ -126,13 +126,14 @@ public class DrawTools
     return paint;
   }
 
-  public void onPropertiesChanged(final boolean burnInProtection, final boolean lowBitAmbient)
-  {
-    minutesPaint.setTypeface(burnInProtection ? NORMAL_TYPEFACE : BOLD_TYPEFACE);
-  }
-
   public void onAmbientModeChanged(final boolean inAmbientMode, final boolean lowBitAmbient)
   {
-    minutesPaint.setAntiAlias(lowBitAmbient ? !inAmbientMode : true);
+    final boolean antiAlias = lowBitAmbient ? !inAmbientMode : true;
+    imagePaint.setAntiAlias(antiAlias);
+    minutesPaint.setAntiAlias(antiAlias);
+    secondsPaint.setAntiAlias(antiAlias);
+    departurePaint.setAntiAlias(antiAlias);
+    statusPaint.setAntiAlias(antiAlias);
+    userMessagePaint.setAntiAlias(antiAlias);
   }
 }
