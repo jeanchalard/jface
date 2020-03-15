@@ -116,7 +116,7 @@
       android:textAppearance="?android:attr/textAppearanceLarge"
       android:id="@+id/offsetLabel"
       android:layout_gravity="center_horizontal"
-      android:layout_weight="5"/>
+      android:layout_weight="10"/>
 
     <Button
       android:layout_width="wrap_content"
@@ -124,6 +124,57 @@
       android:text="Now"
       android:id="@+id/button_now"
       android:layout_weight="1"/>
+
+    <Button
+     android:id="@+id/button_delete_FCM_token"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_weight="0"
+     android:text="Force FCM token refresh"/>
+
+  </LinearLayout>
+
+  <LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <Button
+     android:id="@+id/debug_btn_coarse"
+     android:layout_marginStart="8dp"
+     android:layout_marginEnd="8dp"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_weight="1"
+     android:text="Coarse"/>
+
+    <Button
+     android:id="@+id/debug_btn_burnin"
+     android:layout_marginStart="8dp"
+     android:layout_marginEnd="8dp"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_weight="1"
+     android:text="Burn-in"/>
+
+    <Button
+     android:id="@+id/debug_btn_ambient"
+     android:layout_marginStart="8dp"
+     android:layout_marginEnd="8dp"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_weight="1"
+     android:text="Ambient"/>
+
+    <Button
+     android:id="@+id/debug_btn_visible"
+     android:layout_marginStart="8dp"
+     android:layout_marginEnd="8dp"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_weight="1"
+     android:text="Visible"/>
+
   </LinearLayout>
 
   <FrameLayout
@@ -134,16 +185,9 @@
    android:layout_height="1px"
    android:layout_weight="0"/>
 
-  <Button
-   android:id="@+id/button_delete_FCM_token"
-   android:layout_width="match_parent"
-   android:layout_height="wrap_content"
-   android:layout_weight="0"
-   android:text="Force FCM token refresh"/>
-
   <com.j.jface.feed.views.FaceView
    android:id="@+id/face_simulator"
-   android:layout_margin="40dp"
+   android:layout_margin="20dp"
    android:layout_width="match_parent"
    android:layout_height="wrap_content"/>
 

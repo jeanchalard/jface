@@ -5,6 +5,7 @@ import android.os.Message
 import android.text.format.DateUtils
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.CheckBox
 import android.widget.NumberPicker
 import android.widget.TextView
@@ -41,9 +42,10 @@ class DebugToolsFragment(a : WrappedFragment.Args, private val mWear : Wear) : W
   private val mMinutesUI : NumberPicker = mView.findViewById(R.id.minutesUI)
   private val mSecondsUI : NumberPicker = mView.findViewById(R.id.secondsUI)
   private val mOffsetLabel : TextView = mView.findViewById(R.id.offsetLabel)
-  private val mFenceUIs : Array<CheckBox> = arrayOf(mView.findViewById(R.id.fence1), mView.findViewById(R.id.fence2), mView.findViewById(R.id.fence3), mView.findViewById(R.id.fence4))
+  private val mFenceUIs = arrayOf(R.id.fence1, R.id.fence2, R.id.fence3, R.id.fence4).map { mView.findViewById<CheckBox>(it) }
   private val mHandler = TabDebugToolsHandler(this)
   private val mFace : FaceView = mView.findViewById(R.id.face_simulator) as FaceView
+  private val mFaceToggles = arrayOf(R.id.debug_btn_coarse, R.id.debug_btn_burnin, R.id.debug_btn_ambient, R.id.debug_btn_visible).map { mView.findViewById<Button>(it) }
   private val mWearUpdateListener = object : Firebase.WearDataUpdateListener() {
     override fun onWearDataUpdated(path : String, data : DataMap) = this@DebugToolsFragment.onWearDataUpdated(path, data)
   }
@@ -108,7 +110,8 @@ class DebugToolsFragment(a : WrappedFragment.Args, private val mWear : Wear) : W
     mMinutesUI.setOnValueChangedListener(this)
     mSecondsUI.setOnValueChangedListener(this)
     mDaysOffsetUI.setOnValueChangedListener(this)
-    for (c in mFenceUIs) c.setOnClickListener(this)
+    mFenceUIs.forEach { it.setOnClickListener(this) }
+    mFaceToggles.forEach { it.setOnClickListener(this) }
   }
 
   private fun removeListeners()
@@ -117,7 +120,8 @@ class DebugToolsFragment(a : WrappedFragment.Args, private val mWear : Wear) : W
     mMinutesUI.setOnValueChangedListener(null)
     mSecondsUI.setOnValueChangedListener(null)
     mDaysOffsetUI.setOnValueChangedListener(null)
-    for (c in mFenceUIs) c.setOnClickListener(null)
+    mFenceUIs.forEach { it.setOnClickListener(null) }
+    mFaceToggles.forEach { it.setOnClickListener(null) }
   }
 
   private fun <R> withoutListeners(block : () -> R)
@@ -143,6 +147,10 @@ class DebugToolsFragment(a : WrappedFragment.Args, private val mWear : Wear) : W
   {
     SnackbarRegistry.unsetSnackbarParent(mView)
     mWearUpdateListener.pause()
+  }
+
+  override fun onDestroy() {
+    mFace.onDestroy()
   }
 
   private fun tick()
@@ -215,6 +223,10 @@ class DebugToolsFragment(a : WrappedFragment.Args, private val mWear : Wear) : W
         mHandler.sendEmptyMessage(MSG_UPDATE_TIME)
         updateFences()
       }
+      R.id.debug_btn_coarse -> mFace.toggleCoarse()
+      R.id.debug_btn_burnin -> mFace.toggleBurnin()
+      R.id.debug_btn_ambient -> mFace.toggleAmbient()
+      R.id.debug_btn_visible -> mFace.toggleVisible()
       else -> updateFences()
     }
   }

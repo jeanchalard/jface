@@ -52,9 +52,11 @@ import androidx.annotation.Nullable;
 import static android.support.wearable.watchface.WatchFaceService.PROPERTY_BURN_IN_PROTECTION;
 import static android.support.wearable.watchface.WatchFaceService.PROPERTY_LOW_BIT_AMBIENT;
 
-public class WatchFace implements DataClient.OnDataChangedListener
-{
-  public interface Invalidator { void invalidate(); }
+public class WatchFace implements DataClient.OnDataChangedListener {
+  public interface Invalidator {
+    void invalidate();
+  }
+
   private static final long NORMAL_UPDATE_RATE_MS = 1000;
   private static final long MUTE_UPDATE_RATE_MS = TimeUnit.MINUTES.toMillis(1);
 
@@ -85,8 +87,7 @@ public class WatchFace implements DataClient.OnDataChangedListener
   // Business state
   @Nullable private Departure mNextDeparture;
 
-  public WatchFace(@NonNull final Context context, @NonNull final Invalidator invalidator)
-  {
+  public WatchFace(@NonNull final Context context, @NonNull final Invalidator invalidator) {
     mContext = context;
     mInvalidator = invalidator;
     mDataClient = Wearable.getDataClient(context, new Wearable.WearableOptions.Builder().setLooper(context.getMainLooper()).build());
