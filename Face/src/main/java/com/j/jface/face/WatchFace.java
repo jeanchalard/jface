@@ -29,6 +29,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.wearable.watchface.WatchFaceService;
 import android.text.format.Time;
+import android.util.Log;
 
 import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataClient;
@@ -41,6 +42,7 @@ import com.google.android.gms.wearable.Wearable;
 import com.j.jface.Const;
 import com.j.jface.Departure;
 import com.j.jface.Util;
+import com.j.jface.face.models.TapModel;
 
 import java.util.TimeZone;
 
@@ -56,7 +58,6 @@ public class WatchFace implements DataClient.OnDataChangedListener {
   }
 
   private static final int MSG_UPDATE_TIME = 0;
-  private static final int MSG_CANCEL_WAIT_FOR_TAP_MODE = 1;
 
   // Stuff to speak to
   @NonNull private final Context mContext;
@@ -67,7 +68,9 @@ public class WatchFace implements DataClient.OnDataChangedListener {
   @NonNull private final DataStore mDataStore = new DataStore();
   @NonNull private final TapControl mTapControl = new TapControl();
   // @NonNull private final Sensors mSensors;
-  @NonNull private final Draw mDraw = new Draw();
+
+  @NonNull private final TapModel mTapModel = new TapModel();
+  @NonNull private final Draw mDraw = new Draw(mTapModel);
 
   // Cache object to save allocations
   @NonNull private final Time mTime = new Time();
@@ -146,12 +149,15 @@ public class WatchFace implements DataClient.OnDataChangedListener {
   }
 
   public long nextUpdateTime() {
+    final long now = mDataStore.currentTimeMillis();
+    final boolean animating = mTapModel.toInactive() > 0;
+    if (animating) return now;
+
     final boolean active = mVisible && (0 == (mModeFlags & Const.AMBIENT_MODE));
     mTime.setToNow();
     final int d = (mTime.hour * 3600 + mTime.minute * 60) % 86400;
     final boolean mustWakeForAnimation = (!active && null != mNextDeparture && mNextDeparture.time == d);
 
-    final long now = mDataStore.currentTimeMillis();
     // If active, every second, otherwise every minute
     if (active)
       return now + 1000 - now % 1000;
@@ -266,12 +272,7 @@ public class WatchFace implements DataClient.OnDataChangedListener {
   {
     if (WatchFaceService.TAP_TYPE_TAP == tapType)
     {
-      mUpdateTimeHandler.removeMessages(MSG_CANCEL_WAIT_FOR_TAP_MODE);
-      mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_CANCEL_WAIT_FOR_TAP_MODE,3000);
-      if (0 == (mModeFlags & Const.WAITING_FOR_TAP)) {
-        mModeFlags |= Const.WAITING_FOR_TAP;
-        return true;
-      }
+      if (!mTapModel.startTapAndReturnIfActive()) return true;
       // Determine quadrant. Top quadrant : change location ; bottom quadrant : show/hide message ; left/right : backward/forward departures
       if (x < y) // bottom left triangle
         if (x < Const.SCREEN_SIZE - y) // top left triangle
@@ -441,9 +442,6 @@ public class WatchFace implements DataClient.OnDataChangedListener {
           final long nextUpdateTime = mEngine.nextUpdateTime();
           final long now = mEngine.mDataStore.currentTimeMillis();
           this.sendEmptyMessageDelayed(MSG_UPDATE_TIME, nextUpdateTime - now);
-          break;
-        case MSG_CANCEL_WAIT_FOR_TAP_MODE:
-          mEngine.mModeFlags &= ~Const.WAITING_FOR_TAP;
           break;
       }
       mEngine.invalidate();

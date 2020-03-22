@@ -26,10 +26,6 @@ public class DrawTools
   public final Paint departurePaint;
   public final Paint statusPaint;
   public final Paint userMessagePaint;
-  public final Paint redPaint;
-  public final Paint bluePaint;
-  public final Paint yellowPaint;
-  public final Paint greenPaint;
 
   public final Path watchContourPath;
 
@@ -84,21 +80,9 @@ public class DrawTools
     statusPaint.setTextSize(statusFontSize);
     userMessagePaint.setTextSize(28);
 
-    redPaint = makeFillPaint(0x3FFF7F7F);
-    bluePaint = makeFillPaint(0x3F7F7FFF);
-    yellowPaint = makeFillPaint(0x3FFFFF7F);
-    greenPaint = makeFillPaint(0x3F7FFF7F);
-
     timePosY = Const.ROUND_SCREEN ? 85 : 75;
     departurePosY = timePosY + 36;
     iconToDepartureXPadding = 7;
-  }
-
-  private static Paint makeFillPaint(final int color) {
-    final Paint p = new Paint();
-    p.setColor(color);
-    p.setStyle(Paint.Style.FILL);
-    return p;
   }
 
   @Nullable public Bitmap getIconForKey(final String key) {

@@ -3,27 +3,31 @@ package com.j.jface.face;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.Rect;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.text.format.Time;
 
 import com.j.jface.Const;
 import com.j.jface.Departure;
+import com.j.jface.face.layers.TapLayer;
+import com.j.jface.face.models.TapModel;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class Draw
 {
-
   private static final int SCHEDULE_ONLY = 1;
   private static final int USER_MESSAGE_ONLY = 2;
   private static final int BOTH = 3;
 
+  private final TapLayer tapLayer;
+
   private BitmapCache[] mCache;
-  public Draw() {
+  public Draw(@NonNull final TapModel tapModel) {
     mCache = new BitmapCache[] { new BitmapCache(0, 0, 0, 1, null, new Paint()),
       new BitmapCache(0, 0, 0, 1, null, new Paint()) };
+    tapLayer = new TapLayer(tapModel);
   }
 
   private final StringBuilder mTmpSb = new StringBuilder(256);
@@ -71,13 +75,7 @@ public class Draw
     else
       canvas.drawRect(0, 0, bounds.width(), bounds.height(), drawTools.imagePaint);
 
-    if (0 != (modeFlags & Const.WAITING_FOR_TAP))
-    {
-      canvas.drawArc(15, 10, Const.SCREEN_SIZE - 5, Const.SCREEN_SIZE - 10, 315, 90, true, drawTools.greenPaint);
-      canvas.drawArc(10, 5, Const.SCREEN_SIZE - 10, Const.SCREEN_SIZE - 20, 225, 90, true, drawTools.redPaint);
-      canvas.drawArc(5, 10, Const.SCREEN_SIZE - 20, Const.SCREEN_SIZE - 10, 135, 90, true, drawTools.bluePaint);
-      canvas.drawArc(10, 15, Const.SCREEN_SIZE - 10, Const.SCREEN_SIZE - 5, 45, 90, true, drawTools.yellowPaint);
-    }
+    tapLayer.draw(canvas);
 
     // Draw the time.
     final float center = bounds.width() / 2;
