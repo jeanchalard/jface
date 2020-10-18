@@ -14,7 +14,7 @@ private operator fun PersistableBundle.set(key : String, value : Any)
 {
   when (value)
   {
-    // Careful : this converts ArrayList<Int> to Int[]. The method below does the opposite.
+    // Careful : this converts ArrayList<*> to Int[]. The method below does the opposite.
     // There are types not handled here but that could be, like, list of strings or so.
     is String -> putString(key, value)
     is Int -> putInt(key, value)
@@ -22,7 +22,7 @@ private operator fun PersistableBundle.set(key : String, value : Any)
     is Double -> putDouble(key, value)
     is Boolean -> putBoolean(key, value)
     is LongArray -> putLongArray(key, value)
-    is ArrayList<*> -> putIntArray(key, (value as java.util.ArrayList<Int>).toIntArray())
+    is ArrayList<*> -> putIntArray(key, (value as ArrayList<Int>).toIntArray())
     else -> throw UnsupportedOperationException("Can't put a ${value.javaClass} (${value}) into a PersistableBundle")
   }
 }
