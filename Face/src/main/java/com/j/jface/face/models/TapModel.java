@@ -4,6 +4,7 @@ import android.os.SystemClock;
 
 public class TapModel
 {
+  private static final int DOUBLE_TAP_MS = 400;
   private static final int TAP_ACTIVE_TIME_MS = 3000;
   private long lastTapTime = Long.MIN_VALUE; // In units of SystemClock.uptimeMillis;
   private long activeSince = Long.MIN_VALUE; // Likewise
@@ -17,11 +18,18 @@ public class TapModel
     return wasActive;
   }
 
-  public int sinceActive() {
+  public boolean isDoubleTap()
+  {
+    return SystemClock.uptimeMillis() - lastTapTime < DOUBLE_TAP_MS;
+  }
+
+  public int sinceActive()
+  {
     return (int)(SystemClock.uptimeMillis() - activeSince);
   }
 
-  public int toInactive() {
+  public int toInactive()
+  {
     return (int)(lastTapTime + TAP_ACTIVE_TIME_MS - SystemClock.uptimeMillis());
   }
 }

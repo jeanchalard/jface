@@ -1,7 +1,10 @@
 package com.j.jface.feed.fragments
 
+import android.app.AlertDialog
+import android.support.wearable.view.WearableDialogHelper
 import android.text.*
 import android.text.style.ForegroundColorSpan
+import android.widget.Button
 import android.widget.EditText
 import com.google.android.gms.wearable.DataMap
 import com.j.jface.Const
@@ -17,7 +20,8 @@ import java.util.concurrent.Semaphore
 /**
  * A fragment for showing and managing arbitrary messages.
  */
-const val MESSAGE_PATH = "${Const.DATA_PATH}/${Const.DATA_KEY_USER_MESSAGE}"
+val MESSAGE_PATH = "${Const.DATA_PATH}/${Const.DATA_KEY_USER_MESSAGE}"
+val HEART_PATH = "${Const.DATA_PATH}/${Const.DATA_KEY_HEART_MESSAGE}"
 
 class MessagesFragment(a : WrappedFragment.Args, private val mWear : Wear) : WrappedFragment(a.inflater.inflate(R.layout.fragment_messages, a.container, false)), TextWatcher, PaletteView.OnColorSetListener
 {
@@ -38,6 +42,7 @@ class MessagesFragment(a : WrappedFragment.Args, private val mWear : Wear) : Wra
     mUserMessageDataEdit.setTextColor(Const.USER_MESSAGE_DEFAULT_COLOR)
     mPalette = mView.findViewById(R.id.messagesFragment_palette)
     mPalette.addOnColorSetListener(this)
+    mView.findViewById<Button>(R.id.messagesFragment_setHMessage).setOnClickListener { sendHeartMessage() }
   }
 
   fun onWearDataUpdated(path : String, dataMap : DataMap)
@@ -47,7 +52,6 @@ class MessagesFragment(a : WrappedFragment.Args, private val mWear : Wear) : Wra
     activity.runOnUiThread {
       val oldDistToEnd = (mUserMessageDataEdit.text?.length ?: 0) - mUserMessageDataEdit.selectionStart
       val userMessage = dataMap.getString(Const.DATA_KEY_USER_MESSAGE)
-      if (null == userMessage) return@runOnUiThread
       val starts = getLineStartOffsets(userMessage)
       val text = SpannableString(userMessage)
       val colors = dataMap.getIntegerArrayList(Const.DATA_KEY_USER_MESSAGE_COLORS)
@@ -161,12 +165,20 @@ class MessagesFragment(a : WrappedFragment.Args, private val mWear : Wear) : Wra
     {
       removeAllSpans()
     }
-
   }
 
   private fun removeAllSpans()
   {
     val text = mUserMessageDataEdit.text
     for (span in text.getSpans(0, text.length - 1, ForegroundColorSpan::class.java)) text.removeSpan(span)
+  }
+
+  private fun sendHeartMessage()
+  {
+    val text = mView.findViewById<EditText>(R.id.messagesFragment_hMessage).text
+    if (text.isEmpty()) return
+    val dataMap = DataMap()
+    dataMap.putString(Const.DATA_KEY_HEART_MESSAGE, text.toString())
+    mWear.putDataToCloud(Const.DATA_PATH + "/" + Const.DATA_KEY_HEART_MESSAGE, dataMap)
   }
 }

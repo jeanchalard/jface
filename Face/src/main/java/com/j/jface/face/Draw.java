@@ -1,5 +1,6 @@
 package com.j.jface.face;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -9,7 +10,9 @@ import android.text.format.Time;
 
 import com.j.jface.Const;
 import com.j.jface.Departure;
+import com.j.jface.face.layers.HeartLayer;
 import com.j.jface.face.layers.TapLayer;
+import com.j.jface.face.models.HeartModel;
 import com.j.jface.face.models.TapModel;
 
 import androidx.annotation.NonNull;
@@ -22,12 +25,15 @@ public class Draw
   private static final int BOTH = 3;
 
   private final TapLayer tapLayer;
+  private final HeartLayer heartLayer;
 
   private BitmapCache[] mCache;
-  public Draw(@NonNull final TapModel tapModel) {
+  public Draw(@NonNull final Resources res, @NonNull final DrawTools tools, @NonNull final DataStore dataStore,
+              @NonNull final TapModel tapModel, @NonNull final HeartModel heartModel) {
     mCache = new BitmapCache[] { new BitmapCache(0, 0, 0, 1, null, new Paint()),
       new BitmapCache(0, 0, 0, 1, null, new Paint()) };
     tapLayer = new TapLayer(tapModel);
+    heartLayer = new HeartLayer(heartModel, res, dataStore);
   }
 
   private final StringBuilder mTmpSb = new StringBuilder(256);
@@ -139,6 +145,8 @@ public class Draw
       else
         canvas.drawText(mTmpChr, 0, borderTextLength, bounds.width() / 2, drawTools.statusPaint.getTextSize(), drawTools.statusPaint);
     }
+
+    heartLayer.draw(canvas);
 
 //    long finish = System.currentTimeMillis();
 //    Log.e("TIME", "" + (finish - start));

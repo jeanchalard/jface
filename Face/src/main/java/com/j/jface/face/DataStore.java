@@ -19,6 +19,7 @@ public class DataStore
   @NonNull private final HashMap<String, Boolean> mLocationStatuses = new HashMap<>();
   @NonNull public String mUserMessage = "";
   @NonNull public int[] mUserMessageColors = new int[0];
+  @NonNull public String[] mHeartMessage = new String[0];
   @Nullable public Bitmap mBackground;
   public long mTimeOffset;
   public long mDebugFences;

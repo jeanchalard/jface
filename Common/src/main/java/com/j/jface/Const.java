@@ -53,6 +53,7 @@ public class Const
   @NonNull public static final String DATA_KEY_DEPLIST = "depList";
   @NonNull public static final String DATA_KEY_USER_MESSAGE = "userMessage";
   @NonNull public static final String DATA_KEY_USER_MESSAGE_COLORS = "userMessageColors";
+  @NonNull public static final String DATA_KEY_HEART_MESSAGE = "heartMessage";
   @SuppressWarnings("unused") @NonNull public static final String DATA_KEY_ADHOC = "adHoc";
   @NonNull public static final String DATA_KEY_INSIDE = "inside";
   @NonNull public static final String DATA_KEY_SUCCESSFUL_UPDATE_DATE = "updateTime";

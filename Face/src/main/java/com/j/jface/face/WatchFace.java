@@ -28,8 +28,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.wearable.watchface.WatchFaceService;
+import android.text.TextUtils;
 import android.text.format.Time;
-import android.util.Log;
 
 import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataClient;
@@ -42,6 +42,7 @@ import com.google.android.gms.wearable.Wearable;
 import com.j.jface.Const;
 import com.j.jface.Departure;
 import com.j.jface.Util;
+import com.j.jface.face.models.HeartModel;
 import com.j.jface.face.models.TapModel;
 
 import java.util.TimeZone;
@@ -70,7 +71,8 @@ public class WatchFace implements DataClient.OnDataChangedListener {
   // @NonNull private final Sensors mSensors;
 
   @NonNull private final TapModel mTapModel = new TapModel();
-  @NonNull private final Draw mDraw = new Draw(mTapModel);
+  @NonNull private final HeartModel mHeartModel = new HeartModel();
+  @NonNull private final Draw mDraw;
 
   // Cache object to save allocations
   @NonNull private final Time mTime = new Time();
@@ -87,6 +89,7 @@ public class WatchFace implements DataClient.OnDataChangedListener {
     mInvalidator = invalidator;
     mDataClient = Wearable.getDataClient(context, new Wearable.WearableOptions.Builder().setLooper(context.getMainLooper()).build());
     mDrawTools = new DrawTools(context.getResources());
+    mDraw = new Draw(context.getResources(), mDrawTools, mDataStore, mTapModel, mHeartModel);
     mDataStore.mBackground = ((BitmapDrawable)mContext.getResources().getDrawable(R.drawable.bg)).getBitmap();
     mDataClient.addListener(this);
     mTime.setToNow();
@@ -150,7 +153,7 @@ public class WatchFace implements DataClient.OnDataChangedListener {
 
   public long nextUpdateTime() {
     final long now = mDataStore.currentTimeMillis();
-    final boolean animating = mTapModel.toInactive() > 0;
+    final boolean animating = mTapModel.toInactive() > 0 || mHeartModel.isActive();
     if (animating) return now;
 
     final boolean active = mVisible && (0 == (mModeFlags & Const.AMBIENT_MODE));
@@ -270,8 +273,15 @@ public class WatchFace implements DataClient.OnDataChangedListener {
 
   public boolean onTapCommand(@WatchFaceService.TapType final int tapType, final int x, final int y, final long eventTime)
   {
+    updateTimer();
     if (WatchFaceService.TAP_TYPE_TAP == tapType)
     {
+      final boolean doubleTap = mTapModel.isDoubleTap();
+      if (mHeartModel.isActive() && !doubleTap)
+      {
+        mHeartModel.stop();
+        return true;
+      }
       if (!mTapModel.startTapAndReturnIfActive()) return true;
       // Determine quadrant. Top quadrant : change location ; bottom quadrant : show/hide message ; left/right : backward/forward departures
       if (x < y) // bottom left triangle
@@ -280,7 +290,12 @@ public class WatchFace implements DataClient.OnDataChangedListener {
         else
           mTapControl.toggleUserMessage(); // Bottom
       else if (x < Const.SCREEN_SIZE - y)
-        mTapControl.nextStatus(mDataStore, mTime); // Top
+      {
+        if (doubleTap)
+          mHeartModel.start();
+        else
+          mTapControl.nextStatus(mDataStore, mTime); // Top
+      }
       else
         mTapControl.nextDeparture(mDataStore, mNextDeparture); // Right
       invalidate();
@@ -323,6 +338,7 @@ public class WatchFace implements DataClient.OnDataChangedListener {
     {
       final String dataName = path.substring(Const.DATA_PATH.length() + 1); // + 1 for the "/"
       for (final String key : data.keySet())
+      {
         if (Const.DATA_KEY_DEPLIST.equals(key))
           mDataStore.putDepartureList(dataName, data.getDataMapArrayList(key));
         else if (Const.DATA_KEY_DEBUG_FENCES.equals(key))
@@ -349,6 +365,15 @@ public class WatchFace implements DataClient.OnDataChangedListener {
           mDataStore.mUserMessage = Util.NonNullString(data.getString(Const.DATA_KEY_USER_MESSAGE));
           mDataStore.mUserMessageColors = Util.intArrayFromNullableArrayList(data.getIntegerArrayList(Const.DATA_KEY_USER_MESSAGE_COLORS));
         }
+        else if (Const.DATA_KEY_HEART_MESSAGE.equals(key))
+        {
+          final String heartMessage = data.getString(Const.DATA_KEY_HEART_MESSAGE);
+          final String[] heartMessageArray;
+          if (TextUtils.isEmpty(heartMessage)) heartMessageArray = new String[0];
+          else heartMessageArray = heartMessage.split("\n");
+          mDataStore.mHeartMessage = heartMessageArray;
+        }
+      }
     }
     else if (path.startsWith(Const.LOCATION_PATH))
     {
@@ -373,6 +398,7 @@ public class WatchFace implements DataClient.OnDataChangedListener {
     for (final String path : Const.ALL_FENCE_NAMES)
       WearData.fetchData(mDataClient, Const.LOCATION_PATH + "/" + path, dataHandler);
     WearData.fetchData(mDataClient, Const.DATA_PATH + "/" + Const.DATA_KEY_USER_MESSAGE, dataHandler);
+    WearData.fetchData(mDataClient, Const.DATA_PATH + "/" + Const.DATA_KEY_HEART_MESSAGE, dataHandler);
     WearData.fetchData(mDataClient, Const.DATA_PATH + "/" + Const.DATA_KEY_BACKGROUND, dataHandler);
     WearData.fetchData(mDataClient, Const.DATA_PATH + "/" + Const.DATA_KEY_DEBUG_TIME_OFFSET, dataHandler);
   }

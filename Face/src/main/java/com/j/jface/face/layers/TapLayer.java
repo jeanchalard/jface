@@ -16,14 +16,15 @@ public class TapLayer
   private static final float BASE_ALPHA = 0.3f;
   private static final int FADEIN_DELAY_MS = 300;
   private static final int FADEOUT_DELAY_MS = 500;
-  private Interpolator fadeInInterpolator = new DecelerateInterpolator();
-  private Interpolator fadeOutInterpolator = new AccelerateInterpolator();
-  public final Paint greenPaint = makeFillPaint(0xFF7FFF7F);
-  public final Paint redPaint = makeFillPaint(0xFFFF7F7F);
-  public final Paint bluePaint = makeFillPaint(0xFF7F7FFF);
-  public final Paint yellowPaint = makeFillPaint(0xFFFFFF7F);
+  @NonNull private final Interpolator fadeInInterpolator = new DecelerateInterpolator();
+  @NonNull private final Interpolator fadeOutInterpolator = new AccelerateInterpolator();
+  @NonNull private final Paint greenPaint = makeFillPaint(0xFF7FFF7F);
+  @NonNull private final Paint redPaint = makeFillPaint(0xFFFF7F7F);
+  @NonNull private final Paint bluePaint = makeFillPaint(0xFF7F7FFF);
+  @NonNull private final Paint yellowPaint = makeFillPaint(0xFFFFFF7F);
 
-  private static Paint makeFillPaint(final int color) {
+  private static Paint makeFillPaint(final int color)
+  {
     final Paint p = new Paint();
     p.setColor(color);
     p.setStyle(Paint.Style.FILL);
@@ -31,7 +32,8 @@ public class TapLayer
   }
 
   @NonNull private final TapModel tapModel;
-  public TapLayer(@NonNull final TapModel tapModel) {
+  public TapLayer(@NonNull final TapModel tapModel)
+  {
     this.tapModel = tapModel;
   }
 
@@ -41,9 +43,9 @@ public class TapLayer
     float alpha;
     float proportionSinceActive = ((float)tapModel.sinceActive()) / FADEIN_DELAY_MS;
     float proportionToInactive = ((float)tapModel.toInactive()) / FADEOUT_DELAY_MS;
-    if (proportionSinceActive > 0 && proportionSinceActive <= 1.0f)
+    if (proportionSinceActive >= 0 && proportionSinceActive <= 1.0f)
       alpha = fadeInInterpolator.getInterpolation(proportionSinceActive);
-    else if (proportionToInactive > 0 && proportionToInactive <= 1.0f)
+    else if (proportionToInactive >= 0 && proportionToInactive <= 1.0f)
       alpha = fadeOutInterpolator.getInterpolation(proportionToInactive);
     else
       alpha = 1.0f;
