@@ -17,13 +17,14 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical"
+              android:gravity="center_horizontal|bottom"
               android:theme="@android:style/Theme.Material">
 
   <ScrollView
-    android:layout_width="match_parent"
-    android:layout_height="0px"
-    android:layout_weight="1"
-    android:id="@+id/scrollView">
+   android:layout_width="match_parent"
+   android:layout_height="0px"
+   android:layout_weight="1"
+   android:id="@+id/scrollView">
 
     <TextView
       android:layout_width="fill_parent"
@@ -33,34 +34,59 @@
   </ScrollView>
 
   <LinearLayout
-    android:orientation="horizontal"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_weight="0"
-    android:layout_gravity="center_horizontal"
-    android:gravity="center_horizontal"
-    android:focusable="false">
+   android:layout_width="match_parent"
+   android:layout_height="wrap_content"
+   android:layout_gravity="center_horizontal|bottom"
+   android:gravity="center_horizontal"
+   android:layout_weight="0"
+   android:focusable="false"
+   android:orientation="horizontal">
 
     <Button
-     android:id="@+id/button_show"
+     android:id="@+id/button_show_data"
      android:layout_width="wrap_content"
      android:layout_height="wrap_content"
      android:layout_margin="8dp"
      android:text="Show" />
 
     <Button
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="Load"
-      android:layout_margin="8dp"
-      android:id="@+id/button_load"/>
+     android:id="@+id/button_load_data"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_margin="8dp"
+     android:text="Load" />
 
     <Button
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="Clear"
-      android:id="@+id/button_clear"
-      android:layout_margin="8dp"/>
+     android:id="@+id/button_clear_data"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_margin="8dp"
+     android:text="Clear" />
+
+  </LinearLayout>
+
+  <LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="0"
+    android:layout_gravity="center_horizontal|bottom"
+    android:gravity="center_horizontal"
+    android:focusable="false">
+
+    <Button
+     android:id="@+id/button_show_logs"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_margin="8dp"
+     android:text="Show logs" />
+
+    <Button
+     android:id="@+id/button_clear_logs"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:text="Clear logs"
+     android:layout_margin="8dp"/>
 
   </LinearLayout>
 

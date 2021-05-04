@@ -1,17 +1,18 @@
 package com.j.jface.lifecycle;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.view.MenuItem;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import android.view.MenuItem;
+import androidx.appcompat.app.AppCompatActivity;
 
 /**
  * A wrapper for activities.
  */
-public abstract class ActivityWrapper<T extends WrappedActivity> extends Activity
+public abstract class ActivityWrapper<T extends WrappedActivity> extends AppCompatActivity
 {
   @Nullable private T mW;
 

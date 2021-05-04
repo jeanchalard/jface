@@ -34,7 +34,7 @@ class GeofenceTransitionReceiver(private val service : Service)
     if (Intent.ACTION_BOOT_COMPLETED == action || ACTION_MANUAL_START == action)
       setupGeofence(service, notificationIntent) // This is running in a background thread already. Don't bother running this on an executor.
     if (ACTION_GEOFENCE == action) handleGeofenceTransitions(intent)
-    FeedLoader.startAllLoads(wear)
+    FeedLoader.startAllLoads(wear, "Intent ${action}")
   }
 
   private fun handleGeofenceTransitions(intent : Intent)

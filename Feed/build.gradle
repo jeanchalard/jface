@@ -1,6 +1,7 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'io.fabric'
+apply plugin : 'com.android.application'
+apply plugin : 'kotlin-android'
+apply plugin : 'io.fabric'
+apply plugin : 'kotlin-kapt'
 
 List<String> dirs = ['main']
 
@@ -39,16 +40,20 @@ android {
     lintOptions {
         checkReleaseBuilds false
         abortOnError true
+        disable "NewApi" // Real min SDK is < O, but minAPI = 26+ breaks geofences. Stupid and difficult to deal with, but better than errors or @SuppressList everywhere.
     }
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${kotlin_version}"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutines_version}"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${coroutines_version}"
     implementation "com.google.firebase:firebase-core:17.0.1"
     implementation "com.google.firebase:firebase-firestore:20.1.0"
     implementation "com.google.firebase:firebase-auth:18.1.0"
     implementation "com.google.firebase:firebase-messaging:19.0.1"
     implementation "com.google.android.gms:play-services-auth:$gms_version"
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
     compileOnly 'com.google.android.wearable:wearable:2.4.0'
     implementation 'com.google.android.support:wearable:2.4.0'
     implementation "com.google.android.gms:play-services-wearable:$gms_version"
@@ -59,6 +64,10 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview:1.0.0"
     implementation "com.google.android.material:material:1.0.0"
     implementation "com.crashlytics.sdk.android:crashlytics:2.10.1"
+    def room_version = "2.3.0"
+    implementation "androidx.room:room-runtime:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
     wearApp project(':FacePackage')
     implementation project(':Common')
     implementation 'androidx.appcompat:appcompat:1.0.2'

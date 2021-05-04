@@ -1,26 +1,27 @@
 package com.j.jface.lifecycle;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.view.MenuItem;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 // A base class for a wrapped activity with a sane lifecycle
 public class WrappedActivity
 {
-  @NonNull protected final Activity mA;
+  @NonNull protected final AppCompatActivity mA;
 
   public static class Args
   {
-    @NonNull public final Activity activity;
+    @NonNull public final AppCompatActivity activity;
     @Nullable public final Bundle icicle;
-    public Args(@NonNull final Activity a, @Nullable final Bundle b)
+    public Args(@NonNull final AppCompatActivity a, @Nullable final Bundle b)
     {
       activity = a; icicle = b;
     }
@@ -45,7 +46,7 @@ public class WrappedActivity
   {
     try
     {
-      final Method method = Activity.class.getMethod("isResumed");
+      final Method method = AppCompatActivity.class.getMethod("isResumed");
       return (Boolean)method.invoke(mA);
     } catch (NoSuchMethodException|IllegalAccessException|InvocationTargetException e) {}
     return false;

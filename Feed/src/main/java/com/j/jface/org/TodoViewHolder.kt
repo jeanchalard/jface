@@ -1,7 +1,6 @@
 package com.j.jface.org
 
 import android.animation.ObjectAnimator
-import androidx.recyclerview.widget.RecyclerView
 import android.text.Editable
 import android.text.TextWatcher
 import android.transition.ChangeBounds
@@ -13,6 +12,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageButton
 import android.widget.LinearLayout
+import androidx.recyclerview.widget.RecyclerView
 import com.j.jface.R
 import com.j.jface.org.editor.TodoEditor
 import com.j.jface.org.sound.EditTextSoundRouter
@@ -20,7 +20,7 @@ import com.j.jface.org.sound.SelReportEditText
 import com.j.jface.org.todo.ListChangeObserver
 import com.j.jface.org.todo.Todo
 import com.j.jface.org.todo.TodoListFoldableView
-import java.util.*
+import java.util.ArrayList
 
 class TodoViewHolder(itemView : View,
                      private val mJorg : JOrg,
@@ -98,6 +98,7 @@ class TodoViewHolder(itemView : View,
     TransitionManager.beginDelayedTransition(mRecyclerView, expandCollapseTransition)
     if (show)
     {
+      mEditText.setSingleLine(false)
       mExpansion.visibility = View.VISIBLE
       mClearTodoButton.visibility = View.VISIBLE
       mAddSubTodoButton.visibility = View.VISIBLE
@@ -105,6 +106,7 @@ class TodoViewHolder(itemView : View,
     }
     else
     {
+      mEditText.setSingleLine(true)
       mExpansion.visibility = View.GONE
       mClearTodoButton.visibility = View.GONE
       mAddSubTodoButton.visibility = View.GONE

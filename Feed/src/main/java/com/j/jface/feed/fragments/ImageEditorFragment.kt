@@ -1,7 +1,13 @@
 package com.j.jface.feed.fragments
 
 import android.content.Intent
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.LightingColorFilter
+import android.graphics.Matrix
+import android.graphics.Paint
+import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.provider.MediaStore
 import android.view.View
@@ -24,7 +30,7 @@ class ImageEditorFragment(a : Args, iea : ImageEditorArgs) : WrappedFragment(a.i
   private val mBrightnessBar : SeekBar = mView.findViewById(R.id.select_image_brightness) as SeekBar
   init
   {
-    val bitmap = MediaStore.Images.Media.getBitmap(a.fragment.context.contentResolver, iea.receivedData.data)
+    val bitmap = MediaStore.Images.Media.getBitmap(a.fragment.context!!.contentResolver, iea.receivedData.data)
     val imageView = mView.findViewById(R.id.edited_image) as TouchImageView
     imageView.setImageBitmap(bitmap)
     mView.findViewById<View>(R.id.image_set_button).setOnClickListener { imageChosen(imageView) }
@@ -70,7 +76,7 @@ class ImageEditorFragment(a : Args, iea : ImageEditorArgs) : WrappedFragment(a.i
     background.compress(Bitmap.CompressFormat.PNG, 100, data)
     val asset = Asset.createFromBytes(data.toByteArray())
     mWear.putDataToCloud(Const.DATA_PATH + "/" + Const.DATA_KEY_BACKGROUND, Const.DATA_KEY_BACKGROUND, asset)
-    mFragment.fragmentManager.popBackStack()
+    mFragment.fragmentManager!!.popBackStack()
   }
 
   override fun onStartTrackingTouch(seekBar : SeekBar?) {}

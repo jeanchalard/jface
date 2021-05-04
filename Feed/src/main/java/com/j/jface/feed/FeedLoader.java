@@ -1,10 +1,12 @@
 package com.j.jface.feed;
 
-import androidx.annotation.NonNull;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.Network;
 
 import com.google.android.gms.wearable.DataMap;
 import com.j.jface.Const;
-import com.j.jface.action.NotificationAction;
+import com.j.jface.action.InformUserAction;
 import com.j.jface.wear.Wear;
 
 import java.io.BufferedInputStream;
@@ -16,13 +18,22 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.NonNull;
+
 public class FeedLoader
 {
   private static final ThreadPoolExecutor executor =
    new ThreadPoolExecutor(4, 4, 500, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
 
-  public static void startAllLoads(@NonNull final Wear wear)
+  public static void startAllLoads(@NonNull final Wear wear, @NonNull String reason)
   {
+    final Context context = wear.getContext();
+    LocalLog.INSTANCE.log(context, "Starting all loads : " + reason);
+    final Network network = context.getSystemService(ConnectivityManager.class).getActiveNetwork();
+    if (null == network) {
+      LocalLog.INSTANCE.log(context, "No active network – skipping load.");
+      return;
+    }
     for (final DataSource ds : DataSource.ALL_SOURCES)
       startLoadDataSource(ds, wear);
   }
@@ -57,11 +68,12 @@ public class FeedLoader
         wear.putDataLocally(dataPath, data);
         statusData.putLong(Const.DATA_KEY_SUCCESSFUL_UPDATE_DATE, System.currentTimeMillis());
         statusData.putString(Const.DATA_KEY_LAST_STATUS, "Success");
+        LocalLog.INSTANCE.log(wear.getContext(), "Successfully loaded data " + ds.getName());
       }
       catch (@NonNull InstantiationException | IllegalAccessException | IOException | ParseException | RuntimeException e)
       {
         statusData.putString(Const.DATA_KEY_LAST_STATUS, "Failure ; " + e.getMessage());
-        NotificationAction.Companion.postNotification(wear.getContext(), e.toString(), null);
+        new InformUserAction(wear.getContext(), e.toString(), null, null, null).invoke();
       }
       finally
       {

@@ -5,9 +5,10 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
-import com.google.android.material.snackbar.Snackbar
 import android.view.View
+import com.google.android.material.snackbar.Snackbar
 import com.j.jface.R
+import com.j.jface.feed.LocalLog
 import com.j.jface.feed.views.SnackbarRegistry
 import com.j.jface.nextNotifId
 
@@ -50,7 +51,7 @@ class NotificationAction(private val context : Context, private val text : Strin
       else
       {
         notif.setContentTitle(text.subSequence(0, index))
-        notif.setStyle(Notification.BigTextStyle().bigText(text.subSequence(index, text.length)))
+        notif.style = Notification.BigTextStyle().bigText(text.subSequence(index, text.length))
       }
       val notifId = context.nextNotifId(LAST_NOTIF_ID)
       notificationManager.notify(notifId, notif.build())
@@ -80,6 +81,7 @@ class InformUserAction(private val context : Context, private val text : String,
 {
   override fun invoke()
   {
+    LocalLog.log(context, text)
     val snackbarParent = SnackbarRegistry.getSnackbarParent()
     if (null == snackbarParent) { NotificationAction.postNotification(context, text, pendingIntent); return }
     SnackbarAction.showSnackbar(text, actionMessage, callback)

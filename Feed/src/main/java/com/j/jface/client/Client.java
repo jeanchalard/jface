@@ -9,7 +9,6 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
-import androidx.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.Auth;
@@ -20,6 +19,8 @@ import com.google.android.gms.drive.Drive;
 import com.j.jface.client.action.Action;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import androidx.annotation.NonNull;
 
 public class Client extends Handler implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
 {

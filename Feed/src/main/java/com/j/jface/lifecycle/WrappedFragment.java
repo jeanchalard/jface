@@ -1,12 +1,13 @@
 package com.j.jface.lifecycle;
 
-import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 public abstract class WrappedFragment
 {
@@ -14,11 +15,11 @@ public abstract class WrappedFragment
 
   public static class Args
   {
-    public final Fragment fragment;
+    @NonNull public final Fragment fragment;
     public final LayoutInflater inflater;
     public final ViewGroup container;
     public final Bundle icicle;
-    public Args(final Fragment f, final LayoutInflater i, final ViewGroup c, final Bundle b)
+    public Args(@NonNull final Fragment f, final LayoutInflater i, final ViewGroup c, final Bundle b)
     {
       fragment = f; inflater = i; container = c; icicle = b;
     }

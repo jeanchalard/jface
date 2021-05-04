@@ -1,8 +1,11 @@
 package com.j.jface.feed.fragments
 
-import android.app.AlertDialog
-import android.support.wearable.view.WearableDialogHelper
-import android.text.*
+import android.text.Editable
+import android.text.Selection
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
 import android.widget.Button
 import android.widget.EditText
@@ -14,7 +17,8 @@ import com.j.jface.feed.views.SnackbarRegistry
 import com.j.jface.firebase.Firebase
 import com.j.jface.lifecycle.WrappedFragment
 import com.j.jface.wear.Wear
-import java.util.*
+import java.util.ArrayList
+import java.util.Arrays
 import java.util.concurrent.Semaphore
 
 /**
@@ -49,7 +53,7 @@ class MessagesFragment(a : WrappedFragment.Args, private val mWear : Wear) : Wra
   {
     if (path != MESSAGE_PATH) return
     val activity = mF.activity
-    activity.runOnUiThread {
+    activity!!.runOnUiThread {
       val oldDistToEnd = (mUserMessageDataEdit.text?.length ?: 0) - mUserMessageDataEdit.selectionStart
       val userMessage = dataMap.getString(Const.DATA_KEY_USER_MESSAGE)
       val starts = getLineStartOffsets(userMessage)

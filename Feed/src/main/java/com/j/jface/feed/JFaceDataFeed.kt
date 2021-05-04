@@ -6,15 +6,16 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.widget.Toolbar
 import android.view.MenuItem
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ListView
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.lifecycleScope
 import com.j.jface.R
 import com.j.jface.feed.fragments.DebugToolsFragment
 import com.j.jface.feed.fragments.ImageSelectorFragment
@@ -51,8 +52,8 @@ class JFaceDataFeed(args : WrappedActivity.Args) : WrappedActivity(args)
     list.adapter = ArrayAdapter(mA, R.layout.data_feed_drawer_item, arrayOf("Messages", "Settings", "Logs & data", "Debug tools"))
     @Suppress("UNUSED_ANONYMOUS_PARAMETER")
     val listener = AdapterView.OnItemClickListener { parent, view, position, id ->
-      val f = getFragmentForPosition(position, mWear)
-      mA.fragmentManager.beginTransaction()
+      val f = getFragmentForPosition(position, mWear)!!
+      mA.supportFragmentManager.beginTransaction()
        .replace(R.id.dataFeedContents, f)
        .commit()
       list.setItemChecked(position, true)
@@ -63,7 +64,9 @@ class JFaceDataFeed(args : WrappedActivity.Args) : WrappedActivity(args)
 
     val icicle = args.icicle
     mCurrentlyDisplayedFragmentIndex = icicle?.getInt(LAST_OPEN_FRAGMENT_INDEX) ?: 3
-    listener.onItemClick(null, null, mCurrentlyDisplayedFragmentIndex, 0) // Switch to the initial fragment
+    mA.lifecycleScope.launchWhenResumed {
+      listener.onItemClick(null, null, mCurrentlyDisplayedFragmentIndex, 0) // Switch to the initial fragment
+    }
 
     val toolbar = mA.findViewById<Toolbar>(R.id.dataFeedToolbar)
     toolbar.setTitle(R.string.data_feed_title)

@@ -84,8 +84,8 @@ class DebugToolsFragment(a : WrappedFragment.Args, private val mWear : Wear) : W
     if (Const.RIO_MODE) mFenceUIs[2].text = "渋谷"
 
     val nodeNameTextView = mView.findViewById<TextView>(R.id.nodeId_textView)
-    mWear.getNodeName(mFragment.context) { nodeName ->
-      a.fragment.activity.runOnUiThread { nodeNameTextView.text = "Node id : ${nodeName}" }
+    mWear.getNodeName(mFragment.context!!) { nodeName ->
+      a.fragment.activity!!.runOnUiThread { nodeNameTextView.text = "Node id : ${nodeName}" }
     }
 
     mView.findViewById<View>(R.id.button_delete_FCM_token).setOnClickListener {
