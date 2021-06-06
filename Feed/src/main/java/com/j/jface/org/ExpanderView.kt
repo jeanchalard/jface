@@ -115,20 +115,20 @@ class ExpanderView @JvmOverloads constructor(context : Context, attrs : Attribut
 
   override fun onMeasure(widthMeasureSpec : Int, heightMeasureSpec : Int)
   {
-    val h = View.MeasureSpec.getSize(heightMeasureSpec)
+    val h = MeasureSpec.getSize(heightMeasureSpec)
     val squareSize = oddMin(h - 2 * SQUARE_VERTICAL_PADDING, h / 3)
     val minW = DEPTH_INDENT + mDepth * DEPTH_INDENT + RIGHT_EXTEND * 3
     val maxW = squareSize + minW
-    val w = if (View.MeasureSpec.UNSPECIFIED == View.MeasureSpec.getMode(widthMeasureSpec))
+    val w = if (MeasureSpec.UNSPECIFIED == MeasureSpec.getMode(widthMeasureSpec))
       maxW
     else
-      clamp(minW, View.MeasureSpec.getSize(widthMeasureSpec), maxW)
+      clamp(minW, MeasureSpec.getSize(widthMeasureSpec), maxW)
     setMeasuredDimension(w, h)
   }
 
   private fun oddMin(vararg values : Int) : Int
   {
-    var min = values.min() ?: Integer.MAX_VALUE
+    val min = values.minOrNull() ?: Integer.MAX_VALUE
     return if (0 != (min and 1)) min else min - 1
   }
 }

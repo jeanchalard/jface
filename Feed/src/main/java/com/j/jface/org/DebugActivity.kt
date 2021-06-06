@@ -4,14 +4,18 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.*
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.EventListener
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.Transaction
 import com.j.jface.Const
 import com.j.jface.R
 import com.j.jface.firebase.Firebase
 import com.j.jface.lifecycle.ActivityWrapper
 import com.j.jface.lifecycle.WrappedActivity
 import com.j.jface.org.notif.NotifEngine
-import com.j.jface.org.todo.TodoListReadonlyFullView
 import java.util.concurrent.Executors
 
 class DebugActivityBoot : ActivityWrapper<DebugActivity>()
@@ -48,7 +52,7 @@ class DebugActivity(args : WrappedActivity.Args) : WrappedActivity(args), EventL
     }
   }
 
-  fun applyOneshotChange(docs : List<DocumentSnapshot>, transaction : Transaction)
+  private fun applyOneshotChange(docs : List<DocumentSnapshot>, transaction : Transaction)
   {
     val user = FirebaseAuth.getInstance().currentUser!!
     val collection = FirebaseFirestore.getInstance().collection(user.uid).document(Const.DB_APP_TOP_PATH).collection(Const.DB_ORG_TOP)
@@ -59,7 +63,7 @@ class DebugActivity(args : WrappedActivity.Args) : WrappedActivity(args), EventL
     }
   }
 
-  fun transform(dataMap : HashMap<String, Any?>) : Map<String, Any?>
+  private fun transform(dataMap : HashMap<String, Any?>) : Map<String, Any?>
   {
     dataMap["estimatedMinutes"] = -1
     dataMap.remove("estimatedTime")

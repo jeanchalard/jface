@@ -50,6 +50,7 @@ public class FeedLoader
       if (lastSuccessfulUpdateDate + Const.UPDATE_DELAY_MILLIS > now)
       {
         statusData.putLong(Const.DATA_KEY_STATUS_UPDATE_DATE, System.currentTimeMillis());
+        LocalLog.INSTANCE.log(wear.getContext(), "Update is recent – skipping load.");
         wear.putDataLocally(statusDataPath, statusData);
         return;
       }

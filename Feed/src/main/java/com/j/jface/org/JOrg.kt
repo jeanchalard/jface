@@ -1,14 +1,6 @@
 package com.j.jface.org
 
 import android.content.Intent
-import androidx.coordinatorlayout.widget.CoordinatorLayout
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.ItemTouchHelper
 import android.text.Editable
 import android.util.Log
 import android.view.View
@@ -18,7 +10,14 @@ import android.view.ViewTreeObserver
 import android.view.WindowManager
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.auth.api.Auth
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 import com.j.jface.Const
 import com.j.jface.R
 import com.j.jface.feed.views.SnackbarRegistry
@@ -38,7 +37,7 @@ import com.j.jface.org.todo.Todo
 import com.j.jface.org.todo.TodoListFoldableView
 import com.j.jface.org.todo.TodoProviderContract
 import java.time.LocalDate
-import java.util.*
+import java.util.Locale
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 
@@ -60,7 +59,7 @@ class JOrg(args : WrappedActivity.Args) : WrappedActivity(args)
   init
   {
     mA.setContentView(R.layout.org_top)
-    (mA as AppCompatActivity).setSupportActionBar(mA.findViewById(R.id.orgTopActionBar))
+    mA.setSupportActionBar(mA.findViewById(R.id.orgTopActionBar))
     mSoundSource = SoundSource(mA, mA.findViewById(R.id.sound_source))
     mSoundRouter = EditTextSoundRouter(mSoundSource)
     mTopLayout = mA.findViewById(R.id.topLayout)
@@ -84,7 +83,7 @@ class JOrg(args : WrappedActivity.Args) : WrappedActivity(args)
         Firebase.outOfBandUpdateTodoField(editedTodoId, TodoProviderContract.COLUMN_completionTime, 0).await()
         mA.notifManager.cancel(notifId)
       }
-      val tlv = TodoListFoldableView(mA.getApplicationContext())
+      val tlv = TodoListFoldableView(mA.applicationContext)
       val adapter = TodoAdapter(this, mA, mSoundRouter, tlv, mRecyclerView)
       val touchHelper = ItemTouchHelper(TodoMover(adapter, tlv))
       val editedTodoIndexInView = ensureOpenAndReturnIndex(editedTodoId, tlv)

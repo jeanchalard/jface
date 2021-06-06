@@ -29,6 +29,7 @@ import com.j.jface.Util
 import com.j.jface.lifecycle.AuthTrampoline
 import com.j.jface.org.todo.TodoCore
 import com.j.jface.org.todo.TodoProviderContract
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executors
 
@@ -72,9 +73,14 @@ object Firebase
 
   private fun signInSynchronously(host : AuthTrampoline)
   {
-    val client : GoogleSignInClient = GoogleSignIn.getClient(host.context, GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-     .requestIdToken(host.context.getString(R.string.firebase_client_id))
-     .build())
+    val clientFuture : CompletableFuture<GoogleSignInClient> = CompletableFuture()
+    host.context.runOnUiThread() {
+      // Since some version getClient can only be called on the UI thread because Google likes it simple for them and complicated for their users
+      clientFuture.complete(GoogleSignIn.getClient(host.context, GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+       .requestIdToken(host.context.getString(R.string.firebase_client_id))
+       .build()))
+    }
+    val client = clientFuture.get()
     try
     {
       val googleAccount = client.silentSignIn().await() ?: throw JOrgAuthException("Can't log in to Google")

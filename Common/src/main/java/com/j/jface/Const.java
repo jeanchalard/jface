@@ -31,7 +31,7 @@ public class Const
   public static final int NOTIFICATION_TYPE_FILLIN = 403;
   public static final int NOTIFICATION_TYPE_CANCEL_DONE = 404;
 
-  public static final int SECONDS_渋谷_TO_日暮里 = 28 * 60; // About 28 minutes of riding the train
+  public static final int SECONDS_渋谷_TO_日暮里 = 29 * 60 + 30; // About 29 minutes and 30 seconds of riding the train
   public static final int SECONDS_千住大橋_TO_日暮里 = 6 * 60; // About 6 minutes of riding the train
 
   @NonNull public static final String INTERNAL_PERSISTED_VALUES_FILES = "SystemValues";

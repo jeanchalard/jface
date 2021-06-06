@@ -5,7 +5,6 @@ import android.app.PendingIntent
 import android.app.RemoteInput
 import android.app.job.JobInfo
 import android.app.job.JobParameters
-import android.app.job.JobScheduler
 import android.app.job.JobService
 import android.content.BroadcastReceiver
 import android.content.ComponentName
@@ -13,9 +12,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.PersistableBundle
 import android.util.Log
-import com.j.jface.*
+import com.j.jface.Const
 import com.j.jface.firebase.Firebase
+import com.j.jface.jobScheduler
 import com.j.jface.lifecycle.CommonObjects
+import com.j.jface.notifManager
 import com.j.jface.org.notif.NotifEngine
 import com.j.jface.org.notif.SplitNotification
 import com.j.jface.org.notif.SuggestionNotification
@@ -69,7 +70,7 @@ class AutomaticEditorProcessor : JobService()
        .setPersisted(true)
        .build()
       Log.e("RECEIVED NOTIF", "todoId ${todoId} ; notifId ${notifId} ; notifType ${notifType} → ${intent.extras}")
-      Log.e("SEND " + if (Const.NOTIFICATION_TYPE_SPLIT == notifType) "SPLIT" else "SUGGESTION", Integer.toString(context.jobScheduler.schedule(job)))
+      Log.e("SEND " + if (Const.NOTIFICATION_TYPE_SPLIT == notifType) "SPLIT" else "SUGGESTION", context.jobScheduler.schedule(job).toString())
     }
   }
 
