@@ -1,5 +1,6 @@
 package com.j.jface;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.Locale;
@@ -25,7 +26,7 @@ public class Departure implements Comparable<Departure>
     this.headSign = Const.HEADSIGNS.get(key);
   }
 
-  public String toString()
+  @NonNull public String toString()
   {
     return String.format(Locale.ROOT, "%02d:%02d", time / 3600, (time % 3600) / 60) + extra;
   }

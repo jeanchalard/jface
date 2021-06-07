@@ -1,3 +1,5 @@
+apply plugin: "java-library"
+
 allprojects {
     repositories {
         google()
@@ -9,7 +11,6 @@ allprojects {
     }
 }
 
-apply plugin: "java"
 targetCompatibility = "1.8"
 sourceCompatibility = "1.8"
 // How the hell is this not the default on my laptop ?! What century is this ?!
@@ -18,5 +19,5 @@ compileTestJava.options.encoding = "UTF-8"
 
 dependencies {
     implementation "androidx.annotation:annotation:1.2.0"
-    implementation fileTree(include: ["*.jar"], dir: "libs")
+    compile fileTree(include: ["*.jar"], dir: "libs")
 }
