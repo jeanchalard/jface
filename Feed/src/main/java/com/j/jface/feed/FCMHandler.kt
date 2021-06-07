@@ -5,9 +5,10 @@ import androidx.annotation.WorkerThread
 import android.util.Log
 import com.google.android.gms.wearable.DataMap
 import com.google.android.gms.wearable.Wearable
-import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.messaging.FirebaseMessaging
 import com.j.jface.Const
 import com.j.jface.firebase.Firebase
+import com.j.jface.firebase.await
 import org.json.JSONObject
 import java.io.IOException
 import java.io.InputStreamReader
@@ -60,12 +61,12 @@ object FCMHandler
 
   fun registerTokenForWearData(context : Context)
   {
-    val token = FirebaseInstanceId.getInstance().token
+    val token = FirebaseMessaging.getInstance().token
     Log.e("JOrg/Firebase", "Firebase decided to update its token : ${token}")
     Wearable.getNodeClient(context).connectedNodes.addOnSuccessListener {
       if (null == it || it.isEmpty()) return@addOnSuccessListener
       val d = DataMap().apply {
-        putString(Const.CONFIG_KEY_WEAR_LISTENER_ID, token)
+        putString(Const.CONFIG_KEY_WEAR_LISTENER_ID, token.await())
       }
       if (Firebase.isLoggedIn) Firebase.updateWearData("${Const.CONFIG_PATH}/${Const.CONFIG_KEY_WEAR_LISTENER_PREFIX}${token}", d)
     }

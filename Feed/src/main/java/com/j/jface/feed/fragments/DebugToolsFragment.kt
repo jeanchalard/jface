@@ -11,7 +11,7 @@ import android.widget.NumberPicker
 import android.widget.TextView
 import android.widget.TimePicker
 import com.google.android.gms.wearable.DataMap
-import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.messaging.FirebaseMessaging
 import com.j.jface.Const
 import com.j.jface.R
 import com.j.jface.feed.views.FaceView
@@ -92,14 +92,14 @@ class DebugToolsFragment(a : WrappedFragment.Args, private val mWear : Wear) : W
       Thread {
         try
         {
-          FirebaseInstanceId.getInstance().deleteInstanceId()
+          FirebaseMessaging.getInstance().deleteToken()
         }
         catch (e : IOException)
         {
           Log.e("Can't delete token", "" + e)
         }
 
-        FirebaseInstanceId.getInstance().token // Force token generation
+        FirebaseMessaging.getInstance().token // Force token generation
       }.start()
     }
   }

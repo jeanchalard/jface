@@ -11,7 +11,7 @@ class FCMReceiverService : FirebaseMessagingService()
 {
   val wear : Wear by lazy { Wear(this) }
 
-  override fun onMessageReceived(msg : RemoteMessage?)
+  override fun onMessageReceived(msg : RemoteMessage)
   {
     if (null == msg) return
     Log.e("Firebase message", "" + msg.data)
@@ -23,5 +23,5 @@ class FCMReceiverService : FirebaseMessagingService()
     }
   }
 
-  override fun onNewToken(p0 : String?) = FCMHandler.registerTokenForWearData(this)
+  override fun onNewToken(p0 : String) = FCMHandler.registerTokenForWearData(this)
 }

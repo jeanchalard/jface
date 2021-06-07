@@ -4,10 +4,11 @@ import android.content.Intent
 import android.os.Handler
 import android.widget.TextView
 import com.google.android.gms.auth.api.Auth
-import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.messaging.FirebaseMessaging
 import com.j.jface.R
 import com.j.jface.feed.FCMHandler
 import com.j.jface.firebase.Firebase
+import com.j.jface.firebase.await
 import java.util.concurrent.Executors
 
 abstract class AuthTrampoline(args : WrappedActivity.Args) : WrappedActivity(args)
@@ -39,7 +40,7 @@ abstract class AuthTrampoline(args : WrappedActivity.Args) : WrappedActivity(arg
   {
     if (Firebase.isLoggedIn)
     {
-      FirebaseInstanceId.getInstance().token // Force token generation
+      FirebaseMessaging.getInstance().token.await() // Force token generation
       log("Login successful.")
       handler.postDelayed({ finish() }, 5000)
     }
@@ -51,12 +52,12 @@ abstract class AuthTrampoline(args : WrappedActivity.Args) : WrappedActivity(arg
   override fun onActivityResult(requestCode : Int, resultCode : Int, data : Intent?)
   {
     val signInResult = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
-    if (signInResult.isSuccess)
+    if (true == signInResult?.isSuccess)
     {
       log("Google sign in successful.\nSigning in to Firebase...")
       trySignIn()
     }
-    else log("Google sign in failed : " + signInResult.status + " : " + signInResult.status.statusMessage)
+    else log("Google sign in failed : " + signInResult?.status + " : " + signInResult?.status?.statusMessage)
   }
 
   private var signIns : Int = 0
@@ -71,7 +72,7 @@ abstract class AuthTrampoline(args : WrappedActivity.Args) : WrappedActivity(arg
       } else log("Bailing, fix your code")
     }
     log("Login successful.")
-    FirebaseInstanceId.getInstance().token // Force token generation
+    FirebaseMessaging.getInstance().token.await() // Force token generation
     FCMHandler.registerTokenForWearData(context)
     handler.postDelayed({ finish() }, 5000)
   }

@@ -183,7 +183,7 @@ class JOrg(args : WrappedActivity.Args) : WrappedActivity(args)
   {
     super.onActivityResult(requestCode, resultCode, data)
     val x = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
-    Log.e("Google sign in result", "" + resultCode + " : " + x.status)
+    Log.e("Google sign in result", "" + resultCode + " : " + x?.status)
   }
 
   fun runOnUiThread(r : Runnable) = mA.runOnUiThread(r)
