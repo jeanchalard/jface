@@ -18,7 +18,7 @@ import java.util.Arrays;
 public class TapControl
 {
   private static final int NO_OVERRIDE = -1;
-  private long RESET_TIME_MILLIS = 5 * 60_000;
+  private static final long RESET_TIME_MILLIS = 5 * 60_000;
 
   private long lastChangeTime = 0;
   private Status statusOverride = null;

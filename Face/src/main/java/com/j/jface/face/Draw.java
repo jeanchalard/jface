@@ -12,6 +12,7 @@ import com.j.jface.Const;
 import com.j.jface.Departure;
 import com.j.jface.face.layers.HeartLayer;
 import com.j.jface.face.layers.TapLayer;
+import com.j.jface.face.models.CheckpointModel;
 import com.j.jface.face.models.HeartModel;
 import com.j.jface.face.models.TapModel;
 
@@ -26,14 +27,16 @@ public class Draw
 
   private final TapLayer tapLayer;
   private final HeartLayer heartLayer;
+  private final CheckpointModel checkpointModel;
 
   private BitmapCache[] mCache;
   public Draw(@NonNull final Resources res, @NonNull final DrawTools tools, @NonNull final DataStore dataStore,
-              @NonNull final TapModel tapModel, @NonNull final HeartModel heartModel) {
+              @NonNull final TapModel tapModel, @NonNull final HeartModel heartModel, @NonNull final CheckpointModel checkpointModel) {
     mCache = new BitmapCache[] { new BitmapCache(0, 0, 0, 1, null, new Paint()),
       new BitmapCache(0, 0, 0, 1, null, new Paint()) };
     tapLayer = new TapLayer(tapModel);
     heartLayer = new HeartLayer(heartModel, res, dataStore);
+    this.checkpointModel = checkpointModel; // A layer might be overkill for this
   }
 
   private final StringBuilder mTmpSb = new StringBuilder(256);
@@ -143,8 +146,11 @@ public class Draw
       if (Const.ROUND_SCREEN)
         canvas.drawTextOnPath(mTmpChr, 0, borderTextLength, drawTools.watchContourPath, 0, 0, drawTools.statusPaint);
       else
-        canvas.drawText(mTmpChr, 0, borderTextLength, bounds.width() / 2, drawTools.statusPaint.getTextSize(), drawTools.statusPaint);
+        canvas.drawText(mTmpChr, 0, borderTextLength, center, drawTools.statusPaint.getTextSize(), drawTools.statusPaint);
     }
+
+    if (checkpointModel.isActive())
+      canvas.drawText("✓", center, bounds.height() - drawTools.minutesPaint.getTextSize(), drawTools.checkpointPaint);
 
     heartLayer.draw(canvas);
 

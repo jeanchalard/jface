@@ -42,6 +42,7 @@ import com.google.android.gms.wearable.Wearable;
 import com.j.jface.Const;
 import com.j.jface.Departure;
 import com.j.jface.Util;
+import com.j.jface.face.models.CheckpointModel;
 import com.j.jface.face.models.HeartModel;
 import com.j.jface.face.models.TapModel;
 
@@ -72,6 +73,7 @@ public class WatchFace implements DataClient.OnDataChangedListener {
 
   @NonNull private final TapModel mTapModel = new TapModel();
   @NonNull private final HeartModel mHeartModel = new HeartModel();
+  @NonNull private final CheckpointModel mCheckpointModel = new CheckpointModel();
   @NonNull private final Draw mDraw;
 
   // Cache object to save allocations
@@ -89,7 +91,7 @@ public class WatchFace implements DataClient.OnDataChangedListener {
     mInvalidator = invalidator;
     mDataClient = Wearable.getDataClient(context, new Wearable.WearableOptions.Builder().setLooper(context.getMainLooper()).build());
     mDrawTools = new DrawTools(context.getResources());
-    mDraw = new Draw(context.getResources(), mDrawTools, mDataStore, mTapModel, mHeartModel);
+    mDraw = new Draw(context.getResources(), mDrawTools, mDataStore, mTapModel, mHeartModel, mCheckpointModel);
     mDataStore.mBackground = ((BitmapDrawable)mContext.getResources().getDrawable(R.drawable.bg)).getBitmap();
     mDataClient.addListener(this);
     mTime.setToNow();
@@ -153,7 +155,7 @@ public class WatchFace implements DataClient.OnDataChangedListener {
 
   public long nextUpdateTime() {
     final long now = mDataStore.currentTimeMillis();
-    final boolean animating = mTapModel.toInactive() > 0 || mHeartModel.isActive();
+    final boolean animating = mCheckpointModel.isActive() || mTapModel.toInactive() > 0 || mHeartModel.isActive();
     if (animating) return now;
 
     final boolean active = mVisible && (0 == (mModeFlags & Const.AMBIENT_MODE));
@@ -292,6 +294,7 @@ public class WatchFace implements DataClient.OnDataChangedListener {
           if (doubleTap)
           {
             mTapControl.addCheckpoint(mDataStore);
+            mCheckpointModel.checkpoint();
             WearData.putDataItem(mDataClient, Const.DATA_KEY_CHECKPOINTS, Util.join(mDataStore.mCheckpoints, "\n"));
           }
           else
