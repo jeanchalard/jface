@@ -9,10 +9,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.GregorianCalendar;
 import java.util.Locale;
+
+import static java.util.Calendar.DAY_OF_MONTH;
+import static java.util.Calendar.HOUR_OF_DAY;
+import static java.util.Calendar.MINUTE;
+import static java.util.Calendar.MONTH;
 
 public class Util
 {
@@ -43,16 +48,28 @@ public class Util
 
   public static @NonNull int[] concat(int[] a1, int[] a2)
   {
-    int[] r = Arrays.copyOf(a1, a1.length + a2.length);
+    final int[] r = Arrays.copyOf(a1, a1.length + a2.length);
     System.arraycopy(a2, 0, r, a1.length, a2.length);
     return r;
   }
 
   public static @NonNull <T> T[] concat(T[] a1, T[] a2)
   {
-    T[] r = Arrays.copyOf(a1, a1.length + a2.length);
+    final T[] r = Arrays.copyOf(a1, a1.length + a2.length);
     System.arraycopy(a2, 0, r, a1.length, a2.length);
     return r;
+  }
+
+  // String.join doesn't exist until later releases
+  public static @NonNull String join(@Nullable final String[] array, @NonNull final String separator) {
+    if (null == array || 0 == array.length) return "";
+    final StringBuilder s = new StringBuilder(array[0]);
+    for (int i = 1; i < array.length; ++i)
+    {
+      s.append(separator);
+      s.append(array[i]);
+    }
+    return s.toString();
   }
 
   public static void copy(@NonNull final InputStream in, @NonNull final OutputStream out) throws IOException
@@ -87,9 +104,9 @@ public class Util
     return b.toString();
   }
 
-  private String nowStr()
+  public static String nowStr() // Using only old Java classes so it works on old OSes
   {
-    final LocalTime now = LocalTime.now();
-    return String.format(Locale.JAPAN, "%02d:%02d:%02d", now.getHour(), now.getMinute(), now.getSecond());
+    final GregorianCalendar date = new GregorianCalendar();
+    return String.format(Locale.JAPAN, "%02d-%02d:%02d%02d", date.get(MONTH) + 1, date.get(DAY_OF_MONTH), date.get(HOUR_OF_DAY), date.get(MINUTE));
   }
 }

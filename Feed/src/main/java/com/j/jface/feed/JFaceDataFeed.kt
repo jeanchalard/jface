@@ -2,7 +2,9 @@ package com.j.jface.feed
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context.MODE_PRIVATE
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
@@ -25,10 +27,12 @@ import com.j.jface.lifecycle.ActivityWrapper
 import com.j.jface.lifecycle.AuthTrampoline
 import com.j.jface.lifecycle.FragmentWrapper
 import com.j.jface.lifecycle.WrappedActivity
+import com.j.jface.org.editor.AuthTrampolineTodoEditorBoot
 import com.j.jface.wear.Wear
 
 @Suppress("UNUSED_ANONYMOUS_PARAMETER")
 
+const val OPEN_FRAGMENT_EXTRA = "fragment"
 const val LAST_OPEN_FRAGMENT_INDEX = "last_open_fragment_index"
 
 class AuthTrampolineJFaceDataFeedBoot : ActivityWrapper<AuthTrampolineJFaceDataFeed>()
@@ -39,17 +43,20 @@ class JFaceDataFeed(args : WrappedActivity.Args) : WrappedActivity(args)
   private val mDrawerToggle : ActionBarDrawerToggle
   private val mWear : Wear
 
-  // State
-  private var mCurrentlyDisplayedFragmentIndex = 0
-
   init
   {
     mA.setContentView(R.layout.data_feed_drawer)
     mWear = Wear(mA)
     val drawer = mA.findViewById<DrawerLayout>(R.id.dataFeedDrawer)
 
+    // Android thinks the current tab should not be saved across sessions, but for
+    // this app it's incorrect, it should be. The icicle is not passed back when
+    // opening from a tap on the icon on the home screen, so the state can't be
+    // usefully stored there. Instead, persist it.
+    val statePrefs = mA.getSharedPreferences("statePrefs", MODE_PRIVATE)
+    val fragments = arrayOf("Messages", "Settings", "Logs & data", "Debug tools")
     val list = mA.findViewById<ListView>(R.id.dataFeedDrawerContents)
-    list.adapter = ArrayAdapter(mA, R.layout.data_feed_drawer_item, arrayOf("Messages", "Settings", "Logs & data", "Debug tools"))
+    list.adapter = ArrayAdapter(mA, R.layout.data_feed_drawer_item, fragments)
     @Suppress("UNUSED_ANONYMOUS_PARAMETER")
     val listener = AdapterView.OnItemClickListener { parent, view, position, id ->
       val f = getFragmentForPosition(position, mWear)!!
@@ -58,14 +65,14 @@ class JFaceDataFeed(args : WrappedActivity.Args) : WrappedActivity(args)
        .commit()
       list.setItemChecked(position, true)
       drawer.closeDrawer(list)
-      mCurrentlyDisplayedFragmentIndex = position
+      statePrefs.edit().putInt(LAST_OPEN_FRAGMENT_INDEX, position).apply()
     }
     list.onItemClickListener = listener
 
-    val icicle = args.icicle
-    mCurrentlyDisplayedFragmentIndex = icicle?.getInt(LAST_OPEN_FRAGMENT_INDEX) ?: 3
+    val intentRequestedFragment = args.intent?.getStringExtra(OPEN_FRAGMENT_EXTRA)
+    val fragmentToDisplay : Int = if (null != intentRequestedFragment) fragments.indexOf(intentRequestedFragment) else statePrefs.getInt(LAST_OPEN_FRAGMENT_INDEX, -1)
     mA.lifecycleScope.launchWhenResumed {
-      listener.onItemClick(null, null, mCurrentlyDisplayedFragmentIndex, 0) // Switch to the initial fragment
+      listener.onItemClick(null, null, if (fragmentToDisplay in 0..3) fragmentToDisplay else 3, 0) // Switch to the initial fragment
     }
 
     val toolbar = mA.findViewById<Toolbar>(R.id.dataFeedToolbar)
@@ -73,9 +80,9 @@ class JFaceDataFeed(args : WrappedActivity.Args) : WrappedActivity(args)
     mDrawerToggle = ActionBarDrawerToggle(mA, drawer, toolbar, R.string.drawer_open_desc, R.string.drawer_closed_desc)
   }
 
-  override fun onSaveInstanceState(instanceState : Bundle)
+  companion object
   {
-    instanceState.putInt(LAST_OPEN_FRAGMENT_INDEX, mCurrentlyDisplayedFragmentIndex)
+    fun activityClass() = AuthTrampolineJFaceDataFeedBoot::class.java
   }
 
   override fun onRequestPermissionsResult(requestCode : Int, permissions : Array<String>, results : IntArray)

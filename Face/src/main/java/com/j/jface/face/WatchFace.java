@@ -288,7 +288,15 @@ public class WatchFace implements DataClient.OnDataChangedListener {
         if (x < Const.SCREEN_SIZE - y) // top left triangle
           mTapControl.prevDeparture(mDataStore, mNextDeparture); // Left
         else
-          mTapControl.toggleUserMessage(); // Bottom
+        {
+          if (doubleTap)
+          {
+            mTapControl.addCheckpoint(mDataStore);
+            WearData.putDataItem(mDataClient, Const.DATA_KEY_CHECKPOINTS, Util.join(mDataStore.mCheckpoints, "\n"));
+          }
+          else
+            mTapControl.toggleUserMessage(); // Bottom
+        }
       else if (x < Const.SCREEN_SIZE - y)
       {
         if (doubleTap)
@@ -366,13 +374,9 @@ public class WatchFace implements DataClient.OnDataChangedListener {
           mDataStore.mUserMessageColors = Util.intArrayFromNullableArrayList(data.getIntegerArrayList(Const.DATA_KEY_USER_MESSAGE_COLORS));
         }
         else if (Const.DATA_KEY_HEART_MESSAGE.equals(key))
-        {
-          final String heartMessage = data.getString(Const.DATA_KEY_HEART_MESSAGE);
-          final String[] heartMessageArray;
-          if (TextUtils.isEmpty(heartMessage)) heartMessageArray = new String[0];
-          else heartMessageArray = heartMessage.split("\n");
-          mDataStore.mHeartMessage = heartMessageArray;
-        }
+          mDataStore.mHeartMessage = splitArray(data.getString(key));
+        else if (Const.DATA_KEY_CHECKPOINTS.equals(key))
+          mDataStore.mCheckpoints = splitArray(data.getString(key));
       }
     }
     else if (path.startsWith(Const.LOCATION_PATH))
@@ -380,6 +384,12 @@ public class WatchFace implements DataClient.OnDataChangedListener {
       final String dataName = path.substring(Const.LOCATION_PATH.length() + 1); // + 1 for the "/"
       mDataStore.putLocationStatus(dataName, data.getBoolean(Const.DATA_KEY_INSIDE));
     }
+  }
+
+  private String[] splitArray(@Nullable final String source)
+  {
+    if (TextUtils.isEmpty(source)) return new String[0];
+    return source.split("\n");
   }
 
   private void updateConfigAndData()
@@ -401,6 +411,7 @@ public class WatchFace implements DataClient.OnDataChangedListener {
     WearData.fetchData(mDataClient, Const.DATA_PATH + "/" + Const.DATA_KEY_HEART_MESSAGE, dataHandler);
     WearData.fetchData(mDataClient, Const.DATA_PATH + "/" + Const.DATA_KEY_BACKGROUND, dataHandler);
     WearData.fetchData(mDataClient, Const.DATA_PATH + "/" + Const.DATA_KEY_DEBUG_TIME_OFFSET, dataHandler);
+    WearData.fetchData(mDataClient, Const.DATA_PATH + "/" + Const.DATA_KEY_CHECKPOINTS, dataHandler);
   }
 
   @Override // DataClient.OnDataChangedListener

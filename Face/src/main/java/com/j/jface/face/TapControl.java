@@ -7,6 +7,9 @@ import android.text.format.Time;
 
 import com.j.jface.Const;
 import com.j.jface.Departure;
+import com.j.jface.Util;
+
+import java.util.Arrays;
 
 /**
  * A class to store the status of stuff that is controlled by tapping
@@ -73,5 +76,12 @@ public class TapControl
   {
     lastChangeTime = 1;
     showUserMessage = !showUserMessage;
+  }
+
+  public void addCheckpoint(@NonNull final DataStore dataStore)
+  {
+    final String[] checkpoints = Arrays.copyOf(dataStore.mCheckpoints, dataStore.mCheckpoints.length + 1);
+    checkpoints[checkpoints.length - 1] = Util.nowStr();
+    dataStore.mCheckpoints = checkpoints;
   }
 }

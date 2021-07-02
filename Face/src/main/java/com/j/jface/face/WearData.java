@@ -50,9 +50,9 @@ public final class WearData
    * If the current config {@link DataItem} doesn't exist, it isn't created and the callback
    * receives an empty DataMap.
    */
-  public static void fetchData(final DataClient client,
-                               final String path,
-                               final FetchConfigDataMapCallback callback)
+  public static void fetchData(@NonNull final DataClient client,
+                               @NonNull final String path,
+                               @NonNull final FetchConfigDataMapCallback callback)
   {
     final Uri uri = new Uri.Builder().scheme("wear")
      .path(path)
@@ -64,11 +64,23 @@ public final class WearData
    * Overwrites the current config {@link DataItem}'s {@link DataMap} with {@code newConfig}.
    * If the config DataItem doesn't exist, it's created.
    */
-  public static void putConfigDataItem(DataClient client, DataMap newConfig)
+  public static void putConfigDataItem(@NonNull final DataClient client, @NonNull final DataMap newConfig)
   {
-    PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(Const.CONFIG_PATH);
-    DataMap configToPut = putDataMapRequest.getDataMap();
+    final PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(Const.CONFIG_PATH);
+    final DataMap configToPut = putDataMapRequest.getDataMap();
     configToPut.putAll(newConfig);
+    client.putDataItem(putDataMapRequest.asPutDataRequest());
+  }
+
+  /**
+   * General put function to add a String value at in the data path with the key as both the sub path and the key,
+   * as is customary for paths that only contain one data item.
+   */
+  public static void putDataItem(@NonNull final DataClient client, @NonNull final String key, @NonNull final String value)
+  {
+    final PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(Const.DATA_PATH + "/" + key);
+    final DataMap dm = putDataMapRequest.getDataMap();
+    dm.putString(key, value);
     client.putDataItem(putDataMapRequest.asPutDataRequest());
   }
 

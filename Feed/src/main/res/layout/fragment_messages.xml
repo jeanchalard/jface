@@ -16,10 +16,9 @@
     <EditText
       android:id="@+id/messagesFragment_userMessageDataEdit"
       android:text=""
-      android:layout_width="0px"
+      android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_weight="1"
-      android:hint="Topic"/>
+      android:hint="Topic" />
 
   </LinearLayout>
 
@@ -47,5 +46,12 @@
      android:layout_height="wrap_content"
      android:layout_gravity="end" />
   </LinearLayout>
+
+  <EditText
+     android:id="@+id/messagesFragment_checkpointsDataEdit"
+     android:text=""
+     android:layout_width="match_parent"
+     android:layout_height= "wrap_content"
+    android:hint="Checkpoints" />
 
 </LinearLayout>

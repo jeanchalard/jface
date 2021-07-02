@@ -54,7 +54,7 @@ class FaceView @JvmOverloads constructor(context : Context, attrs : AttributeSet
     return true
   }
 
-  fun sendOnPropertiesChanged() = face.onPropertiesChanged(Bundle().apply {
+  private fun sendOnPropertiesChanged() = face.onPropertiesChanged(Bundle().apply {
     putBoolean(PROPERTY_LOW_BIT_AMBIENT, coarse)
     putBoolean(PROPERTY_BURN_IN_PROTECTION, burnin)
   })

@@ -20,6 +20,7 @@ public class DataStore
   @NonNull public String mUserMessage = "";
   @NonNull public int[] mUserMessageColors = new int[0];
   @NonNull public String[] mHeartMessage = new String[0];
+  @NonNull public String[] mCheckpoints = new String[0];
   @Nullable public Bitmap mBackground;
   public long mTimeOffset;
   public long mDebugFences;

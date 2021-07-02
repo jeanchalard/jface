@@ -3,6 +3,8 @@ package com.j.jface.lifecycle;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.util.Log;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
@@ -19,16 +21,17 @@ public abstract class ActivityWrapper<T extends WrappedActivity> extends AppComp
   // Activity callbacks
   @Override protected void onCreate(@Nullable final Bundle icicle)
   {
+    super.onCreate(icicle);
     mW = WrapUtils.buildFromParent(getClass(),
      new Class[]{WrappedActivity.Args.class},
-     new Object[]{new WrappedActivity.Args(this, icicle)});
-    super.onCreate(null);
+     new Object[]{new WrappedActivity.Args(this, icicle, getIntent())});
   }
 
-  @Override public void onSaveInstanceState(@NonNull final Bundle savedInstanceState)
+  @Override public void onSaveInstanceState(@NonNull final Bundle icicle)
   {
+    super.onSaveInstanceState(icicle);
     assert mW != null;
-    mW.onSaveInstanceState(savedInstanceState);
+    mW.onSaveInstanceState(icicle);
   }
 
   @Override public void onConfigurationChanged(final Configuration c)

@@ -282,8 +282,12 @@ object Firebase
       if (snapshot.metadata.hasPendingWrites()) return // This was a local update.
       snapshot.documents.forEach { doc ->
         val wearPath = firebasePathToWearPath(doc.reference.path)
-try{        val data = doc.toDataMap()
-        onWearDataUpdated(wearPath, data) } catch (e:Exception) {return}
+        try
+        {
+          val data = doc.toDataMap()
+          onWearDataUpdated(wearPath, data)
+        }
+        catch (e:Exception) {return}
       }
     }
     abstract fun onWearDataUpdated(path : String, data : DataMap)

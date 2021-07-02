@@ -21,9 +21,10 @@ public class WrappedActivity
   {
     @NonNull public final AppCompatActivity activity;
     @Nullable public final Bundle icicle;
-    public Args(@NonNull final AppCompatActivity a, @Nullable final Bundle b)
+    @Nullable public final Intent intent;
+    public Args(@NonNull final AppCompatActivity a, @Nullable final Bundle b, @Nullable Intent i)
     {
-      activity = a; icicle = b;
+      activity = a; icicle = b; intent = i;
     }
   }
 
