@@ -30,6 +30,7 @@ public class Const
   public static final int NOTIFICATION_TYPE_SPLIT = 402;
   public static final int NOTIFICATION_TYPE_FILLIN = 403;
   public static final int NOTIFICATION_TYPE_CANCEL_DONE = 404;
+  public static final int CHECKPOINTS_CLEAR = 501;
 
   public static final int SECONDS_渋谷_TO_日暮里 = 29 * 60 + 30; // About 29 minutes and 30 seconds of riding the train
   public static final int SECONDS_千住大橋_TO_日暮里 = 6 * 60; // About 6 minutes of riding the train

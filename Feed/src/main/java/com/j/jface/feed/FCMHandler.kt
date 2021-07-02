@@ -65,10 +65,11 @@ object FCMHandler
     Log.e("JOrg/Firebase", "Firebase decided to update its token : ${token}")
     Wearable.getNodeClient(context).connectedNodes.addOnSuccessListener {
       if (null == it || it.isEmpty()) return@addOnSuccessListener
-      val d = DataMap().apply {
-        putString(Const.CONFIG_KEY_WEAR_LISTENER_ID, token.await())
+      val d = DataMap()
+      token.addOnCompleteListener { tokenId ->
+        d.putString(Const.CONFIG_KEY_WEAR_LISTENER_ID, tokenId.result)
+        if (Firebase.isLoggedIn) Firebase.updateWearData("${Const.CONFIG_PATH}/${Const.CONFIG_KEY_WEAR_LISTENER_PREFIX}${token}", d)
       }
-      if (Firebase.isLoggedIn) Firebase.updateWearData("${Const.CONFIG_PATH}/${Const.CONFIG_KEY_WEAR_LISTENER_PREFIX}${token}", d)
     }
   }
 }
