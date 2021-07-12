@@ -1,5 +1,6 @@
 package com.j.jface.lifecycle;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -21,15 +22,17 @@ public abstract class ActivityWrapper<T extends WrappedActivity> extends AppComp
   // Activity callbacks
   @Override protected void onCreate(@Nullable final Bundle icicle)
   {
-    super.onCreate(icicle);
     mW = WrapUtils.buildFromParent(getClass(),
      new Class[]{WrappedActivity.Args.class},
      new Object[]{new WrappedActivity.Args(this, icicle, getIntent())});
+    // Do not pass the icicle to avoid the framework trying to use its broken fragment-recreation mechanics
+    super.onCreate(null);
   }
 
+  @SuppressLint("MissingSuperCall")
   @Override public void onSaveInstanceState(@NonNull final Bundle icicle)
   {
-    super.onSaveInstanceState(icicle);
+    // Do not call super, because the framework would try to save fragment state, but its way of doing it is crap
     assert mW != null;
     mW.onSaveInstanceState(icicle);
   }
