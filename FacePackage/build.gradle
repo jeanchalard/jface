@@ -4,7 +4,7 @@ apply plugin : "kotlin-android"
 List<String> dirs = [ "main" ]
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 31
     defaultConfig {
         versionCode 1
         versionName "1.0"

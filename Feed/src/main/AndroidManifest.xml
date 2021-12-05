@@ -36,7 +36,8 @@
 
     <activity
      android:name=".org.DebugActivityBoot"
-     android:label="Debug activity">
+     android:label="Debug activity"
+     android:exported="true">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
       </intent-filter>
@@ -56,6 +57,7 @@
      android:name=".org.AuthTrampolineJOrgBoot"
      android:label="@string/orgtool_name"
      android:icon="@drawable/jormungand"
+     android:exported="true"
      android:taskAffinity="com.j.jface.org.JOrg">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
@@ -135,7 +137,8 @@
       </intent-filter>
     </service>
 
-    <receiver android:name=".feed.BootCompletedReceiver">
+    <receiver android:name=".feed.BootCompletedReceiver"
+     android:exported="true">
       <intent-filter>
         <action android:name="android.intent.action.BOOT_COMPLETED" />
       </intent-filter>
