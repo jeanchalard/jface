@@ -22,17 +22,17 @@ class DataSource private constructor(val name : String, val url : String, val pa
      DataSource(Const.山手線_渋谷_日暮里方面_休日,
       "https://ekitan.com/timetable/railway/line-station/182-4/d1?dw=2&view=list", EkitanParser::class.java, 1),
      DataSource(Const.京成線_千住大橋_上野方面_平日,
-      "http://keisei.ekitan.com/norikae/pc/T5?dir=35&dw=0&slCode=254-4&d=1", KeiseiParser::class.java),
+      "https://keisei.ekitan.com/norikae/pc/T5?dir=35&dw=0&slCode=254-4&d=1", KeiseiParser::class.java),
      DataSource(Const.京成線_千住大橋_上野方面_休日,
-      "http://keisei.ekitan.com/norikae/pc/T5?dir=49&dw=1&slCode=254-4&d=1", KeiseiParser::class.java),
+      "https://keisei.ekitan.com/norikae/pc/T5?dir=49&dw=1&slCode=254-4&d=1", KeiseiParser::class.java),
      DataSource(Const.京成線_千住大橋_成田方面_平日,
-      "http://keisei.ekitan.com/norikae/pc/T5?dir=35&dw=0&slCode=254-4&d=2", KeiseiParser::class.java),
+      "https://keisei.ekitan.com/norikae/pc/T5?dir=35&dw=0&slCode=254-4&d=2", KeiseiParser::class.java),
      DataSource(Const.京成線_千住大橋_成田方面_休日,
-      "http://keisei.ekitan.com/norikae/pc/T5?dir=50&dw=1&slCode=254-4&d=2", KeiseiParser::class.java),
+      "https://keisei.ekitan.com/norikae/pc/T5?dir=50&dw=1&slCode=254-4&d=2", KeiseiParser::class.java),
      DataSource(Const.京成線_日暮里_千住大橋方面_平日,
-      "http://keisei.ekitan.com/norikae/pc/T5?dir=44&dw=0&slCode=254-1&d=2", KeiseiParser::class.java),
+      "https://keisei.ekitan.com/norikae/pc/T5?dir=44&dw=0&slCode=254-1&d=2", KeiseiParser::class.java),
      DataSource(Const.京成線_日暮里_千住大橋方面_休日,
-      "http://keisei.ekitan.com/norikae/pc/T5?dir=52&dw=1&slCode=254-1&d=2", KeiseiParser::class.java)
+      "https://keisei.ekitan.com/norikae/pc/T5?dir=52&dw=1&slCode=254-1&d=2", KeiseiParser::class.java)
     )
     private val RIO_SOURCES = arrayOf(
      DataSource(Const.京王線_稲城駅_新宿方面_平日,
