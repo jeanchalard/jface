@@ -75,7 +75,7 @@ class NotifEngine : JobService()
         setOverrideDeadline(interval + 2 * 3600_000)
         setPersisted(true)
       }.build()
-      NotificationAction.postNotification(context, "Clue scheduled in ${interval}s (${Instant.now().plusMillis(interval).atOffset(ZoneOffset.ofHours(9))})", null)
+      NotificationAction.postNotification(context, "Clue scheduled in ${interval}s (${Instant.now().plusMillis(interval).atOffset(ZoneOffset.ofHours(9))})", details = null, pendingIntent = null)
       jobScheduler.schedule(job)
     }
   }

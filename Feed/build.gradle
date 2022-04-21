@@ -35,10 +35,10 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    lintOptions {
-        checkReleaseBuilds false
+    lint {
         abortOnError true
-        disable "NewApi" // Real min SDK is < O, but minAPI = 26+ breaks geofences. Stupid and difficult to deal with, but better than errors or @SuppressList everywhere.
+        checkReleaseBuilds false
+        disable 'NewApi'
     }
 }
 
@@ -46,6 +46,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${kotlin_version}"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutines_version}"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${coroutines_version}"
+    implementation "androidx.core:core-ktx:1.7.0"
     implementation "com.google.firebase:firebase-core:20.0.0"
     implementation "com.google.firebase:firebase-firestore:24.0.0"
     implementation "com.google.firebase:firebase-auth:21.0.1"

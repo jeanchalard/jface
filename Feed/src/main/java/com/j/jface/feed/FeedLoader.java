@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.Stack;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -36,6 +37,13 @@ public class FeedLoader
     }
     for (final DataSource ds : DataSource.ALL_SOURCES)
       startLoadDataSource(ds, wear);
+  }
+
+  private static StackTraceElement findRelevantStackTraceElement(@NonNull final StackTraceElement[] stack)
+  {
+    for (final StackTraceElement e : stack)
+      if (e.getClassName().startsWith("com.j.jface")) return e;
+    return stack[0];
   }
 
   private static void startLoadDataSource(@NonNull final DataSource ds, @NonNull final Wear wear)
@@ -73,8 +81,9 @@ public class FeedLoader
       }
       catch (@NonNull InstantiationException | IllegalAccessException | IOException | ParseException | RuntimeException e)
       {
+        final String details = findRelevantStackTraceElement(e.getStackTrace()).toString() + "\n" + ds.getUrl();
         statusData.putString(Const.DATA_KEY_LAST_STATUS, "Failure ; " + e.getMessage());
-        new InformUserAction(wear.getContext(), e.toString(), null, null, null).invoke();
+        new InformUserAction(wear.getContext(), e.toString(), details,null, null, null).invoke();
       }
       finally
       {

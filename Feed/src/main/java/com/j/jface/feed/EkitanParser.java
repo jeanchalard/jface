@@ -34,8 +34,8 @@ public class EkitanParser extends FeedParser
     while (true) {
       if (null == find(src, "data-tr-type=\"")) break;
       final String type = find(src, "\"");
-      find(src, "data-departure=\"");
-      final String time = find(src, "\""); // Format is HHMM
+      find(src, "&departure=");
+      final String time = find(src, "&"); // Format is HHMM
       final int t = Integer.parseInt(time);
       final int hour = t / 100;
       final int minute = t % 100;

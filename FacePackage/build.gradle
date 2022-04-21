@@ -27,13 +27,13 @@ android {
         androidTest.setRoot("tests")
         androidTest.java.srcDirs = ["tests/src"]
     }
-    lintOptions {
-        checkReleaseBuilds false
-        abortOnError true
-    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    lint {
+        abortOnError true
+        checkReleaseBuilds false
     }
 }
 
