@@ -6,6 +6,7 @@ import android.widget.TextView
 import com.google.android.gms.auth.api.Auth
 import com.google.firebase.messaging.FirebaseMessaging
 import com.j.jface.R
+import com.j.jface.Util
 import com.j.jface.feed.FCMHandler
 import com.j.jface.firebase.Firebase
 import com.j.jface.firebase.await
@@ -51,6 +52,11 @@ abstract class AuthTrampoline(args : WrappedActivity.Args) : WrappedActivity(arg
 
   override fun onActivityResult(requestCode : Int, resultCode : Int, data : Intent?)
   {
+    if (null == data)
+    {
+      log("onActivityResult with null intent. requestCode = ${requestCode} ; resultCode = ${resultCode}\n${Util.getStackTrace(20)}")
+      return
+    }
     val signInResult = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
     if (true == signInResult?.isSuccess)
     {
