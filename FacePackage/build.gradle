@@ -9,7 +9,7 @@ android {
         versionCode 1
         versionName "1.0"
         applicationId "com.j.jface"
-        minSdkVersion 21
+        minSdkVersion 28
     }
     buildTypes {
         release {

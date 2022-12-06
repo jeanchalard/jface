@@ -15,13 +15,12 @@ import androidx.annotation.Nullable;
 public class DrawTools
 {
   private static final int WEIGHT_NORMAL = 400;
-  private static final int WEIGHT_MEDIUM = 500;
   private static final int WEIGHT_SEMI_BOLD = 600;
-  // Requires API 28 : test if it works with my new watch
-  //  private static final Typeface BOLD_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, WEIGHT_SEMI_BOLD, false /* italic */);
-  //  private static final Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, WEIGHT_NORMAL, false /* italic */);
-  private static final Typeface BOLD_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
-  private static final Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
+  private static final Typeface BOLD_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, WEIGHT_SEMI_BOLD, false /* italic */);
+  private static final Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, WEIGHT_NORMAL, false /* italic */);
+  // When API < 28, use the following instead
+//  private static final Typeface BOLD_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
+//  private static final Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
 
   public final float timePosY;
   public final float departurePosY;
@@ -49,7 +48,7 @@ public class DrawTools
     imagePaint = new Paint();
     imagePaint.setColor(0xFF000000);
     minutesPaint = createTextPaint(0xFFFFFFFF, BOLD_TYPEFACE);
-    secondsPaint = createTextPaint(0xFFC7C7C7, BOLD_TYPEFACE);
+    secondsPaint = createTextPaint(0xFFA7A7A7, BOLD_TYPEFACE);
     departurePaint = createTextPaint(0xFFCCCCCC, NORMAL_TYPEFACE);
     statusPaint = createTextPaint(0xFFCCCCCC, NORMAL_TYPEFACE);
     statusPaint.setTextAlign(Paint.Align.CENTER);

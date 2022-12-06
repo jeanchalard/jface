@@ -9,6 +9,8 @@ android {
     compileSdkVersion 32
     defaultConfig {
         applicationId "com.j.jface"
+        // ATTENTION : The face package has minApi 28 for the text weight API, but that will prevent this from building
+        // so it's necessary to lower to 26 to build this
         minSdkVersion 25 // STOPSHIP : as of API 26 geofences are broken. Somehow work around this, or keep this at 25
         targetSdkVersion 25 // STOPSHIP : likewise
         versionCode 1
