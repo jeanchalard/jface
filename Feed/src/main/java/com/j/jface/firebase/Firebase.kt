@@ -287,7 +287,7 @@ object Firebase
           val data = doc.toDataMap()
           onWearDataUpdated(wearPath, data)
         }
-        catch (e:Exception) {return}
+        catch (e : Exception) {return}
       }
     }
     abstract fun onWearDataUpdated(path : String, data : DataMap)

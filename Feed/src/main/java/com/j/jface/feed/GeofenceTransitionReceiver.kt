@@ -24,7 +24,7 @@ class GeofenceTransitionReceiver(private val service : Service)
     {
       val i = Intent(service, GeofenceTransitionReceiverService::class.java)
       i.action = ACTION_GEOFENCE
-      return PendingIntent.getService(service, 0, i, PendingIntent.FLAG_UPDATE_CURRENT)
+      return PendingIntent.getService(service, 0, i, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 
   fun onHandleIntent(intent : Intent)
@@ -40,10 +40,11 @@ class GeofenceTransitionReceiver(private val service : Service)
   private fun handleGeofenceTransitions(intent : Intent)
   {
     val event = GeofencingEvent.fromIntent(intent)
-    if (event.hasError()) return
+    if (null == event || event.hasError()) return
 
     val fences = event.triggeringGeofences
     val transitionType = event.geofenceTransition
+    if (null == fences) return
     for (fence in fences)
       handleGeofenceTransition(fence, transitionType)
   }
@@ -61,8 +62,7 @@ class GeofenceTransitionReceiver(private val service : Service)
 
   private fun handleGeofenceTransition(fence : Geofence, transitionType : Int)
   {
-    val params = Fences.paramsFromName(fence.requestId)
-    if (null == params) return // Unknown fence
+    val params = Fences.paramsFromName(fence.requestId) ?: return // null means the fence is unknown, that's supposedly impossible
     if (Geofence.GEOFENCE_TRANSITION_ENTER == transitionType)
       wear.putDataLocally(Const.LOCATION_PATH + "/" + params.name, Const.DATA_KEY_INSIDE, true)
     else if (Geofence.GEOFENCE_TRANSITION_EXIT == transitionType)

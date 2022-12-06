@@ -10,6 +10,9 @@ import com.j.jface.Util
 import com.j.jface.feed.FCMHandler
 import com.j.jface.firebase.Firebase
 import com.j.jface.firebase.await
+import java.io.Closeable
+import java.net.DatagramSocket
+import java.net.Socket
 import java.util.concurrent.Executors
 
 abstract class AuthTrampoline(args : WrappedActivity.Args) : WrappedActivity(args)
