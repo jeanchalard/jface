@@ -24,7 +24,7 @@ public class HeartLayer
   private static final int ZOOMIN_DELAY_MS = 300;
   private static final int FADEOUT_DELAY_MS = HeartModel.FADE_OUT_MS;
 
-  private static final int TEXTSIZE = 40;
+  private static final int TEXTSIZE = 48;
   private static final int TEXTMARGIN = 4;
 
   @Nullable private Bitmap cache = null;
@@ -53,7 +53,8 @@ public class HeartLayer
     final Bitmap heart = drawable.copy(drawable.getConfig(), true);
 
     final Canvas c = new Canvas(heart);
-    float y = Const.SCREEN_SIZE / 2 - (TEXTSIZE + TEXTMARGIN / 2) * dataStore.mHeartMessage.length / 2;
+    // 0.55 and not 0.5 because the bitmap is not vertically symmetric ; it helps with centering
+    float y = 0.55f * drawable.getHeight() - (TEXTSIZE + TEXTMARGIN / 2) * dataStore.mHeartMessage.length / 2;
     for (final String label : dataStore.mHeartMessage)
     {
       final float textWidth = paint.measureText(label);

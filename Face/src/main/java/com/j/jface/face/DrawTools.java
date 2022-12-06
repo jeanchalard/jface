@@ -14,12 +14,19 @@ import androidx.annotation.Nullable;
 
 public class DrawTools
 {
+  private static final int WEIGHT_NORMAL = 400;
+  private static final int WEIGHT_MEDIUM = 500;
+  private static final int WEIGHT_SEMI_BOLD = 600;
+  // Requires API 28 : test if it works with my new watch
+  //  private static final Typeface BOLD_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, WEIGHT_SEMI_BOLD, false /* italic */);
+  //  private static final Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, WEIGHT_NORMAL, false /* italic */);
   private static final Typeface BOLD_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
   private static final Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
 
   public final float timePosY;
   public final float departurePosY;
   public final float iconToDepartureXPadding;
+  public final float departureLinesAdditionalPadding;
 
   public final Paint imagePaint;
   public final Paint minutesPaint;
@@ -41,8 +48,8 @@ public class DrawTools
   public DrawTools(@Nullable final Resources resources) {
     imagePaint = new Paint();
     imagePaint.setColor(0xFF000000);
-    minutesPaint = createTextPaint(0xFFFFFFFF, NORMAL_TYPEFACE);
-    secondsPaint = createTextPaint(0xFF888888, NORMAL_TYPEFACE);
+    minutesPaint = createTextPaint(0xFFFFFFFF, BOLD_TYPEFACE);
+    secondsPaint = createTextPaint(0xFFC7C7C7, BOLD_TYPEFACE);
     departurePaint = createTextPaint(0xFFCCCCCC, NORMAL_TYPEFACE);
     statusPaint = createTextPaint(0xFFCCCCCC, NORMAL_TYPEFACE);
     statusPaint.setTextAlign(Paint.Align.CENTER);
@@ -52,7 +59,12 @@ public class DrawTools
     checkpointPaint = createTextPaint(0xFFFFFFFF, BOLD_TYPEFACE);
     checkpointPaint.setTextAlign(Paint.Align.CENTER);
 
-    final int statusFontSize = 18;
+    // We can afford to do this because we know what device we are running on, but otherwise we should
+    // read this stuff from resources instead. All the values below are in pixels.
+    final int timeSize = Const.SCREEN_SIZE > 300 ? 84 : 48;
+    final int departureSize = Const.SCREEN_SIZE > 300 ? 32 : 20;
+
+    final int statusFontSize = 28;
     final int contourPadding = 2;
     watchContourPath = new Path();
     watchContourPath.addArc(statusFontSize + contourPadding, statusFontSize + contourPadding, // top, left
@@ -60,12 +72,13 @@ public class DrawTools
      -269, 358); // startAngle, sweepAngle
 
     if (null != resources) {
-      jrIcon = ((BitmapDrawable)resources.getDrawable(R.drawable.jr)).getBitmap();
-      hibiyaIcon = ((BitmapDrawable)resources.getDrawable(R.drawable.hibiya)).getBitmap();
-      keiseiIcon = ((BitmapDrawable)resources.getDrawable(R.drawable.keisei)).getBitmap();
-      keiōIcon = ((BitmapDrawable)resources.getDrawable(R.drawable.keiou)).getBitmap();
-      mitaIcon = ((BitmapDrawable)resources.getDrawable(R.drawable.mita)).getBitmap();
-      ōedoIcon = ((BitmapDrawable)resources.getDrawable(R.drawable.ooedo)).getBitmap();
+      final int iconSize = departureSize;
+      jrIcon = Bitmap.createScaledBitmap(((BitmapDrawable)resources.getDrawable(R.drawable.jr)).getBitmap(), iconSize, iconSize, true /* filter */);
+      hibiyaIcon = Bitmap.createScaledBitmap(((BitmapDrawable)resources.getDrawable(R.drawable.hibiya)).getBitmap(), iconSize, iconSize, true /* filter */);
+      keiseiIcon = Bitmap.createScaledBitmap(((BitmapDrawable)resources.getDrawable(R.drawable.keisei)).getBitmap(), iconSize, iconSize, true /* filter */);
+      keiōIcon = Bitmap.createScaledBitmap(((BitmapDrawable)resources.getDrawable(R.drawable.keiou)).getBitmap(), iconSize, iconSize, true /* filter */);
+      mitaIcon = Bitmap.createScaledBitmap(((BitmapDrawable)resources.getDrawable(R.drawable.mita)).getBitmap(), iconSize, iconSize, true /* filter */);
+      ōedoIcon = Bitmap.createScaledBitmap(((BitmapDrawable)resources.getDrawable(R.drawable.ooedo)).getBitmap(), iconSize, iconSize, true /* filter */);
     } else {
       jrIcon = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
       hibiyaIcon = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
@@ -75,19 +88,17 @@ public class DrawTools
       ōedoIcon = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
     }
 
-    // We can afford to do this because we know what device we are running on, but otherwise we should
-    // read this stuff from resources instead. All the values below are in pixels.
-    minutesPaint.setTextSize(Const.SCREEN_SIZE > 300 ? 54 : 48);
-    final int timeSize = Const.SCREEN_SIZE > 300 ? 23 : 20;
-    secondsPaint.setTextSize(timeSize);
-    departurePaint.setTextSize(timeSize);
+    minutesPaint.setTextSize(timeSize);
+    secondsPaint.setTextSize(departureSize);
+    departurePaint.setTextSize(departureSize);
     statusPaint.setTextSize(statusFontSize);
-    userMessagePaint.setTextSize(28);
-    checkpointPaint.setTextSize(54);
+    userMessagePaint.setTextSize(36);
+    checkpointPaint.setTextSize(72);
 
-    timePosY = Const.ROUND_SCREEN ? 85 : 75;
-    departurePosY = timePosY + 36;
+    timePosY = Const.ROUND_SCREEN ? 135 : 75;
+    departurePosY = timePosY + 60;
     iconToDepartureXPadding = 7;
+    departureLinesAdditionalPadding = Const.SCREEN_SIZE > 400 ? 6 : 0;
   }
 
   @Nullable public Bitmap getIconForKey(final String key) {

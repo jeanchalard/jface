@@ -121,9 +121,9 @@ public class Draw
       // Draw header
       if (null != departure2)
       {
-        final float y1e = y1 + lineHeight;
+        final float y1e = y1 + lineHeight + drawTools.departureLinesAdditionalPadding;
         canvas.drawText(departure2.headSign, center, y1e, drawTools.departurePaint);
-        final float y2 = y1e + lineHeight;
+        final float y2 = y1e + lineHeight + drawTools.departureLinesAdditionalPadding;
         // Draw departures
         mustInvalidate |= drawDepartureSet(1, departure2, center, y2, drawTools, canvas);
       }

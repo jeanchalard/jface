@@ -11,7 +11,7 @@ public class Const
 
   public static final boolean RIO_MODE = false;
   public static final boolean ROUND_SCREEN = !RIO_MODE;
-  public static final int SCREEN_SIZE = RIO_MODE ? 280 : 320;
+  public static final int SCREEN_SIZE = RIO_MODE ? 280 : 396;
 
   public static final int ANIM_DURATION = 1000; // milliseconds
   public static final long MILLISECONDS_TO_UTC = 9 * 3600 * 1000;
@@ -21,7 +21,6 @@ public class Const
   public static final int COARSE_AMBIENT_MODE = 1; // Ambient mode has fewer bits per pixel
   public static final int AMBIENT_MODE = 2;
   public static final int BURN_IN_PROTECTION_MODE = 4;
-  public static final int WAITING_FOR_TAP = 8;
 
   public static final int CHOOSE_IMAGE_RESULT_CODE = 100;
   public static final int GOOGLE_SIGN_IN_RESULT_CODE = 300;
@@ -106,26 +105,26 @@ public class Const
   @NonNull public static final HashMap<String, String> HEADSIGNS = new HashMap <>();
 
   static {
-    HEADSIGNS.put(日比谷線_北千住_平日, "北千住 ▶ 六本木");
-    HEADSIGNS.put(日比谷線_北千住_休日, "北千住 ▶ 六本木");
-    HEADSIGNS.put(日比谷線_六本木_平日, "六本木 ▶ 北千住");
-    HEADSIGNS.put(日比谷線_六本木_休日, "六本木 ▶ 北千住");
-    HEADSIGNS.put(山手線_日暮里_渋谷方面_平日, "日暮里 ▶ 渋谷");
-    HEADSIGNS.put(山手線_日暮里_渋谷方面_休日, "日暮里 ▶ 渋谷");
-    HEADSIGNS.put(山手線_渋谷_日暮里方面_平日, "渋谷 ▶ 日暮里");
-    HEADSIGNS.put(山手線_渋谷_日暮里方面_休日, "渋谷 ▶ 日暮里");
-    HEADSIGNS.put(大江戸線_六本木_新宿方面_平日, "六本木 ▶ 新宿");
-    HEADSIGNS.put(大江戸線_六本木_新宿方面_休日, "六本木 ▶ 新宿");
-    HEADSIGNS.put(京王線_稲城駅_新宿方面_平日, "稲城 ▶ 新宿");
-    HEADSIGNS.put(京王線_稲城駅_新宿方面_休日, "稲城 ▶ 新宿");
-    HEADSIGNS.put(都営三田線_本蓮沼_目黒方面_平日, "本蓮沼 ▶ 巣鴨");
-    HEADSIGNS.put(都営三田線_本蓮沼_目黒方面_休日, "本蓮沼 ▶ 巣鴨");
-    HEADSIGNS.put(京成線_千住大橋_上野方面_平日, "千住大橋 ▶ 日暮里");
-    HEADSIGNS.put(京成線_千住大橋_上野方面_休日, "千住大橋 ▶ 日暮里");
-    HEADSIGNS.put(京成線_千住大橋_成田方面_平日, "千住大橋 ▶ 成田");
-    HEADSIGNS.put(京成線_千住大橋_成田方面_休日, "千住大橋 ▶ 成田");
-    HEADSIGNS.put(京成線_日暮里_千住大橋方面_平日, "日暮里 ▶ 千住大橋");
-    HEADSIGNS.put(京成線_日暮里_千住大橋方面_休日, "日暮里 ▶ 千住大橋");
+    HEADSIGNS.put(日比谷線_北千住_平日, "北千住 ► 六本木");
+    HEADSIGNS.put(日比谷線_北千住_休日, "北千住 ► 六本木");
+    HEADSIGNS.put(日比谷線_六本木_平日, "六本木 ► 北千住");
+    HEADSIGNS.put(日比谷線_六本木_休日, "六本木 ► 北千住");
+    HEADSIGNS.put(山手線_日暮里_渋谷方面_平日, "日暮里 ► 渋谷");
+    HEADSIGNS.put(山手線_日暮里_渋谷方面_休日, "日暮里 ► 渋谷");
+    HEADSIGNS.put(山手線_渋谷_日暮里方面_平日, "渋谷 ► 日暮里");
+    HEADSIGNS.put(山手線_渋谷_日暮里方面_休日, "渋谷 ► 日暮里");
+    HEADSIGNS.put(大江戸線_六本木_新宿方面_平日, "六本木 ► 新宿");
+    HEADSIGNS.put(大江戸線_六本木_新宿方面_休日, "六本木 ► 新宿");
+    HEADSIGNS.put(京王線_稲城駅_新宿方面_平日, "稲城 ► 新宿");
+    HEADSIGNS.put(京王線_稲城駅_新宿方面_休日, "稲城 ► 新宿");
+    HEADSIGNS.put(都営三田線_本蓮沼_目黒方面_平日, "本蓮沼 ► 巣鴨");
+    HEADSIGNS.put(都営三田線_本蓮沼_目黒方面_休日, "本蓮沼 ► 巣鴨");
+    HEADSIGNS.put(京成線_千住大橋_上野方面_平日, "千住大橋 ► 日暮里");
+    HEADSIGNS.put(京成線_千住大橋_上野方面_休日, "千住大橋 ► 日暮里");
+    HEADSIGNS.put(京成線_千住大橋_成田方面_平日, "千住大橋 ► 成田");
+    HEADSIGNS.put(京成線_千住大橋_成田方面_休日, "千住大橋 ► 成田");
+    HEADSIGNS.put(京成線_日暮里_千住大橋方面_平日, "日暮里 ► 千住大橋");
+    HEADSIGNS.put(京成線_日暮里_千住大橋方面_休日, "日暮里 ► 千住大橋");
   }
 
   @NonNull private static final String[] J_DEPLIST_DATA_PATHS =
