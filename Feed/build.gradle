@@ -6,13 +6,11 @@ apply plugin : "kotlin-kapt"
 List<String> dirs = ["main"]
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 33
     defaultConfig {
         applicationId "com.j.jface"
-        // ATTENTION : The face package has minApi 28 for the text weight API, but that will prevent this from building
-        // so it's necessary to lower to 26 to build this
-        minSdkVersion 25 // STOPSHIP : as of API 26 geofences are broken. Somehow work around this, or keep this at 25
-        targetSdkVersion 25 // STOPSHIP : likewise
+        minSdkVersion 32
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
@@ -48,31 +46,31 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${kotlin_version}"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutines_version}"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${coroutines_version}"
-    implementation "androidx.core:core-ktx:1.8.0"
-    implementation "com.google.firebase:firebase-core:21.1.0"
-    implementation "com.google.firebase:firebase-firestore:24.2.1"
-    implementation "com.google.firebase:firebase-auth:21.0.6"
-    implementation "com.google.firebase:firebase-messaging:23.0.6"
-    implementation "com.google.android.gms:play-services-auth:20.2.0"
+    implementation "androidx.core:core-ktx:1.9.0"
+    implementation "com.google.firebase:firebase-core:21.1.1"
+    implementation "com.google.firebase:firebase-firestore:24.4.1"
+    implementation "com.google.firebase:firebase-auth:21.1.0"
+    implementation "com.google.firebase:firebase-messaging:23.1.0"
+    implementation "com.google.android.gms:play-services-auth:20.4.0"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1"
-    implementation "com.google.firebase:firebase-crashlytics:18.2.12"
-    implementation "com.google.firebase:firebase-analytics:21.1.0"
+    implementation "com.google.firebase:firebase-crashlytics:18.3.2"
+    implementation "com.google.firebase:firebase-analytics:21.2.0"
     compileOnly "com.google.android.wearable:wearable:2.9.0"
     implementation "com.google.android.support:wearable:2.9.0"
-    implementation "com.google.android.gms:play-services-wearable:17.1.0"
-    implementation "com.google.android.gms:play-services-location:20.0.0"
+    implementation "com.google.android.gms:play-services-wearable:18.0.0"
+    implementation "com.google.android.gms:play-services-location:21.0.1"
     implementation "com.google.android.gms:play-services-drive:17.0.0"
-    implementation "androidx.annotation:annotation:1.4.0"
+    implementation "androidx.annotation:annotation:1.5.0"
     implementation "androidx.legacy:legacy-support-v13:1.0.0"
     implementation "androidx.recyclerview:recyclerview:1.2.1"
-    implementation "com.google.android.material:material:1.6.1"
+    implementation "com.google.android.material:material:1.7.0"
     def room_version = "2.4.3"
     implementation "androidx.room:room-runtime:${room_version}"
     kapt "androidx.room:room-compiler:${room_version}"
     implementation "androidx.room:room-ktx:${room_version}"
     wearApp project(":FacePackage")
     implementation project(":Common")
-    implementation "androidx.appcompat:appcompat:1.4.2"
+    implementation "androidx.appcompat:appcompat:1.5.1"
     //    androidTestImplementation "com.android.support.test:runner:0.5"
     //    androidTestImplementation "com.android.support.test:rules:0.5"
     androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0", {

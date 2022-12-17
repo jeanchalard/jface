@@ -19,6 +19,7 @@ import com.j.jface.feed.views.SnackbarRegistry
 import com.j.jface.firebase.Firebase
 import com.j.jface.lifecycle.WrappedFragment
 import com.j.jface.wear.Wear
+import kotlinx.coroutines.MainCoroutineDispatcher
 import java.io.IOException
 import java.time.Instant
 import java.time.LocalTime
@@ -158,13 +159,16 @@ class DebugToolsFragment(a : WrappedFragment.Args, private val mWear : Wear) : W
     mTicking = true
     mTime1 = System.currentTimeMillis() + mOffset
     val zdt = OffsetDateTime.ofInstant(Instant.ofEpochMilli(mTime1), ZoneId.systemDefault())
-    mHoursUI.value = zdt.hour
-    mMinutesUI.value = zdt.minute
-    mSecondsUI.value = zdt.second
-
     mTime2 = System.currentTimeMillis()
-    mOffsetLabel.text = java.lang.Long.toString(mOffset)
+    val offset = mOffset
     mTicking = false
+
+    mFragment.activity?.runOnUiThread {
+      mHoursUI.value = zdt.hour
+      mMinutesUI.value = zdt.minute
+      mSecondsUI.value = zdt.second
+      mOffsetLabel.text = java.lang.Long.toString(offset)
+    }
   }
 
   private fun baseDay(timestamp : Long, utcOffset : Long) : Long = (timestamp + utcOffset * 1000) / DateUtils.DAY_IN_MILLIS
@@ -174,7 +178,7 @@ class DebugToolsFragment(a : WrappedFragment.Args, private val mWear : Wear) : W
     when (path)
     {
       DEBUG_TIME_OFFSET_PATH -> withoutListeners {
-        mOffset = data[Const.DATA_KEY_DEBUG_TIME_OFFSET]
+        data.get<Long>(Const.DATA_KEY_DEBUG_TIME_OFFSET)?.let { mOffset = it }
         val now = System.currentTimeMillis()
         mTime1 = now
         val utcOffset = Const.MILLISECONDS_TO_UTC
@@ -182,7 +186,7 @@ class DebugToolsFragment(a : WrappedFragment.Args, private val mWear : Wear) : W
         tick()
       }
       DEBUG_FENCES_PATH -> withoutListeners {
-          val fences = data.get<Long>(Const.DATA_KEY_DEBUG_FENCES).toInt()
+          val fences = data.get<Long>(Const.DATA_KEY_DEBUG_FENCES)?.toInt() ?: 0
           for (i in mFenceUIs.indices) mFenceUIs[i].isChecked = 0 != (fences and (1 shl i))
       }
     }

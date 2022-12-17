@@ -29,7 +29,7 @@ private const val DELETE_CHECKPOINTS_ACTION = "delete checkpoints"
 
 class DataChangeListenerService : WearableListenerService()
 {
-  override fun onDataChanged(eb : DataEventBuffer?)
+  override fun onDataChanged(eb : DataEventBuffer)
   {
     if (null == eb)
     {

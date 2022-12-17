@@ -1,6 +1,7 @@
 package com.j.jface.feed
 
 import android.content.Context
+import android.util.Log
 import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Entity
@@ -44,5 +45,6 @@ object LocalLog {
 
   fun log(context : Context, msg : String) {
     GlobalScope.launch(Dispatchers.IO) { getDb(context).insert(msg) }
+    Log.e("jface", msg)
   }
 }

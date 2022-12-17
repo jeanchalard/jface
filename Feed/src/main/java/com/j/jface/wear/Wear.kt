@@ -73,7 +73,7 @@ class Wear(val context : Context)
   // Puts
   private inline fun put(path : String, locally : Boolean = true, toCloud : Boolean = true, f : (DataMap) -> Unit)
   {
-    val data = PutDataMapRequest.create(path).apply { f(dataMap) }
+    val data = PutDataMapRequest.create(path).apply { f(dataMap); setUrgent() }
     if (locally) dataClient.putDataItem(data.asPutDataRequest())
     if (!toCloud or !Firebase.isLoggedIn) return
     // If this device is the master node, there is no point in sending an FCM message anyway.

@@ -18,9 +18,6 @@ public class DrawTools
   private static final int WEIGHT_SEMI_BOLD = 600;
   private static final Typeface BOLD_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, WEIGHT_SEMI_BOLD, false /* italic */);
   private static final Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, WEIGHT_NORMAL, false /* italic */);
-  // When API < 28, use the following instead
-//  private static final Typeface BOLD_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
-//  private static final Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
 
   public final float timePosY;
   public final float departurePosY;

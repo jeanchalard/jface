@@ -68,6 +68,7 @@ public final class WearData
   {
     final PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(Const.CONFIG_PATH);
     final DataMap configToPut = putDataMapRequest.getDataMap();
+    putDataMapRequest.setUrgent();
     configToPut.putAll(newConfig);
     client.putDataItem(putDataMapRequest.asPutDataRequest());
   }
@@ -80,6 +81,7 @@ public final class WearData
   {
     final PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(Const.DATA_PATH + "/" + key);
     final DataMap dm = putDataMapRequest.getDataMap();
+    putDataMapRequest.setUrgent();
     dm.putString(key, value);
     client.putDataItem(putDataMapRequest.asPutDataRequest());
   }

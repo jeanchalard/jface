@@ -10,8 +10,8 @@ class BootCompletedReceiver : BroadcastReceiver()
   {
     if (intent.action != Intent.ACTION_BOOT_COMPLETED) return // Security suggestion from linter : spoofing countermeasure
 
-    val i = Intent(context, GeofenceTransitionReceiverService::class.java)
+    val i = Intent(context, GeofenceTransitionReceiver::class.java)
     i.action = Intent.ACTION_BOOT_COMPLETED
-    context.startService(i)
+    GeofenceTransitionReceiver().onReceive(context, i)
   }
 }

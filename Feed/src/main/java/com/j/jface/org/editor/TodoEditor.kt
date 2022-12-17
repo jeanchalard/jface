@@ -65,8 +65,8 @@ class TodoEditor(a : WrappedActivity.Args) : WrappedActivity(a)
       val openView = mA.findViewById<View>(openField)
       openView?.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener
       {
-        override fun onViewAttachedToWindow(v : View?) { v?.performClick() }
-        override fun onViewDetachedFromWindow(v : View?) = Unit
+        override fun onViewAttachedToWindow(v : View) { v.performClick() }
+        override fun onViewDetachedFromWindow(v : View) = Unit
       })
     }
   }

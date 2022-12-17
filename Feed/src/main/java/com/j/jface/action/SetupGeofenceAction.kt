@@ -37,7 +37,8 @@ fun setupGeofence(context : Context, intent : PendingIntent)
   }
   val request = builder.build()
 
-  val hasPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+  val hasPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) and
+   ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
   if (PackageManager.PERMISSION_GRANTED == hasPermission)
     client.addGeofences(request, intent).addOnCompleteListener {
       if (it.isSuccessful) InformUserAction(context, "Geofences added.").invoke()

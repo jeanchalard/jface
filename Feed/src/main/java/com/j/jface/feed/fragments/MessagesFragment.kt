@@ -115,8 +115,8 @@ class MessagesFragment(a : WrappedFragment.Args, private val mWear : Wear) : Wra
 
   private fun onMessageUpdated(dataMap : DataMap)
   {
-    mF.activity!!.runOnUiThread {
-      val userMessage = dataMap.getString(DATA_KEY_USER_MESSAGE)
+    mF.requireActivity().runOnUiThread {
+      val userMessage = dataMap.getString(DATA_KEY_USER_MESSAGE) ?: ""
       val starts = getLineStartOffsets(userMessage)
       val text = SpannableString(userMessage)
       val colors = dataMap.getIntegerArrayList(Const.DATA_KEY_USER_MESSAGE_COLORS)
@@ -134,7 +134,7 @@ class MessagesFragment(a : WrappedFragment.Args, private val mWear : Wear) : Wra
   private fun onCheckpointsUpdated(checkpoints : String)
   {
     if (expectedCheckpointsUpdatesFromUI.tryAcquire()) return // Was updated from the UI of this very fragment
-    mF.activity!!.runOnUiThread {
+    mF.requireActivity().runOnUiThread {
       expectedCheckpointsUpdatesFromWear.release()
       mCheckpointsDataEdit.setTextKeepState(checkpoints)
     }
@@ -224,8 +224,9 @@ class MessagesFragment(a : WrappedFragment.Args, private val mWear : Wear) : Wra
       when (it.dataItem.uri.path)
       {
         "${DATA_PATH}/${DATA_KEY_CHECKPOINTS}" -> {
-          if (DataEvent.TYPE_DELETED == it.type) onCheckpointsUpdated("")
-          else onCheckpointsUpdated(DataMapItem.fromDataItem(it.dataItem).dataMap[DATA_KEY_CHECKPOINTS])
+          val checkpoints = DataMapItem.fromDataItem(it.dataItem).dataMap.get<String>(DATA_KEY_CHECKPOINTS)
+          if (DataEvent.TYPE_DELETED == it.type || null == checkpoints) onCheckpointsUpdated("")
+          else onCheckpointsUpdated(checkpoints)
         }
       }
     }

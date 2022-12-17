@@ -1,15 +1,18 @@
 package com.j.jface.feed
 
 import android.app.PendingIntent
-import android.app.Service
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.util.Log
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingEvent
 import com.j.jface.Const
 import com.j.jface.action.setupGeofence
+import com.j.jface.feed.LocalLog.log
 import com.j.jface.wear.Wear
 
-class GeofenceTransitionReceiver(private val service : Service)
+class GeofenceTransitionReceiver() : BroadcastReceiver()
 {
   companion object
   {
@@ -17,27 +20,35 @@ class GeofenceTransitionReceiver(private val service : Service)
     const val ACTION_GEOFENCE = "com.j.jface.feed.action.GEOFENCE"
     private var serial = 0
   }
-  private val wear : Wear by lazy { Wear(service) }
-
-  private val notificationIntent : PendingIntent
-    get()
-    {
-      val i = Intent(service, GeofenceTransitionReceiverService::class.java)
-      i.action = ACTION_GEOFENCE
-      return PendingIntent.getService(service, 0, i, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+  private var wear : Wear? = null
+  private fun wear(context : Context) : Wear {
+    synchronized(this) {
+      val w = wear ?: Wear(context)
+      wear = w
+      return w
     }
+  }
 
-  fun onHandleIntent(intent : Intent)
+  private fun getNotificationIntent(context : Context) : PendingIntent
   {
+    val i = Intent(context, this::class.java)
+    i.action = ACTION_GEOFENCE
+    return PendingIntent.getBroadcast(context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
+  }
+
+  override fun onReceive(context : Context?, intent : Intent)
+  {
+    if (null == context) { Log.e("jface", "onReceive without context, srsly you guys"); return }
+    Log.e("jface", "GeofenceTransitionReceiver : ${intent}")
     serial += 1
     val action = intent.action
     if (Intent.ACTION_BOOT_COMPLETED == action || ACTION_MANUAL_START == action)
-      setupGeofence(service, notificationIntent) // This is running in a background thread already. Don't bother running this on an executor.
-    if (ACTION_GEOFENCE == action) handleGeofenceTransitions(intent)
-    FeedLoader.startAllLoads(wear, "Intent ${action}")
+      setupGeofence(context, getNotificationIntent(context)) // This is running in a background thread already. Don't bother running this on an executor.
+    if (ACTION_GEOFENCE == action) handleGeofenceTransitions(context, intent)
+    FeedLoader.startAllLoads(wear(context), "Intent ${action}")
   }
 
-  private fun handleGeofenceTransitions(intent : Intent)
+  private fun handleGeofenceTransitions(context : Context, intent : Intent)
   {
     val event = GeofencingEvent.fromIntent(intent)
     if (null == event || event.hasError()) return
@@ -46,7 +57,7 @@ class GeofenceTransitionReceiver(private val service : Service)
     val transitionType = event.geofenceTransition
     if (null == fences) return
     for (fence in fences)
-      handleGeofenceTransition(fence, transitionType)
+      handleGeofenceTransition(context, fence, transitionType)
   }
 
   private fun stypeFromType(i : Int) : String
@@ -60,12 +71,13 @@ class GeofenceTransitionReceiver(private val service : Service)
     }
   }
 
-  private fun handleGeofenceTransition(fence : Geofence, transitionType : Int)
+  private fun handleGeofenceTransition(context : Context, fence : Geofence, transitionType : Int)
   {
     val params = Fences.paramsFromName(fence.requestId) ?: return // null means the fence is unknown, that's supposedly impossible
+    log(context, "Geofence transition : ${stypeFromType(transitionType)}/${params.name}")
     if (Geofence.GEOFENCE_TRANSITION_ENTER == transitionType)
-      wear.putDataLocally(Const.LOCATION_PATH + "/" + params.name, Const.DATA_KEY_INSIDE, true)
+      wear(context).putDataLocally(Const.LOCATION_PATH + "/" + params.name, Const.DATA_KEY_INSIDE, true)
     else if (Geofence.GEOFENCE_TRANSITION_EXIT == transitionType)
-      wear.putDataLocally(Const.LOCATION_PATH + "/" + params.name, Const.DATA_KEY_INSIDE, false)
+      wear(context).putDataLocally(Const.LOCATION_PATH + "/" + params.name, Const.DATA_KEY_INSIDE, false)
   }
 }

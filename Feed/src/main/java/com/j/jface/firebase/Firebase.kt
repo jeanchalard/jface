@@ -34,7 +34,7 @@ import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executors
 
 fun <T> Task<T>.await() : T = Tasks.await(this) // Guaranteed to return non-null
-private fun firestoreStoreableObject(it : Any) : Any = when (it)
+private fun firestoreStoreableObject(it : Any?) = when (it)
 {
   is Asset -> "image" // TODO : send the image data, like base64 encoded or something
   else -> it
@@ -42,7 +42,10 @@ private fun firestoreStoreableObject(it : Any) : Any = when (it)
 private fun DataMap.toMap() : Map<String, Any>
 {
   val m = HashMap<String, Any>()
-  this.keySet().forEach { m[it] = firestoreStoreableObject(this[it]) }
+  this.keySet().forEach {
+    val storeableObject = firestoreStoreableObject(this[it])
+    if (null != storeableObject) m[it] = storeableObject
+  }
   return m
 }
 

@@ -47,7 +47,7 @@ private operator fun DataMap.set(key : String, value : Any?)
 fun DataMap.toPersistableBundle() : PersistableBundle
 {
   val target = PersistableBundle()
-  for (key in this.keySet()) target[key] = this[key]
+  for (key in this.keySet()) this.get<Any?>(key)?.let { target[key] = it }
   return target
 }
 fun PersistableBundle.toDataMap() : DataMap

@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
@@ -27,7 +26,6 @@ import com.j.jface.lifecycle.ActivityWrapper
 import com.j.jface.lifecycle.AuthTrampoline
 import com.j.jface.lifecycle.FragmentWrapper
 import com.j.jface.lifecycle.WrappedActivity
-import com.j.jface.org.editor.AuthTrampolineTodoEditorBoot
 import com.j.jface.wear.Wear
 
 @Suppress("UNUSED_ANONYMOUS_PARAMETER")
@@ -87,7 +85,7 @@ class JFaceDataFeed(args : WrappedActivity.Args) : WrappedActivity(args)
 
   override fun onRequestPermissionsResult(requestCode : Int, permissions : Array<String>, results : IntArray)
   {
-    if (permissions.isNotEmpty()) startGeofenceService(mA)
+    if (permissions.isNotEmpty()) startGeofences(mA)
   }
 
   // Handling the drawer.
@@ -105,7 +103,7 @@ class JFaceDataFeed(args : WrappedActivity.Args) : WrappedActivity(args)
   {
     mDrawerToggle.syncState()
     if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(mA, Manifest.permission.ACCESS_FINE_LOCATION))
-      startGeofenceService(mA)
+      startGeofences(mA)
     else
       ActivityCompat.requestPermissions(mA, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
   }
@@ -122,10 +120,10 @@ class JFaceDataFeed(args : WrappedActivity.Args) : WrappedActivity(args)
     return null
   }
 
-  private fun startGeofenceService(activity : Activity)
+  private fun startGeofences(activity : Activity)
   {
-    val i = Intent(activity, GeofenceTransitionReceiverService::class.java)
+    val i = Intent(activity, GeofenceTransitionReceiver::class.java)
     i.action = GeofenceTransitionReceiver.ACTION_MANUAL_START
-    activity.startService(i)
+    GeofenceTransitionReceiver().onReceive(activity, i)
   }
 }

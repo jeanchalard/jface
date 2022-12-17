@@ -18,6 +18,6 @@ compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 
 dependencies {
-    implementation "androidx.annotation:annotation:1.4.0"
+    implementation "androidx.annotation:annotation:1.5.0"
     api fileTree(include: ["*.jar"], dir: "libs")
 }
