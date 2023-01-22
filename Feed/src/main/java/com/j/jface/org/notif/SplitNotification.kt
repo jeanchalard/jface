@@ -44,7 +44,8 @@ class SplitNotification(val context : Context) : NotificationBuilder
   private fun buildSplitNotificationAction(existingIntent : Intent) : Notification.Action
   {
     val intent = Intent(existingIntent).setClass(context, AutomaticEditorProcessor.Receiver::class.java)
-    val pendingIntent = PendingIntent.getBroadcast(context, Const.NOTIFICATION_RESULT_CODE, intent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_UPDATE_CURRENT)
+    val pendingIntent = PendingIntent.getBroadcast(context, Const.NOTIFICATION_RESULT_CODE, intent,
+     PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     return Notification.Action.Builder(null, "Subitems", pendingIntent)
      .addRemoteInput(RemoteInput.Builder(Const.EXTRA_TODO_SUBITEMS)
       .setAllowFreeFormInput(true)
@@ -64,7 +65,8 @@ class SplitNotification(val context : Context) : NotificationBuilder
      .putExtra(Const.EXTRA_TODO_ID, todo.id)
      .putExtra(Const.EXTRA_NOTIF_ID, id)
      .putExtra(Const.EXTRA_NOTIF_TYPE, Const.NOTIFICATION_TYPE_SPLIT)
-    val pendingIntent = PendingIntent.getActivity(context, Const.NOTIFICATION_RESULT_CODE, intent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_UPDATE_CURRENT)
+    val pendingIntent = PendingIntent.getActivity(context, Const.NOTIFICATION_RESULT_CODE, intent,
+     PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     val title = "Split todo : " + todo.text
     val description = "This todo has last been updated " + todo.timeAgo() + " ; do something and split it up"
     return Notification.Builder(context, NotifEngine.getChannel(context).id).apply {

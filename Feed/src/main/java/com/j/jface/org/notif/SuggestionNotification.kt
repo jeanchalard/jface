@@ -19,7 +19,8 @@ class SuggestionNotification(val context : Context) : NotificationBuilder
   private fun buildSuggestionNotificationActions(existingIntent : Intent) : Notification.Action
   {
     val intent = Intent(existingIntent).setClass(context, AutomaticEditorProcessor.Receiver::class.java)
-    val pendingIntent = PendingIntent.getBroadcast(context, Const.NOTIFICATION_RESULT_CODE, intent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_UPDATE_CURRENT)
+    val pendingIntent = PendingIntent.getBroadcast(context, Const.NOTIFICATION_RESULT_CODE, intent,
+     PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     return Notification.Action.Builder(null, "Done", pendingIntent).build()
   }
 
@@ -31,7 +32,8 @@ class SuggestionNotification(val context : Context) : NotificationBuilder
      .putExtra(Const.EXTRA_TODO_ID, todo.id)
      .putExtra(Const.EXTRA_NOTIF_ID, id)
      .putExtra(Const.EXTRA_NOTIF_TYPE, Const.NOTIFICATION_TYPE_CANCEL_DONE)
-    val pendingIntent = PendingIntent.getActivity(context, Const.NOTIFICATION_RESULT_CODE, intent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_UPDATE_CURRENT)
+    val pendingIntent = PendingIntent.getActivity(context, Const.NOTIFICATION_RESULT_CODE, intent,
+     PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     return Notification.Builder(context, NotifEngine.getChannel(context).id).apply {
       setSmallIcon(R.drawable.jormungand)
       setColor(context.getColor(R.color.jormungand_color))
@@ -54,7 +56,8 @@ class SuggestionNotification(val context : Context) : NotificationBuilder
      .putExtra(Const.EXTRA_TODO_ID, todo.id)
      .putExtra(Const.EXTRA_NOTIF_ID, id)
      .putExtra(Const.EXTRA_NOTIF_TYPE, Const.NOTIFICATION_TYPE_SUGGESTION)
-    val pendingIntent = PendingIntent.getActivity(context, Const.NOTIFICATION_RESULT_CODE, intent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_UPDATE_CURRENT)
+    val pendingIntent = PendingIntent.getActivity(context, Const.NOTIFICATION_RESULT_CODE, intent,
+     PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     return Notification.Builder(context, NotifEngine.getChannel(context).id).apply {
       setShowWhen(true)
       setWhen(System.currentTimeMillis())

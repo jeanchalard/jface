@@ -49,7 +49,8 @@ class FillinNotification(val context : Context) : NotificationBuilder
   {
     return attr.replies.mapIndexed { i, reply ->
       val intent = Intent(existingIntent).setClass(context, AutomaticEditorProcessor.Receiver::class.java).putExtra(Const.EXTRA_FILLIN_REPLY_INDEX, i)
-      val pendingIntent = PendingIntent.getBroadcast(context, Const.NOTIFICATION_RESULT_CODE, intent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_UPDATE_CURRENT)
+      val pendingIntent = PendingIntent.getBroadcast(context, Const.NOTIFICATION_RESULT_CODE, intent,
+       PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
       Notification.Action.Builder(null, reply.label, pendingIntent).build()
     }
   }
@@ -79,7 +80,8 @@ class FillinNotification(val context : Context) : NotificationBuilder
      .putExtra(Const.EXTRA_FILLIN_FIELD, attr.ordinal)
      .putExtra(Const.EXTRA_FILLIN_REPLY_INDEX, -1)
      .putExtra(Const.EXTRA_NOTIF_TYPE, Const.NOTIFICATION_TYPE_FILLIN)
-    val pendingIntent = PendingIntent.getActivity(context, Const.NOTIFICATION_RESULT_CODE, intent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_UPDATE_CURRENT)
+    val pendingIntent = PendingIntent.getActivity(context, Const.NOTIFICATION_RESULT_CODE, intent,
+     PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     return Notification.Builder(context, NotifEngine.getChannel(context).id).apply {
       setShowWhen(true)
       setWhen(System.currentTimeMillis())

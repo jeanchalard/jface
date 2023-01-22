@@ -91,7 +91,8 @@ class DataChangeListenerService : WearableListenerService()
     val intent = Intent().setClass(this, DataChangeListenerService::class.java).apply {
       action = DELETE_CHECKPOINTS_ACTION
     }
-    val pendingIntent = PendingIntent.getService(this, Const.CHECKPOINTS_CLEAR, intent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_UPDATE_CURRENT)
+    val pendingIntent = PendingIntent.getService(this, Const.CHECKPOINTS_CLEAR, intent,
+     PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     return Notification.Action.Builder(null, "Delete", pendingIntent).build()
   }
 
@@ -105,7 +106,8 @@ class DataChangeListenerService : WearableListenerService()
     val title = "JFace"
     val intent = Intent(this, JFaceDataFeed.activityClass())
     intent.putExtra(OPEN_FRAGMENT_EXTRA, "Messages")
-    val pendingIntent = PendingIntent.getActivity(this, Const.NOTIFICATION_RESULT_CODE, intent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_UPDATE_CURRENT)
+    val pendingIntent = PendingIntent.getActivity(this, Const.NOTIFICATION_RESULT_CODE, intent,
+     PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     val notification = Notification.Builder(this, getChannel().id).apply {
       setShowWhen(true)
       setWhen(System.currentTimeMillis())

@@ -36,7 +36,8 @@ class AutomaticEditorProcessor : JobService()
         setClass(context, AutomaticEditorProcessor.Receiver::class.java)
         putExtra(Const.EXTRA_WAS_DISMISSED, true)
       }
-      return PendingIntent.getBroadcast(context, Const.NOTIFICATION_RESULT_CODE, deleteIntent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_UPDATE_CURRENT)
+      return PendingIntent.getBroadcast(context, Const.NOTIFICATION_RESULT_CODE, deleteIntent,
+       PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
   }
 
