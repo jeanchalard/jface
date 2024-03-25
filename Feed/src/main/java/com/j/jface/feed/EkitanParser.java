@@ -26,13 +26,15 @@ public class EkitanParser extends FeedParser
     final DataMap result = new DataMap();
     final BufferedReader src = new BufferedReader(new InputStreamReader(srcStream));
 
-    if (skipFirstTab) find(src, "search-result-body");
-    final String contents = find(src, "search-result-body");
+    if (skipFirstTab) find(src, "class=\"search-result-body\"");
+    final String contents = find(src, "class=\"search-result-body\"");
     if (null == contents) throw new ParseException("EkitanParser : can't parse page " + dataName, 0);
 
     final ArrayList<DataMap> buildData = new ArrayList<>();
     while (true) {
-      if (null == find(src, "data-tr-type=\"")) break;
+      final String next = find(src, "data-tr-type=\"");
+      if (null == next) break; // End of page
+      if (next.contains("search-result-footer")) break; // End of this tab
       final String type = find(src, "\"");
       find(src, "&departure=");
       final String time = find(src, "&"); // Format is HHMM
@@ -42,7 +44,7 @@ public class EkitanParser extends FeedParser
 
       final String mark = type.startsWith("各") || type.startsWith("普") ? "" : type;
       final DataMap departure = new DataMap();
-      departure.putInt(Const.DATA_KEY_DEPTIME, hour * 3600 + minute * 60);
+      departure.putInt(Const.DATA_KEY_DEPTIME, (hour < 3 ? 24 + hour : hour) * 3600 + minute * 60);
       departure.putString(Const.DATA_KEY_EXTRA, mark);
       buildData.add(departure);
     }

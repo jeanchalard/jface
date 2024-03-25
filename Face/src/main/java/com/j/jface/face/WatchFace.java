@@ -218,7 +218,8 @@ public class WatchFace implements DataClient.OnDataChangedListener {
         departure1 = mDataStore.findClosestDeparture(Const.京成線_千住大橋_上野方面_平日, departureTime);
         departure2 = mDataStore.findClosestDeparture(Const.京成線_千住大橋_成田方面_平日, departureTime);
         break;
-      case HOME_休日_J :
+      case HOME_土曜_J :
+      case HOME_日曜_J :
         departure1 = mDataStore.findClosestDeparture(Const.京成線_千住大橋_上野方面_休日, departureTime);
         departure2 = mDataStore.findClosestDeparture(Const.京成線_千住大橋_成田方面_休日, departureTime);
         break;
@@ -230,8 +231,12 @@ public class WatchFace implements DataClient.OnDataChangedListener {
         departure1 = mDataStore.findClosestDeparture(Const.京成線_日暮里_千住大橋方面_休日, departureTime);
         departure2 = mDataStore.findClosestDeparture(Const.山手線_日暮里_渋谷方面_休日, departureTime);
         break;
-      case ROPPONGI_休日_J :
-        departure1 = mDataStore.findClosestDeparture(Const.日比谷線_六本木_平日, departureTime);
+      case ROPPONGI_土曜_J :
+        departure1 = mDataStore.findClosestDeparture(Const.日比谷線_六本木_土曜, departureTime);
+        departure2 = null;
+        break;
+      case ROPPONGI_日曜_J :
+        departure1 = mDataStore.findClosestDeparture(Const.日比谷線_六本木_日曜, departureTime);
         departure2 = null;
         break;
       case HOME_平日_RIO :

@@ -31,7 +31,7 @@ class FaceView @JvmOverloads constructor(context : Context, attrs : AttributeSet
   }
 
   private val bounds = Rect(0, 0, Const.SCREEN_SIZE, Const.SCREEN_SIZE)
-  override fun onDraw(canvas : Canvas?)
+  override fun onDraw(canvas : Canvas)
   {
     super.onDraw(canvas)
     if (null == canvas) return

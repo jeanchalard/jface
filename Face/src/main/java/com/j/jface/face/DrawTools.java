@@ -105,9 +105,11 @@ public class DrawTools
       case Const.山手線_渋谷_日暮里方面_休日:
         return jrIcon;
       case Const.日比谷線_北千住_平日:
-      case Const.日比谷線_北千住_休日:
+      case Const.日比谷線_北千住_土曜:
+      case Const.日比谷線_北千住_日曜:
       case Const.日比谷線_六本木_平日:
-      case Const.日比谷線_六本木_休日:
+      case Const.日比谷線_六本木_土曜:
+      case Const.日比谷線_六本木_日曜:
         return hibiyaIcon;
       case Const.京成線_千住大橋_上野方面_平日:
       case Const.京成線_千住大橋_上野方面_休日:

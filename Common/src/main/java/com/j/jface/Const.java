@@ -82,9 +82,11 @@ public class Const
   @NonNull public static final String EXTRA_TODO_SUBITEMS = "todoSubitems";
 
   @NonNull public static final String 日比谷線_北千住_平日 = "日比谷線・北千住・平日";
-  @NonNull public static final String 日比谷線_北千住_休日 = "日比谷線・北千住・休日";
+  @NonNull public static final String 日比谷線_北千住_土曜 = "日比谷線・北千住・土曜日";
+  @NonNull public static final String 日比谷線_北千住_日曜 = "日比谷線・北千住・日曜日";
   @NonNull public static final String 日比谷線_六本木_平日 = "日比谷線・六本木・平日";
-  @NonNull public static final String 日比谷線_六本木_休日 = "日比谷線・六本木・休日";
+  @NonNull public static final String 日比谷線_六本木_土曜 = "日比谷線・六本木・土曜日";
+  @NonNull public static final String 日比谷線_六本木_日曜 = "日比谷線・六本木・日曜日";
   @NonNull public static final String 山手線_日暮里_渋谷方面_平日 = "山手線・日暮里・平日";
   @NonNull public static final String 山手線_日暮里_渋谷方面_休日 = "山手線・日暮里・休日";
   @NonNull public static final String 山手線_渋谷_日暮里方面_平日 = "山手線・渋谷・平日";
@@ -106,9 +108,11 @@ public class Const
 
   static {
     HEADSIGNS.put(日比谷線_北千住_平日, "北千住 ► 六本木");
-    HEADSIGNS.put(日比谷線_北千住_休日, "北千住 ► 六本木");
+    HEADSIGNS.put(日比谷線_北千住_土曜, "北千住 ► 六本木");
+    HEADSIGNS.put(日比谷線_北千住_日曜, "北千住 ► 六本木");
     HEADSIGNS.put(日比谷線_六本木_平日, "六本木 ► 北千住");
-    HEADSIGNS.put(日比谷線_六本木_休日, "六本木 ► 北千住");
+    HEADSIGNS.put(日比谷線_六本木_土曜, "六本木 ► 北千住");
+    HEADSIGNS.put(日比谷線_六本木_日曜, "六本木 ► 北千住");
     HEADSIGNS.put(山手線_日暮里_渋谷方面_平日, "日暮里 ► 渋谷");
     HEADSIGNS.put(山手線_日暮里_渋谷方面_休日, "日暮里 ► 渋谷");
     HEADSIGNS.put(山手線_渋谷_日暮里方面_平日, "渋谷 ► 日暮里");
@@ -129,8 +133,8 @@ public class Const
 
   @NonNull private static final String[] J_DEPLIST_DATA_PATHS =
    {
-//    日比谷線_北千住_平日, 日比谷線_北千住_休日,
-//    日比谷線_六本木_平日, 日比谷線_六本木_休日,
+//    日比谷線_北千住_平日, 日比谷線_北千住_土曜, 日比谷線_北千住_日曜,
+//    日比谷線_六本木_平日, 日比谷線_六本木_土曜, 日比谷線_六本木_日曜,
     山手線_日暮里_渋谷方面_平日, 山手線_日暮里_渋谷方面_休日,
     山手線_渋谷_日暮里方面_平日, 山手線_渋谷_日暮里方面_休日,
     京成線_千住大橋_上野方面_平日, 京成線_千住大橋_上野方面_休日,

@@ -11,11 +11,13 @@ public enum Status
   COMMUTE_MORNING_平日_J("J : Commute (morning)"),
   COMMUTE_EVENING_平日_J("J : Commute (evening)"),
   HOME_平日_J("J : At home (workday)"),
-  HOME_休日_J("J : At home (holiday)"),
+  HOME_土曜_J("J : At home (saturday)"),
+  HOME_日曜_J("J : At home (sunday)"),
   日暮里_平日_J("J : Nippori (workday)"),
   日暮里_休日_J("J : Nippori (holiday)"),
   SHIBUYA_休日_J("J : Shibuya (holiday)"),
-  ROPPONGI_休日_J("J : Roppongi (holiday)"),
+  ROPPONGI_土曜_J("J : Roppongi (saturday)"),
+  ROPPONGI_日曜_J("J : Roppongi (sunday)"),
   HOME_平日_RIO("Rio : At home (workday)"),
   HOME_休日_RIO("Rio : At home (holiday)"),
   WORK_平日_RIO("Rio : At work (workday)"),
@@ -50,10 +52,12 @@ public enum Status
       case HOME_平日_J : return 日暮里_平日_J;
       case 日暮里_平日_J : return OTHER;
 
-      case HOME_休日_J : return 日暮里_休日_J;
+      case HOME_土曜_J : return HOME_日曜_J;
+      case HOME_日曜_J : return 日暮里_休日_J;
       case 日暮里_休日_J : return SHIBUYA_休日_J;
-      case SHIBUYA_休日_J : return ROPPONGI_休日_J;
-      case ROPPONGI_休日_J : return OTHER;
+      case SHIBUYA_休日_J : return ROPPONGI_土曜_J;
+      case ROPPONGI_土曜_J : return ROPPONGI_日曜_J;
+      case ROPPONGI_日曜_J : return OTHER;
 
       case HOME_平日_RIO : return WORK_平日_RIO;
       case WORK_平日_RIO : return JUGGLING_木曜_RIO;
@@ -67,7 +71,7 @@ public enum Status
       case OTHER :
         final boolean workDay = (time.weekDay >= Time.MONDAY && time.weekDay <= Time.FRIDAY);
         if (Const.RIO_MODE) return workDay ? HOME_平日_RIO : HOME_休日_RIO;
-        else return workDay ? COMMUTE_MORNING_平日_J : HOME_休日_J;
+        else return workDay ? COMMUTE_MORNING_平日_J : HOME_土曜_J;
     }
   }
 
@@ -133,7 +137,8 @@ public enum Status
     {
       case COMMUTE_MORNING_平日_J :
       case HOME_平日_J :
-      case HOME_休日_J :
+      case HOME_土曜_J :
+      case HOME_日曜_J :
       case HOME_平日_RIO :
       case HOME_休日_RIO :
         return "家";
@@ -146,7 +151,8 @@ public enum Status
       case JUGGLING_木曜_RIO:
         return "渋谷";
 
-      case ROPPONGI_休日_J:
+      case ROPPONGI_土曜_J:
+      case ROPPONGI_日曜_J:
       case ROPPONGI_休日_RIO:
         return "六本木";
 
@@ -179,11 +185,16 @@ public enum Status
 
     if (!workDay && 渋谷 == symbolicLocation) return SHIBUYA_休日_J;
 
-    if (!workDay && 六本木 == symbolicLocation) return ROPPONGI_休日_J;
+    if (time.weekDay == Time.SATURDAY && 六本木 == symbolicLocation) return ROPPONGI_土曜_J;
+    if (time.weekDay == Time.SUNDAY && 六本木 == symbolicLocation) return ROPPONGI_日曜_J;
 
     if (DUNNO == symbolicLocation || 千住大橋 == symbolicLocation)
-      return workDay ? HOME_平日_J : HOME_休日_J;
-
+      switch (time.weekDay)
+      {
+        case Time.SATURDAY : return HOME_土曜_J;
+        case Time.SUNDAY : return HOME_日曜_J;
+        default : return HOME_平日_J;
+      }
     return OTHER;
   }
 
