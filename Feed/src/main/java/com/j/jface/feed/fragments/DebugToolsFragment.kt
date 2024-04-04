@@ -27,7 +27,6 @@ import java.time.OffsetDateTime
 import java.time.ZoneId
 
 const val MSG_UPDATE_TIME = 1
-const val GRACE_FOR_UPDATE = 200L
 const val DEBUG_FENCES_PATH = "${Const.DATA_PATH}/${Const.DATA_KEY_DEBUG_FENCES}"
 const val DEBUG_TIME_OFFSET_PATH = "${Const.DATA_PATH}/${Const.DATA_KEY_DEBUG_TIME_OFFSET}"
 
@@ -36,8 +35,6 @@ class DebugToolsFragment(a : WrappedFragment.Args, private val mWear : Wear) : W
   private val mFragment = a.fragment
   private var mOffset = 0L
   private var mTicking = false
-  private var mTime1 = System.currentTimeMillis()
-  private var mTime2 = System.currentTimeMillis()
   private val mDaysOffsetUI : NumberPicker = mView.findViewById(R.id.daysOffsetUI)
   private val mHoursUI : NumberPicker = mView.findViewById(R.id.hoursUI)
   private val mMinutesUI : NumberPicker = mView.findViewById(R.id.minutesUI)
@@ -157,9 +154,8 @@ class DebugToolsFragment(a : WrappedFragment.Args, private val mWear : Wear) : W
   private fun tick()
   {
     mTicking = true
-    mTime1 = System.currentTimeMillis() + mOffset
-    val zdt = OffsetDateTime.ofInstant(Instant.ofEpochMilli(mTime1), ZoneId.systemDefault())
-    mTime2 = System.currentTimeMillis()
+    val now = System.currentTimeMillis() + mOffset
+    val zdt = OffsetDateTime.ofInstant(Instant.ofEpochMilli(now), ZoneId.systemDefault())
     val offset = mOffset
     mTicking = false
 
@@ -180,7 +176,6 @@ class DebugToolsFragment(a : WrappedFragment.Args, private val mWear : Wear) : W
       DEBUG_TIME_OFFSET_PATH -> withoutListeners {
         data.get<Long>(Const.DATA_KEY_DEBUG_TIME_OFFSET)?.let { mOffset = it }
         val now = System.currentTimeMillis()
-        mTime1 = now
         val utcOffset = Const.MILLISECONDS_TO_UTC
         mDaysOffsetUI.value = (baseDay(now + mOffset, utcOffset) - baseDay(now, utcOffset)).toInt()
         tick()
@@ -193,16 +188,16 @@ class DebugToolsFragment(a : WrappedFragment.Args, private val mWear : Wear) : W
     mFace.invalidate();
   }
 
-  private fun updateOffset(grace : Long)
+  private fun updateOffset()
   {
     if (mTicking) return
     mHandler.removeMessages(MSG_UPDATE_TIME)
-    mTime2 = System.currentTimeMillis()
-    mTime1 = OffsetDateTime.now().with(LocalTime.of(mHoursUI.value, mMinutesUI.value, mSecondsUI.value)).toEpochSecond() * 1000
+    val now = System.currentTimeMillis()
+    val offsetTime = OffsetDateTime.ofInstant(Instant.ofEpochMilli(now), ZoneId.systemDefault()).with(LocalTime.of(mHoursUI.value, mMinutesUI.value, mSecondsUI.value)).toEpochSecond() * 1000 + now % 1000
     val dayOffset = mDaysOffsetUI.value
-    mTime1 += dayOffset * 86400000 - grace
-    mOffset = mTime1 - mTime2
-    mHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, grace)
+    val offsetDateTime = offsetTime + dayOffset * 86400000
+    mOffset = offsetDateTime - now
+    mHandler.sendEmptyMessage(MSG_UPDATE_TIME)
     mWear.putDataToCloud(DEBUG_TIME_OFFSET_PATH, Const.DATA_KEY_DEBUG_TIME_OFFSET, mOffset)
   }
 
@@ -223,7 +218,7 @@ class DebugToolsFragment(a : WrappedFragment.Args, private val mWear : Wear) : W
       {
         mOffset = 0
         tick()
-        updateOffset(0L)
+        updateOffset()
         mHandler.removeMessages(MSG_UPDATE_TIME)
         mHandler.sendEmptyMessage(MSG_UPDATE_TIME)
         updateFences()
@@ -237,6 +232,6 @@ class DebugToolsFragment(a : WrappedFragment.Args, private val mWear : Wear) : W
     mFace.invalidate();
   }
 
-  override fun onValueChange(picker : NumberPicker, oldVal : Int, newVal : Int) = updateOffset(GRACE_FOR_UPDATE)
-  override fun onTimeChanged(view : TimePicker, hourOfDay : Int, minute : Int) = updateOffset(GRACE_FOR_UPDATE)
+  override fun onValueChange(picker : NumberPicker, oldVal : Int, newVal : Int) = updateOffset()
+  override fun onTimeChanged(view : TimePicker, hourOfDay : Int, minute : Int) = updateOffset()
 }
