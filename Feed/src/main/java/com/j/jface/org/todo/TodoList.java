@@ -361,7 +361,6 @@ class TodoList implements Iterable<Todo>, TodoUpdaterProxy, TodoSource.ListChang
   @NonNull private final ArrayList<ListChangeObserver> mObservers;
   public void addObserver(@NonNull final ListChangeObserver obs)
   {
-    Log.e("OBS", "Added " + obs, new RuntimeException());
     mObservers.add(obs);
   }
   public void removeObserver(@NonNull final ListChangeObserver obs)
