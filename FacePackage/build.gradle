@@ -1,10 +1,12 @@
-apply plugin : "com.android.application"
-apply plugin : "kotlin-android"
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+}
 
 List<String> dirs = [ "main" ]
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion 35
     defaultConfig {
         versionCode 1
         versionName "1.0"
@@ -28,8 +30,8 @@ android {
         androidTest.java.srcDirs = ["tests/src"]
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     lint {
         abortOnError true
@@ -39,8 +41,8 @@ android {
 }
 
 dependencies {
-    implementation "com.google.android.gms:play-services-wearable:18.1.0"
-    implementation "androidx.annotation:annotation:1.7.1"
+    implementation "com.google.android.gms:play-services-wearable:18.2.0"
+    implementation "androidx.annotation:annotation:1.9.1"
     implementation "androidx.legacy:legacy-support-v13:1.0.0"
     implementation project(":Common")
     compileOnly "com.google.android.wearable:wearable:2.9.0"

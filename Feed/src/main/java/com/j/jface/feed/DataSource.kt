@@ -54,5 +54,4 @@ class DataSource private constructor(val name : String, val url : String, val pa
     @JvmField
     val ALL_SOURCES = if (Const.RIO_MODE) RIO_SOURCES else J_SOURCES
   }
-
 }
