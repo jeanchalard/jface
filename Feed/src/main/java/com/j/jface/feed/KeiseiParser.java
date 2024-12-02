@@ -20,7 +20,7 @@ public class KeiseiParser extends FeedParser
   {
     if (null != arg) throw new IllegalArgumentException("KeiseiParser : arg must be null.");
     final DataMap result = new DataMap();
-    final BufferedReader src = new BufferedReader(new InputStreamReader(new BufferedInputStream(srcStream), "Shift_JIS"));
+    final BufferedReader src = new BufferedReader(new InputStreamReader(new BufferedInputStream(srcStream), "UTF-8"));
 
     if (null == find(src, "class=\"name\">") || null == find(src, "</tr>"))
       return result;
