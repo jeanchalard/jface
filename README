@@ -1,0 +1,134 @@
+The jface package contains two projects :
+• The JFace watch app and companion phone app
+• The JOrg todo app
+Both of these are included in this Android package for
+development simplicity, since I want both anyway and
+eventually JFace should ideally show data from JOrg.
+(if these were ever released on the play store, the
+package should be split into two apps sharing the
+same signature)
+
+JFace
+=====
+JFace is a watch face app showing time in a clean and
+compact style, and is aware of the train lines and
+stations the user often takes, and shows the upcoming
+times of the relevant trains according to where the
+phone is and the day of the week.
+- Knows which trains at which stations are relevant.
+  For example, it knows what are stations close to
+  home the user often uses, close to work, as well as
+  frequently used stations.
+- Using geofencing, it knows where the phone is right
+  now. It uses this information, together with the
+  day of the week, to choose what train schedule to
+  show.
+- The watch face then permanently displays the three
+  next trains for the two most relevant lines and
+  directions.
+- The above is hardcoded in code. The phone will
+  check and fetch data regularly, using various
+  signals to check if the data is fresh enough and
+  re-fetch it otherwise. It uses various websites
+  to update its time tables. This means that when
+  train companies update the schedule, there might
+  be a few days when the watch is out of date, but
+  since this doesn't happen often in Tōkyō that's
+  fine and it fixes itself within a few days. In
+  practice I haven't ever noticed this bug, so I
+  don't really have an incentive to improve.
+- The watch face has controls to show next or
+  previous departures easily, in case three in the
+  future aren't enough or you want to check a past
+  departure. It also has a debug tool right from
+  the watch face to change which location the face
+  should show, because geofencing isn't very
+  reliable so this sometimes comes in handy,
+  especially when you just arrived at a changing
+  station and the phone has been sleeping in your
+  pocket for a while. The Android Messages API
+  also AFAICT has issues where it crashes and
+  stops sending messages, and when it has this
+  feature is useful. (of course this can be a bug
+  in my code but I've looked pretty hard ; I'll
+  continue debugging and try to find one, but if
+  I'm right that it's actually a bug in google's
+  code I'll never be able to fix it)
+- The companion app can set a message to show
+  permanently on the watch face below the train
+  times. It can set the color of the text line-by-
+  line. This is useful to remember something
+  important every time you look at your watch, or
+  to just help your brain's memory.
+- The watch face has a feature where double-tap on
+  the lower quadrant (the yellow one) will put up
+  a notification on the phone with the time of the
+  double-tap. This is the easiest way I know to
+  remember some time when you really need to.
+- The watch face has a random feature where it can
+  show a heart with some configurable text in it.
+  I did that to wow my wife and it worked
+- The companion app has a bunch of debug tools. In
+  particular the entire watch face can run inside
+  a view in the app for debug and development
+  ease. The companion app is the one setting up
+  the geofences and receiving data, fetching the
+  updated timetables, and communicating all of
+  that with the watch.
+
+JOrg
+====
+An app to manage your TODOs. It has two main
+features that no other app that I know of has.
+- TODOs are splittable and splicable ad
+  infinitum. You can set subtasks, then subtasks
+  of subtasks, then subtasks of that, and so on
+  and there is no limit. I fully expected most
+  TODO apps to do this, but in actual practice
+  I've never encountered one that allows more
+  than three levels.
+- The app will use reminder notifications for a
+  bunch of ACTUALLY USEFUL things. A large issue
+  with most TODO apps is that friction adding a
+  task will make you stop doing it, making the
+  app eventually completely useless. So either
+  you add details to the task as you register it
+  and friction is too high and you stop using
+  the app, or you don't and the app isn't very
+  helpful because it can't remind you or help
+  you managing TODOs for lack of knowlegde of
+  the deadline, where to do it, the importance
+  or other details.
+  To address this, JOrg encourages you to add no
+  detail at all at first. Then it will put up
+  notifications later, at unpredictable and
+  reasonably spaced out times, that encourages
+  you to add the details. The notifications have
+  the most common options to do it in one tap,
+  and go to a very low friction UI if that's not
+  enough. The idea is that you can keep the
+  notification until such a time that you have
+  downtime to fill it in. JOrg also avoids at
+  all costs being obnoxious about it, if you
+  don't want to add this info you can just
+  dismiss the notification and it won't bother
+  you with that any more.
+  JOrg also tries to be smart with these
+  notifications, and ask for the most relevant
+  and most important data first at any given
+  time. For example if a task hasn't been
+  touched in a long while maybe it will
+  remind you to split it up to make it easier
+  to start. If it knows a task will take less
+  than 5 minutes to complete and you should do
+  it at home, it will sometimes suggest to do
+  it right now when you're home.
+Aside from that, JOrg is a pretty normal TODO
+app. Maybe it's worth mentioning it manages to
+reduce the friction of adding TODOs, even on
+top of the notification system above, more
+than any other app I know of, for example by
+listening to both the keyboard and microphone
+at the same time to let you input in mixed
+style, which can help you write faster.
+
